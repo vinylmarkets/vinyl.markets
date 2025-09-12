@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { 
   NavigationMenu,
@@ -13,6 +13,10 @@ import { siteNavigation } from "@/data/sitemap";
 import { cn } from "@/lib/utils";
 
 export const Navigation = () => {
+  const [terminalValue, setTerminalValue] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
   return (
     <header className="border-b border-border/50 backdrop-blur-sm sticky top-0 z-50" style={{ backgroundColor: 'hsl(var(--header-background))', color: 'hsl(var(--header-foreground))' }}>
       <div className="container mx-auto px-6 py-4">
@@ -85,6 +89,30 @@ export const Navigation = () => {
                 ))}
               </NavigationMenuList>
             </NavigationMenu>
+
+            {/* Terminal-style Ask Tubeamp */}
+            <div className="flex items-center gap-2 bg-black/90 border border-secondary/30 rounded px-3 py-2">
+              <span className="text-secondary text-sm font-mono">$</span>
+              <div className="relative flex items-center">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={terminalValue}
+                  onChange={(e) => setTerminalValue(e.target.value)}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setIsFocused(false)}
+                  placeholder="Ask Tubeamp anything..."
+                  className="bg-transparent text-secondary text-sm font-mono placeholder:text-secondary/50 focus:outline-none w-48"
+                />
+                <span className={`text-secondary font-mono text-sm ml-0.5 ${isFocused ? 'animate-pulse' : 'opacity-0'}`}>|</span>
+              </div>
+              <button 
+                onClick={() => inputRef.current?.focus()}
+                className="text-secondary hover:text-secondary/80 text-sm font-mono transition-colors"
+              >
+                ⏎
+              </button>
+            </div>
           </div>
         </div>
       </div>
