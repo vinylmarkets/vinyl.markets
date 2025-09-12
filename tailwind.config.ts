@@ -57,6 +57,25 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        probability: {
+          high: "hsl(var(--probability-high))",
+          medium: "hsl(var(--probability-medium))",
+          low: "hsl(var(--probability-low))",
+          neutral: "hsl(var(--probability-neutral))",
+        },
+      },
+      backgroundImage: {
+        'gradient-amber': 'var(--gradient-amber)',
+        'gradient-success': 'var(--gradient-success)',
+        'gradient-card': 'var(--gradient-card)',
+      },
+      boxShadow: {
+        'glow-amber': 'var(--glow-amber)',
+        'glow-green': 'var(--glow-green)',
+        'card': 'var(--shadow-card)',
+      },
+      fontFamily: {
+        mono: 'var(--font-mono)',
       },
       borderRadius: {
         lg: "var(--radius)",
