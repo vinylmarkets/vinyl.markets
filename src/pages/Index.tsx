@@ -35,23 +35,23 @@ const Index = () => {
         {/* Market Analysis Blog Posts */}
         <div className="mb-12">
           <h2 className="text-3xl font-serif mb-8 text-foreground">Today's Market Analysis</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-2 gap-4 md:gap-8">
             {/* Blog Post 1 */}
             <article className="bg-card border border-border rounded-lg overflow-hidden hover:shadow-card transition-shadow">
               <img 
                 src={techSectorImg} 
                 alt="Tech sector analysis" 
-                className="w-full h-48 object-cover"
+                className="w-full h-32 md:h-48 object-cover"
               />
-              <div className="p-6">
-                <div className="text-sm text-muted-foreground mb-2">December 12, 2024</div>
-                <h3 className="text-xl font-serif mb-3 text-foreground">Tech Sector Shows 73% Probability of Continued Rally</h3>
-                <p className="text-muted-foreground mb-4 leading-relaxed">
+              <div className="p-4 md:p-6">
+                <div className="text-xs md:text-sm text-muted-foreground mb-2">December 12, 2024</div>
+                <h3 className="text-sm md:text-xl font-serif mb-2 md:mb-3 text-foreground leading-tight">Tech Sector Shows 73% Probability of Continued Rally</h3>
+                <p className="text-xs md:text-base text-muted-foreground mb-3 md:mb-4 leading-relaxed line-clamp-2 md:line-clamp-none">
                   Our algorithmic analysis reveals strong momentum indicators across major tech stocks. NVIDIA and Apple show particularly compelling probability metrics.
                 </p>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-secondary">High Confidence</span>
-                  <button className="text-sm text-primary hover:underline">Read Analysis →</button>
+                  <span className="text-xs md:text-sm font-medium text-secondary">High Confidence</span>
+                  <button className="text-xs md:text-sm text-primary hover:underline">Read Analysis →</button>
                 </div>
               </div>
             </article>
@@ -61,17 +61,17 @@ const Index = () => {
               <img 
                 src={energySectorImg} 
                 alt="Energy sector analysis" 
-                className="w-full h-48 object-cover"
+                className="w-full h-32 md:h-48 object-cover"
               />
-              <div className="p-6">
-                <div className="text-sm text-muted-foreground mb-2">December 12, 2024</div>
-                <h3 className="text-xl font-serif mb-3 text-foreground">Energy Sector Volatility: 42% Probability Models Signal Caution</h3>
-                <p className="text-muted-foreground mb-4 leading-relaxed">
+              <div className="p-4 md:p-6">
+                <div className="text-xs md:text-sm text-muted-foreground mb-2">December 12, 2024</div>
+                <h3 className="text-sm md:text-xl font-serif mb-2 md:mb-3 text-foreground leading-tight">Energy Sector Volatility: 42% Probability Models Signal Caution</h3>
+                <p className="text-xs md:text-base text-muted-foreground mb-3 md:mb-4 leading-relaxed line-clamp-2 md:line-clamp-none">
                   Geopolitical tensions and seasonal demand patterns create complex probability matrices for energy stocks.
                 </p>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-probability-medium">Medium Confidence</span>
-                  <button className="text-sm text-primary hover:underline">Read Analysis →</button>
+                  <span className="text-xs md:text-sm font-medium text-probability-medium">Medium Confidence</span>
+                  <button className="text-xs md:text-sm text-primary hover:underline">Read Analysis →</button>
                 </div>
               </div>
             </article>
@@ -81,17 +81,17 @@ const Index = () => {
               <img 
                 src={healthcareSectorImg} 
                 alt="Healthcare sector analysis" 
-                className="w-full h-48 object-cover"
+                className="w-full h-32 md:h-48 object-cover"
               />
-              <div className="p-6">
-                <div className="text-sm text-muted-foreground mb-2">December 12, 2024</div>
-                <h3 className="text-xl font-serif mb-3 text-foreground">Healthcare Innovation Drives 68% Probability of Sector Rotation</h3>
-                <p className="text-muted-foreground mb-4 leading-relaxed">
+              <div className="p-4 md:p-6">
+                <div className="text-xs md:text-sm text-muted-foreground mb-2">December 12, 2024</div>
+                <h3 className="text-sm md:text-xl font-serif mb-2 md:mb-3 text-foreground leading-tight">Healthcare Innovation Drives 68% Probability of Sector Rotation</h3>
+                <p className="text-xs md:text-base text-muted-foreground mb-3 md:mb-4 leading-relaxed line-clamp-2 md:line-clamp-none">
                   Breakthrough pharmaceutical approvals and biotech merger activity create compelling probability scenarios.
                 </p>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-secondary">High Confidence</span>
-                  <button className="text-sm text-primary hover:underline">Read Analysis →</button>
+                  <span className="text-xs md:text-sm font-medium text-secondary">High Confidence</span>
+                  <button className="text-xs md:text-sm text-primary hover:underline">Read Analysis →</button>
                 </div>
               </div>
             </article>
@@ -101,17 +101,17 @@ const Index = () => {
               <img 
                 src={cryptoAnalysisImg} 
                 alt="Cryptocurrency analysis" 
-                className="w-full h-48 object-cover"
+                className="w-full h-32 md:h-48 object-cover"
               />
-              <div className="p-6">
-                <div className="text-sm text-muted-foreground mb-2">December 12, 2024</div>
-                <h3 className="text-xl font-serif mb-3 text-foreground">Crypto Market Shows 59% Probability of Holiday Rally</h3>
-                <p className="text-muted-foreground mb-4 leading-relaxed">
+              <div className="p-4 md:p-6">
+                <div className="text-xs md:text-sm text-muted-foreground mb-2">December 12, 2024</div>
+                <h3 className="text-sm md:text-xl font-serif mb-2 md:mb-3 text-foreground leading-tight">Crypto Market Shows 59% Probability of Holiday Rally</h3>
+                <p className="text-xs md:text-base text-muted-foreground mb-3 md:mb-4 leading-relaxed line-clamp-2 md:line-clamp-none">
                   Bitcoin and Ethereum display strong institutional buying patterns ahead of year-end positioning.
                 </p>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-secondary">High Confidence</span>
-                  <button className="text-sm text-primary hover:underline">Read Analysis →</button>
+                  <span className="text-xs md:text-sm font-medium text-secondary">High Confidence</span>
+                  <button className="text-xs md:text-sm text-primary hover:underline">Read Analysis →</button>
                 </div>
               </div>
             </article>
@@ -126,7 +126,7 @@ const Index = () => {
           <p className="text-lg text-center text-muted-foreground mb-8 max-w-2xl mx-auto">
             Live probability assessments from our transparent algorithmic framework
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-2 gap-4 md:gap-6">
             {mockPortfolioData.slice(0, 4).map((stock) => (
               <ProbabilityCard key={stock.symbol} {...stock} />
             ))}
