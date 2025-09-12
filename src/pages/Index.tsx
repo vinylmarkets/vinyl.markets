@@ -16,14 +16,13 @@ const Index = () => {
       <section className="py-16 px-4 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-serif mb-6 text-foreground">
-            Financial Education
-            <span className="block text-secondary font-serif italic">Refined</span>
+            Transparent data for retail traders
           </h1>
-          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Transparent data for retail traders through the lens of academic rigor and institutional-grade analysis
+          <p className="text-lg text-muted-foreground mb-8 max-w-3xl mx-auto">
+            Get access to the probability modeling and see how our algorithm is built. We don't make buy/sell recommendations. We simply give you our algorithm and make it public so you can see how our model makes its projection.
           </p>
-          <Button size="lg" className="rounded-full px-8 py-3 text-base">
-            Begin Your Education
+          <Button variant="secondary" size="lg" className="rounded-full px-8 py-3 text-base">
+            Get Started
           </Button>
         </div>
       </section>
