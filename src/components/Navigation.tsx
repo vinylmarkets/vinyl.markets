@@ -102,7 +102,7 @@ export const Navigation = () => {
               </NavigationMenuList>
             </NavigationMenu>
 
-            {/* Terminal-style Ask Tubeamp */}
+            {/* Terminal-style Ask Tubeamp - Desktop */}
             <div className="flex items-center gap-2 bg-black/90 border border-secondary/30 rounded px-3 py-2">
               <span className="text-secondary text-sm font-mono">$</span>
               <div className="relative flex items-center">
@@ -125,6 +125,30 @@ export const Navigation = () => {
                 ⏎
               </button>
             </div>
+          </div>
+        </div>
+
+        {/* Terminal-style Ask Tubeamp - Mobile */}
+        <div className="md:hidden mt-4">
+          <div className="flex items-center gap-2 bg-black/90 border border-secondary/30 rounded px-3 py-2">
+            <span className="text-secondary text-sm font-mono">$</span>
+            <div className="relative flex items-center flex-1">
+              <input
+                type="text"
+                value={terminalValue}
+                onChange={(e) => setTerminalValue(e.target.value)}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                placeholder="Ask Tubeamp anything..."
+                className="bg-transparent text-secondary text-sm font-mono placeholder:text-secondary/50 focus:outline-none w-full"
+              />
+              <span className={`text-secondary font-mono text-sm ml-0.5 animate-pulse`}>|</span>
+            </div>
+            <button 
+              className="text-secondary hover:text-secondary/80 text-sm font-mono transition-colors"
+            >
+              ⏎
+            </button>
           </div>
         </div>
       </div>
