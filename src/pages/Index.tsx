@@ -29,15 +29,9 @@ const Index = () => {
 
       {/* Content Grid */}
       <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          <div>
-            <h2 className="text-3xl font-serif mb-6 text-foreground">Research Laboratory</h2>
-            <PerformanceLeaderboard />
-          </div>
-          <div>
-            <h2 className="text-3xl font-serif mb-6 text-foreground">Community Insights</h2>
-            <CommunityPreview />
-          </div>
+        <div className="mb-12">
+          <h2 className="text-3xl font-serif mb-6 text-foreground">Community Insights</h2>
+          <CommunityPreview />
         </div>
 
         {/* Current Research Portfolio */}
