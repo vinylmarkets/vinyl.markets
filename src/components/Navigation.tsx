@@ -116,7 +116,7 @@ export const Navigation = () => {
                   placeholder="Ask Tubeamp anything..."
                   className="bg-transparent text-secondary text-sm font-mono placeholder:text-secondary/50 focus:outline-none w-48"
                 />
-                <span className={`text-secondary font-mono text-sm ml-0.5 ${isFocused ? 'animate-pulse' : 'opacity-0'}`}>|</span>
+                <span className={`text-secondary font-mono text-sm ml-0.5 animate-pulse`}>|</span>
               </div>
               <button 
                 onClick={() => inputRef.current?.focus()}
