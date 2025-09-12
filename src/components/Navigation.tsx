@@ -40,33 +40,45 @@ export const Navigation = () => {
                         <NavigationMenuTrigger className="text-secondary hover:text-secondary/80 bg-transparent">
                           {item.title}
                         </NavigationMenuTrigger>
-                        <NavigationMenuContent>
-                          <div className="grid w-96 gap-3 p-4">
-                            <div className="row-span-3">
+                         <NavigationMenuContent>
+                          <div className="grid w-80 gap-0 p-2">
+                            <div className="row-span-3 mb-2">
                               <NavigationMenuLink asChild>
                                 <Link
-                                  className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                                  className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-4 no-underline outline-none focus:shadow-md"
                                   to={item.href}
                                 >
-                                  <div className="mb-2 mt-4 text-lg font-medium">
+                                  <div className="mb-1 mt-2 text-base font-medium">
                                     {item.title}
                                   </div>
-                                  <p className="text-sm leading-tight text-muted-foreground">
+                                  <p className="text-xs leading-tight text-muted-foreground">
                                     {item.description}
                                   </p>
                                 </Link>
                               </NavigationMenuLink>
                             </div>
-                            {item.children.map((child) => (
+                            {item.children.map((child, index) => (
                               <NavigationMenuLink key={child.href} asChild>
                                 <Link
                                   to={child.href}
                                   className={cn(
-                                    "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                                    "block select-none space-y-1 rounded-none px-3 py-2 leading-none no-underline outline-none transition-colors text-xs",
+                                    index % 2 === 0 
+                                      ? "bg-white hover:bg-ledger-hover-green" 
+                                      : "bg-ledger-light-green hover:bg-ledger-hover-green"
                                   )}
+                                  style={{
+                                    backgroundColor: index % 2 === 0 ? 'hsl(0 0% 100%)' : 'hsl(var(--ledger-light-green))'
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'hsl(var(--ledger-hover-green))';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = index % 2 === 0 ? 'hsl(0 0% 100%)' : 'hsl(var(--ledger-light-green))';
+                                  }}
                                 >
-                                  <div className="text-sm font-medium leading-none">{child.title}</div>
-                                  <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                  <div className="text-xs font-medium leading-none text-foreground">{child.title}</div>
+                                  <p className="line-clamp-2 text-xs leading-snug text-muted-foreground">
                                     {child.description}
                                   </p>
                                 </Link>
