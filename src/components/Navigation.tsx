@@ -33,7 +33,7 @@ export const Navigation = () => {
                 <NavigationMenuItem key={item.href}>
                   {item.children ? (
                     <>
-                      <NavigationMenuTrigger className="text-white hover:text-secondary">
+                      <NavigationMenuTrigger className="text-background hover:text-secondary">
                         {item.title}
                       </NavigationMenuTrigger>
                       <NavigationMenuContent>
@@ -88,7 +88,7 @@ export const Navigation = () => {
 
           {/* Action Buttons */}
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" className="border-white/20 text-white hover:bg-white/10">
+            <Button variant="outline" size="sm" className="border-background/30 text-background hover:bg-background/10">
               <Terminal className="w-4 h-4 mr-2" />
               Ask Tubeamp
             </Button>
