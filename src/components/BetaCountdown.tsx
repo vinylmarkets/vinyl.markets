@@ -94,7 +94,7 @@ export const BetaCountdown = () => {
           </div>
         </div>
         
-        <Button className="w-full bg-gradient-success hover:bg-gradient-success/90 text-lg py-3 shadow-glow-green">
+        <Button variant="secondary" className="w-full text-lg py-3">
           Claim Your Lifetime Spot
         </Button>
         <div className="text-xs text-muted-foreground mt-2">
