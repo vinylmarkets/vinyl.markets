@@ -55,8 +55,8 @@ const Index = () => {
           <h2 className="text-5xl font-bold mb-4 text-foreground">
             Transparent data for retail traders.
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-2">
-            Get access to the probability modeling and see how our algorithm is built.
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-2">
+            Get access to the probability modeling and see how our algorithm is built. We don't make buy/sell recommendations. We simply give you our algorithm and make it public so you can see how our model makes its projection.
           </p>
           <p className="text-xl font-semibold text-secondary mb-8">
             Sign up today
