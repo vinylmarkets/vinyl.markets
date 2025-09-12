@@ -1,4 +1,5 @@
 import { ProbabilityCard } from "@/components/ProbabilityCard";
+import { StockTicker } from "@/components/StockTicker";
 import { mockPortfolioData } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
 import { Terminal, Zap } from "lucide-react";
@@ -29,15 +30,30 @@ const Index = () => {
         </div>
       </header>
 
+      {/* Stock Ticker Banner */}
+      <StockTicker />
+
       {/* Hero Section */}
       <section className="container mx-auto px-6 py-12">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h2 className="text-5xl font-bold mb-4 bg-gradient-amber bg-clip-text text-transparent">
-            Portfolio Probability Cards
+            Stock Signal Analysis
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
             Turn market noise into clear, probabilistic signals. Your daily intelligence briefing at 7:30 AM.
           </p>
+          
+          {/* Stock Ticker Search CTA */}
+          <div className="flex items-center justify-center gap-3 max-w-md mx-auto">
+            <input 
+              type="text" 
+              placeholder="Enter stock ticker (e.g. AAPL)" 
+              className="flex-1 px-4 py-3 bg-card border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+            />
+            <Button className="bg-gradient-amber px-6 py-3">
+              Analyze
+            </Button>
+          </div>
         </div>
 
         {/* Probability Cards Grid */}
