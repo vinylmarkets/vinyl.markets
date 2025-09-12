@@ -58,6 +58,9 @@ const Index = () => {
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-2">
             Get access to the probability modeling and see how our algorithm is built. We don't make buy/sell recommendations. We simply give you our algorithm and make it public so you can see how our model makes its projection.
           </p>
+          <p className="text-lg font-bold text-foreground mb-4 tracking-wider">
+            LIVE DATA + MARKET MECHANICS + MEDIA MONITORING
+          </p>
           <p className="text-xl font-semibold text-secondary mb-8">
             Sign up today
           </p>
