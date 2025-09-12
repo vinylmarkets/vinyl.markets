@@ -1,34 +1,13 @@
 import { ProbabilityCard } from "@/components/ProbabilityCard";
-import { StockTicker } from "@/components/StockTicker";
+import { Navigation } from "@/components/Navigation";
 import { mockPortfolioData } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
-import { Terminal, Zap } from "lucide-react";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border/50 backdrop-blur-sm sticky top-0 z-50" style={{ backgroundColor: 'hsl(var(--header-background))', color: 'hsl(var(--header-foreground))' }}>
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded bg-secondary flex items-center justify-center">
-                <Zap className="w-5 h-5 text-white" />
-              </div>
-              <h1 className="text-2xl font-bold" style={{ color: 'hsl(var(--header-foreground))' }}>Tubeamp</h1>
-            </div>
-            <div className="flex items-center gap-3">
-              <Button variant="outline" size="sm" className="border-white/20 text-white hover:bg-white/10">
-                <Terminal className="w-4 h-4 mr-2" />
-                Ask Tubeamp
-              </Button>
-              <Button size="sm" className="bg-secondary hover:bg-secondary/90 text-secondary-foreground">
-                Get Started
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* Navigation */}
+      <Navigation />
 
       {/* Stock Ticker Banner */}
       <div className="border-b border-border/50 overflow-hidden py-3" style={{ backgroundColor: 'hsl(var(--header-background))', color: 'hsl(var(--header-foreground))' }}>
