@@ -49,10 +49,13 @@ const Index = () => {
       <section className="container mx-auto px-6 py-12">
         <div className="text-center mb-8">
           <h2 className="text-5xl font-bold mb-4 text-foreground">
-            Stock Signal Analysis
+            Transparent data for retail traders.
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-            Turn market noise into clear, probabilistic signals. Your daily intelligence briefing at 7:30 AM.
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-2">
+            Get access to the probability modeling and see how our algorithm is built.
+          </p>
+          <p className="text-xl font-semibold text-secondary mb-8">
+            Sign up today
           </p>
           
           {/* Stock Ticker Search CTA */}
