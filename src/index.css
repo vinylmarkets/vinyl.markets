@@ -18,8 +18,8 @@ All colors MUST be HSL.
     --popover: 20 8% 12%;
     --popover-foreground: 38 90% 85%;
 
-    /* Warm Amber (Tube Amp) */
-    --primary: 38 95% 65%;
+    /* Purple (Tube Amp) */
+    --primary: 280 65% 65%;
     --primary-foreground: 20 5% 8%;
     
     /* Financial Green */
@@ -29,7 +29,7 @@ All colors MUST be HSL.
     --muted: 20 8% 18%;
     --muted-foreground: 38 20% 60%;
 
-    --accent: 38 95% 65%;
+    --accent: 280 65% 65%;
     --accent-foreground: 20 5% 8%;
 
     --destructive: 0 84% 60%;
@@ -37,7 +37,7 @@ All colors MUST be HSL.
 
     --border: 20 15% 25%;
     --input: 20 15% 25%;
-    --ring: 38 95% 65%;
+    --ring: 280 65% 65%;
 
     --radius: 0.5rem;
     
@@ -48,7 +48,7 @@ All colors MUST be HSL.
     --probability-neutral: 38 20% 60%; /* Muted Amber */
     
     /* Gradients */
-    --gradient-amber: linear-gradient(135deg, hsl(var(--primary)), hsl(45 93% 75%));
+    --gradient-amber: linear-gradient(135deg, hsl(var(--primary)), hsl(285 65% 75%));
     --gradient-success: linear-gradient(135deg, hsl(var(--secondary)), hsl(142 76% 55%));
     --gradient-card: linear-gradient(135deg, hsl(var(--card)), hsl(20 12% 15%));
     
