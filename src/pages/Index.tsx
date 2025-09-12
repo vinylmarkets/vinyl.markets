@@ -61,9 +61,9 @@ const Index = () => {
           <p className="text-lg font-bold text-foreground mb-4 tracking-wider">
             LIVE DATA + MARKET MECHANICS + MEDIA MONITORING
           </p>
-          <p className="text-xl font-semibold text-secondary mb-8">
+          <Button className="bg-secondary hover:bg-secondary/90 text-secondary-foreground px-6 py-2 mb-8">
             Sign up today
-          </p>
+          </Button>
           
           {/* Live Stats Section */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12 max-w-6xl mx-auto">
