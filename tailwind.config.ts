@@ -64,20 +64,13 @@ export default {
           neutral: "hsl(var(--probability-neutral))",
         },
       },
-      backgroundImage: {
-        'gradient-amber': 'var(--gradient-amber)',
-        'gradient-success': 'var(--gradient-success)',
-        'gradient-card': 'var(--gradient-card)',
-      },
       boxShadow: {
-        'glow-amber': 'var(--glow-amber)',
-        'glow-green': 'var(--glow-green)',
-        'card': 'var(--shadow-card)',
+        'subtle': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+        'card': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
       },
       fontFamily: {
         mono: 'var(--font-mono)',
         serif: 'var(--font-serif)',
-        'serif-body': 'var(--font-serif-body)',
         sans: 'var(--font-sans)',
       },
       borderRadius: {
