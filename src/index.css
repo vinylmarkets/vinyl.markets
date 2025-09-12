@@ -8,38 +8,42 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Tubeamp Brand Colors */
-    --background: 20 5% 8%;
-    --foreground: 38 90% 85%;
+    /* Tubeamp Brand Colors - Light Creme Theme */
+    --background: 45 25% 95%; /* Creme background */
+    --foreground: 20 10% 20%; /* Dark text for readability */
 
-    --card: 20 8% 12%;
-    --card-foreground: 38 90% 85%;
+    --card: 0 0% 100%; /* White cards */
+    --card-foreground: 20 10% 20%;
 
-    --popover: 20 8% 12%;
-    --popover-foreground: 38 90% 85%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 10% 20%;
 
     /* Purple (Tube Amp) */
     --primary: 280 65% 65%;
-    --primary-foreground: 20 5% 8%;
+    --primary-foreground: 0 0% 100%;
     
     /* Financial Green */
     --secondary: 142 76% 45%;
-    --secondary-foreground: 20 5% 8%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 20 8% 18%;
-    --muted-foreground: 38 20% 60%;
+    --muted: 45 15% 90%;
+    --muted-foreground: 38 20% 40%;
 
     --accent: 280 65% 65%;
-    --accent-foreground: 20 5% 8%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 38 90% 85%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 20 15% 25%;
-    --input: 20 15% 25%;
+    --border: 45 15% 85%;
+    --input: 45 15% 85%;
     --ring: 280 65% 65%;
 
     --radius: 0.5rem;
+    
+    /* Header - Keep Black */
+    --header-background: 20 5% 8%;
+    --header-foreground: 38 90% 85%;
     
     /* Tubeamp Specific Design Tokens */
     --probability-high: 142 76% 45%; /* Financial Green */
@@ -50,12 +54,12 @@ All colors MUST be HSL.
     /* Gradients */
     --gradient-amber: linear-gradient(135deg, hsl(var(--primary)), hsl(285 65% 75%));
     --gradient-success: linear-gradient(135deg, hsl(var(--secondary)), hsl(142 76% 55%));
-    --gradient-card: linear-gradient(135deg, hsl(var(--card)), hsl(20 12% 15%));
+    --gradient-card: linear-gradient(135deg, hsl(var(--card)), hsl(45 10% 98%));
     
     /* Glows & Effects */
     --glow-amber: 0 0 30px hsl(var(--primary) / 0.3);
     --glow-green: 0 0 30px hsl(var(--secondary) / 0.3);
-    --shadow-card: 0 10px 30px -5px hsl(var(--background) / 0.8);
+    --shadow-card: 0 4px 20px -2px hsl(20 10% 20% / 0.1);
     
     /* Typography */
     --font-mono: 'JetBrains Mono', 'Courier New', monospace;

@@ -8,17 +8,17 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b border-border/50 backdrop-blur-sm sticky top-0 z-50" style={{ backgroundColor: 'hsl(var(--header-background))', color: 'hsl(var(--header-foreground))' }}>
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded bg-gradient-amber flex items-center justify-center">
-                <Zap className="w-5 h-5 text-primary-foreground" />
+              <div className="w-8 h-8 rounded bg-secondary flex items-center justify-center">
+                <Zap className="w-5 h-5 text-white" />
               </div>
-              <h1 className="text-2xl font-bold text-primary">Tubeamp</h1>
+              <h1 className="text-2xl font-bold" style={{ color: 'hsl(var(--header-foreground))' }}>Tubeamp</h1>
             </div>
             <div className="flex items-center gap-3">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="border-white/20 text-white hover:bg-white/10">
                 <Terminal className="w-4 h-4 mr-2" />
                 Ask Tubeamp
               </Button>
@@ -31,7 +31,40 @@ const Index = () => {
       </header>
 
       {/* Stock Ticker Banner */}
-      <StockTicker />
+      <div className="border-b border-border/50 overflow-hidden py-3" style={{ backgroundColor: 'hsl(var(--header-background))', color: 'hsl(var(--header-foreground))' }}>
+        <div className="flex gap-8 animate-scroll">
+          {/* Duplicate the items for seamless scrolling */}
+          {[
+            { symbol: "AAPL", price: 185.43, change: 2.87, isPositive: true },
+            { symbol: "TSLA", price: 248.91, change: -5.12, isPositive: false },
+            { symbol: "NVDA", price: 421.67, change: 8.24, isPositive: true },
+            { symbol: "MSFT", price: 367.12, change: 1.45, isPositive: true },
+            { symbol: "AMZN", price: 142.38, change: -1.92, isPositive: false },
+            { symbol: "GOOGL", price: 138.21, change: 3.47, isPositive: true },
+            { symbol: "META", price: 312.45, change: -2.18, isPositive: false },
+            { symbol: "BTC-USD", price: 42891.23, change: 1247.56, isPositive: true },
+            { symbol: "ETH-USD", price: 2534.67, change: -89.34, isPositive: false },
+          ].concat([
+            { symbol: "AAPL", price: 185.43, change: 2.87, isPositive: true },
+            { symbol: "TSLA", price: 248.91, change: -5.12, isPositive: false },
+            { symbol: "NVDA", price: 421.67, change: 8.24, isPositive: true },
+            { symbol: "MSFT", price: 367.12, change: 1.45, isPositive: true },
+            { symbol: "AMZN", price: 142.38, change: -1.92, isPositive: false },
+            { symbol: "GOOGL", price: 138.21, change: 3.47, isPositive: true },
+            { symbol: "META", price: 312.45, change: -2.18, isPositive: false },
+            { symbol: "BTC-USD", price: 42891.23, change: 1247.56, isPositive: true },
+            { symbol: "ETH-USD", price: 2534.67, change: -89.34, isPositive: false },
+          ]).map((stock, index) => (
+            <div key={`${stock.symbol}-${index}`} className="flex items-center gap-2 whitespace-nowrap min-w-fit">
+              <span className="font-semibold text-secondary">{stock.symbol}</span>
+              <span style={{ color: 'hsl(var(--header-foreground))' }}>${stock.price.toLocaleString()}</span>
+              <span className={`text-sm ${stock.isPositive ? 'text-secondary' : 'text-destructive'}`}>
+                {stock.isPositive ? '+' : ''}{stock.change.toFixed(2)}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Hero Section */}
       <section className="container mx-auto px-6 py-12">
