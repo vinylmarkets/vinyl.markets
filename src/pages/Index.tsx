@@ -66,8 +66,7 @@ const Index = () => {
           </Button>
           
           {/* Live Stats Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12 max-w-6xl mx-auto">
-            <LiveAccuracyTracker />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12 max-w-6xl mx-auto">
             <BetaCountdown />
             <PerformanceLeaderboard />
           </div>
@@ -105,6 +104,11 @@ const Index = () => {
           <p className="text-sm text-muted-foreground mt-4">
             No credit card required • Cancel anytime
           </p>
+        </div>
+
+        {/* Live Performance Section at Bottom */}
+        <div className="mt-16 max-w-lg mx-auto">
+          <LiveAccuracyTracker />
         </div>
       </section>
     </div>
