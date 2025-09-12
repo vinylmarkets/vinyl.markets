@@ -40,7 +40,7 @@ export const ProbabilityCard = ({
     <Card className="bg-gradient-card border-border/50 shadow-card hover:shadow-glow-amber transition-all duration-300 p-6">
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h3 className="text-2xl font-bold text-primary">{symbol}</h3>
+          <h3 className="text-2xl font-bold text-foreground">{symbol}</h3>
           <p className="text-sm text-muted-foreground">{company}</p>
         </div>
         <Badge 
