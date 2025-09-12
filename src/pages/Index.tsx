@@ -41,6 +41,21 @@ const Index = () => {
           </div>
         </div>
 
+        {/* Current Research Portfolio */}
+        <div className="mb-12">
+          <h3 className="text-3xl font-serif text-center mb-3 text-foreground">
+            Current Research Portfolio
+          </h3>
+          <p className="text-lg text-center text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Live probability assessments from our transparent algorithmic framework
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {mockPortfolioData.map((stock) => (
+              <ProbabilityCard key={stock.symbol} {...stock} />
+            ))}
+          </div>
+        </div>
+
         {/* Beta Countdown */}
         <div className="text-center mb-12">
           <BetaCountdown />
