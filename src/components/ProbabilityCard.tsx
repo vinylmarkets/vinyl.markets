@@ -13,6 +13,7 @@ interface ProbabilityCardProps {
   confidence: number;
   volume: string;
   sentiment: "bullish" | "bearish" | "neutral";
+  aiSummary: string;
 }
 
 export const ProbabilityCard = ({
@@ -25,7 +26,8 @@ export const ProbabilityCard = ({
   timeframe,
   confidence,
   volume,
-  sentiment
+  sentiment,
+  aiSummary
 }: ProbabilityCardProps) => {
   const isPositive = change >= 0;
   const probabilityColorClass = 
@@ -88,6 +90,13 @@ export const ProbabilityCard = ({
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Volume</span>
           <span className="font-medium text-foreground">{volume}</span>
+        </div>
+
+        <div className="mt-4 p-4 bg-muted/30 rounded-lg border border-border/20">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-sm font-medium text-primary">AI Analysis</span>
+          </div>
+          <p className="text-sm text-muted-foreground leading-relaxed">{aiSummary}</p>
         </div>
       </div>
     </Card>

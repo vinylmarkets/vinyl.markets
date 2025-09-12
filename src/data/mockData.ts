@@ -10,6 +10,7 @@ export const mockPortfolioData = [
     confidence: 84,
     volume: "48.2M",
     sentiment: "bullish" as const,
+    aiSummary: "Strong earnings momentum and iPhone 15 sales exceed expectations. Technical indicators show bullish divergence with sustained volume above 20-day moving average.",
   },
   {
     symbol: "TSLA",
@@ -22,6 +23,7 @@ export const mockPortfolioData = [
     confidence: 67,
     volume: "92.1M",
     sentiment: "bearish" as const,
+    aiSummary: "Production challenges and competitive EV market pressure. Recent delivery numbers missed analyst expectations, creating downward momentum despite long-term growth potential.",
   },
   {
     symbol: "NVDA",
@@ -34,6 +36,7 @@ export const mockPortfolioData = [
     confidence: 91,
     volume: "156.7M",
     sentiment: "bullish" as const,
+    aiSummary: "AI boom continues with record datacenter revenue. Strong institutional buying and options flow indicate sustained upward pressure. RSI approaching overbought but momentum remains strong.",
   },
   {
     symbol: "MSFT",
@@ -46,6 +49,7 @@ export const mockPortfolioData = [
     confidence: 76,
     volume: "23.8M",
     sentiment: "neutral" as const,
+    aiSummary: "Azure growth stabilizing while AI investments show promise. Sideways consolidation pattern suggests waiting for catalyst. Mixed analyst ratings create uncertainty.",
   },
   {
     symbol: "AMZN",
@@ -58,6 +62,7 @@ export const mockPortfolioData = [
     confidence: 72,
     volume: "34.5M",
     sentiment: "neutral" as const,
+    aiSummary: "AWS margins improving but retail headwinds persist. Holiday season outlook mixed with inventory optimization ongoing. Support level holding at $140.",
   },
   {
     symbol: "GOOGL",
@@ -70,5 +75,6 @@ export const mockPortfolioData = [
     confidence: 88,
     volume: "28.9M",
     sentiment: "bullish" as const,
+    aiSummary: "Search revenue resilience and Bard AI integration driving optimism. Recent cost-cutting measures showing results. Breakout above $135 resistance confirms upward trend.",
   }
 ];
