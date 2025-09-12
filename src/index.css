@@ -43,7 +43,7 @@ All colors MUST be HSL.
     
     /* Tubeamp Specific Design Tokens */
     --probability-high: 142 76% 45%; /* Financial Green */
-    --probability-medium: 45 93% 65%; /* Warm Yellow */
+    --probability-medium: 280 65% 65%; /* Purple */
     --probability-low: 0 84% 60%; /* Alert Red */
     --probability-neutral: 38 20% 60%; /* Muted Amber */
     
