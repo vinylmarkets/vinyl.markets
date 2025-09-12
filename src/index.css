@@ -8,64 +8,70 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Tubeamp Brand Colors - Light Creme Theme */
-    --background: 45 25% 95%; /* Creme background */
-    --foreground: 20 10% 20%; /* Dark text for readability */
+    /* University Library Theme - Elegant Crème & White */
+    --background: 40 30% 97%; /* Warm crème background */
+    --foreground: 25 15% 15%; /* Rich dark brown text */
 
-    --card: 0 0% 100%; /* White cards */
-    --card-foreground: 20 10% 20%;
+    --card: 0 0% 100%; /* Pure white cards */
+    --card-foreground: 25 15% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 20 10% 20%;
+    --popover-foreground: 25 15% 15%;
 
-    /* Blue (Tube Amp) */
-    --primary: 220 75% 55%;
+    /* Elegant Amber (Library Brass) */
+    --primary: 35 85% 50%;
     --primary-foreground: 0 0% 100%;
     
-    /* Financial Green */
-    --secondary: 142 76% 45%;
+    /* Sophisticated Forest Green */
+    --secondary: 145 65% 40%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 45 15% 90%;
-    --muted-foreground: 38 20% 40%;
+    --muted: 40 20% 92%;
+    --muted-foreground: 25 15% 45%;
 
-    --accent: 220 75% 55%;
+    --accent: 35 85% 50%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 75% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 45 15% 85%;
-    --input: 45 15% 85%;
-    --ring: 220 75% 55%;
+    --border: 40 15% 88%;
+    --input: 40 15% 88%;
+    --ring: 35 85% 50%;
 
-    --radius: 0.5rem;
+    --radius: 0.375rem;
     
-    /* Header - Keep Black */
-    --header-background: 20 5% 8%;
-    --header-foreground: 38 90% 85%;
+    /* Elegant Dark Header */
+    --header-background: 25 15% 12%;
+    --header-foreground: 40 25% 85%;
     
-    /* Tubeamp Specific Design Tokens */
-    --probability-high: 142 76% 45%; /* Financial Green */
-    --probability-medium: 220 75% 55%; /* Blue */
-    --probability-low: 0 84% 60%; /* Alert Red */
-    --probability-neutral: 38 20% 60%; /* Muted Amber */
+    /* Financial Education Colors */
+    --probability-high: 145 65% 40%; /* Forest Green */
+    --probability-medium: 35 85% 50%; /* Elegant Amber */
+    --probability-low: 0 75% 55%; /* Refined Red */
+    --probability-neutral: 25 15% 55%; /* Muted Brown */
     
-    /* Accounting Ledger Colors */
-    --ledger-light-green: 142 20% 95%;
-    --ledger-hover-green: 142 30% 85%;
+    /* Library Accent Colors */
+    --leather-brown: 25 35% 25%;
+    --parchment: 40 25% 95%;
+    --gold-leaf: 45 90% 55%;
     
-    /* Gradients */
-    --gradient-amber: linear-gradient(135deg, hsl(var(--primary)), hsl(225 75% 65%));
-    --gradient-success: linear-gradient(135deg, hsl(var(--secondary)), hsl(142 76% 55%));
-    --gradient-card: linear-gradient(135deg, hsl(var(--card)), hsl(45 10% 98%));
+    /* Elegant Gradients */
+    --gradient-amber: linear-gradient(135deg, hsl(var(--primary)), hsl(45 90% 60%));
+    --gradient-success: linear-gradient(135deg, hsl(var(--secondary)), hsl(145 70% 50%));
+    --gradient-card: linear-gradient(135deg, hsl(var(--card)), hsl(40 20% 98%));
+    --gradient-library: linear-gradient(180deg, hsl(40 30% 97%), hsl(40 25% 95%));
     
-    /* Glows & Effects */
-    --glow-amber: 0 0 30px hsl(var(--primary) / 0.3);
-    --glow-green: 0 0 30px hsl(var(--secondary) / 0.3);
-    --shadow-card: 0 4px 20px -2px hsl(20 10% 20% / 0.1);
+    /* Sophisticated Effects */
+    --glow-amber: 0 0 40px hsl(var(--primary) / 0.25);
+    --glow-green: 0 0 40px hsl(var(--secondary) / 0.25);
+    --shadow-card: 0 8px 25px -5px hsl(25 15% 15% / 0.12);
+    --shadow-elegant: 0 4px 15px -2px hsl(25 15% 15% / 0.08);
     
-    /* Typography */
+    /* Typography System */
+    --font-serif: 'Playfair Display', 'Georgia', serif;
+    --font-serif-body: 'Crimson Text', 'Times New Roman', serif;
+    --font-sans: 'Inter', 'Helvetica Neue', sans-serif;
     --font-mono: 'JetBrains Mono', 'Courier New', monospace;
 
     --sidebar-background: 0 0% 98%;

@@ -76,6 +76,9 @@ export default {
       },
       fontFamily: {
         mono: 'var(--font-mono)',
+        serif: 'var(--font-serif)',
+        'serif-body': 'var(--font-serif-body)',
+        sans: 'var(--font-sans)',
       },
       borderRadius: {
         lg: "var(--radius)",
