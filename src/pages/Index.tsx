@@ -1,5 +1,9 @@
 import { ProbabilityCard } from "@/components/ProbabilityCard";
 import { Navigation } from "@/components/Navigation";
+import { LiveAccuracyTracker } from "@/components/LiveAccuracyTracker";
+import { BetaCountdown } from "@/components/BetaCountdown";
+import { PerformanceLeaderboard } from "@/components/PerformanceLeaderboard";
+import { CommunityPreview } from "@/components/CommunityPreview";
 import { mockPortfolioData } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
 
@@ -58,6 +62,13 @@ const Index = () => {
             Sign up today
           </p>
           
+          {/* Live Stats Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12 max-w-6xl mx-auto">
+            <LiveAccuracyTracker />
+            <BetaCountdown />
+            <PerformanceLeaderboard />
+          </div>
+          
           {/* Stock Ticker Search CTA */}
           <div className="flex items-center justify-center gap-3 max-w-md mx-auto">
             <input 
@@ -76,6 +87,11 @@ const Index = () => {
           {mockPortfolioData.map((stock) => (
             <ProbabilityCard key={stock.symbol} {...stock} />
           ))}
+        </div>
+
+        {/* Community Section */}
+        <div className="mt-16 max-w-2xl mx-auto">
+          <CommunityPreview />
         </div>
 
         {/* Call to Action */}
