@@ -3,9 +3,12 @@ import { Navigation } from "@/components/Navigation";
 import { LiveAccuracyTracker } from "@/components/LiveAccuracyTracker";
 import { BetaCountdown } from "@/components/BetaCountdown";
 import { PerformanceLeaderboard } from "@/components/PerformanceLeaderboard";
-import { CommunityPreview } from "@/components/CommunityPreview";
 import { mockPortfolioData } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
+import techSectorImg from "@/assets/blog-tech-sector.jpg";
+import energySectorImg from "@/assets/blog-energy-sector.jpg";
+import healthcareSectorImg from "@/assets/blog-healthcare-sector.jpg";
+import cryptoAnalysisImg from "@/assets/blog-crypto-analysis.jpg";
 
 const Index = () => {
   return (
@@ -29,51 +32,87 @@ const Index = () => {
 
       {/* Content Grid */}
       <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="mb-12">
-          <h2 className="text-3xl font-serif mb-6 text-foreground">Community Insights</h2>
-          <CommunityPreview />
-        </div>
-
         {/* Market Analysis Blog Posts */}
         <div className="mb-12">
           <h2 className="text-3xl font-serif mb-8 text-foreground">Today's Market Analysis</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Blog Post 1 */}
-            <article className="bg-card border border-border rounded-lg p-6 hover:shadow-card transition-shadow">
-              <div className="text-sm text-muted-foreground mb-2">December 12, 2024</div>
-              <h3 className="text-xl font-serif mb-3 text-foreground">Tech Sector Shows 73% Probability of Continued Rally</h3>
-              <p className="text-muted-foreground mb-4 leading-relaxed">
-                Our algorithmic analysis reveals strong momentum indicators across major tech stocks. NVIDIA and Apple show particularly compelling probability metrics, with institutional buying patterns suggesting sustained upward movement through Q1 2025.
-              </p>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-secondary">High Confidence</span>
-                <button className="text-sm text-primary hover:underline">Read Analysis →</button>
+            <article className="bg-card border border-border rounded-lg overflow-hidden hover:shadow-card transition-shadow">
+              <img 
+                src={techSectorImg} 
+                alt="Tech sector analysis" 
+                className="w-full h-48 object-cover"
+              />
+              <div className="p-6">
+                <div className="text-sm text-muted-foreground mb-2">December 12, 2024</div>
+                <h3 className="text-xl font-serif mb-3 text-foreground">Tech Sector Shows 73% Probability of Continued Rally</h3>
+                <p className="text-muted-foreground mb-4 leading-relaxed">
+                  Our algorithmic analysis reveals strong momentum indicators across major tech stocks. NVIDIA and Apple show particularly compelling probability metrics.
+                </p>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-secondary">High Confidence</span>
+                  <button className="text-sm text-primary hover:underline">Read Analysis →</button>
+                </div>
               </div>
             </article>
 
             {/* Blog Post 2 */}
-            <article className="bg-card border border-border rounded-lg p-6 hover:shadow-card transition-shadow">
-              <div className="text-sm text-muted-foreground mb-2">December 12, 2024</div>
-              <h3 className="text-xl font-serif mb-3 text-foreground">Energy Sector Volatility: 42% Probability Models Signal Caution</h3>
-              <p className="text-muted-foreground mb-4 leading-relaxed">
-                Geopolitical tensions and seasonal demand patterns create complex probability matrices for energy stocks. Our transparent model shows mixed signals, with oil futures displaying heightened uncertainty through year-end.
-              </p>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-probability-medium">Medium Confidence</span>
-                <button className="text-sm text-primary hover:underline">Read Analysis →</button>
+            <article className="bg-card border border-border rounded-lg overflow-hidden hover:shadow-card transition-shadow">
+              <img 
+                src={energySectorImg} 
+                alt="Energy sector analysis" 
+                className="w-full h-48 object-cover"
+              />
+              <div className="p-6">
+                <div className="text-sm text-muted-foreground mb-2">December 12, 2024</div>
+                <h3 className="text-xl font-serif mb-3 text-foreground">Energy Sector Volatility: 42% Probability Models Signal Caution</h3>
+                <p className="text-muted-foreground mb-4 leading-relaxed">
+                  Geopolitical tensions and seasonal demand patterns create complex probability matrices for energy stocks.
+                </p>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-probability-medium">Medium Confidence</span>
+                  <button className="text-sm text-primary hover:underline">Read Analysis →</button>
+                </div>
               </div>
             </article>
 
             {/* Blog Post 3 */}
-            <article className="bg-card border border-border rounded-lg p-6 hover:shadow-card transition-shadow">
-              <div className="text-sm text-muted-foreground mb-2">December 12, 2024</div>
-              <h3 className="text-xl font-serif mb-3 text-foreground">Healthcare Innovation Drives 68% Probability of Sector Rotation</h3>
-              <p className="text-muted-foreground mb-4 leading-relaxed">
-                Breakthrough pharmaceutical approvals and biotech merger activity create compelling probability scenarios. Our model identifies emerging opportunities in small-cap healthcare stocks with strong fundamental backing.
-              </p>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-secondary">High Confidence</span>
-                <button className="text-sm text-primary hover:underline">Read Analysis →</button>
+            <article className="bg-card border border-border rounded-lg overflow-hidden hover:shadow-card transition-shadow">
+              <img 
+                src={healthcareSectorImg} 
+                alt="Healthcare sector analysis" 
+                className="w-full h-48 object-cover"
+              />
+              <div className="p-6">
+                <div className="text-sm text-muted-foreground mb-2">December 12, 2024</div>
+                <h3 className="text-xl font-serif mb-3 text-foreground">Healthcare Innovation Drives 68% Probability of Sector Rotation</h3>
+                <p className="text-muted-foreground mb-4 leading-relaxed">
+                  Breakthrough pharmaceutical approvals and biotech merger activity create compelling probability scenarios.
+                </p>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-secondary">High Confidence</span>
+                  <button className="text-sm text-primary hover:underline">Read Analysis →</button>
+                </div>
+              </div>
+            </article>
+
+            {/* Blog Post 4 */}
+            <article className="bg-card border border-border rounded-lg overflow-hidden hover:shadow-card transition-shadow">
+              <img 
+                src={cryptoAnalysisImg} 
+                alt="Cryptocurrency analysis" 
+                className="w-full h-48 object-cover"
+              />
+              <div className="p-6">
+                <div className="text-sm text-muted-foreground mb-2">December 12, 2024</div>
+                <h3 className="text-xl font-serif mb-3 text-foreground">Crypto Market Shows 59% Probability of Holiday Rally</h3>
+                <p className="text-muted-foreground mb-4 leading-relaxed">
+                  Bitcoin and Ethereum display strong institutional buying patterns ahead of year-end positioning.
+                </p>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-secondary">High Confidence</span>
+                  <button className="text-sm text-primary hover:underline">Read Analysis →</button>
+                </div>
               </div>
             </article>
           </div>
@@ -87,8 +126,8 @@ const Index = () => {
           <p className="text-lg text-center text-muted-foreground mb-8 max-w-2xl mx-auto">
             Live probability assessments from our transparent algorithmic framework
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mockPortfolioData.map((stock) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {mockPortfolioData.slice(0, 4).map((stock) => (
               <ProbabilityCard key={stock.symbol} {...stock} />
             ))}
           </div>
