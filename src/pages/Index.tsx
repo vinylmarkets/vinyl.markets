@@ -16,13 +16,14 @@ const Index = () => {
       <section className="py-16 px-4 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-serif mb-6 text-foreground">
-            Human stories & ideas
+            Financial Education
+            <span className="block text-secondary font-serif italic">Refined</span>
           </h1>
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            A place to read, write, and deepen your understanding of financial markets
+            Transparent data for retail traders through the lens of academic rigor and institutional-grade analysis
           </p>
           <Button size="lg" className="rounded-full px-8 py-3 text-base">
-            Start reading
+            Begin Your Education
           </Button>
         </div>
       </section>
