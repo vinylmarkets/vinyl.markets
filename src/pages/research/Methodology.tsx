@@ -22,10 +22,38 @@ const Methodology = () => {
           </p>
         </header>
 
+        {/* Table of Contents */}
+        <nav className="bg-card border border-border rounded-lg p-6 mb-12">
+          <h3 className="text-lg font-semibold text-foreground mb-4">Contents</h3>
+          <div className="grid md:grid-cols-2 gap-3 text-sm">
+            <a href="#core-methodology" className="text-secondary hover:text-secondary/80 transition-colors hover:underline">
+              Our Core Methodology
+            </a>
+            <a href="#continuous-iteration" className="text-secondary hover:text-secondary/80 transition-colors hover:underline">
+              Continuous Iteration Framework
+            </a>
+            <a href="#what-we-dont-do" className="text-secondary hover:text-secondary/80 transition-colors hover:underline">
+              What We Don't Do
+            </a>
+            <a href="#educational-philosophy" className="text-secondary hover:text-secondary/80 transition-colors hover:underline">
+              Educational Empowerment Philosophy
+            </a>
+            <a href="#research-transparency" className="text-secondary hover:text-secondary/80 transition-colors hover:underline">
+              Research Transparency
+            </a>
+            <a href="#academic-experience" className="text-secondary hover:text-secondary/80 transition-colors hover:underline">
+              The Academic User Experience
+            </a>
+            <a href="#research-community" className="text-secondary hover:text-secondary/80 transition-colors hover:underline">
+              Join Our Research Community
+            </a>
+          </div>
+        </nav>
+
         <hr className="border-border mb-12" />
 
         {/* Core Methodology Section */}
-        <section className="mb-12">
+        <section id="core-methodology" className="mb-12">
           <h2 className="text-3xl font-bold text-foreground mb-8">Our Core Methodology</h2>
           
           <div className="space-y-8">
@@ -108,7 +136,7 @@ const Methodology = () => {
         <hr className="border-border mb-12" />
 
         {/* Continuous Iteration Framework */}
-        <section className="mb-12">
+        <section id="academic-experience" className="mb-12">
           <h2 className="text-3xl font-bold text-foreground mb-8">Continuous Iteration Framework</h2>
           
           <div className="grid md:grid-cols-3 gap-8">
@@ -147,7 +175,7 @@ const Methodology = () => {
         <hr className="border-border mb-12" />
 
         {/* What We Don't Do */}
-        <section className="mb-12">
+        <section id="continuous-iteration" className="mb-12">
           <h2 className="text-3xl font-bold text-foreground mb-8">What We Don&apos;t Do</h2>
           
           <div className="space-y-8">
@@ -183,7 +211,7 @@ const Methodology = () => {
         <hr className="border-border mb-12" />
 
         {/* Educational Empowerment Philosophy */}
-        <section className="mb-12">
+        <section id="what-we-dont-do" className="mb-12">
           <h2 className="text-3xl font-bold text-foreground mb-8">Educational Empowerment Philosophy</h2>
           
           <div className="grid md:grid-cols-2 gap-8">
@@ -225,7 +253,7 @@ const Methodology = () => {
         <hr className="border-border mb-12" />
 
         {/* Research Transparency */}
-        <section className="mb-12">
+        <section id="educational-philosophy" className="mb-12">
           <h2 className="text-3xl font-bold text-foreground mb-8">Research Transparency</h2>
           
           <div className="grid md:grid-cols-3 gap-8">
@@ -265,7 +293,7 @@ const Methodology = () => {
         <hr className="border-border mb-12" />
 
         {/* The Academic User Experience */}
-        <section className="mb-12">
+        <section id="research-transparency" className="mb-12">
           <h2 className="text-3xl font-bold text-foreground mb-8">The Academic User Experience</h2>
           
           <div className="grid md:grid-cols-3 gap-8">
@@ -304,7 +332,7 @@ const Methodology = () => {
         <hr className="border-border mb-12" />
 
         {/* Call to Action */}
-        <section className="text-center">
+        <section id="research-community" className="text-center">
           <h2 className="text-3xl font-bold text-foreground mb-6">Join Our Research Community</h2>
           <p className="text-lg text-muted-foreground mb-8">
             We invite academics, researchers, and analytically-minded practitioners to:
