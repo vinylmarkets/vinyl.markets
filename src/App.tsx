@@ -8,6 +8,8 @@ import ResearchIndex from "./pages/research/ResearchIndex";
 import Methodology from "./pages/research/Methodology";
 import DataSources from "./pages/research/DataSources";
 import ResearchPapers from "./pages/research/ResearchPapers";
+import HoetingMadigan1999 from "./pages/research/papers/HoetingMadigan1999";
+import DaEngelbergGao2011 from "./pages/research/papers/DaEngelbergGao2011";
 import KahnemanTversky1973 from "./pages/research/papers/KahnemanTversky1973";
 import BollenMaoZeng2011 from "./pages/research/papers/BollenMaoZeng2011";
 import NotFound from "./pages/NotFound";
@@ -22,10 +24,12 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/research" element={<ResearchIndex />} />
-          <Route path="/research/methodology" element={<Methodology />} />
+          <Route path="/research" element={<ResearchPapers />} />
           <Route path="/research/data-sources" element={<DataSources />} />
+          <Route path="/research/methodology" element={<Methodology />} />
           <Route path="/research/papers" element={<ResearchPapers />} />
+          <Route path="/research/papers/hoeting-1999" element={<HoetingMadigan1999 />} />
+          <Route path="/research/papers/da-engelberg-gao-2011" element={<DaEngelbergGao2011 />} />
           <Route path="/research/papers/kahneman-tversky-1973" element={<KahnemanTversky1973 />} />
           <Route path="/research/papers/bollen-mao-zeng-2011" element={<BollenMaoZeng2011 />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
