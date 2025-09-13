@@ -6,6 +6,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Methodology from "./pages/research/Methodology";
 import DataSources from "./pages/research/DataSources";
+import ResearchPapers from "./pages/research/ResearchPapers";
+import KahnemanTversky1973 from "./pages/research/papers/KahnemanTversky1973";
+import BollenMaoZeng2011 from "./pages/research/papers/BollenMaoZeng2011";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,6 +23,9 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/research/methodology" element={<Methodology />} />
           <Route path="/research/data-sources" element={<DataSources />} />
+          <Route path="/research/papers" element={<ResearchPapers />} />
+          <Route path="/research/papers/kahneman-tversky-1973" element={<KahnemanTversky1973 />} />
+          <Route path="/research/papers/bollen-mao-zeng-2011" element={<BollenMaoZeng2011 />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
