@@ -217,10 +217,13 @@ const CremersWeinbaum2010 = () => {
                   <div className="text-xs text-muted-foreground">Pan & Poteshman (2006)</div>
                 </Link>
                 
-                <div className="block p-3 rounded-lg border bg-muted/30">
+                <Link 
+                  to="/research/papers/garman-kohlhagen-1983"
+                  className="block p-3 rounded-lg border hover:bg-muted/50 transition-colors"
+                >
                   <div className="font-medium text-sm">Options Market Making</div>
                   <div className="text-xs text-muted-foreground">Garman & Kohlhagen (1983)</div>
-                </div>
+                </Link>
               </CardContent>
             </Card>
 
