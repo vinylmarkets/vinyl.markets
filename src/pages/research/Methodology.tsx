@@ -54,7 +54,7 @@ const Methodology = () => {
 
         {/* Core Methodology Section */}
         <section id="core-methodology" className="mb-12">
-          <h2 className="text-3xl font-bold text-foreground mb-8">Our Core Methodology</h2>
+          <h2 className="text-3xl font-serif text-foreground mb-8">Our Core Methodology</h2>
           
           <div className="space-y-8">
             <div>
@@ -137,7 +137,7 @@ const Methodology = () => {
 
         {/* Continuous Iteration Framework */}
         <section id="academic-experience" className="mb-12">
-          <h2 className="text-3xl font-bold text-foreground mb-8">Continuous Iteration Framework</h2>
+          <h2 className="text-3xl font-serif text-foreground mb-8">Continuous Iteration Framework</h2>
           
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-card border border-border rounded-lg p-6">
@@ -176,7 +176,7 @@ const Methodology = () => {
 
         {/* What We Don't Do */}
         <section id="continuous-iteration" className="mb-12">
-          <h2 className="text-3xl font-bold text-foreground mb-8">What We Don&apos;t Do</h2>
+          <h2 className="text-3xl font-serif text-foreground mb-8">What We Don&apos;t Do</h2>
           
           <div className="space-y-8">
             <div className="bg-card border border-border rounded-lg p-6">
@@ -212,7 +212,7 @@ const Methodology = () => {
 
         {/* Educational Empowerment Philosophy */}
         <section id="what-we-dont-do" className="mb-12">
-          <h2 className="text-3xl font-bold text-foreground mb-8">Educational Empowerment Philosophy</h2>
+          <h2 className="text-3xl font-serif text-foreground mb-8">Educational Empowerment Philosophy</h2>
           
           <div className="grid md:grid-cols-2 gap-8">
             <div>
@@ -254,7 +254,7 @@ const Methodology = () => {
 
         {/* Research Transparency */}
         <section id="educational-philosophy" className="mb-12">
-          <h2 className="text-3xl font-bold text-foreground mb-8">Research Transparency</h2>
+          <h2 className="text-3xl font-serif text-foreground mb-8">Research Transparency</h2>
           
           <div className="grid md:grid-cols-3 gap-8">
             <div>
@@ -294,7 +294,7 @@ const Methodology = () => {
 
         {/* The Academic User Experience */}
         <section id="research-transparency" className="mb-12">
-          <h2 className="text-3xl font-bold text-foreground mb-8">The Academic User Experience</h2>
+          <h2 className="text-3xl font-serif text-foreground mb-8">The Academic User Experience</h2>
           
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-card border border-border rounded-lg p-6">
@@ -333,7 +333,7 @@ const Methodology = () => {
 
         {/* Call to Action */}
         <section id="research-community" className="text-center">
-          <h2 className="text-3xl font-bold text-foreground mb-6">Join Our Research Community</h2>
+          <h2 className="text-3xl font-serif text-foreground mb-6">Join Our Research Community</h2>
           <p className="text-lg text-muted-foreground mb-8">
             We invite academics, researchers, and analytically-minded practitioners to:
           </p>

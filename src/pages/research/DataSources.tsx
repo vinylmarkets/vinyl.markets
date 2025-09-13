@@ -54,7 +54,7 @@ const DataSources = () => {
 
         {/* Real-Time Market Data */}
         <section id="market-data" className="mb-12">
-          <h2 className="text-3xl font-bold text-foreground mb-8">Real-Time Market Data</h2>
+          <h2 className="text-3xl font-serif text-foreground mb-8">Real-Time Market Data</h2>
           
           <Card className="mb-8">
             <CardContent className="p-6">
@@ -87,7 +87,7 @@ const DataSources = () => {
 
         {/* Social Sentiment Intelligence */}
         <section id="social-sentiment" className="mb-12">
-          <h2 className="text-3xl font-bold text-foreground mb-8">Social Sentiment Intelligence</h2>
+          <h2 className="text-3xl font-serif text-foreground mb-8">Social Sentiment Intelligence</h2>
           
           <div className="grid md:grid-cols-3 gap-6">
             <Card>
@@ -144,7 +144,7 @@ const DataSources = () => {
 
         {/* Options Flow Intelligence */}
         <section id="options-flow" className="mb-12">
-          <h2 className="text-3xl font-bold text-foreground mb-8">Options Flow Intelligence</h2>
+          <h2 className="text-3xl font-serif text-foreground mb-8">Options Flow Intelligence</h2>
           
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
@@ -186,7 +186,7 @@ const DataSources = () => {
 
         {/* News & Media Analysis */}
         <section id="news-analysis" className="mb-12">
-          <h2 className="text-3xl font-bold text-foreground mb-8">News & Media Analysis</h2>
+          <h2 className="text-3xl font-serif text-foreground mb-8">News & Media Analysis</h2>
           
           <div className="space-y-6">
             <Card>
@@ -246,7 +246,7 @@ const DataSources = () => {
 
         {/* Emerging Data Sources */}
         <section id="emerging-sources" className="mb-12">
-          <h2 className="text-3xl font-bold text-foreground mb-8">Emerging Data Sources (In Development)</h2>
+          <h2 className="text-3xl font-serif text-foreground mb-8">Emerging Data Sources (In Development)</h2>
           
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
@@ -291,7 +291,7 @@ const DataSources = () => {
 
         {/* Data Quality & Verification */}
         <section id="data-quality" className="mb-12">
-          <h2 className="text-3xl font-bold text-foreground mb-8">Data Quality & Verification</h2>
+          <h2 className="text-3xl font-serif text-foreground mb-8">Data Quality & Verification</h2>
           
           <div className="grid md:grid-cols-3 gap-6">
             <Card>
@@ -336,7 +336,7 @@ const DataSources = () => {
 
         {/* Competitive Advantage */}
         <section id="competitive-advantage" className="mb-12">
-          <h2 className="text-3xl font-bold text-foreground mb-8">The Competitive Advantage</h2>
+          <h2 className="text-3xl font-serif text-foreground mb-8">The Competitive Advantage</h2>
           
           <div className="grid md:grid-cols-2 gap-8">
             <Card className="border-destructive/20">
@@ -375,7 +375,7 @@ const DataSources = () => {
 
         {/* Data Transparency Commitment */}
         <section className="mb-12">
-          <h2 className="text-3xl font-bold text-foreground mb-8">Data Transparency Commitment</h2>
+          <h2 className="text-3xl font-serif text-foreground mb-8">Data Transparency Commitment</h2>
           
           <Card>
             <CardContent className="p-6">
@@ -407,7 +407,7 @@ const DataSources = () => {
 
         {/* Call to Action */}
         <section className="text-center">
-          <h2 className="text-3xl font-bold text-foreground mb-6">Coming Soon: Advanced Intelligence</h2>
+          <h2 className="text-3xl font-serif text-foreground mb-6">Coming Soon: Advanced Intelligence</h2>
           
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             <Card>
