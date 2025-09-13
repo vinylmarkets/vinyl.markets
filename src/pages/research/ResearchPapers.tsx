@@ -126,6 +126,17 @@ const ResearchPapers = () => {
           application: "Put-call ratio analysis segmented by moneyness and time to expiration.",
           citation: "45(2), 335-367",
           doi: "10.1017/S002210901000013X"
+        },
+        {
+          id: "garman-kohlhagen-1983",
+          title: "Foreign Currency Option Values",
+          authors: "Garman, M. B., & Kohlhagen, S. W.",
+          year: "1983",
+          journal: "Journal of International Money and Finance",
+          keyFinding: "Extended Black-Scholes framework to currency options by incorporating foreign interest rates.",
+          application: "Options market making analysis and cross-market arbitrage identification.",
+          citation: "2(3), 231-237",
+          doi: "10.1016/S0261-5606(83)80001-1"
         }
       ]
     },
