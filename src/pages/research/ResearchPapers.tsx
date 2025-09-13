@@ -184,7 +184,7 @@ const ResearchPapers = () => {
         {paperCategories.map((category, categoryIndex) => (
           <section key={categoryIndex} className="mb-16">
             <div className="flex items-center gap-3 mb-8">
-              <div className="p-2 rounded-lg bg-primary/10 text-primary">
+              <div className="p-2 rounded-lg bg-purple-100 text-purple-600">
                 {category.icon}
               </div>
               <h2 className="text-3xl font-serif font-bold text-foreground">
