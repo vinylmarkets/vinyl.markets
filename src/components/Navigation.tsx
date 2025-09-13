@@ -8,13 +8,14 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { Zap } from "lucide-react";
+import { Zap, Menu, X } from "lucide-react";
 import { siteNavigation } from "@/data/sitemap";
 import { cn } from "@/lib/utils";
 
 export const Navigation = () => {
   const [terminalValue, setTerminalValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
@@ -28,6 +29,14 @@ export const Navigation = () => {
             </div>
             <h1 className="text-2xl font-bold" style={{ color: 'hsl(var(--header-foreground))' }}>Tubeamp</h1>
           </Link>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 text-secondary hover:text-secondary/80 transition-colors"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
 
           {/* Main Navigation */}
           <div className="hidden md:flex items-center gap-8">
@@ -128,29 +137,62 @@ export const Navigation = () => {
           </div>
         </div>
 
-        {/* Terminal-style Ask Tubeamp - Mobile */}
-        <div className="md:hidden mt-4">
-          <div className="flex items-center gap-2 bg-black/90 border border-secondary/30 rounded px-3 py-2">
-            <span className="text-secondary text-sm font-mono">$</span>
-            <div className="relative flex items-center flex-1">
-              <input
-                type="text"
-                value={terminalValue}
-                onChange={(e) => setTerminalValue(e.target.value)}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                placeholder="Ask Tubeamp anything..."
-                className="bg-transparent text-secondary text-sm font-mono placeholder:text-secondary/50 focus:outline-none w-full"
-              />
-              <span className={`text-secondary font-mono text-sm ml-0.5 animate-pulse`}>|</span>
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden mt-4 pb-4 border-t border-border/50">
+            <nav className="flex flex-col gap-4 mt-4">
+              {siteNavigation.slice(1).map((item) => (
+                <div key={item.href}>
+                  <Link
+                    to={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block text-secondary hover:text-secondary/80 font-medium py-2 transition-colors"
+                  >
+                    {item.title}
+                  </Link>
+                  {item.children && (
+                    <div className="ml-4 mt-2 space-y-2">
+                      {item.children.map((child) => (
+                        <Link
+                          key={child.href}
+                          to={child.href}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="block text-sm text-secondary/70 hover:text-secondary/90 py-1 transition-colors"
+                        >
+                          {child.title}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </nav>
+
+            {/* Terminal-style Ask Tubeamp - Mobile */}
+            <div className="mt-6">
+              <div className="flex items-center gap-2 bg-black/90 border border-secondary/30 rounded px-3 py-2">
+                <span className="text-secondary text-sm font-mono">$</span>
+                <div className="relative flex items-center flex-1">
+                  <input
+                    type="text"
+                    value={terminalValue}
+                    onChange={(e) => setTerminalValue(e.target.value)}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
+                    placeholder="Ask Tubeamp anything..."
+                    className="bg-transparent text-secondary text-sm font-mono placeholder:text-secondary/50 focus:outline-none w-full"
+                  />
+                  <span className={`text-secondary font-mono text-sm ml-0.5 animate-pulse`}>|</span>
+                </div>
+                <button 
+                  className="text-secondary hover:text-secondary/80 text-sm font-mono transition-colors"
+                >
+                  ⏎
+                </button>
+              </div>
             </div>
-            <button 
-              className="text-secondary hover:text-secondary/80 text-sm font-mono transition-colors"
-            >
-              ⏎
-            </button>
           </div>
-        </div>
+        )}
       </div>
     </header>
   );
