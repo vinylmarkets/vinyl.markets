@@ -1,6 +1,7 @@
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Database, MessageCircle, Hash, MessageSquare, Building2, TrendingUp, FileText, Shield, Search, BarChart3, Users } from "lucide-react";
 
 const DataSources = () => {
   return (
@@ -57,7 +58,12 @@ const DataSources = () => {
           
           <Card className="mb-8">
             <CardContent className="p-6">
-              <h3 className="text-xl font-semibold text-foreground mb-4">Polygon.io - Our Primary Market Engine</h3>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <Database className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold text-foreground">Polygon.io - Our Primary Market Engine</h3>
+              </div>
               <div className="space-y-3 text-muted-foreground">
                 <p><strong className="text-foreground">Real-time stock prices</strong> across all major exchanges</p>
                 <p><strong className="text-foreground">Complete options chains</strong> with live Greeks calculations</p>
@@ -86,7 +92,10 @@ const DataSources = () => {
           <div className="grid md:grid-cols-3 gap-6">
             <Card>
               <CardContent className="p-6">
-                <h3 className="text-lg font-semibold text-foreground mb-4">Reddit API Integration</h3>
+                <div className="flex items-center gap-2 mb-4">
+                  <MessageCircle className="h-5 w-5 text-orange-500" />
+                  <h3 className="text-lg font-semibold text-foreground">Reddit API Integration</h3>
+                </div>
                 <div className="space-y-2 text-sm text-muted-foreground">
                   <p><strong className="text-foreground">Subreddits monitored:</strong> r/wallstreetbets, r/investing, r/stocks, r/SecurityAnalysis, r/ValueInvesting</p>
                   <p><strong className="text-foreground">Real-time mention tracking</strong> with sentiment scoring</p>
@@ -98,7 +107,10 @@ const DataSources = () => {
 
             <Card>
               <CardContent className="p-6">
-                <h3 className="text-lg font-semibold text-foreground mb-4">Twitter/X Financial Intelligence</h3>
+                <div className="flex items-center gap-2 mb-4">
+                  <Hash className="h-5 w-5 text-blue-400" />
+                  <h3 className="text-lg font-semibold text-foreground">Twitter/X Financial Intelligence</h3>
+                </div>
                 <div className="space-y-2 text-sm text-muted-foreground">
                   <p><strong className="text-foreground">FinTwit monitoring:</strong> 500+ verified financial accounts</p>
                   <p><strong className="text-foreground">Hashtag tracking:</strong> $TICKER mentions and financial keywords</p>
@@ -110,7 +122,10 @@ const DataSources = () => {
 
             <Card>
               <CardContent className="p-6">
-                <h3 className="text-lg font-semibold text-foreground mb-4">Discord Communities</h3>
+                <div className="flex items-center gap-2 mb-4">
+                  <MessageSquare className="h-5 w-5 text-indigo-500" />
+                  <h3 className="text-lg font-semibold text-foreground">Discord Communities</h3>
+                </div>
                 <div className="space-y-2 text-sm text-muted-foreground">
                   <p><strong className="text-foreground">Trading server monitoring</strong> (public channels only)</p>
                   <p><strong className="text-foreground">Real-time chat analysis</strong> for emerging trends</p>
@@ -134,7 +149,10 @@ const DataSources = () => {
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardContent className="p-6">
-                <h3 className="text-lg font-semibold text-foreground mb-4">Unusual Options Activity Detection</h3>
+                <div className="flex items-center gap-2 mb-4">
+                  <BarChart3 className="h-5 w-5 text-green-500" />
+                  <h3 className="text-lg font-semibold text-foreground">Unusual Options Activity Detection</h3>
+                </div>
                 <div className="space-y-2 text-sm text-muted-foreground">
                   <p><strong className="text-foreground">Volume anomalies:</strong> Trades 3x+ above 20-day average</p>
                   <p><strong className="text-foreground">Dark pool estimates:</strong> Large block trades and institutional activity</p>
@@ -146,7 +164,10 @@ const DataSources = () => {
 
             <Card>
               <CardContent className="p-6">
-                <h3 className="text-lg font-semibold text-foreground mb-4">Smart Money Tracking</h3>
+                <div className="flex items-center gap-2 mb-4">
+                  <TrendingUp className="h-5 w-5 text-emerald-500" />
+                  <h3 className="text-lg font-semibold text-foreground">Smart Money Tracking</h3>
+                </div>
                 <div className="space-y-2 text-sm text-muted-foreground">
                   <p><strong className="text-foreground">Sweep detection:</strong> Large orders split across exchanges</p>
                   <p><strong className="text-foreground">Opening vs. closing</strong> position identification</p>
@@ -170,7 +191,10 @@ const DataSources = () => {
           <div className="space-y-6">
             <Card>
               <CardContent className="p-6">
-                <h3 className="text-lg font-semibold text-foreground mb-4">Bloomberg Terminal Integration</h3>
+                <div className="flex items-center gap-2 mb-4">
+                  <Building2 className="h-5 w-5 text-blue-600" />
+                  <h3 className="text-lg font-semibold text-foreground">Bloomberg Terminal Integration</h3>
+                </div>
                 <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
                   <p><strong className="text-foreground">Breaking news alerts</strong> with millisecond timestamps</p>
                   <p><strong className="text-foreground">Analyst upgrades/downgrades</strong> in real-time</p>
@@ -182,10 +206,16 @@ const DataSources = () => {
 
             <Card>
               <CardContent className="p-6">
-                <h3 className="text-lg font-semibold text-foreground mb-4">Earnings Intelligence Pipeline</h3>
+                <div className="flex items-center gap-2 mb-4">
+                  <FileText className="h-5 w-5 text-purple-500" />
+                  <h3 className="text-lg font-semibold text-foreground">Earnings Intelligence Pipeline</h3>
+                </div>
                 <div className="space-y-4">
                   <div>
-                    <h4 className="font-medium text-foreground mb-2">SEC EDGAR Database APIs:</h4>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Shield className="h-4 w-4 text-blue-700" />
+                      <h4 className="font-medium text-foreground">SEC EDGAR Database APIs:</h4>
+                    </div>
                     <div className="grid md:grid-cols-2 gap-2 text-sm text-muted-foreground">
                       <p><strong className="text-foreground">10-K/10-Q filings</strong> automatically parsed for key metrics</p>
                       <p><strong className="text-foreground">8-K current reports</strong> for material events</p>
@@ -195,7 +225,10 @@ const DataSources = () => {
                   </div>
                   
                   <div>
-                    <h4 className="font-medium text-foreground mb-2">Earnings Call Transcripts:</h4>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Users className="h-4 w-4 text-green-600" />
+                      <h4 className="font-medium text-foreground">Earnings Call Transcripts:</h4>
+                    </div>
                     <div className="grid md:grid-cols-2 gap-2 text-sm text-muted-foreground">
                       <p><strong className="text-foreground">FactSet CallStreet</strong> integration for real-time transcripts</p>
                       <p><strong className="text-foreground">Seeking Alpha earnings call</strong> API for historical data</p>
@@ -218,7 +251,10 @@ const DataSources = () => {
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardContent className="p-6">
-                <h3 className="text-lg font-semibold text-foreground mb-4">Patent Intelligence</h3>
+                <div className="flex items-center gap-2 mb-4">
+                  <FileText className="h-5 w-5 text-purple-600" />
+                  <h3 className="text-lg font-semibold text-foreground">Patent Intelligence</h3>
+                </div>
                 <div className="space-y-2 text-sm text-muted-foreground">
                   <p><strong className="text-foreground">Real-time patent applications</strong> by public companies</p>
                   <p><strong className="text-foreground">Patent approval notifications</strong> indicating R&D success</p>
@@ -233,7 +269,10 @@ const DataSources = () => {
 
             <Card>
               <CardContent className="p-6">
-                <h3 className="text-lg font-semibold text-foreground mb-4">Legal Filing Monitoring</h3>
+                <div className="flex items-center gap-2 mb-4">
+                  <Building2 className="h-5 w-5 text-red-600" />
+                  <h3 className="text-lg font-semibold text-foreground">Legal Filing Monitoring</h3>
+                </div>
                 <div className="space-y-2 text-sm text-muted-foreground">
                   <p><strong className="text-foreground">Federal court filings</strong> involving public companies</p>
                   <p><strong className="text-foreground">Class action lawsuit monitoring</strong> for risk assessment</p>
