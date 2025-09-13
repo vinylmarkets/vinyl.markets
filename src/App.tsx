@@ -15,6 +15,7 @@ import BollenMaoZeng2011 from "./pages/research/papers/BollenMaoZeng2011";
 import BoehmerJones2021 from "./pages/research/papers/BoehmerJones2021";
 import BrownJennings1989 from "./pages/research/papers/BrownJennings1989";
 import JegadeeshTitman1993 from "./pages/research/papers/JegadeeshTitman1993";
+import Engle1982 from "./pages/research/papers/Engle1982";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/research/papers/boehmer-2021" element={<BoehmerJones2021 />} />
           <Route path="/research/papers/brown-jennings-1989" element={<BrownJennings1989 />} />
           <Route path="/research/papers/jegadeesh-titman-1993" element={<JegadeeshTitman1993 />} />
+          <Route path="/research/papers/engle-1982" element={<Engle1982 />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
