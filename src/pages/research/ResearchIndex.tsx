@@ -77,8 +77,8 @@ const ResearchIndex = () => {
           
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                <BookOpen className="h-8 w-8 text-primary" />
+              <div className="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-4">
+                <BookOpen className="h-8 w-8 text-purple-600" />
               </div>
               <h3 className="text-xl font-semibold mb-3">Academic Rigor</h3>
               <p className="text-muted-foreground">
@@ -88,8 +88,8 @@ const ResearchIndex = () => {
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                <Database className="h-8 w-8 text-primary" />
+              <div className="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-4">
+                <Database className="h-8 w-8 text-purple-600" />
               </div>
               <h3 className="text-xl font-semibold mb-3">Data Transparency</h3>
               <p className="text-muted-foreground">
@@ -99,8 +99,8 @@ const ResearchIndex = () => {
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                <Users className="h-8 w-8 text-primary" />
+              <div className="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-4">
+                <Users className="h-8 w-8 text-purple-600" />
               </div>
               <h3 className="text-xl font-semibold mb-3">Continuous Validation</h3>
               <p className="text-muted-foreground">
