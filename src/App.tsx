@@ -26,6 +26,12 @@ import PanPoteshman2006 from "./pages/research/papers/PanPoteshman2006";
 import CremersWeinbaum2010 from "./pages/research/papers/CremersWeinbaum2010";
 import OptionsPaperRouter from "./pages/research/papers/OptionsPaperRouter";
 import NotFound from "./pages/NotFound";
+import Briefings from "./pages/dashboard/Briefings";
+import Terminal from "./pages/dashboard/Terminal";
+import LearningProgress from "./pages/dashboard/Progress";
+import Portfolio from "./pages/dashboard/Portfolio";
+import SettingsPage from "./pages/dashboard/Settings";
+import Upgrade from "./pages/dashboard/Upgrade";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +47,12 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={<MockDashboard />} />
+              <Route path="/dashboard/briefings" element={<Briefings />} />
+              <Route path="/dashboard/terminal" element={<Terminal />} />
+              <Route path="/dashboard/progress" element={<LearningProgress />} />
+              <Route path="/dashboard/portfolio" element={<Portfolio />} />
+              <Route path="/dashboard/settings" element={<SettingsPage />} />
+              <Route path="/dashboard/upgrade" element={<Upgrade />} />
               <Route path="/dashboard-test" element={<DashboardTest />} />
               <Route path="/dashboard-old" element={<Dashboard />} />
               <Route path="/research" element={<ResearchPapers />} />
