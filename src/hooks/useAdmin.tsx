@@ -9,7 +9,10 @@ export function useAdmin() {
 
   useEffect(() => {
     async function checkAdminStatus() {
+      console.log('useAdmin: Checking admin status for user:', user?.email);
+      
       if (!user) {
+        console.log('useAdmin: No user found, setting isAdmin to false');
         setIsAdmin(false);
         setLoading(false);
         return;
@@ -23,14 +26,18 @@ export function useAdmin() {
           .eq('id', user.id)
           .single();
 
+        console.log('useAdmin: Database query result:', { data, error, userId: user.id });
+
         if (error) {
-          console.error('Error checking admin status:', error);
+          console.error('useAdmin: Error checking admin status:', error);
           setIsAdmin(false);
         } else {
-          setIsAdmin(data?.role === 'admin');
+          const adminStatus = data?.role === 'admin';
+          console.log('useAdmin: Setting admin status:', adminStatus, 'for role:', data?.role);
+          setIsAdmin(adminStatus);
         }
       } catch (error) {
-        console.error('Error in admin check:', error);
+        console.error('useAdmin: Error in admin check:', error);
         setIsAdmin(false);
       } finally {
         setLoading(false);
