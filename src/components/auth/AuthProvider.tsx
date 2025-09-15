@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { User, Session } from '@supabase/supabase-js'
-import { supabase, isSupabaseConfigured } from '@/integrations/supabase/client'
+import { supabase } from '@/integrations/supabase/client'
 
 interface AuthContextType {
   user: User | null
@@ -36,13 +36,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Check if Supabase is properly configured
-    if (!isSupabaseConfigured()) {
-      console.warn('Supabase not configured properly. Using mock authentication.')
-      setLoading(false)
-      return
-    }
-
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
@@ -66,8 +59,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [])
 
   const signOut = async () => {
-    if (!isSupabaseConfigured()) return
-    
     try {
       await supabase.auth.signOut()
     } catch (error) {

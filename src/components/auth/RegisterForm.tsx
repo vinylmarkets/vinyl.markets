@@ -133,15 +133,14 @@ export function RegisterForm({ onClose }: RegisterFormProps) {
       if (authData.user) {
         console.log('Creating user profile...');
         const { error: profileError } = await supabase
-          .from('profiles')
+          .from('users')
           .insert([
             {
               id: authData.user.id,
+              email: data.email,
               full_name: data.fullName,
               investment_experience: data.investmentExperience,
               risk_tolerance: data.riskTolerance,
-              terms_accepted: true,
-              educational_purpose_acknowledged: true,
             }
           ]);
 

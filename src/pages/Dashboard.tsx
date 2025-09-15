@@ -85,7 +85,7 @@ export default function Dashboard() {
       
       try {
         const { data, error } = await supabase
-          .from('profiles')
+          .from('users')
           .select('*')
           .eq('id', user.id)
           .single();
