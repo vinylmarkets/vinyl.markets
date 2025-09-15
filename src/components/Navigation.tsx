@@ -8,15 +8,51 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { Zap, Menu, X } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Zap, Menu, X, User, LogOut, Settings } from "lucide-react";
 import { siteNavigation } from "@/data/sitemap";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { AuthModal } from "@/components/auth/AuthModal";
 
 export const Navigation = () => {
   const [terminalValue, setTerminalValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>('login');
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  const { user, signOut } = useAuth();
+  
+  const handleAuthModal = (tab: 'login' | 'register') => {
+    setAuthModalTab(tab);
+    setAuthModalOpen(true);
+  };
+  
+  const handleSignOut = async () => {
+    await signOut();
+    setMobileMenuOpen(false);
+  };
+  
+  const getUserInitials = (user: any) => {
+    if (user?.user_metadata?.full_name) {
+      return user.user_metadata.full_name
+        .split(' ')
+        .map((n: string) => n[0])
+        .join('')
+        .toUpperCase();
+    }
+    return user?.email?.[0]?.toUpperCase() || 'U';
+  };
 
   return (
     <header className="border-b border-border/50 backdrop-blur-sm sticky top-0 z-50" style={{ backgroundColor: 'hsl(var(--header-background))', color: 'hsl(var(--header-foreground))' }}>
@@ -134,6 +170,67 @@ export const Navigation = () => {
                 ⏎
               </button>
             </div>
+
+            {/* Authentication */}
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                    <Avatar className="h-10 w-10">
+                      <AvatarFallback className="bg-secondary text-secondary-foreground">
+                        {getUserInitials(user)}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56 z-50 bg-background border-border" align="end" forceMount>
+                  <div className="flex items-center justify-start gap-2 p-2">
+                    <div className="flex flex-col space-y-1 leading-none">
+                      <p className="font-medium text-sm">
+                        {user.user_metadata?.full_name || "User"}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard" className="w-full cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleAuthModal('login')}
+                  className="text-secondary hover:text-secondary/80"
+                >
+                  Log In
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => handleAuthModal('register')}
+                  className="bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+                >
+                  Sign Up Free
+                </Button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -166,6 +263,68 @@ export const Navigation = () => {
                   )}
                 </div>
               ))}
+              
+              {/* Mobile Authentication */}
+              {user ? (
+                <div className="border-t border-border/50 pt-4 mt-4">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
+                        {getUserInitials(user)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">
+                        {user.user_metadata?.full_name || "User"}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-2 text-secondary hover:text-secondary/80 py-2 transition-colors"
+                    >
+                      <User className="h-4 w-4" />
+                      Dashboard
+                    </Link>
+                    <button
+                      onClick={handleSignOut}
+                      className="flex items-center gap-2 text-secondary hover:text-secondary/80 py-2 transition-colors w-full text-left"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="border-t border-border/50 pt-4 mt-4 space-y-3">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      handleAuthModal('login');
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full text-secondary hover:text-secondary/80"
+                  >
+                    Log In
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      handleAuthModal('register');
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+                  >
+                    Sign Up Free
+                  </Button>
+                </div>
+              )}
             </nav>
 
             {/* Terminal-style Ask Tubeamp - Mobile */}
@@ -193,6 +352,13 @@ export const Navigation = () => {
             </div>
           </div>
         )}
+        
+        {/* Auth Modal */}
+        <AuthModal 
+          isOpen={authModalOpen} 
+          onClose={() => setAuthModalOpen(false)}
+          initialTab={authModalTab}
+        />
       </div>
     </header>
   );
