@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import DashboardTest from "./pages/DashboardTest";
 import BasicTest from "./pages/BasicTest";
+import MockDashboard from "./pages/MockDashboard";
 import ResearchIndex from "./pages/research/ResearchIndex";
 import Methodology from "./pages/research/Methodology";
 import DataSources from "./pages/research/DataSources";
@@ -37,12 +38,12 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/dashboard" element={<BasicTest />} />
-            <Route path="/dashboard-test" element={<DashboardTest />} />
-            <Route path="/dashboard-old" element={<Dashboard />} />
-            <Route path="/research" element={<ResearchPapers />} />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/dashboard" element={<MockDashboard />} />
+              <Route path="/dashboard-test" element={<DashboardTest />} />
+              <Route path="/dashboard-old" element={<Dashboard />} />
+              <Route path="/research" element={<ResearchPapers />} />
             <Route path="/research/data-sources" element={<DataSources />} />
             <Route path="/research/methodology" element={<Methodology />} />
             <Route path="/research/papers" element={<ResearchPapers />} />
