@@ -27,6 +27,7 @@ import CremersWeinbaum2010 from "./pages/research/papers/CremersWeinbaum2010";
 import OptionsPaperRouter from "./pages/research/papers/OptionsPaperRouter";
 import NotFound from "./pages/NotFound";
 import Briefings from "./pages/dashboard/Briefings";
+import BriefingDetail from "./pages/dashboard/BriefingDetail";
 import Terminal from "./pages/dashboard/Terminal";
 import LearningProgress from "./pages/dashboard/Progress";
 import Portfolio from "./pages/dashboard/Portfolio";
@@ -49,6 +50,7 @@ const App = () => {
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={<MockDashboard />} />
               <Route path="/dashboard/briefings" element={<Briefings />} />
+              <Route path="/dashboard/briefings/:id" element={<BriefingDetail />} />
               <Route path="/dashboard/terminal" element={<Terminal />} />
               <Route path="/dashboard/progress" element={<LearningProgress />} />
               <Route path="/dashboard/portfolio" element={<Portfolio />} />
