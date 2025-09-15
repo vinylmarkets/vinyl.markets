@@ -78,9 +78,14 @@ export function RegisterForm({ onClose }: RegisterFormProps) {
   const passwordStrength = getPasswordStrength(password || "");
 
   const onSubmit = async (data: RegisterFormData) => {
+    console.log('Registration attempt started');
+    console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL ? 'Set' : 'Missing');
+    console.log('Supabase Key:', import.meta.env.VITE_SUPABASE_ANON_KEY ? 'Set' : 'Missing');
+    
     setIsLoading(true);
     
     try {
+      console.log('Attempting to sign up user...');
       // First, sign up the user
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
@@ -92,7 +97,10 @@ export function RegisterForm({ onClose }: RegisterFormProps) {
         },
       });
 
+      console.log('Sign up response:', { authData, authError });
+
       if (authError) {
+        console.error('Authentication error:', authError);
         toast({
           variant: "destructive",
           title: "Registration Failed",
@@ -103,6 +111,7 @@ export function RegisterForm({ onClose }: RegisterFormProps) {
 
       // If user is created, store additional profile data
       if (authData.user) {
+        console.log('Creating user profile...');
         const { error: profileError } = await supabase
           .from('profiles')
           .insert([
@@ -122,6 +131,7 @@ export function RegisterForm({ onClose }: RegisterFormProps) {
         }
       }
 
+      console.log('Registration successful');
       toast({
         title: "Welcome to TubeAmp!",
         description: "Please check your email to verify your account.",
@@ -132,6 +142,7 @@ export function RegisterForm({ onClose }: RegisterFormProps) {
       // Redirect to dashboard or verification page
       window.location.href = "/dashboard";
     } catch (error) {
+      console.error('Unexpected registration error:', error);
       toast({
         variant: "destructive",
         title: "Registration Failed",
