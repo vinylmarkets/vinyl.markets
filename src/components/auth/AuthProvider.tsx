@@ -34,11 +34,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Check if Supabase is properly configured
+    const isSupabaseConfigured = 
+      import.meta.env.VITE_SUPABASE_URL && 
+      import.meta.env.VITE_SUPABASE_ANON_KEY &&
+      import.meta.env.VITE_SUPABASE_URL !== 'https://placeholder.supabase.co';
+
+    if (!isSupabaseConfigured) {
+      console.warn('Supabase not configured. Authentication features will be disabled.');
+      setLoading(false);
+      return;
+    }
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
+    }).catch((error) => {
+      console.error('Auth initialization error:', error);
+      setLoading(false);
     })
 
     // Listen for auth changes
@@ -54,7 +69,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [])
 
   const signOut = async () => {
-    await supabase.auth.signOut()
+    try {
+      await supabase.auth.signOut()
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
   }
 
   return (
