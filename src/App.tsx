@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
+import DashboardTest from "./pages/DashboardTest";
 import ResearchIndex from "./pages/research/ResearchIndex";
 import Methodology from "./pages/research/Methodology";
 import DataSources from "./pages/research/DataSources";
@@ -38,7 +39,8 @@ const App = () => {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard" element={<DashboardTest />} />
+              <Route path="/dashboard-old" element={<Dashboard />} />
               <Route path="/research" element={<ResearchPapers />} />
               <Route path="/research/data-sources" element={<DataSources />} />
               <Route path="/research/methodology" element={<Methodology />} />
