@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { 
   BookOpen, 
   TrendingUp, 
@@ -11,19 +12,9 @@ import {
   Calendar,
   ArrowRight,
   Crown,
-  BarChart3,
   Target,
-  Clock,
-  FileText,
-  Zap,
-  Bell,
-  User,
-  Settings,
-  LogOut,
-  Menu,
-  LayoutDashboard
+  Clock
 } from "lucide-react";
-import { useState } from "react";
 
 // Mock data
 const mockStats = {
@@ -56,322 +47,241 @@ const mockTodaysBriefing = {
 };
 
 export default function MockDashboard() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const userTier = "free";
   const firstName = "Test User";
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="h-16 border-b border-border bg-background flex items-center justify-between px-6">
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="md:hidden"
-          >
-            <Menu className="h-4 w-4" />
-          </Button>
-          
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded bg-secondary flex items-center justify-center">
-              <Zap className="w-5 h-5 text-white" />
-            </div>
-            <h1 className="text-xl font-bold text-foreground">TubeAmp Dashboard</h1>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" className="relative">
-            <Bell className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="sm">
-            <User className="h-4 w-4" />
-          </Button>
-        </div>
-      </header>
-
-      <div className="flex">
-        {/* Sidebar */}
-        <div className={`${sidebarOpen ? 'block' : 'hidden'} md:block w-64 border-r border-border bg-background h-[calc(100vh-4rem)]`}>
-          <div className="p-4 space-y-2">
-            <Button variant="secondary" className="w-full justify-start">
-              <LayoutDashboard className="mr-2 h-4 w-4" />
-              Dashboard
-            </Button>
-            <Button variant="ghost" className="w-full justify-start">
-              <FileText className="mr-2 h-4 w-4" />
-              Intelligence Briefings
-            </Button>
-            <Button variant="ghost" className="w-full justify-start">
-              <MessageSquare className="mr-2 h-4 w-4" />
-              Ask TubeAmp
-            </Button>
-            <Button variant="ghost" className="w-full justify-start">
-              <BookOpen className="mr-2 h-4 w-4" />
-              Learning Progress
-            </Button>
-            <Button variant="ghost" className="w-full justify-start text-muted-foreground" disabled>
-              <Crown className="mr-2 h-4 w-4" />
-              Portfolio (Premium)
-            </Button>
-            <Button variant="ghost" className="w-full justify-start">
-              <Settings className="mr-2 h-4 w-4" />
-              Settings
-            </Button>
-          </div>
-          
-          {/* Upgrade Section */}
-          <div className="mx-4 mt-6 p-3 bg-gradient-to-br from-secondary/20 to-secondary/10 rounded-lg border">
-            <div className="flex items-center gap-2 mb-2">
-              <Crown className="h-4 w-4 text-yellow-500" />
-              <span className="text-sm font-medium">Upgrade</span>
-            </div>
-            <p className="text-xs text-muted-foreground mb-3">
-              Unlock advanced features
+    <DashboardLayout>
+      <div className="space-y-6">{/* Welcome Section */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-serif font-bold text-foreground">
+              Welcome back, {firstName}! 👋
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Ready to dive into today's market intelligence?
             </p>
-            <Button size="sm" className="w-full text-xs">
-              View Plans
-            </Button>
+          </div>
+          
+          <div className="text-right">
+            <div className="text-sm text-muted-foreground">
+              {new Date().toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              })}
+            </div>
+            <Badge variant="outline" className="mt-1">
+              {userTier.charAt(0).toUpperCase() + userTier.slice(1)} Plan
+            </Badge>
           </div>
         </div>
 
-        {/* Main Content */}
-        <main className="flex-1 p-6 bg-muted/30">
-          <div className="space-y-6">
-            {/* Welcome Section */}
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-serif font-bold text-foreground">
-                  Welcome back, {firstName}! 👋
-                </h1>
-                <p className="text-muted-foreground mt-1">
-                  Ready to dive into today's market intelligence?
-                </p>
-              </div>
-              
-              <div className="text-right">
-                <div className="text-sm text-muted-foreground">
-                  {new Date().toLocaleDateString('en-US', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Briefings Read</p>
+                  <p className="text-2xl font-bold">{mockStats.briefingsRead}</p>
                 </div>
-                <Badge variant="outline" className="mt-1">
-                  {userTier.charAt(0).toUpperCase() + userTier.slice(1)} Plan
+                <BookOpen className="h-8 w-8 text-secondary" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Questions Asked</p>
+                  <p className="text-2xl font-bold">{mockStats.questionsAsked}</p>
+                </div>
+                <MessageSquare className="h-8 w-8 text-secondary" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Learning Streak</p>
+                  <p className="text-2xl font-bold">{mockStats.learningStreak} days</p>
+                </div>
+                <Target className="h-8 w-8 text-secondary" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Achievements</p>
+                  <p className="text-2xl font-bold">{mockStats.achievementsEarned}</p>
+                </div>
+                <Award className="h-8 w-8 text-secondary" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Today's Intelligence Briefing */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-secondary" />
+                  Today's Intelligence
+                </CardTitle>
+                <Badge variant="secondary" className="bg-secondary/20 text-secondary">
+                  {mockTodaysBriefing.confidence} Confidence
                 </Badge>
               </div>
-            </div>
-
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Briefings Read</p>
-                      <p className="text-2xl font-bold">{mockStats.briefingsRead}</p>
-                    </div>
-                    <BookOpen className="h-8 w-8 text-secondary" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Questions Asked</p>
-                      <p className="text-2xl font-bold">{mockStats.questionsAsked}</p>
-                    </div>
-                    <MessageSquare className="h-8 w-8 text-secondary" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Learning Streak</p>
-                      <p className="text-2xl font-bold">{mockStats.learningStreak} days</p>
-                    </div>
-                    <Target className="h-8 w-8 text-secondary" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Achievements</p>
-                      <p className="text-2xl font-bold">{mockStats.achievementsEarned}</p>
-                    </div>
-                    <Award className="h-8 w-8 text-secondary" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Today's Intelligence Briefing */}
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                      <Calendar className="h-5 w-5 text-secondary" />
-                      Today's Intelligence
-                    </CardTitle>
-                    <Badge variant="secondary" className="bg-secondary/20 text-secondary">
-                      {mockTodaysBriefing.confidence} Confidence
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <h3 className="font-semibold text-lg mb-2">{mockTodaysBriefing.title}</h3>
-                  <p className="text-muted-foreground mb-4 leading-relaxed">
-                    {mockTodaysBriefing.summary}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Clock className="h-4 w-4" />
-                      {mockTodaysBriefing.readTime}
-                    </div>
-                    <Button size="sm">
-                      Read Full Brief
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Recent Ask TubeAmp Queries */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MessageSquare className="h-5 w-5 text-secondary" />
-                    Recent Questions
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {mockRecentQueries.map((query) => (
-                      <div key={query.id} className="border-l-2 border-secondary pl-4">
-                        <p className="text-sm font-medium mb-1 line-clamp-2">
-                          {query.question}
-                        </p>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <span>
-                            {query.timestamp.toLocaleDateString()} at {query.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </span>
-                          {query.answered && (
-                            <Badge variant="outline" className="text-xs py-0">
-                              Answered
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <Button variant="outline" size="sm" className="w-full mt-4">
-                    <MessageSquare className="mr-2 h-4 w-4" />
-                    Ask New Question
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Learning Progress & Upgrade */}
-            <div className="grid md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <TrendingUp className="h-5 w-5 text-secondary" />
-                    Learning Progress
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span>Options Basics</span>
-                        <span>85%</span>
-                      </div>
-                      <Progress value={85} className="h-2" />
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span>Market Analysis</span>
-                        <span>65%</span>
-                      </div>
-                      <Progress value={65} className="h-2" />
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span>Risk Management</span>
-                        <span>40%</span>
-                      </div>
-                      <Progress value={40} className="h-2" />
-                    </div>
-                  </div>
-                  <Button variant="outline" size="sm" className="w-full mt-4">
-                    Continue Learning
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Upgrade Prompt */}
-              <Card className="border-2 border-dashed border-yellow-200 bg-gradient-to-br from-yellow-50 to-orange-50">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Crown className="h-5 w-5 text-yellow-600" />
-                    Unlock More Features
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 text-sm mb-4">
-                    <li className="flex items-center gap-2">
-                      <div className="h-1.5 w-1.5 rounded-full bg-yellow-600"></div>
-                      Unlimited Ask TubeAmp queries
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="h-1.5 w-1.5 rounded-full bg-yellow-600"></div>
-                      Advanced portfolio tracking
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="h-1.5 w-1.5 rounded-full bg-yellow-600"></div>
-                      Real-time market alerts
-                    </li>
-                  </ul>
-                  <Button size="sm" className="w-full bg-yellow-600 hover:bg-yellow-700 text-white">
-                    Upgrade to Essential - $29/mo
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Educational Disclaimer */}
-            <Card className="border-2 border-muted">
-              <CardContent className="pt-6">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="h-5 w-5 text-destructive mt-0.5 flex-shrink-0" />
-                  <div className="space-y-2">
-                    <h3 className="font-semibold text-sm">Educational Platform Notice</h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      TubeAmp provides educational market analysis and research for learning purposes only. 
-                      This is not investment advice, financial advice, or recommendations to buy or sell securities.
-                    </p>
-                  </div>
+            </CardHeader>
+            <CardContent>
+              <h3 className="font-semibold text-lg mb-2">{mockTodaysBriefing.title}</h3>
+              <p className="text-muted-foreground mb-4 leading-relaxed">
+                {mockTodaysBriefing.summary}
+              </p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Clock className="h-4 w-4" />
+                  {mockTodaysBriefing.readTime}
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        </main>
+                <Button size="sm">
+                  Read Full Brief
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Recent Ask TubeAmp Queries */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="h-5 w-5 text-secondary" />
+                Recent Questions
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {mockRecentQueries.map((query) => (
+                  <div key={query.id} className="border-l-2 border-secondary pl-4">
+                    <p className="text-sm font-medium mb-1 line-clamp-2">
+                      {query.question}
+                    </p>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span>
+                        {query.timestamp.toLocaleDateString()} at {query.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                      {query.answered && (
+                        <Badge variant="outline" className="text-xs py-0">
+                          Answered
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <Button variant="outline" size="sm" className="w-full mt-4">
+                <MessageSquare className="mr-2 h-4 w-4" />
+                Ask New Question
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Learning Progress & Upgrade */}
+        <div className="grid md:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <TrendingUp className="h-5 w-5 text-secondary" />
+                Learning Progress
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span>Options Basics</span>
+                    <span>85%</span>
+                  </div>
+                  <Progress value={85} className="h-2" />
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span>Market Analysis</span>
+                    <span>65%</span>
+                  </div>
+                  <Progress value={65} className="h-2" />
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span>Risk Management</span>
+                    <span>40%</span>
+                  </div>
+                  <Progress value={40} className="h-2" />
+                </div>
+              </div>
+              <Button variant="outline" size="sm" className="w-full mt-4">
+                Continue Learning
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Upgrade Prompt */}
+          <Card className="border-2 border-dashed border-yellow-200 bg-gradient-to-br from-yellow-50 to-orange-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Crown className="h-5 w-5 text-yellow-600" />
+                Unlock More Features
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2 text-sm mb-4">
+                <li className="flex items-center gap-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-yellow-600"></div>
+                  Unlimited Ask TubeAmp queries
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-yellow-600"></div>
+                  Advanced portfolio tracking
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-yellow-600"></div>
+                  Real-time market alerts
+                </li>
+              </ul>
+              <Button size="sm" className="w-full bg-yellow-600 hover:bg-yellow-700 text-white">
+                Upgrade to Essential - $29/mo
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Educational Disclaimer */}
+        <Card className="border-2 border-muted">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-destructive mt-0.5 flex-shrink-0" />
+              <div className="space-y-2">
+                <h3 className="font-semibold text-sm">Educational Platform Notice</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  TubeAmp provides educational market analysis and research for learning purposes only. 
+                  This is not investment advice, financial advice, or recommendations to buy or sell securities.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
