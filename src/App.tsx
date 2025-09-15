@@ -36,6 +36,8 @@ import SettingsPage from "./pages/dashboard/Settings";
 import Upgrade from "./pages/dashboard/Upgrade";
 
 // Admin Dashboard Components
+import { AdminProtected } from "./components/AdminProtected";
+import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ExecutiveOverview from "./pages/admin/ExecutiveOverview";
 import UserAnalytics from "./pages/admin/UserAnalytics";
@@ -70,13 +72,14 @@ const App = () => {
               <Route path="/dashboard/upgrade" element={<Upgrade />} />
               
               {/* Admin Dashboard Routes */}
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/executive-overview" element={<ExecutiveOverview />} />
-              <Route path="/admin/user-analytics" element={<UserAnalytics />} />
-              <Route path="/admin/product-intelligence" element={<ProductIntelligence />} />
-              <Route path="/admin/content-performance" element={<ContentPerformance />} />
-              <Route path="/admin/business-metrics" element={<BusinessMetrics />} />
-              <Route path="/admin/compliance-monitoring" element={<ComplianceMonitoring />} />
+              <Route path="/admin-login" element={<AdminLogin />} />
+              <Route path="/admin" element={<AdminProtected><AdminDashboard /></AdminProtected>} />
+              <Route path="/admin/executive-overview" element={<AdminProtected><ExecutiveOverview /></AdminProtected>} />
+              <Route path="/admin/user-analytics" element={<AdminProtected><UserAnalytics /></AdminProtected>} />
+              <Route path="/admin/product-intelligence" element={<AdminProtected><ProductIntelligence /></AdminProtected>} />
+              <Route path="/admin/content-performance" element={<AdminProtected><ContentPerformance /></AdminProtected>} />
+              <Route path="/admin/business-metrics" element={<AdminProtected><BusinessMetrics /></AdminProtected>} />
+              <Route path="/admin/compliance-monitoring" element={<AdminProtected><ComplianceMonitoring /></AdminProtected>} />
               
               <Route path="/dashboard-test" element={<DashboardTest />} />
               <Route path="/dashboard-old" element={<Dashboard />} />

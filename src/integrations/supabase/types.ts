@@ -944,6 +944,7 @@ export type Database = {
           id: string
           investment_experience: string | null
           risk_tolerance: string | null
+          role: string | null
           subscription_status: string | null
           subscription_tier: string | null
           terms_accepted_at: string
@@ -957,6 +958,7 @@ export type Database = {
           id: string
           investment_experience?: string | null
           risk_tolerance?: string | null
+          role?: string | null
           subscription_status?: string | null
           subscription_tier?: string | null
           terms_accepted_at?: string
@@ -970,6 +972,7 @@ export type Database = {
           id?: string
           investment_experience?: string | null
           risk_tolerance?: string | null
+          role?: string | null
           subscription_status?: string | null
           subscription_tier?: string | null
           terms_accepted_at?: string
@@ -979,6 +982,44 @@ export type Database = {
       }
     }
     Views: {
+      admin_executive_summary: {
+        Row: {
+          briefings_today: number | null
+          monthly_revenue: number | null
+          paid_users: number | null
+          queries_today: number | null
+          total_users: number | null
+          users_last_7_days: number | null
+        }
+        Relationships: []
+      }
+      admin_feature_usage: {
+        Row: {
+          feature: string | null
+          total_usage: number | null
+          unique_users: number | null
+          usage_date: string | null
+        }
+        Relationships: []
+      }
+      admin_revenue_analytics: {
+        Row: {
+          avg_customer_age_days: number | null
+          monthly_revenue: number | null
+          subscriber_count: number | null
+          subscription_tier: string | null
+        }
+        Relationships: []
+      }
+      admin_user_growth: {
+        Row: {
+          cumulative_users: number | null
+          new_signups: number | null
+          paid_signups: number | null
+          signup_date: string | null
+        }
+        Relationships: []
+      }
       business_metrics_summary: {
         Row: {
           active_users: number | null
@@ -1057,6 +1098,10 @@ export type Database = {
           delivered_at: string
           user_rating: number
         }[]
+      }
+      is_current_user_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
       }
       screen_content_compliance: {
         Args: { content_text: string }
