@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import DashboardTest from "./pages/DashboardTest";
 import BasicTest from "./pages/BasicTest";
+import IntegrationTest from "./components/IntegrationTest";
 import MockDashboard from "./pages/MockDashboard";
 import ResearchIndex from "./pages/research/ResearchIndex";
 import Methodology from "./pages/research/Methodology";
@@ -48,6 +49,7 @@ const App = () => {
           <AuthProvider>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/integration-test" element={<IntegrationTest />} />
               <Route path="/terminal" element={<Terminal />} />
               <Route path="/dashboard" element={<MockDashboard />} />
               <Route path="/dashboard/briefings" element={<Briefings />} />
