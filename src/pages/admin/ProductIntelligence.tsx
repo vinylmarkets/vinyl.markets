@@ -43,19 +43,15 @@ export default function ProductIntelligence() {
         .limit(10);
 
       // Fetch achievement data
-      const { data: achievements } = await supabase
+      const { data: achievementsData } = await supabase
         .from('achievements')
-        .select('category')
-        .then(response => {
-          if (response.data) {
-            const categoryCount = response.data.reduce((acc: any, curr) => {
-              acc[curr.category] = (acc[curr.category] || 0) + 1;
-              return acc;
-            }, {});
-            return Object.entries(categoryCount).map(([category, count]) => ({ category, count: count as number }));
-          }
-          return [];
-        });
+        .select('category');
+
+      const achievements = achievementsData ? 
+        Object.entries(achievementsData.reduce((acc: any, curr) => {
+          acc[curr.category] = (acc[curr.category] || 0) + 1;
+          return acc;
+        }, {})).map(([category, count]) => ({ category, count: count as number })) : [];
 
       // Calculate metrics
       const totalBriefings = briefingMetrics?.reduce((sum, d) => sum + (d.briefings_delivered || 0), 0) || 0;

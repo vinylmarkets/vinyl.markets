@@ -29,17 +29,17 @@ export default function UserAnalytics() {
 
   const fetchUserAnalytics = async () => {
     try {
-      // Fetch signup trends
+      // Fetch signup trends from daily metrics
       const { data: signupData } = await supabase
-        .from('admin_user_growth')
+        .from('daily_metrics')
         .select('*')
-        .order('signup_date', { ascending: true })
+        .order('date', { ascending: true })
         .limit(30);
 
-      // Fetch subscription distribution
+      // Fetch subscription distribution from users table
       const { data: subscriptionData } = await supabase
-        .from('admin_revenue_analytics')
-        .select('*');
+        .from('users')
+        .select('subscription_tier');
 
       // Fetch top active users
       const { data: topUsersData } = await supabase
@@ -50,20 +50,29 @@ export default function UserAnalytics() {
 
       // Calculate total users and engagement
       const { data: userSummary } = await supabase
-        .from('admin_executive_summary')
+        .from('daily_metrics')
         .select('*')
+        .order('date', { ascending: false })
+        .limit(1)
         .single();
 
       if (signupData && subscriptionData && topUsersData) {
         const signupTrends = signupData.map(d => ({
-          date: new Date(d.signup_date).toLocaleDateString(),
+          date: new Date(d.date).toLocaleDateString(),
           signups: Number(d.new_signups) || 0,
-          paidSignups: Number(d.paid_signups) || 0
+          paidSignups: Number(d.subscription_conversions) || 0
         }));
 
-        const subscriptionDistribution = subscriptionData.map(d => ({
-          tier: d.subscription_tier || 'unknown',
-          count: Number(d.subscriber_count) || 0,
+        // Process subscription distribution from users data
+        const tierCounts = subscriptionData.reduce((acc: any, user) => {
+          const tier = user.subscription_tier || 'free';
+          acc[tier] = (acc[tier] || 0) + 1;
+          return acc;
+        }, {});
+
+        const subscriptionDistribution = Object.entries(tierCounts).map(([tier, count]) => ({
+          tier,
+          count: count as number,
           percentage: 0 // Will calculate below
         }));
 
@@ -108,7 +117,7 @@ export default function UserAnalytics() {
 
         if (userSummary) {
           setTotalUsers(Number(userSummary.total_users) || 0);
-          setAvgEngagement(78); // This would be calculated from engagement metrics
+          setAvgEngagement(78);
         }
       }
     } catch (error) {

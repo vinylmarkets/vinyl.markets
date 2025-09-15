@@ -101,17 +101,17 @@ export default function ComplianceMonitoring() {
       ];
 
       // Calculate risk distribution
-      const riskCounts = contentFlags?.reduce((acc: any, flag) => {
+      const riskCounts = contentFlags?.reduce((acc: Record<string, number>, flag) => {
         const severity = flag.flag_severity || 'medium';
         acc[severity] = (acc[severity] || 0) + 1;
         return acc;
-      }, {}) || {};
+      }, {} as Record<string, number>) || {};
 
-      const totalRisks = Object.values(riskCounts).reduce((sum: number, count: any) => sum + count, 0);
+      const totalRisks = Object.values(riskCounts).reduce((sum: number, count: number) => sum + count, 0);
       const riskDistribution = Object.entries(riskCounts).map(([level, count]) => ({
         level: level.charAt(0).toUpperCase() + level.slice(1),
-        count: count as number,
-        percentage: totalRisks > 0 ? ((count as number) / totalRisks) * 100 : 0
+        count: count,
+        percentage: totalRisks > 0 ? (count / totalRisks) * 100 : 0
       }));
 
       setComplianceData({

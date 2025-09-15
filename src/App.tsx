@@ -35,6 +35,14 @@ import Portfolio from "./pages/dashboard/Portfolio";
 import SettingsPage from "./pages/dashboard/Settings";
 import Upgrade from "./pages/dashboard/Upgrade";
 
+// Admin Dashboard Components
+import ExecutiveOverview from "./pages/admin/ExecutiveOverview";
+import UserAnalytics from "./pages/admin/UserAnalytics";
+import ProductIntelligence from "./pages/admin/ProductIntelligence";
+import ContentPerformance from "./pages/admin/ContentPerformance";
+import BusinessMetrics from "./pages/admin/BusinessMetrics";
+import ComplianceMonitoring from "./pages/admin/ComplianceMonitoring";
+
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -59,27 +67,36 @@ const App = () => {
               <Route path="/dashboard/portfolio" element={<Portfolio />} />
               <Route path="/dashboard/settings" element={<SettingsPage />} />
               <Route path="/dashboard/upgrade" element={<Upgrade />} />
+              
+              {/* Admin Dashboard Routes */}
+              <Route path="/admin/executive-overview" element={<ExecutiveOverview />} />
+              <Route path="/admin/user-analytics" element={<UserAnalytics />} />
+              <Route path="/admin/product-intelligence" element={<ProductIntelligence />} />
+              <Route path="/admin/content-performance" element={<ContentPerformance />} />
+              <Route path="/admin/business-metrics" element={<BusinessMetrics />} />
+              <Route path="/admin/compliance-monitoring" element={<ComplianceMonitoring />} />
+              
               <Route path="/dashboard-test" element={<DashboardTest />} />
               <Route path="/dashboard-old" element={<Dashboard />} />
               <Route path="/research" element={<ResearchPapers />} />
-            <Route path="/research/data-sources" element={<DataSources />} />
-            <Route path="/research/methodology" element={<Methodology />} />
-            <Route path="/research/papers" element={<ResearchPapers />} />
-            <Route path="/research/papers/hoeting-1999" element={<HoetingMadigan1999 />} />
-            <Route path="/research/papers/da-engelberg-gao-2011" element={<DaEngelbergGao2011 />} />
-            <Route path="/research/papers/kahneman-tversky-1973" element={<KahnemanTversky1973 />} />
-            <Route path="/research/papers/bollen-mao-zeng-2011" element={<BollenMaoZeng2011 />} />
-            <Route path="/research/papers/boehmer-2021" element={<BoehmerJones2021 />} />
-            <Route path="/research/papers/brown-jennings-1989" element={<BrownJennings1989 />} />
-            <Route path="/research/papers/jegadeesh-titman-1993" element={<JegadeeshTitman1993 />} />
-            <Route path="/research/papers/engle-1982" element={<Engle1982 />} />
-            <Route path="/research/papers/glosten-milgrom-1985" element={<GlostenMilgrom1985 />} />
-            <Route path="/research/papers/pan-poteshman-2006" element={<PanPoteshman2006 />} />
-            <Route path="/research/papers/cremers-weinbaum-2010" element={<CremersWeinbaum2010 />} />
-            <Route path="/research/papers/:slug" element={<OptionsPaperRouter />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+              <Route path="/research/data-sources" element={<DataSources />} />
+              <Route path="/research/methodology" element={<Methodology />} />
+              <Route path="/research/papers" element={<ResearchPapers />} />
+              <Route path="/research/papers/hoeting-1999" element={<HoetingMadigan1999 />} />
+              <Route path="/research/papers/da-engelberg-gao-2011" element={<DaEngelbergGao2011 />} />
+              <Route path="/research/papers/kahneman-tversky-1973" element={<KahnemanTversky1973 />} />
+              <Route path="/research/papers/bollen-mao-zeng-2011" element={<BollenMaoZeng2011 />} />
+              <Route path="/research/papers/boehmer-2021" element={<BoehmerJones2021 />} />
+              <Route path="/research/papers/brown-jennings-1989" element={<BrownJennings1989 />} />
+              <Route path="/research/papers/jegadeesh-titman-1993" element={<JegadeeshTitman1993 />} />
+              <Route path="/research/papers/engle-1982" element={<Engle1982 />} />
+              <Route path="/research/papers/glosten-milgrom-1985" element={<GlostenMilgrom1985 />} />
+              <Route path="/research/papers/pan-poteshman-2006" element={<PanPoteshman2006 />} />
+              <Route path="/research/papers/cremers-weinbaum-2010" element={<CremersWeinbaum2010 />} />
+              <Route path="/research/papers/:slug" element={<OptionsPaperRouter />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
