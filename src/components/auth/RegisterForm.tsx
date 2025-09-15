@@ -79,10 +79,30 @@ export function RegisterForm({ onClose }: RegisterFormProps) {
 
   const onSubmit = async (data: RegisterFormData) => {
     console.log('Registration attempt started');
-    console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL ? 'Set' : 'Missing');
-    console.log('Supabase Key:', import.meta.env.VITE_SUPABASE_ANON_KEY ? 'Set' : 'Missing');
+    console.log('Environment variables check:');
+    console.log('VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL);
+    console.log('VITE_SUPABASE_ANON_KEY:', import.meta.env.VITE_SUPABASE_ANON_KEY ? 'SET' : 'MISSING');
     
     setIsLoading(true);
+    
+    // Temporary bypass for testing - remove this after fixing Supabase
+    if (!import.meta.env.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL === 'https://placeholder.supabase.co') {
+      console.error('Supabase not configured - using mock registration');
+      
+      // Mock successful registration
+      setTimeout(() => {
+        toast({
+          title: "Registration Successful! (Mock Mode)",
+          description: "Supabase is not configured. This is a test registration.",
+        });
+        
+        onClose();
+        window.location.href = "/dashboard";
+        setIsLoading(false);
+      }, 1000);
+      
+      return;
+    }
     
     try {
       console.log('Attempting to sign up user...');
@@ -146,7 +166,7 @@ export function RegisterForm({ onClose }: RegisterFormProps) {
       toast({
         variant: "destructive",
         title: "Registration Failed",
-        description: "An unexpected error occurred. Please try again.",
+        description: `Network error: ${error}`,
       });
     } finally {
       setIsLoading(false);

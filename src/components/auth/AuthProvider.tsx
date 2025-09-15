@@ -38,7 +38,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     // Check if Supabase is properly configured
     if (!isSupabaseConfigured()) {
-      console.warn('Supabase not configured properly. Authentication will be disabled.')
+      console.warn('Supabase not configured properly. Using mock authentication.')
       setLoading(false)
       return
     }

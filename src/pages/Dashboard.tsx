@@ -64,6 +64,11 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!loading && !user) {
+      // Check if we're in mock mode (Supabase not configured)
+      if (!import.meta.env.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL === 'https://placeholder.supabase.co') {
+        console.log('Dashboard: Running in mock mode - allowing access');
+        return; // Don't redirect in mock mode
+      }
       window.location.href = "/";
     }
   }, [user, loading]);
@@ -111,7 +116,7 @@ export default function Dashboard() {
   }
 
   const userTier = "free"; // Mock - get from userProfile in real app
-  const userName = user?.user_metadata?.full_name || userProfile?.full_name || "Trader";
+  const userName = user?.user_metadata?.full_name || userProfile?.full_name || "Test User";
   const firstName = userName.split(' ')[0];
 
   return (
