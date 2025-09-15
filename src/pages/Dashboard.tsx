@@ -1,151 +1,371 @@
 import { useAuth } from "@/components/auth/AuthProvider";
-import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { 
   BookOpen, 
   TrendingUp, 
   AlertCircle, 
-  User,
-  Settings,
+  MessageSquare,
+  Award,
+  Calendar,
+  ArrowRight,
+  Crown,
   BarChart3,
-  Shield
+  Target,
+  Clock,
+  FileText
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+// Mock data - replace with real Supabase queries
+const mockStats = {
+  briefingsRead: 12,
+  questionsAsked: 45,
+  achievementsEarned: 3,
+  learningStreak: 7
+};
+
+const mockRecentQueries = [
+  {
+    id: 1,
+    question: "What's the difference between put-call parity and covered call strategies?",
+    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+    answered: true
+  },
+  {
+    id: 2,
+    question: "How does unusual options activity indicate smart money moves?",
+    timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 hours ago
+    answered: true
+  },
+  {
+    id: 3,
+    question: "Can you explain the Cremers-Weinbaum methodology in simple terms?",
+    timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+    answered: true
+  }
+];
+
+const mockTodaysBriefing = {
+  title: "Big Money Moves in Tech Sector",
+  summary: "Unusual options activity detected in major tech stocks with 73% confidence level. Smart money appears to be positioning for earnings season.",
+  confidence: "High",
+  readTime: "3 min read",
+  published: new Date()
+};
 
 export default function Dashboard() {
   const { user, loading } = useAuth();
+  const [userProfile, setUserProfile] = useState<any>(null);
 
   useEffect(() => {
-    // If not authenticated, redirect to home page
     if (!loading && !user) {
       window.location.href = "/";
     }
   }, [user, loading]);
+
+  useEffect(() => {
+    async function fetchUserProfile() {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching profile:', error);
+          return;
+        }
+
+        setUserProfile(data);
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    if (user) {
+      fetchUserProfile();
+    }
+  }, [user]);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="text-muted-foreground">Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
   if (!user) {
-    return null; // Will redirect in useEffect
+    return null;
   }
 
+  const userTier = "free"; // Mock - get from userProfile in real app
+  const userName = user?.user_metadata?.full_name || userProfile?.full_name || "Trader";
+  const firstName = userName.split(' ')[0];
+
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        {/* Welcome Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-serif font-bold text-foreground mb-2">
-            Welcome to TubeAmp Dashboard
-          </h1>
-          <p className="text-muted-foreground">
-            Your educational market intelligence center
-          </p>
+    <DashboardLayout>
+      <div className="space-y-6">
+        {/* Welcome Section */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-serif font-bold text-foreground">
+              Welcome back, {firstName}! 👋
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Ready to dive into today's market intelligence?
+            </p>
+          </div>
+          
+          <div className="text-right">
+            <div className="text-sm text-muted-foreground">
+              {new Date().toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              })}
+            </div>
+            <Badge variant="outline" className="mt-1">
+              {userTier.charAt(0).toUpperCase() + userTier.slice(1)} Plan
+            </Badge>
+          </div>
         </div>
 
-        {/* User Profile Card */}
-        <Card className="mb-8">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-full bg-secondary/10 flex items-center justify-center">
-                  <User className="h-6 w-6 text-secondary" />
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Briefings Read</p>
+                  <p className="text-2xl font-bold">{mockStats.briefingsRead}</p>
+                </div>
+                <BookOpen className="h-8 w-8 text-secondary" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Questions Asked</p>
+                  <p className="text-2xl font-bold">{mockStats.questionsAsked}</p>
+                </div>
+                <MessageSquare className="h-8 w-8 text-secondary" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Learning Streak</p>
+                  <p className="text-2xl font-bold">{mockStats.learningStreak} days</p>
+                </div>
+                <Target className="h-8 w-8 text-secondary" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Achievements</p>
+                  <p className="text-2xl font-bold">{mockStats.achievementsEarned}</p>
+                </div>
+                <Award className="h-8 w-8 text-secondary" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Today's Intelligence Briefing */}
+          <Card className="md:col-span-1">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-secondary" />
+                  Today's Intelligence
+                </CardTitle>
+                <Badge 
+                  variant="secondary" 
+                  className={
+                    mockTodaysBriefing.confidence === "High" 
+                      ? "bg-secondary/20 text-secondary" 
+                      : "bg-yellow-500/20 text-yellow-600"
+                  }
+                >
+                  {mockTodaysBriefing.confidence} Confidence
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <h3 className="font-semibold text-lg mb-2">{mockTodaysBriefing.title}</h3>
+              <p className="text-muted-foreground mb-4 leading-relaxed">
+                {mockTodaysBriefing.summary}
+              </p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Clock className="h-4 w-4" />
+                  {mockTodaysBriefing.readTime}
+                </div>
+                <Button size="sm">
+                  Read Full Brief
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Recent Ask TubeAmp Queries */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="h-5 w-5 text-secondary" />
+                Recent Questions
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {mockRecentQueries.map((query) => (
+                  <div key={query.id} className="border-l-2 border-secondary pl-4">
+                    <p className="text-sm font-medium mb-1 line-clamp-2">
+                      {query.question}
+                    </p>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span>
+                        {query.timestamp.toLocaleDateString()} at {query.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                      {query.answered && (
+                        <Badge variant="outline" className="text-xs py-0">
+                          Answered
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <Button variant="outline" size="sm" className="w-full mt-4">
+                <MessageSquare className="mr-2 h-4 w-4" />
+                Ask New Question
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {/* Learning Progress */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <TrendingUp className="h-5 w-5 text-secondary" />
+                Learning Progress
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span>Options Basics</span>
+                    <span>85%</span>
+                  </div>
+                  <Progress value={85} className="h-2" />
                 </div>
                 <div>
-                  <CardTitle className="text-lg">
-                    {user.user_metadata?.full_name || user.email}
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground">{user.email}</p>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span>Market Analysis</span>
+                    <span>65%</span>
+                  </div>
+                  <Progress value={65} className="h-2" />
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span>Risk Management</span>
+                    <span>40%</span>
+                  </div>
+                  <Progress value={40} className="h-2" />
                 </div>
               </div>
-              <Badge variant="secondary">
-                <Shield className="h-3 w-3 mr-1" />
-                Educational Account
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="text-center p-4 bg-muted/30 rounded-lg">
-                <BookOpen className="h-8 w-8 text-secondary mx-auto mb-2" />
-                <div className="font-semibold">Learning Mode</div>
-                <div className="text-sm text-muted-foreground">Educational Content</div>
-              </div>
-              <div className="text-center p-4 bg-muted/30 rounded-lg">
-                <BarChart3 className="h-8 w-8 text-secondary mx-auto mb-2" />
-                <div className="font-semibold">Market Analysis</div>
-                <div className="text-sm text-muted-foreground">Daily Intelligence</div>
-              </div>
-              <div className="text-center p-4 bg-muted/30 rounded-lg">
-                <TrendingUp className="h-8 w-8 text-secondary mx-auto mb-2" />
-                <div className="font-semibold">Research Access</div>
-                <div className="text-sm text-muted-foreground">Academic Papers</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <BookOpen className="h-5 w-5 text-secondary" />
-                Today's Analysis
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Get your personalized market intelligence briefing
-              </p>
-              <Button className="w-full" variant="outline">
-                View Today's Brief
+              <Button variant="outline" size="sm" className="w-full mt-4">
+                Continue Learning
               </Button>
             </CardContent>
           </Card>
 
+          {/* Upgrade Prompt (for free tier) */}
+          {userTier === "free" && (
+            <Card className="border-2 border-dashed border-yellow-200 bg-gradient-to-br from-yellow-50 to-orange-50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Crown className="h-5 w-5 text-yellow-600" />
+                  Unlock More Features
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-sm mb-4">
+                  <li className="flex items-center gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-yellow-600"></div>
+                    Unlimited Ask TubeAmp queries
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-yellow-600"></div>
+                    Advanced portfolio tracking
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-yellow-600"></div>
+                    Real-time market alerts
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-yellow-600"></div>
+                    Weekly deep-dive reports
+                  </li>
+                </ul>
+                <Button size="sm" className="w-full bg-yellow-600 hover:bg-yellow-700 text-white">
+                  Upgrade to Essential - $29/mo
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Quick Actions */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-lg">
                 <BarChart3 className="h-5 w-5 text-secondary" />
-                Ask TubeAmp
+                Quick Actions
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Get answers to your market education questions
-              </p>
-              <Button className="w-full" variant="outline">
-                Open Terminal
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-secondary" />
-                Research Library
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Explore academic research and methodology
-              </p>
-              <Button className="w-full" variant="outline" asChild>
-                <a href="/research">Browse Research</a>
-              </Button>
+              <div className="space-y-3">
+                <Button variant="outline" size="sm" className="w-full justify-start">
+                  <FileText className="mr-2 h-4 w-4" />
+                  View All Briefings
+                </Button>
+                <Button variant="outline" size="sm" className="w-full justify-start">
+                  <BookOpen className="mr-2 h-4 w-4" />
+                  Browse Research Library
+                </Button>
+                <Button variant="outline" size="sm" className="w-full justify-start">
+                  <TrendingUp className="mr-2 h-4 w-4" />
+                  Check Market Status
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -160,14 +380,14 @@ export default function Dashboard() {
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   TubeAmp provides educational market analysis and research for learning purposes only. 
                   This is not investment advice, financial advice, or recommendations to buy or sell securities. 
-                  All content is for educational and informational purposes. Trading and investing involves 
-                  substantial risk of loss and is not suitable for all investors.
+                  All content is for educational and informational purposes. Please consult with qualified 
+                  financial professionals before making investment decisions.
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
