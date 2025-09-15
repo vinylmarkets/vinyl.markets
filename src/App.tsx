@@ -36,6 +36,7 @@ import SettingsPage from "./pages/dashboard/Settings";
 import Upgrade from "./pages/dashboard/Upgrade";
 
 // Admin Dashboard Components
+import AdminDashboard from "./pages/admin/AdminDashboard";
 import ExecutiveOverview from "./pages/admin/ExecutiveOverview";
 import UserAnalytics from "./pages/admin/UserAnalytics";
 import ProductIntelligence from "./pages/admin/ProductIntelligence";
@@ -69,6 +70,7 @@ const App = () => {
               <Route path="/dashboard/upgrade" element={<Upgrade />} />
               
               {/* Admin Dashboard Routes */}
+              <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/executive-overview" element={<ExecutiveOverview />} />
               <Route path="/admin/user-analytics" element={<UserAnalytics />} />
               <Route path="/admin/product-intelligence" element={<ProductIntelligence />} />
