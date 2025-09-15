@@ -18,7 +18,11 @@ import {
 } from "lucide-react";
 
 export default function Index() {
+  console.log('Index component is rendering');
+  
   const [toggleState, setToggleState] = useState<'academic' | 'plain'>('plain');
+
+  console.log('Index component state initialized');
 
   const sampleBriefing = {
     academic: {
