@@ -66,13 +66,6 @@ export function DashboardSidebar() {
   const { user } = useAuth();
   const { isAdmin } = useAdmin();
   
-  // Debug logging
-  console.log('DashboardSidebar: Admin status check', { 
-    user: user?.email, 
-    isAdmin,
-    userId: user?.id 
-  });
-  
   // Mock user tier - in real app, fetch from user profile
   const userTier = "free"; // "free", "essential", "pro"
   const isCollapsed = state === "collapsed";
@@ -150,15 +143,6 @@ export function DashboardSidebar() {
                       )}
                     </NavLink>
                   </SidebarMenuButton>
-                </SidebarMenuItem>
-              )}
-              
-              {/* Debug info - remove after testing */}
-              {!isCollapsed && (
-                <SidebarMenuItem>
-                  <div className="px-2 py-1 text-xs text-muted-foreground">
-                    Debug: Admin={isAdmin ? 'Yes' : 'No'} | User={user?.email || 'None'}
-                  </div>
                 </SidebarMenuItem>
               )}
             </SidebarMenu>
