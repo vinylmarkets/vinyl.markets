@@ -19,9 +19,11 @@ import {
   Briefcase,
   Settings,
   Crown,
-  BookOpen
+  BookOpen,
+  Shield
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { useAdmin } from "@/hooks/useAdmin";
 
 const navigationItems = [
   {
@@ -62,6 +64,7 @@ export function DashboardSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
   const { user } = useAuth();
+  const { isAdmin } = useAdmin();
   
   // Mock user tier - in real app, fetch from user profile
   const userTier = "free"; // "free", "essential", "pro"
@@ -120,6 +123,28 @@ export function DashboardSidebar() {
                   </SidebarMenuItem>
                 );
               })}
+              
+              {/* Admin Dashboard Link - Only show for admin users */}
+              {isAdmin && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <NavLink 
+                      to="/admin" 
+                      className={getNavClassName("/admin")}
+                    >
+                      <Shield className="h-4 w-4" />
+                      {!isCollapsed && (
+                        <div className="flex items-center justify-between w-full">
+                          <span>Admin Dashboard</span>
+                          <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
+                            Admin
+                          </Badge>
+                        </div>
+                      )}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
