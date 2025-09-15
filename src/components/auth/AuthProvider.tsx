@@ -34,18 +34,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Check if Supabase is properly configured
-    const isSupabaseConfigured = 
-      import.meta.env.VITE_SUPABASE_URL && 
-      import.meta.env.VITE_SUPABASE_ANON_KEY &&
-      import.meta.env.VITE_SUPABASE_URL !== 'https://placeholder.supabase.co';
-
-    if (!isSupabaseConfigured) {
-      console.warn('Supabase not configured. Authentication features will be disabled.');
-      setLoading(false);
-      return;
-    }
-
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
