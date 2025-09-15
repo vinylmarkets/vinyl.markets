@@ -59,16 +59,22 @@ const mockTodaysBriefing = {
 };
 
 export default function Dashboard() {
+  console.log('Dashboard component: Starting to render');
+  
   const { user, loading } = useAuth();
   const [userProfile, setUserProfile] = useState<any>(null);
 
+  console.log('Dashboard component: Auth state -', { user: !!user, loading });
+
   useEffect(() => {
+    console.log('Dashboard useEffect: Checking auth redirect logic');
     if (!loading && !user) {
       // Check if we're in mock mode (Supabase not configured)
       if (!import.meta.env.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL === 'https://placeholder.supabase.co') {
         console.log('Dashboard: Running in mock mode - allowing access');
         return; // Don't redirect in mock mode
       }
+      console.log('Dashboard: User not authenticated, redirecting to home');
       window.location.href = "/";
     }
   }, [user, loading]);
@@ -101,6 +107,7 @@ export default function Dashboard() {
   }, [user]);
 
   if (loading) {
+    console.log('Dashboard: Showing loading state');
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -111,13 +118,28 @@ export default function Dashboard() {
     );
   }
 
+  if (!user && (!import.meta.env.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL === 'https://placeholder.supabase.co')) {
+    console.log('Dashboard: Mock mode - creating mock user');
+    // Mock user for development
+    const mockUser = {
+      id: 'mock-user',
+      email: 'test@example.com',
+      user_metadata: { full_name: 'Test User' }
+    };
+  }
+
   if (!user) {
+    console.log('Dashboard: No user and not in mock mode, returning null');
     return null;
   }
 
+  console.log('Dashboard: About to render main content');
+  
   const userTier = "free"; // Mock - get from userProfile in real app
   const userName = user?.user_metadata?.full_name || userProfile?.full_name || "Test User";
   const firstName = userName.split(' ')[0];
+
+  console.log('Dashboard: Rendering with user data -', { userName, firstName, userTier });
 
   return (
     <DashboardLayout>

@@ -29,7 +29,7 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  console.log('AuthProvider is rendering');
+  console.log('AuthProvider: Starting initialization');
   
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
@@ -75,6 +75,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
+  console.log('AuthProvider: Rendering children with state -', { user: !!user, session: !!session, loading });
+  
   return (
     <AuthContext.Provider value={{ user, session, loading, signOut }}>
       {children}

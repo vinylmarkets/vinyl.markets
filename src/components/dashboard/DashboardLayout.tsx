@@ -8,6 +8,8 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
+  console.log('DashboardLayout: Rendering layout component');
+  
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
