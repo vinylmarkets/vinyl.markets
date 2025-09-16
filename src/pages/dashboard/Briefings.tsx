@@ -1,234 +1,266 @@
 import { useState, useEffect } from "react";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Clock, Search, Filter, Star, Calendar, TrendingUp } from "lucide-react";
-import { mockBriefings } from "@/data/mockBriefings";
-import { useNavigate } from "react-router-dom";
-import { ProbabilityChart } from "@/components/charts";
+import { ProbabilityChart } from "@/components/charts/ProbabilityChart";
+import { TrendingUp, Calendar, Plus, RefreshCw } from "lucide-react";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { BriefingCard } from "@/components/briefings/BriefingCard";
+import { BriefingFilters } from "@/components/briefings/BriefingFilters";
+import { StockFollowWidget } from "@/components/briefings/StockFollowWidget";
 import { PredictionAPI } from "@/lib/prediction-api";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
+import { formatDistanceToNow } from "date-fns";
 
 export default function Briefings() {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
-  const [predictionData, setPredictionData] = useState<any[]>([]);
-  const navigate = useNavigate();
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [followedStocks, setFollowedStocks] = useState<string[]>([]);
+  const [briefings, setBriefings] = useState<any[]>([]);
+  const [predictions, setPredictions] = useState<any[]>([]);
+  const [isGeneratingBriefing, setIsGeneratingBriefing] = useState(false);
+  const { toast } = useToast();
 
-  // Load sample prediction data for the chart
   useEffect(() => {
-    const loadPredictions = async () => {
+    const loadData = async () => {
+      // Load prediction data for chart
       try {
-        // Try to get live data for a few popular stocks
-        const symbols = ['AAPL', 'GOOGL', 'MSFT'];
-        const predictions = await Promise.allSettled(
-          symbols.map(symbol => PredictionAPI.getPrediction(symbol))
-        );
-        
-        const validPredictions = predictions
-          .filter((result): result is PromiseFulfilledResult<any> => result.status === 'fulfilled')
-          .map(result => result.value);
-
-        if (validPredictions.length > 0) {
-          setPredictionData(validPredictions);
-        } else {
-          // Fallback sample data
-          setPredictionData([
-            { symbol: 'AAPL', probability: 0.67, confidence: 0.85, current_price: 185.43 },
-            { symbol: 'GOOGL', probability: 0.72, confidence: 0.78, current_price: 138.21 },
-            { symbol: 'MSFT', probability: 0.58, confidence: 0.82, current_price: 367.12 },
-          ]);
-        }
+        const briefing = await PredictionAPI.getDailyBriefing();
+        setPredictions(briefing.predictions || []);
       } catch (error) {
-        // Use sample data if API fails
-        setPredictionData([
-          { symbol: 'AAPL', probability: 0.67, confidence: 0.85, current_price: 185.43 },
-          { symbol: 'GOOGL', probability: 0.72, confidence: 0.78, current_price: 138.21 },
-          { symbol: 'MSFT', probability: 0.58, confidence: 0.82, current_price: 367.12 },
-        ]);
+        console.log('Using mock data for charts');
+        const mockPredictions = [
+          { symbol: 'AAPL', probability: 0.75, confidence: 0.8, current_price: 150.25 },
+          { symbol: 'GOOGL', probability: 0.65, confidence: 0.7, current_price: 2800.50 },
+          { symbol: 'MSFT', probability: 0.80, confidence: 0.85, current_price: 350.75 },
+          { symbol: 'TSLA', probability: 0.45, confidence: 0.6, current_price: 220.30 },
+          { symbol: 'AMZN', probability: 0.70, confidence: 0.75, current_price: 3200.15 }
+        ];
+        setPredictions(mockPredictions);
       }
+
+      // Load briefings from database
+      await loadBriefings();
+      
+      // Load user's followed stocks
+      await loadFollowedStocks();
     };
 
-    loadPredictions();
+    loadData();
   }, []);
 
-  // Filter and sort briefings
-  const filteredBriefings = mockBriefings
-    .filter(briefing => {
+  const loadBriefings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('briefings')
+        .select('*')
+        .eq('published', true)
+        .order('publication_date', { ascending: false });
+
+      if (error) throw error;
+      setBriefings(data || []);
+    } catch (error) {
+      console.error('Error loading briefings:', error);
+      // Fallback to empty array for now
+      setBriefings([]);
+    }
+  };
+
+  const loadFollowedStocks = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('user_stock_follows')
+        .select('stock_symbol')
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+      setFollowedStocks(data?.map(item => item.stock_symbol) || []);
+    } catch (error) {
+      console.error('Error loading followed stocks:', error);
+    }
+  };
+
+  const generateNewBriefing = async () => {
+    setIsGeneratingBriefing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-briefing-content', {
+        body: {
+          category: 'market-overview',
+          stockSymbols: followedStocks.length > 0 ? followedStocks.slice(0, 5) : undefined,
+          userPreferences: {
+            explanation_mode: 'plain_speak',
+            risk_tolerance: 'conservative'
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Briefing Generated",
+        description: "A new market intelligence briefing has been created.",
+      });
+
+      // Reload briefings to show the new one
+      await loadBriefings();
+    } catch (error) {
+      console.error('Error generating briefing:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate briefing. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingBriefing(false);
+    }
+  };
+
+  // Filter briefings based on search and category
+  const filteredBriefings = briefings
+    .filter((briefing) => {
       const matchesSearch = briefing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          briefing.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          briefing.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+                          briefing.executive_summary.toLowerCase().includes(searchQuery.toLowerCase());
+      
       const matchesCategory = categoryFilter === "all" || briefing.category === categoryFilter;
-      return matchesSearch && matchesCategory;
+      
+      // Filter by followed stocks if any are selected
+      const matchesStocks = followedStocks.length === 0 || 
+        (briefing.stocks_mentioned && briefing.stocks_mentioned.some((stock: string) => 
+          followedStocks.includes(stock)
+        ));
+      
+      return matchesSearch && matchesCategory && matchesStocks;
     })
     .sort((a, b) => {
-      if (sortBy === "newest") return new Date(b.date).getTime() - new Date(a.date).getTime();
-      if (sortBy === "oldest") return new Date(a.date).getTime() - new Date(b.date).getTime();
-      if (sortBy === "confidence") return b.confidenceScore - a.confidenceScore;
-      if (sortBy === "rating") return (b.rating || 0) - (a.rating || 0);
-      return 0;
+      switch (sortBy) {
+        case "oldest":
+          return new Date(a.publication_date).getTime() - new Date(b.publication_date).getTime();
+        case "category":
+          return a.category.localeCompare(b.category);
+        case "title":
+          return a.title.localeCompare(b.title);
+        default: // "newest"
+          return new Date(b.publication_date).getTime() - new Date(a.publication_date).getTime();
+      }
     });
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    
-    if (diffHours < 24) {
-      return `${diffHours} hours ago`;
-    } else {
-      return date.toLocaleDateString();
-    }
+    return formatDistanceToNow(date, { addSuffix: true });
   };
-
-  const getConfidenceColor = (score: number) => {
-    if (score >= 85) return "text-emerald-600";
-    if (score >= 70) return "text-yellow-600"; 
-    return "text-orange-600";
-  };
-
-  const categories = Array.from(new Set(mockBriefings.map(b => b.category)));
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* Header */}
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Intelligence Briefings</h1>
-            <p className="text-muted-foreground">AI-powered market analysis with Academic/Plain Speak modes</p>
+            <h1 className="text-3xl font-bold text-foreground">Daily Intelligence Briefings</h1>
+            <p className="text-muted-foreground mt-2">
+              AI-powered market analysis and insights delivered daily
+            </p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => navigate('/dashboard/charts')}>
-              <TrendingUp className="h-4 w-4 mr-2" />
-              View Charts
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => loadBriefings()}
+              disabled={isGeneratingBriefing}
+            >
+              <RefreshCw className="h-4 w-4 mr-1" />
+              Refresh
             </Button>
-            <Button>
-              <FileText className="h-4 w-4 mr-2" />
-              Request Custom Brief
+            <Button 
+              onClick={generateNewBriefing}
+              disabled={isGeneratingBriefing}
+              size="sm"
+            >
+              {isGeneratingBriefing ? (
+                <RefreshCw className="h-4 w-4 mr-1 animate-spin" />
+              ) : (
+                <Plus className="h-4 w-4 mr-1" />
+              )}
+              Generate Briefing
             </Button>
           </div>
         </div>
 
         {/* Market Overview Chart */}
-        {predictionData.length > 0 && (
-          <ProbabilityChart 
-            data={predictionData}
-            title="Current Market Predictions"
-          />
-        )}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              Market Overview
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ProbabilityChart data={predictions} />
+          </CardContent>
+        </Card>
+
+        {/* Stock Follow Widget */}
+        <StockFollowWidget 
+          followedStocks={followedStocks}
+          onFollowedStocksChange={setFollowedStocks}
+        />
 
         {/* Search and Filters */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search briefings, topics, or tags..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-full sm:w-48">
-              <Filter className="h-4 w-4 mr-2" />
-              <SelectValue placeholder="Filter by category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              {categories.map(category => (
-                <SelectItem key={category} value={category}>{category}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-full sm:w-40">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="newest">Newest First</SelectItem>
-              <SelectItem value="oldest">Oldest First</SelectItem>
-              <SelectItem value="confidence">Confidence</SelectItem>
-              <SelectItem value="rating">Rating</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <BriefingFilters
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          categoryFilter={categoryFilter}
+          setCategoryFilter={setCategoryFilter}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          followedStocks={followedStocks}
+          setFollowedStocks={setFollowedStocks}
+        />
 
-        {/* Results count */}
-        <div className="text-sm text-muted-foreground">
-          {filteredBriefings.length} briefing{filteredBriefings.length !== 1 ? 's' : ''} found
-        </div>
-
-        {/* Briefings List */}
-        <div className="grid gap-4">
-          {filteredBriefings.map((briefing) => (
-            <Card 
-              key={briefing.id} 
-              className="hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => navigate(`/dashboard/briefings/${briefing.id}`)}
-            >
-              <CardHeader>
-                <div className="flex items-start justify-between gap-4">
-                  <div className="space-y-2 flex-1">
-                    <div className="flex items-center gap-2">
-                      <CardTitle className="text-lg">{briefing.title}</CardTitle>
-                      {briefing.rating && (
-                        <div className="flex items-center gap-1">
-                          <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                          <span className="text-sm text-muted-foreground">{briefing.rating}</span>
-                        </div>
-                      )}
-                    </div>
-                    <p className="text-muted-foreground">{briefing.summary}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {briefing.tags.slice(0, 3).map(tag => (
-                        <Badge key={tag} variant="outline" className="text-xs">
-                          {tag.replace('-', ' ')}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-2">
-                    <Badge variant="secondary">{briefing.category}</Badge>
-                    <div className={`text-sm font-semibold ${getConfidenceColor(briefing.confidenceScore)}`}>
-                      {briefing.confidenceScore}% confidence
-                    </div>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      {briefing.readTime} min read
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      {formatDate(briefing.date)}
-                    </div>
-                  </div>
-                  <Button variant="outline" size="sm" onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/dashboard/briefings/${briefing.id}`);
-                  }}>
-                    Read Analysis
+        {/* Briefings Display */}
+        {filteredBriefings.length === 0 ? (
+          <Card>
+            <CardContent className="text-center py-12">
+              <div className="max-w-md mx-auto">
+                <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No briefings found</h3>
+                <p className="text-muted-foreground mb-4">
+                  {briefings.length === 0 
+                    ? "No briefings have been generated yet. Click 'Generate Briefing' to create your first one."
+                    : "No briefings match your current filters. Try adjusting your search or filters."
+                  }
+                </p>
+                {briefings.length === 0 && (
+                  <Button onClick={generateNewBriefing} disabled={isGeneratingBriefing}>
+                    {isGeneratingBriefing ? (
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Plus className="h-4 w-4 mr-2" />
+                    )}
+                    Generate Your First Briefing
                   </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {filteredBriefings.length === 0 && (
-          <div className="text-center py-12">
-            <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No briefings found</h3>
-            <p className="text-muted-foreground">Try adjusting your search or filter criteria</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className={
+            viewMode === 'grid' 
+              ? "grid gap-6 md:grid-cols-2 lg:grid-cols-3" 
+              : "space-y-4"
+          }>
+            {filteredBriefings.map((briefing) => (
+              <BriefingCard 
+                key={briefing.id} 
+                briefing={briefing}
+                viewMode={viewMode}
+              />
+            ))}
           </div>
         )}
       </div>
