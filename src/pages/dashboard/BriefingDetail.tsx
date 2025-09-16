@@ -14,6 +14,66 @@ import { ReadingStats } from "@/components/briefings/ReadingStats";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
+// Component to parse and render briefing content with styled headers
+const BriefingContent = ({ content }: { content: string }) => {
+  const parseContent = (text: string) => {
+    const sections = text.split(/===\s*(.+?)\s*===/);
+    const parsedSections = [];
+    
+    for (let i = 0; i < sections.length; i++) {
+      if (i === 0 && sections[i].trim()) {
+        // Content before first header
+        parsedSections.push({
+          type: 'content',
+          text: sections[i].trim()
+        });
+      } else if (i % 2 === 1) {
+        // Header
+        parsedSections.push({
+          type: 'header',
+          text: sections[i].trim()
+        });
+      } else if (i % 2 === 0 && sections[i].trim()) {
+        // Content after header
+        parsedSections.push({
+          type: 'content',
+          text: sections[i].trim()
+        });
+      }
+    }
+    
+    return parsedSections;
+  };
+
+  const sections = parseContent(content);
+
+  return (
+    <div className="space-y-6">
+      {sections.map((section, index) => {
+        if (section.type === 'header') {
+          return (
+            <h3 
+              key={index} 
+              className="text-lg font-semibold text-foreground flex items-center gap-2 mt-6 mb-3 first:mt-0"
+            >
+              {section.text}
+            </h3>
+          );
+        } else {
+          return (
+            <div 
+              key={index} 
+              className="text-muted-foreground leading-relaxed whitespace-pre-wrap"
+            >
+              {section.text}
+            </div>
+          );
+        }
+      })}
+    </div>
+  );
+};
+
 export default function BriefingDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -176,11 +236,8 @@ export default function BriefingDetail() {
           </CardHeader>
           <CardContent>
             <div className="prose prose-lg max-w-none">
-              <div 
-                className="leading-relaxed [&_strong]:text-lg [&_strong]:font-semibold [&_strong]:text-foreground [&_strong]:block [&_strong]:mb-3 [&_strong]:mt-6 [&_strong]:flex [&_strong]:items-center [&_strong]:gap-2"
-                dangerouslySetInnerHTML={{
-                  __html: isAcademicMode ? briefing.academic_content : briefing.plain_speak_content
-                }}
+              <BriefingContent 
+                content={isAcademicMode ? briefing.academic_content : briefing.plain_speak_content}
               />
             </div>
           </CardContent>

@@ -44,27 +44,43 @@ serve(async (req) => {
     Always include appropriate risk disclaimers.`;
 
     const academicPrompt = `Create an academic-style briefing covering:
-    <strong>Market Pulse</strong> (2-3 sentences capturing the current state)
-    <strong>Deep Dive Analysis</strong> (data-driven insights with supporting evidence)  
-    <strong>Research Methodology</strong> (data sources and analytical approach used)
-    <strong>Risk Assessment</strong> (key factors and limitations to consider)
-    <strong>Learning Corner</strong> (key concept explanation for education)
+    === Market Pulse ===
+    (2-3 sentences capturing the current state)
+    
+    === Deep Dive Analysis ===
+    (data-driven insights with supporting evidence)
+    
+    === Research Methodology ===
+    (data sources and analytical approach used)
+    
+    === Risk Assessment ===
+    (key factors and limitations to consider)
+    
+    === Learning Corner ===
+    (key concept explanation for education)
     
     Category: ${category}
     ${stockSymbols ? `Focus stocks: ${stockSymbols.join(', ')}` : ''}
     ${marketConditions ? `Market context: ${JSON.stringify(marketConditions)}` : ''}
     
-    IMPORTANT: Only use HTML strong tags for headers. Do NOT include any HTML document structure like html, head, body, DOCTYPE, or meta tags. Return only the content with strong tags for headers.`;
+    IMPORTANT: Use === Header === format for section headers. Do NOT use any HTML tags. Return plain text only.`;
 
     const plainSpeakPrompt = `Create a plain-language version of the same briefing:
-    <strong>Today's Market Story</strong> (simple summary of what happened)
-    <strong>Why This Matters to You</strong> (easy explanation of significance)
-    <strong>What to Watch Next</strong> (key indicators and upcoming events)
-    <strong>Quick Learning Moment</strong> (educational insight made simple)
+    === Today's Market Story ===
+    (simple summary of what happened)
+    
+    === Why This Matters to You ===
+    (easy explanation of significance)
+    
+    === What to Watch Next ===
+    (key indicators and upcoming events)
+    
+    === Quick Learning Moment ===
+    (educational insight made simple)
     
     Use conversational tone, avoid jargon, explain complex terms simply.
     Same content as academic version but accessible to beginners.
-    IMPORTANT: Only use HTML strong tags for headers. Do NOT include any HTML document structure like html, head, body, DOCTYPE, or meta tags. Return only the content with strong tags for headers.`;
+    IMPORTANT: Use === Header === format for section headers. Do NOT use any HTML tags. Return plain text only.`;
 
     // Generate academic content
     const academicResponse = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -84,30 +100,17 @@ serve(async (req) => {
       }),
     });
 
-    // Comprehensive HTML document structure cleaning
-    const cleanHtmlStructure = (content: string): string => {
+    // Simple text cleaning (no HTML needed since we're generating plain text)
+    const cleanTextContent = (content: string): string => {
       return content
-        // Remove HTML document declarations
-        .replace(/<!DOCTYPE[^>]*>/gi, '')
-        // Remove HTML tags with any attributes
-        .replace(/<\/?html[^>]*>/gi, '')
-        .replace(/<\/?head[^>]*>/gi, '')
-        .replace(/<\/?body[^>]*>/gi, '')
-        .replace(/<\/?title[^>]*>/gi, '')
-        .replace(/<meta[^>]*>/gi, '')
-        .replace(/<link[^>]*>/gi, '')
-        // Remove markdown code blocks
         .replace(/```html/gi, '')
         .replace(/```/gi, '')
-        // Remove standalone html text
         .replace(/^\s*html\s*$/gmi, '')
-        // Clean up extra whitespace
-        .replace(/\n\s*\n\s*\n/g, '\n\n')
         .trim();
     };
 
     const academicData = await academicResponse.json();
-    let academicContent = cleanHtmlStructure(academicData.choices[0].message.content);
+    let academicContent = cleanTextContent(academicData.choices[0].message.content);
 
     // Generate plain speak content
     const plainSpeakResponse = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -128,7 +131,7 @@ serve(async (req) => {
     });
 
     const plainSpeakData = await plainSpeakResponse.json();
-    let plainSpeakContent = cleanHtmlStructure(plainSpeakData.choices[0].message.content);
+    let plainSpeakContent = cleanTextContent(plainSpeakData.choices[0].message.content);
 
     // Generate educational principle
     const educationalResponse = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -186,7 +189,7 @@ serve(async (req) => {
     });
 
     const titleData = await titleResponse.json();
-    const engagingTitle = cleanHtmlStructure(titleData.choices[0].message.content)
+    const engagingTitle = cleanTextContent(titleData.choices[0].message.content)
       .replace(/['"]/g, '');
 
     // Create briefing record in database
