@@ -9,35 +9,71 @@ export function AskTubeAmp() {
     e.preventDefault();
     if (!query.trim()) return;
 
-    // Extract stock symbol with improved logic
-    const extractStockSymbol = (text: string): string | null => {
-      // Common stock symbols pattern - 1-5 uppercase letters
-      // But skip common English words
-      const words = text.toUpperCase().split(/\s+/);
+    // Extract stock symbol with improved logic for both symbols and company names
+    const extractSymbol = (query: string): string | null => {
+      const upperQuery = query.toUpperCase();
       
-      // List of common stocks (you can expand this)
-      const knownStocks = ['GME', 'AMC', 'AAPL', 'MSFT', 'TSLA', 'NVDA', 'META', 'GOOGL', 'AMZN', 'SPY', 'QQQ'];
+      // Company name to ticker symbol mapping
+      const companyToTicker: { [key: string]: string } = {
+        'APPLE': 'AAPL',
+        'MICROSOFT': 'MSFT',
+        'GOOGLE': 'GOOGL',
+        'AMAZON': 'AMZN',
+        'TESLA': 'TSLA',
+        'META': 'META',
+        'FACEBOOK': 'META',
+        'NETFLIX': 'NFLX',
+        'NVIDIA': 'NVDA',
+        'GAMESTOP': 'GME',
+        'AMC': 'AMC',
+        'TWITTER': 'X',
+        'BERKSHIRE': 'BRK.B',
+        'WALMART': 'WMT',
+        'DISNEY': 'DIS',
+        'PAYPAL': 'PYPL',
+        'ADOBE': 'ADBE',
+        'SALESFORCE': 'CRM'
+      };
       
-      // First check for known stocks
-      for (const word of words) {
-        if (knownStocks.includes(word)) {
-          return word;
+      // First, check for company names and convert to tickers
+      for (const [company, ticker] of Object.entries(companyToTicker)) {
+        if (upperQuery.includes(company)) {
+          return ticker;
         }
       }
       
-      // Then look for any 1-5 letter uppercase word that's not a common English word
-      const commonWords = ['WHAT', 'WHERE', 'WHEN', 'WHY', 'HOW', 'IS', 'THE', 'FOR', 'OF', 'TO', 'BY', 'AT', 'IN', 'ON', 'IT', 'AS', 'OR', 'AND', 'BUT', 'IF', 'THEN', 'WILL', 'CAN', 'BE', 'HAS', 'HAD', 'HAVE', 'ARE', 'WAS', 'WERE', 'BEEN', 'ABOVE', 'BELOW'];
+      // Common words to skip
+      const skipWords = new Set([
+        'WHAT', 'IS', 'THE', 'YOUR', 'PREDICTION', 'FOR',
+        'PROBABILITY', 'ABOVE', 'BELOW', 'BY', 'AT', 'IN', 
+        'ON', 'WILL', 'BE', 'TODAY', 'TOMORROW', 'MOVEMENT',
+        'PRICE', 'STOCK', 'SHARE', 'HOW', 'WHEN', 'WHERE'
+      ]);
+      
+      // Look for stock symbols (1-5 uppercase letters)
+      const words = upperQuery.split(/\s+/);
       
       for (const word of words) {
-        if (word.match(/^[A-Z]{1,5}$/) && !commonWords.includes(word)) {
-          return word;
+        // Remove any punctuation
+        const cleanWord = word.replace(/[^A-Z]/g, '');
+        
+        // Check if it's a valid ticker symbol
+        if (cleanWord.length >= 1 && 
+            cleanWord.length <= 5 && 
+            /^[A-Z]+$/.test(cleanWord) && 
+            !skipWords.has(cleanWord)) {
+          return cleanWord;
         }
       }
+      
+      // Also check for $SYMBOL format
+      const dollarMatch = upperQuery.match(/\$([A-Z]{1,5})/);
+      if (dollarMatch) return dollarMatch[1];
       
       return null;
     };
 
-    const symbol = extractStockSymbol(query);
+    const symbol = extractSymbol(query);
     if (!symbol) {
       setResponse('Please mention a stock symbol like GME, AAPL, or TSLA');
       return;
