@@ -59,7 +59,7 @@ export default function ProductIntelligence() {
 
       // Mock data for features not fully implemented
       const featureAdoption = [
-        { feature: 'Intelligence Briefings', adoption: 89, growth: 12 },
+        { feature: 'Market Intelligence', adoption: 89, growth: 12 },
         { feature: 'Terminal Queries', adoption: 76, growth: 8 },
         { feature: 'Portfolio Tracking', adoption: 45, growth: 23 },
         { feature: 'Educational Modules', adoption: 34, growth: 15 },

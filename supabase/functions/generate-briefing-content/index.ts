@@ -37,33 +37,34 @@ serve(async (req) => {
     console.log('Generating briefing for category:', category);
 
     // Create comprehensive prompts for both modes
-    const systemPrompt = `You are a senior financial analyst creating daily intelligence briefings. 
+    const systemPrompt = `You are a senior financial analyst creating daily market intelligence briefings. 
     Focus on the ${category} category. 
     Provide accurate, balanced analysis without investment advice.
     Include relevant data sources and methodology notes.
     Always include appropriate risk disclaimers.`;
 
     const academicPrompt = `Create an academic-style briefing covering:
-    1. Executive Summary (2-3 sentences)
-    2. Market Analysis with data-driven insights
-    3. Methodology and data sources used
-    4. Risk factors and limitations
-    5. Educational principle (key concept explanation)
+    **Market Pulse:** (2-3 sentences capturing the current state)
+    **Deep Dive Analysis:** (data-driven insights with supporting evidence)
+    **Research Methodology:** (data sources and analytical approach used)
+    **Risk Assessment:** (key factors and limitations to consider)
+    **Learning Corner:** (key concept explanation for education)
     
     Category: ${category}
     ${stockSymbols ? `Focus stocks: ${stockSymbols.join(', ')}` : ''}
     ${marketConditions ? `Market context: ${JSON.stringify(marketConditions)}` : ''}
     
-    Format as structured analysis with clear sections.`;
+    Format with bold headers and clear sections. Make headers engaging and descriptive.`;
 
     const plainSpeakPrompt = `Create a plain-language version of the same briefing:
-    1. What happened today (simple summary)
-    2. Why it matters (easy explanation)
-    3. What to watch for (key indicators)
-    4. Learn something new (educational insight)
+    **Today's Market Story:** (simple summary of what happened)
+    **Why This Matters to You:** (easy explanation of significance)
+    **What to Watch Next:** (key indicators and upcoming events)
+    **Quick Learning Moment:** (educational insight made simple)
     
     Use conversational tone, avoid jargon, explain complex terms simply.
-    Same content as academic version but accessible to beginners.`;
+    Same content as academic version but accessible to beginners.
+    Format with bold headers that are engaging and descriptive.`;
 
     // Generate academic content
     const academicResponse = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -138,9 +139,36 @@ serve(async (req) => {
       difficulty: "beginner"
     };
 
+    // Generate engaging title
+    const titleResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { 
+            role: 'system', 
+            content: 'Create an engaging, clickable title for a market intelligence briefing. Use power words, be specific, and create curiosity. Maximum 80 characters.' 
+          },
+          { 
+            role: 'user', 
+            content: `Create a compelling title for a ${category} briefing based on this content: ${academicContent.substring(0, 300)}` 
+          }
+        ],
+        max_tokens: 50,
+        temperature: 0.8,
+      }),
+    });
+
+    const titleData = await titleResponse.json();
+    const engagingTitle = titleData.choices[0].message.content.replace(/['"]/g, '');
+
     // Create briefing record in database
     const briefingData = {
-      title: `${category} Market Intelligence - ${new Date().toLocaleDateString()}`,
+      title: engagingTitle,
       category,
       executive_summary: academicContent.split('\n')[0] || 'Market analysis and insights for informed decision-making.',
       academic_content: academicContent,

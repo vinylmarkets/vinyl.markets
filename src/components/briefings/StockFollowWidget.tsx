@@ -129,7 +129,7 @@ export const StockFollowWidget = ({ followedStocks, onFollowedStocksChange }: St
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Star className="h-5 w-5 text-yellow-500" />
-          Follow Stocks for Daily Intelligence Briefings
+          Follow Stocks for Daily Market Intelligence
         </CardTitle>
       </CardHeader>
       

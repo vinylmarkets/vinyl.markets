@@ -159,7 +159,7 @@ export default function Briefings() {
       <div className="space-y-6">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Daily Intelligence Briefings</h1>
+            <h1 className="text-3xl font-bold text-foreground">Daily Market Intelligence</h1>
             <p className="text-muted-foreground mt-2">
               AI-powered market analysis and insights delivered daily
             </p>

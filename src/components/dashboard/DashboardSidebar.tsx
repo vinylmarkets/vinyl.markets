@@ -33,7 +33,7 @@ const navigationItems = [
     exact: true
   },
   {
-    title: "Intelligence Briefings",
+    title: "Market Intelligence",
     url: "/dashboard/briefings",
     icon: FileText,
   },
