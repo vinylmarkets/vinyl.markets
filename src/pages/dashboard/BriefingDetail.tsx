@@ -207,10 +207,6 @@ export default function BriefingDetail() {
                 {briefing.title}
               </CardTitle>
 
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                {briefing.executive_summary}
-              </p>
-
               {/* Stock Badges */}
               {briefing.stocks_mentioned && briefing.stocks_mentioned.length > 0 && (
                 <div className="space-y-2">

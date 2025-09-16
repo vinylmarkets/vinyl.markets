@@ -83,10 +83,6 @@ export const BriefingCard = ({ briefing, viewMode = 'grid' }: BriefingCardProps)
         </CardHeader>
 
         <CardContent className={`pt-0 pb-3 ${viewMode === 'list' ? 'flex-1' : ''}`}>
-          <p className="text-sm text-muted-foreground line-clamp-2 mb-3 leading-relaxed">
-            {briefing.executive_summary}
-          </p>
-
           {briefing.stocks_mentioned && briefing.stocks_mentioned.length > 0 && (
             <div className="mb-3">
               <div className="flex flex-wrap gap-1">
