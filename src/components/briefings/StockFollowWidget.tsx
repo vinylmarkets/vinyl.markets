@@ -195,7 +195,7 @@ export const StockFollowWidget = ({ followedStocks, onFollowedStocksChange }: St
 
         {followedStocks.length === 0 && (
           <p className="text-sm text-muted-foreground">
-            Add stocks you're interested in to receive personalized briefings and insights.
+            Add stocks you're interested in to receive daily briefings and insights.
           </p>
         )}
       </CardContent>

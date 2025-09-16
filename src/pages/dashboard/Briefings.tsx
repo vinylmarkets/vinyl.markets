@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ProbabilityChart } from "@/components/charts/ProbabilityChart";
-import { TrendingUp, Calendar, Plus, RefreshCw } from "lucide-react";
+import { Calendar, Plus, RefreshCw } from "lucide-react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { BriefingCard } from "@/components/briefings/BriefingCard";
 import { BriefingFilters } from "@/components/briefings/BriefingFilters";
 import { StockFollowWidget } from "@/components/briefings/StockFollowWidget";
-import { PredictionAPI } from "@/lib/prediction-api";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { formatDistanceToNow } from "date-fns";
@@ -19,28 +17,11 @@ export default function Briefings() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [followedStocks, setFollowedStocks] = useState<string[]>([]);
   const [briefings, setBriefings] = useState<any[]>([]);
-  const [predictions, setPredictions] = useState<any[]>([]);
   const [isGeneratingBriefing, setIsGeneratingBriefing] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     const loadData = async () => {
-      // Load prediction data for chart
-      try {
-        const briefing = await PredictionAPI.getDailyBriefing();
-        setPredictions(briefing.predictions || []);
-      } catch (error) {
-        console.log('Using mock data for charts');
-        const mockPredictions = [
-          { symbol: 'AAPL', probability: 0.75, confidence: 0.8, current_price: 150.25 },
-          { symbol: 'GOOGL', probability: 0.65, confidence: 0.7, current_price: 2800.50 },
-          { symbol: 'MSFT', probability: 0.80, confidence: 0.85, current_price: 350.75 },
-          { symbol: 'TSLA', probability: 0.45, confidence: 0.6, current_price: 220.30 },
-          { symbol: 'AMZN', probability: 0.70, confidence: 0.75, current_price: 3200.15 }
-        ];
-        setPredictions(mockPredictions);
-      }
-
       // Load briefings from database
       await loadBriefings();
       
@@ -188,19 +169,6 @@ export default function Briefings() {
             </Button>
           </div>
         </div>
-
-        {/* Market Overview Chart */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Market Overview
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ProbabilityChart data={predictions} />
-          </CardContent>
-        </Card>
 
         {/* Stock Follow Widget */}
         <StockFollowWidget 
