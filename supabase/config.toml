@@ -1,1 +1,7 @@
 project_id = "jhxjvpbwkdzjufjyqanq"
+
+[functions.generate-briefing-content]
+verify_jwt = false
+
+[functions.morning-market-analysis]
+verify_jwt = false

@@ -6,6 +6,7 @@ import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { BriefingCard } from "@/components/briefings/BriefingCard";
 import { BriefingFilters } from "@/components/briefings/BriefingFilters";
 import { StockFollowWidget } from "@/components/briefings/StockFollowWidget";
+import { MorningAnalysisTrigger } from "@/components/MorningAnalysisTrigger";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { formatDistanceToNow } from "date-fns";
@@ -169,6 +170,9 @@ export default function Briefings() {
             </Button>
           </div>
         </div>
+
+        {/* Morning Market Analysis */}
+        <MorningAnalysisTrigger />
 
         {/* Stock Follow Widget */}
         <StockFollowWidget 
