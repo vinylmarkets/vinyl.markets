@@ -21,6 +21,7 @@ import {
 import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { PredictionAPI, Prediction } from '@/lib/prediction-api';
 
 interface Message {
   id: number;
@@ -212,11 +213,8 @@ export default function Terminal() {
     setIsLoading(true);
 
     try {
-      // Simulate AI processing delay
-      await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1500));
-
-      // Generate educational AI response
-      const aiResponse = generateEducationalResponse(inputValue);
+      // Get real prediction data
+      const aiResponse = await handleQuery(inputValue);
       const sources = generateSources(inputValue);
 
       const aiMessage: Message = {
@@ -264,52 +262,44 @@ export default function Terminal() {
     }
   };
 
-  const generateEducationalResponse = (question: string): string => {
-    const responses = [
-      `Great question about options trading! Let me explain this concept in educational terms.
-
-**Key Learning Points:**
-• Options are financial derivatives that give you the right (but not obligation) to buy or sell an underlying asset
-• Understanding Greeks (Delta, Gamma, Theta, Vega) is crucial for risk management
-• Put-call parity is a fundamental relationship in options pricing
-
-**Educational Context:**
-This concept is covered in the Cremers-Weinbaum research methodology, which analyzes unusual options activity to identify informed trading patterns. The academic framework helps us understand how institutional investors use options for hedging and speculation.
-
-**Remember:** This is educational information to help you understand market mechanics. Always paper trade first and consult financial professionals before risking real capital.`,
-
-      `Excellent question! This touches on important market microstructure concepts.
-
-**Educational Framework:**
-• Market makers provide liquidity by quoting bid-ask spreads
-• Order flow analysis reveals institutional trading patterns  
-• Volume and open interest provide insights into market sentiment
-
-**Academic Perspective:**
-Research by Boehmer & Jones (2021) shows how sophisticated algorithms analyze these patterns. The methodology involves statistical analysis of trading volumes, price movements, and options positioning.
-
-**Learning Application:**
-Understanding these concepts helps you interpret market data more effectively. Focus on learning the underlying principles rather than trying to predict specific price movements.
-
-**Educational Disclaimer:** This analysis is for learning purposes only and does not constitute trading advice.`,
-
-      `That's a sophisticated question about market analysis! Let me break this down educationally.
-
-**Core Concepts:**
-• Implied volatility reflects market expectations of future price movement
-• Historical volatility measures actual past price fluctuations
-• The relationship between these provides market sentiment indicators
-
-**Research Methodology:**
-Academic studies like those in our research library examine how volatility clustering affects options pricing. The statistical models help identify when markets might be mispricing risk.
-
-**Educational Value:**
-Learning to interpret volatility data helps you understand market psychology and risk assessment. This is fundamental knowledge for anyone studying financial markets.
-
-**Important Note:** This educational content helps you learn market analysis techniques but should never be used as the sole basis for investment decisions.`
-    ];
-
-    return responses[Math.floor(Math.random() * responses.length)];
+  // Real API query handler
+  const handleQuery = async (userQuery: string): Promise<string> => {
+    // Extract stock symbol from query
+    const symbolMatch = userQuery.toUpperCase().match(/\b[A-Z]{1,5}\b/);
+    
+    if (!symbolMatch) {
+      return "Please mention a stock symbol (e.g., GME, AAPL, TSLA)";
+    }
+    
+    const symbol = symbolMatch[0];
+    
+    try {
+      // Call Python API for real predictions
+      const data: Prediction = await PredictionAPI.getPrediction(symbol);
+      
+      // Format the response based on the question
+      if (userQuery.toLowerCase().includes('probability') || 
+          userQuery.toLowerCase().includes('above') ||
+          userQuery.toLowerCase().includes('below')) {
+        
+        return `📊 **${symbol} Analysis** (Real-Time Data)\n\n` +
+          `**Probability of Upward Movement:** ${(data.probability * 100).toFixed(1)}%\n` +
+          `**Current Price:** $${data.current_price.toFixed(2)}\n` +
+          `**Confidence Level:** ${(data.confidence * 100).toFixed(0)}%\n\n` +
+          `**Analysis Factors:**\n` +
+          `• Market Momentum: ${(data.factors.base_rate * 100).toFixed(1)}%\n` +
+          `• Reddit Sentiment: ${data.factors.reddit_adjustment > 0 ? '📈' : '📉'} ${Math.abs(data.factors.reddit_adjustment * 100).toFixed(1)}%\n` +
+          `• News Impact: ${data.factors.news_adjustment > 0 ? '📰+' : '📰-'} ${Math.abs(data.factors.news_adjustment * 100).toFixed(1)}%\n\n` +
+          `**Interpretation:** ${data.interpretation}\n\n` +
+          `*Data sources: Polygon.io (market), Reddit API (sentiment), NewsAPI (news)*`;
+      }
+      
+      return data.interpretation;
+      
+    } catch (error) {
+      console.error('API Error:', error);
+      return "Unable to get prediction. Make sure the Python API is running on port 8000.";
+    }
   };
 
   const generateSources = (question: string): string[] => {
