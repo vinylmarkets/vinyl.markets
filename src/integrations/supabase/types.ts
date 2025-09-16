@@ -355,6 +355,57 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_market_analysis: {
+        Row: {
+          analysis_data: Json | null
+          analysis_date: string
+          analysis_type: string
+          created_at: string
+          current_price: number | null
+          id: string
+          market_cap: number | null
+          metric_name: string
+          metric_value: number
+          price_change_pct: number | null
+          significance_score: number
+          symbol: string
+          updated_at: string
+          volume: number | null
+        }
+        Insert: {
+          analysis_data?: Json | null
+          analysis_date: string
+          analysis_type: string
+          created_at?: string
+          current_price?: number | null
+          id?: string
+          market_cap?: number | null
+          metric_name: string
+          metric_value: number
+          price_change_pct?: number | null
+          significance_score?: number
+          symbol: string
+          updated_at?: string
+          volume?: number | null
+        }
+        Update: {
+          analysis_data?: Json | null
+          analysis_date?: string
+          analysis_type?: string
+          created_at?: string
+          current_price?: number | null
+          id?: string
+          market_cap?: number | null
+          metric_name?: string
+          metric_value?: number
+          price_change_pct?: number | null
+          significance_score?: number
+          symbol?: string
+          updated_at?: string
+          volume?: number | null
+        }
+        Relationships: []
+      }
       daily_metrics: {
         Row: {
           active_users: number | null
@@ -553,6 +604,33 @@ export type Database = {
           symbol?: string
           timestamp?: string
           volume?: number | null
+        }
+        Relationships: []
+      }
+      market_scan_config: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          parameters: Json
+          scan_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          parameters: Json
+          scan_type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          parameters?: Json
+          scan_type?: string
+          updated_at?: string
         }
         Relationships: []
       }
