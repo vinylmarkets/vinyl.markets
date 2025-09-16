@@ -19,16 +19,11 @@ interface BriefingFiltersProps {
 
 const categories = [
   { id: 'all', name: 'All Categories' },
-  { id: 'market-overview', name: 'Market Overview' },
-  { id: 'sector-analysis', name: 'Sector Analysis' },
-  { id: 'earnings-preview', name: 'Earnings Preview' },
-  { id: 'economic-indicators', name: 'Economic Indicators' },
-  { id: 'geopolitical-impact', name: 'Geopolitical Impact' },
-  { id: 'crypto-analysis', name: 'Crypto Analysis' },
-  { id: 'options-flow', name: 'Options Flow' },
-  { id: 'insider-activity', name: 'Insider Activity' },
-  { id: 'social-sentiment', name: 'Social Sentiment' },
-  { id: 'risk-assessment', name: 'Risk Assessment' }
+  { id: 'macro-economic', name: 'Macro-Economic Analysis' },
+  { id: 'individual-stock', name: 'Individual Stock Analysis' },
+  { id: 'market-structure', name: 'Market Structure & Conditions' },
+  { id: 'alternative-investments', name: 'Alternative Investments & Emerging Trends' },
+  { id: 'historical-patterns', name: 'Historical Pattern Analysis' }
 ];
 
 export const BriefingFilters = ({

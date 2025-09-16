@@ -31,16 +31,11 @@ export const BriefingCard = ({ briefing, viewMode = 'grid' }: BriefingCardProps)
 
   const getCategoryColor = (category: string) => {
     const colors = {
-      'market-overview': 'bg-blue-100 text-blue-800 border-blue-200',
-      'sector-analysis': 'bg-green-100 text-green-800 border-green-200',
-      'earnings-preview': 'bg-purple-100 text-purple-800 border-purple-200',
-      'economic-indicators': 'bg-orange-100 text-orange-800 border-orange-200',
-      'geopolitical-impact': 'bg-red-100 text-red-800 border-red-200',
-      'crypto-analysis': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      'options-flow': 'bg-indigo-100 text-indigo-800 border-indigo-200',
-      'insider-activity': 'bg-pink-100 text-pink-800 border-pink-200',
-      'social-sentiment': 'bg-teal-100 text-teal-800 border-teal-200',
-      'risk-assessment': 'bg-gray-100 text-gray-800 border-gray-200'
+      'macro-economic': 'bg-blue-100 text-blue-800 border-blue-200',
+      'individual-stock': 'bg-green-100 text-green-800 border-green-200',
+      'market-structure': 'bg-purple-100 text-purple-800 border-purple-200',
+      'alternative-investments': 'bg-orange-100 text-orange-800 border-orange-200',
+      'historical-patterns': 'bg-indigo-100 text-indigo-800 border-indigo-200'
     };
     return colors[category as keyof typeof colors] || 'bg-gray-100 text-gray-800 border-gray-200';
   };

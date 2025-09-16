@@ -90,7 +90,7 @@ export default function Briefings() {
     try {
       const { data, error } = await supabase.functions.invoke('generate-briefing-content', {
         body: {
-          category: 'market-overview',
+          category: 'market-structure', // Use valid category
           stockSymbols: followedStocks.length > 0 ? followedStocks.slice(0, 5) : undefined,
           userPreferences: {
             explanation_mode: 'plain_speak',
