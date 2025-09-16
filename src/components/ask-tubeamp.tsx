@@ -9,14 +9,39 @@ export function AskTubeAmp() {
     e.preventDefault();
     if (!query.trim()) return;
 
-    // Extract stock symbol
-    const symbolMatch = query.toUpperCase().match(/\b[A-Z]{1,5}\b/);
-    if (!symbolMatch) {
+    // Extract stock symbol with improved logic
+    const extractStockSymbol = (text: string): string | null => {
+      // Common stock symbols pattern - 1-5 uppercase letters
+      // But skip common English words
+      const words = text.toUpperCase().split(/\s+/);
+      
+      // List of common stocks (you can expand this)
+      const knownStocks = ['GME', 'AMC', 'AAPL', 'MSFT', 'TSLA', 'NVDA', 'META', 'GOOGL', 'AMZN', 'SPY', 'QQQ'];
+      
+      // First check for known stocks
+      for (const word of words) {
+        if (knownStocks.includes(word)) {
+          return word;
+        }
+      }
+      
+      // Then look for any 1-5 letter uppercase word that's not a common English word
+      const commonWords = ['WHAT', 'WHERE', 'WHEN', 'WHY', 'HOW', 'IS', 'THE', 'FOR', 'OF', 'TO', 'BY', 'AT', 'IN', 'ON', 'IT', 'AS', 'OR', 'AND', 'BUT', 'IF', 'THEN', 'WILL', 'CAN', 'BE', 'HAS', 'HAD', 'HAVE', 'ARE', 'WAS', 'WERE', 'BEEN', 'ABOVE', 'BELOW'];
+      
+      for (const word of words) {
+        if (word.match(/^[A-Z]{1,5}$/) && !commonWords.includes(word)) {
+          return word;
+        }
+      }
+      
+      return null;
+    };
+
+    const symbol = extractStockSymbol(query);
+    if (!symbol) {
       setResponse('Please mention a stock symbol like GME, AAPL, or TSLA');
       return;
     }
-
-    const symbol = symbolMatch[0];
     setLoading(true);
     setResponse('');
 
