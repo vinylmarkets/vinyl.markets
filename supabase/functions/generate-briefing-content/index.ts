@@ -91,6 +91,9 @@ serve(async (req) => {
     academicContent = academicContent
       .replace(/^<\/?html>/gi, '')
       .replace(/<!DOCTYPE html>/gi, '')
+      .replace(/<\/?body>/gi, '')
+      .replace(/<\/?head>/gi, '')
+      .replace(/<\/?meta[^>]*>/gi, '')
       .replace(/```html/gi, '')
       .replace(/```/gi, '')
       .replace(/^\s*html\s*$/gmi, '')
@@ -121,6 +124,9 @@ serve(async (req) => {
     plainSpeakContent = plainSpeakContent
       .replace(/^<\/?html>/gi, '')
       .replace(/<!DOCTYPE html>/gi, '')
+      .replace(/<\/?body>/gi, '')
+      .replace(/<\/?head>/gi, '')
+      .replace(/<\/?meta[^>]*>/gi, '')
       .replace(/```html/gi, '')
       .replace(/```/gi, '')
       .replace(/^\s*html\s*$/gmi, '')
@@ -185,6 +191,8 @@ serve(async (req) => {
     const engagingTitle = titleData.choices[0].message.content
       .replace(/['"]/g, '')
       .replace(/<!DOCTYPE html>/gi, '')
+      .replace(/<\/?body>/gi, '')
+      .replace(/<\/?head>/gi, '')
       .replace(/```html/gi, '')
       .replace(/```/gi, '')
       .trim();
