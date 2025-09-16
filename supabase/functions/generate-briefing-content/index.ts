@@ -90,6 +90,7 @@ serve(async (req) => {
     // Clean up unwanted HTML tags and markdown formatting
     academicContent = academicContent
       .replace(/^<\/?html>/gi, '')
+      .replace(/<!DOCTYPE html>/gi, '')
       .replace(/```html/gi, '')
       .replace(/```/gi, '')
       .replace(/^\s*html\s*$/gmi, '')
@@ -119,6 +120,7 @@ serve(async (req) => {
     // Clean up unwanted HTML tags and markdown formatting
     plainSpeakContent = plainSpeakContent
       .replace(/^<\/?html>/gi, '')
+      .replace(/<!DOCTYPE html>/gi, '')
       .replace(/```html/gi, '')
       .replace(/```/gi, '')
       .replace(/^\s*html\s*$/gmi, '')
@@ -182,6 +184,7 @@ serve(async (req) => {
     const titleData = await titleResponse.json();
     const engagingTitle = titleData.choices[0].message.content
       .replace(/['"]/g, '')
+      .replace(/<!DOCTYPE html>/gi, '')
       .replace(/```html/gi, '')
       .replace(/```/gi, '')
       .trim();
