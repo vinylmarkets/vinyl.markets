@@ -146,6 +146,122 @@ export type Database = {
           },
         ]
       }
+      briefing_categories: {
+        Row: {
+          daily_target: number
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          daily_target?: number
+          description?: string | null
+          id: string
+          name: string
+        }
+        Update: {
+          daily_target?: number
+          description?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      briefing_views: {
+        Row: {
+          briefing_id: string
+          completed_reading: boolean | null
+          id: string
+          reading_mode: string | null
+          reading_time_seconds: number | null
+          user_id: string
+          viewed_at: string
+        }
+        Insert: {
+          briefing_id: string
+          completed_reading?: boolean | null
+          id?: string
+          reading_mode?: string | null
+          reading_time_seconds?: number | null
+          user_id: string
+          viewed_at?: string
+        }
+        Update: {
+          briefing_id?: string
+          completed_reading?: boolean | null
+          id?: string
+          reading_mode?: string | null
+          reading_time_seconds?: number | null
+          user_id?: string
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "briefing_views_briefing_id_fkey"
+            columns: ["briefing_id"]
+            isOneToOne: false
+            referencedRelation: "briefings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      briefings: {
+        Row: {
+          academic_content: string
+          category: string
+          chart_config: Json | null
+          created_at: string
+          educational_principle: Json | null
+          executive_summary: string
+          id: string
+          methodology_notes: string | null
+          plain_speak_content: string
+          publication_date: string
+          published: boolean | null
+          related_resources: string[] | null
+          risk_disclaimers: string | null
+          stocks_mentioned: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          academic_content: string
+          category: string
+          chart_config?: Json | null
+          created_at?: string
+          educational_principle?: Json | null
+          executive_summary: string
+          id?: string
+          methodology_notes?: string | null
+          plain_speak_content: string
+          publication_date: string
+          published?: boolean | null
+          related_resources?: string[] | null
+          risk_disclaimers?: string | null
+          stocks_mentioned?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          academic_content?: string
+          category?: string
+          chart_config?: Json | null
+          created_at?: string
+          educational_principle?: Json | null
+          executive_summary?: string
+          id?: string
+          methodology_notes?: string | null
+          plain_speak_content?: string
+          publication_date?: string
+          published?: boolean | null
+          related_resources?: string[] | null
+          risk_disclaimers?: string | null
+          stocks_mentioned?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       compliance_logs: {
         Row: {
           action_taken: string | null
@@ -973,6 +1089,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_stock_follows: {
+        Row: {
+          followed_at: string
+          id: string
+          stock_symbol: string
+          user_id: string
+        }
+        Insert: {
+          followed_at?: string
+          id?: string
+          stock_symbol: string
+          user_id: string
+        }
+        Update: {
+          followed_at?: string
+          id?: string
+          stock_symbol?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       users: {
         Row: {
