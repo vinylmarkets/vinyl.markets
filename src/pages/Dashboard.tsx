@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { IntelligenceBriefing } from "@/components/intelligence-briefing";
+import { AskTubeAmp } from "@/components/ask-tubeamp";
 import { 
   BookOpen, 
   TrendingUp, 
@@ -221,79 +223,14 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Today's Intelligence Briefing */}
-          <Card className="md:col-span-1">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-secondary" />
-                  Today's Intelligence
-                </CardTitle>
-                <Badge 
-                  variant="secondary" 
-                  className={
-                    mockTodaysBriefing.confidence === "High" 
-                      ? "bg-secondary/20 text-secondary" 
-                      : "bg-yellow-500/20 text-yellow-600"
-                  }
-                >
-                  {mockTodaysBriefing.confidence} Confidence
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <h3 className="font-semibold text-lg mb-2">{mockTodaysBriefing.title}</h3>
-              <p className="text-muted-foreground mb-4 leading-relaxed">
-                {mockTodaysBriefing.summary}
-              </p>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  {mockTodaysBriefing.readTime}
-                </div>
-                <Button size="sm">
-                  Read Full Brief
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Recent Ask TubeAmp Queries */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="h-5 w-5 text-secondary" />
-                Recent Questions
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {mockRecentQueries.map((query) => (
-                  <div key={query.id} className="border-l-2 border-secondary pl-4">
-                    <p className="text-sm font-medium mb-1 line-clamp-2">
-                      {query.question}
-                    </p>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <span>
-                        {query.timestamp.toLocaleDateString()} at {query.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
-                      {query.answered && (
-                        <Badge variant="outline" className="text-xs py-0">
-                          Answered
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <Button variant="outline" size="sm" className="w-full mt-4">
-                <MessageSquare className="mr-2 h-4 w-4" />
-                Ask New Question
-              </Button>
-            </CardContent>
-          </Card>
+        {/* Real-time Intelligence and Query Interface */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <div>
+            <IntelligenceBriefing />
+          </div>
+          <div>
+            <AskTubeAmp />
+          </div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
