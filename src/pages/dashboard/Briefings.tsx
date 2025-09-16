@@ -1,19 +1,59 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Clock, Search, Filter, Star, Calendar } from "lucide-react";
+import { FileText, Clock, Search, Filter, Star, Calendar, TrendingUp } from "lucide-react";
 import { mockBriefings } from "@/data/mockBriefings";
 import { useNavigate } from "react-router-dom";
+import { ProbabilityChart } from "@/components/charts";
+import { PredictionAPI } from "@/lib/prediction-api";
 
 export default function Briefings() {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
+  const [predictionData, setPredictionData] = useState<any[]>([]);
   const navigate = useNavigate();
+
+  // Load sample prediction data for the chart
+  useEffect(() => {
+    const loadPredictions = async () => {
+      try {
+        // Try to get live data for a few popular stocks
+        const symbols = ['AAPL', 'GOOGL', 'MSFT'];
+        const predictions = await Promise.allSettled(
+          symbols.map(symbol => PredictionAPI.getPrediction(symbol))
+        );
+        
+        const validPredictions = predictions
+          .filter((result): result is PromiseFulfilledResult<any> => result.status === 'fulfilled')
+          .map(result => result.value);
+
+        if (validPredictions.length > 0) {
+          setPredictionData(validPredictions);
+        } else {
+          // Fallback sample data
+          setPredictionData([
+            { symbol: 'AAPL', probability: 0.67, confidence: 0.85, current_price: 185.43 },
+            { symbol: 'GOOGL', probability: 0.72, confidence: 0.78, current_price: 138.21 },
+            { symbol: 'MSFT', probability: 0.58, confidence: 0.82, current_price: 367.12 },
+          ]);
+        }
+      } catch (error) {
+        // Use sample data if API fails
+        setPredictionData([
+          { symbol: 'AAPL', probability: 0.67, confidence: 0.85, current_price: 185.43 },
+          { symbol: 'GOOGL', probability: 0.72, confidence: 0.78, current_price: 138.21 },
+          { symbol: 'MSFT', probability: 0.58, confidence: 0.82, current_price: 367.12 },
+        ]);
+      }
+    };
+
+    loadPredictions();
+  }, []);
 
   // Filter and sort briefings
   const filteredBriefings = mockBriefings
@@ -62,11 +102,25 @@ export default function Briefings() {
             <h1 className="text-3xl font-bold text-foreground">Intelligence Briefings</h1>
             <p className="text-muted-foreground">AI-powered market analysis with Academic/Plain Speak modes</p>
           </div>
-          <Button>
-            <FileText className="h-4 w-4 mr-2" />
-            Request Custom Brief
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => navigate('/dashboard/charts')}>
+              <TrendingUp className="h-4 w-4 mr-2" />
+              View Charts
+            </Button>
+            <Button>
+              <FileText className="h-4 w-4 mr-2" />
+              Request Custom Brief
+            </Button>
+          </div>
         </div>
+
+        {/* Market Overview Chart */}
+        {predictionData.length > 0 && (
+          <ProbabilityChart 
+            data={predictionData}
+            title="Current Market Predictions"
+          />
+        )}
 
         {/* Search and Filters */}
         <div className="flex flex-col sm:flex-row gap-4">

@@ -30,6 +30,7 @@ import NotFound from "./pages/NotFound";
 import Briefings from "./pages/dashboard/Briefings";
 import BriefingDetail from "./pages/dashboard/BriefingDetail";
 import Terminal from "./pages/dashboard/Terminal";
+import Charts from "./pages/dashboard/Charts";
 import LearningProgress from "./pages/dashboard/Progress";
 import Portfolio from "./pages/dashboard/Portfolio";
 import SettingsPage from "./pages/dashboard/Settings";
@@ -66,6 +67,7 @@ const App = () => {
               <Route path="/dashboard/briefings" element={<Briefings />} />
               <Route path="/dashboard/briefings/:id" element={<BriefingDetail />} />
               <Route path="/dashboard/terminal" element={<Terminal />} />
+              <Route path="/dashboard/charts" element={<Charts />} />
               <Route path="/dashboard/progress" element={<LearningProgress />} />
               <Route path="/dashboard/portfolio" element={<Portfolio />} />
               <Route path="/dashboard/settings" element={<SettingsPage />} />

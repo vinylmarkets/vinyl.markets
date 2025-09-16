@@ -43,6 +43,11 @@ const navigationItems = [
     icon: Terminal,
   },
   {
+    title: "Charts & Analytics",
+    url: "/dashboard/charts",
+    icon: TrendingUp,
+  },
+  {
     title: "Learning Progress",
     url: "/dashboard/progress",
     icon: BookOpen,
