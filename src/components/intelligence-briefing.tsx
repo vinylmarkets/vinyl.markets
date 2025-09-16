@@ -16,10 +16,11 @@ export function IntelligenceBriefing() {
 
   const loadBriefing = async () => {
     try {
-      const data = await PredictionAPI.getDailyBriefing();
+      const response = await fetch('http://localhost:8000/briefing');
+      const data = await response.json();
       setBriefing(data);
     } catch (error) {
-      console.error('Failed to load briefing:', error);
+      console.error('Failed to load briefings:', error);
     } finally {
       setLoading(false);
     }
