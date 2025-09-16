@@ -129,9 +129,12 @@ export default function BriefingDetail() {
           </CardHeader>
           <CardContent>
             <div className="prose prose-lg max-w-none">
-              <div className="whitespace-pre-wrap leading-relaxed">
-                {isAcademicMode ? briefing.academic_content : briefing.plain_speak_content}
-              </div>
+              <div 
+                className="leading-relaxed"
+                dangerouslySetInnerHTML={{
+                  __html: isAcademicMode ? briefing.academic_content : briefing.plain_speak_content
+                }}
+              />
             </div>
           </CardContent>
         </Card>

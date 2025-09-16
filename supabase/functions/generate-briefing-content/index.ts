@@ -44,27 +44,27 @@ serve(async (req) => {
     Always include appropriate risk disclaimers.`;
 
     const academicPrompt = `Create an academic-style briefing covering:
-    **Market Pulse:** (2-3 sentences capturing the current state)
-    **Deep Dive Analysis:** (data-driven insights with supporting evidence)
-    **Research Methodology:** (data sources and analytical approach used)
-    **Risk Assessment:** (key factors and limitations to consider)
-    **Learning Corner:** (key concept explanation for education)
+    <h3>Market Pulse</h3> (2-3 sentences capturing the current state)
+    <h3>Deep Dive Analysis</h3> (data-driven insights with supporting evidence)
+    <h3>Research Methodology</h3> (data sources and analytical approach used)
+    <h3>Risk Assessment</h3> (key factors and limitations to consider)
+    <h3>Learning Corner</h3> (key concept explanation for education)
     
     Category: ${category}
     ${stockSymbols ? `Focus stocks: ${stockSymbols.join(', ')}` : ''}
     ${marketConditions ? `Market context: ${JSON.stringify(marketConditions)}` : ''}
     
-    Format with bold headers and clear sections. Make headers engaging and descriptive.`;
+    Use HTML h3 tags for headers and clear sections. Make headers engaging and descriptive.`;
 
     const plainSpeakPrompt = `Create a plain-language version of the same briefing:
-    **Today's Market Story:** (simple summary of what happened)
-    **Why This Matters to You:** (easy explanation of significance)
-    **What to Watch Next:** (key indicators and upcoming events)
-    **Quick Learning Moment:** (educational insight made simple)
+    <h3>Today's Market Story</h3> (simple summary of what happened)
+    <h3>Why This Matters to You</h3> (easy explanation of significance)
+    <h3>What to Watch Next</h3> (key indicators and upcoming events)
+    <h3>Quick Learning Moment</h3> (educational insight made simple)
     
     Use conversational tone, avoid jargon, explain complex terms simply.
     Same content as academic version but accessible to beginners.
-    Format with bold headers that are engaging and descriptive.`;
+    Use HTML h3 tags for headers that are engaging and descriptive.`;
 
     // Generate academic content
     const academicResponse = await fetch('https://api.openai.com/v1/chat/completions', {
