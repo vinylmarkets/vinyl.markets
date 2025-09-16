@@ -36,49 +36,60 @@ serve(async (req) => {
 
     console.log('Generating briefing for category:', category);
 
+    const currentDate = new Date().toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+
     // Create comprehensive prompts for both modes
-    const systemPrompt = `You are a senior financial analyst creating daily market intelligence briefings. 
-    Focus on the ${category} category. 
+    const systemPrompt = `You are a senior financial analyst creating daily market intelligence briefings for ${currentDate}. 
+    Focus on the ${category} category and current market conditions as of today's date.
+    Generate analysis based on recent market trends, current economic indicators, and up-to-date financial data.
+    IMPORTANT: All content must be relevant to ${currentDate} and current market conditions.
     Provide accurate, balanced analysis without investment advice.
     Include relevant data sources and methodology notes.
     Always include appropriate risk disclaimers.`;
 
-    const academicPrompt = `Create an academic-style briefing covering:
+    const academicPrompt = `Create an academic-style briefing for ${currentDate} covering current market conditions:
     === Market Pulse ===
-    (2-3 sentences capturing the current state)
+    (2-3 sentences capturing today's market state and recent developments)
     
     === Deep Dive Analysis ===
-    (data-driven insights with supporting evidence)
+    (data-driven insights based on current market trends and recent economic indicators)
     
     === Research Methodology ===
-    (data sources and analytical approach used)
+    (data sources and analytical approach used for current market analysis)
     
     === Risk Assessment ===
-    (key factors and limitations to consider)
+    (current market risks and factors to consider as of ${currentDate})
     
     === Learning Corner ===
-    (key concept explanation for education)
+    (key concept explanation relevant to today's market environment)
     
     Category: ${category}
+    Date: ${currentDate}
     ${stockSymbols ? `Focus stocks: ${stockSymbols.join(', ')}` : ''}
     ${marketConditions ? `Market context: ${JSON.stringify(marketConditions)}` : ''}
     
+    CRITICAL: Generate analysis for ${currentDate} and current market conditions only. Do not reference outdated information.
     IMPORTANT: Use === Header === format for section headers. Do NOT use any HTML tags. Return plain text only.`;
 
-    const plainSpeakPrompt = `Create a plain-language version of the same briefing:
+    const plainSpeakPrompt = `Create a plain-language version of the same briefing for ${currentDate}:
     === Today's Market Story ===
-    (simple summary of what happened)
+    (simple summary of what's happening in today's markets)
     
     === Why This Matters to You ===
-    (easy explanation of significance)
+    (easy explanation of current market significance)
     
     === What to Watch Next ===
-    (key indicators and upcoming events)
+    (key indicators and upcoming events based on current conditions)
     
     === Quick Learning Moment ===
-    (educational insight made simple)
+    (educational insight relevant to today's market environment)
     
     Use conversational tone, avoid jargon, explain complex terms simply.
+    Focus on current market conditions as of ${currentDate}.
     Same content as academic version but accessible to beginners.
     IMPORTANT: Use === Header === format for section headers. Do NOT use any HTML tags. Return plain text only.`;
 
@@ -176,11 +187,11 @@ serve(async (req) => {
         messages: [
           { 
             role: 'system', 
-            content: 'Create an engaging, clickable title for a market intelligence briefing. Use power words, be specific, and create curiosity. Maximum 80 characters.' 
+            content: `Create an engaging, clickable title for a market intelligence briefing for ${currentDate}. Use power words, be specific about current market conditions, and create curiosity. Maximum 80 characters.` 
           },
           { 
             role: 'user', 
-            content: `Create a compelling title for a ${category} briefing based on this content: ${academicContent.substring(0, 300)}` 
+            content: `Create a compelling title for a ${category} briefing for ${currentDate} based on current market conditions: ${academicContent.substring(0, 300)}` 
           }
         ],
         max_tokens: 50,
