@@ -22,7 +22,7 @@ export function AskTubeAmp() {
 
     try {
       // Try direct connection first
-      const apiUrl = `http://localhost:8000/predict/${symbol}`;
+      const apiUrl = `/api/predict/${symbol}`;
       console.log('Fetching:', apiUrl);
       
       const res = await fetch(apiUrl, {
