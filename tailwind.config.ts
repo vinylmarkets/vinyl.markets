@@ -63,6 +63,17 @@ export default {
           low: "hsl(var(--probability-low))",
           neutral: "hsl(var(--probability-neutral))",
         },
+        amber: {
+          DEFAULT: "hsl(var(--amber))",
+          foreground: "hsl(var(--amber-foreground))",
+        },
+        purple: {
+          DEFAULT: "hsl(var(--purple))",
+          foreground: "hsl(var(--purple-foreground))",
+        },
+        tech: "hsl(var(--tech-accent))",
+        finance: "hsl(var(--finance-accent))",
+        healthcare: "hsl(var(--healthcare-accent))",
       },
       boxShadow: {
         'subtle': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',

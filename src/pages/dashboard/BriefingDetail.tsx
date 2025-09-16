@@ -5,9 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, BookOpen } from "lucide-react";
+import { ArrowLeft, BookOpen, Share2 } from "lucide-react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { EducationalPrincipleBox } from "@/components/briefings/EducationalPrincipleBox";
+import { StockBadge } from "@/components/briefings/StockBadge";
+import { FeaturedImage } from "@/components/briefings/FeaturedImage";
+import { ReadingStats } from "@/components/briefings/ReadingStats";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -80,57 +83,101 @@ export default function BriefingDetail() {
     <DashboardLayout>
       <div className="max-w-4xl mx-auto py-6 space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between">
           <Button
             variant="outline"
             size="sm"
             onClick={() => navigate('/dashboard/briefings')}
+            className="flex items-center gap-2"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft className="w-4 h-4" />
             Back to Briefings
           </Button>
           
-          <div className="flex items-center space-x-2 ml-auto">
-            <Label htmlFor="academic-mode">Academic Mode</Label>
-            <Switch
-              id="academic-mode"
-              checked={isAcademicMode}
-              onCheckedChange={setIsAcademicMode}
-            />
+          <div className="flex items-center gap-4">
+            <div className="flex items-center space-x-2">
+              <Label htmlFor="academic-mode" className="text-sm font-medium">Academic Mode</Label>
+              <Switch
+                id="academic-mode"
+                checked={isAcademicMode}
+                onCheckedChange={setIsAcademicMode}
+              />
+            </div>
+            
+            <Button variant="outline" size="sm" className="flex items-center gap-2">
+              <Share2 className="w-4 h-4" />
+              Share
+            </Button>
           </div>
         </div>
 
+        {/* Featured Image */}
+        <FeaturedImage 
+          title={briefing.title}
+          category={briefing.category}
+          stocks={briefing.stocks_mentioned || []}
+        />
+
+        {/* Reading Stats */}
+        <ReadingStats 
+          publicationDate={briefing.publication_date}
+          contentLength={
+            isAcademicMode 
+              ? briefing.academic_content?.length || 0 
+              : briefing.plain_speak_content?.length || 0
+          }
+          stocksCount={briefing.stocks_mentioned?.length || 0}
+          category={briefing.category}
+        />
+
         {/* Briefing Header */}
-        <Card>
+        <Card className="border-2 border-amber/20 bg-gradient-to-r from-amber/5 to-transparent">
           <CardHeader>
             <div className="space-y-4">
-              <Badge variant="outline">
-                {briefing.category.replace('-', ' ')}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="bg-purple/10 text-purple border-purple/30">
+                  {briefing.category.replace('-', ' ')}
+                </Badge>
+                <Badge variant="outline" className="bg-amber/10 text-amber border-amber/30">
+                  Market Intelligence
+                </Badge>
+              </div>
               
-              <CardTitle className="text-2xl font-bold">
+              <CardTitle className="text-2xl md:text-3xl font-bold leading-tight">
                 {briefing.title}
               </CardTitle>
 
-              <p className="text-lg text-muted-foreground">
+              <p className="text-lg text-muted-foreground leading-relaxed">
                 {briefing.executive_summary}
               </p>
+
+              {/* Stock Badges */}
+              {briefing.stocks_mentioned && briefing.stocks_mentioned.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">Stocks Analyzed:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {briefing.stocks_mentioned.map((symbol: string) => (
+                      <StockBadge key={symbol} symbol={symbol} size="md" />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </CardHeader>
         </Card>
 
         {/* Main Content */}
-        <Card>
+        <Card className="border-l-4 border-l-primary">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5" />
+              <BookOpen className="h-5 w-5 text-primary" />
               {isAcademicMode ? "Academic Analysis" : "Plain Language Summary"}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="prose prose-lg max-w-none">
               <div 
-                className="leading-relaxed [&_strong]:text-lg [&_strong]:font-semibold [&_strong]:text-foreground [&_strong]:block [&_strong]:mb-3 [&_strong]:mt-6"
+                className="leading-relaxed [&_strong]:text-lg [&_strong]:font-semibold [&_strong]:text-foreground [&_strong]:block [&_strong]:mb-3 [&_strong]:mt-6 [&_strong]:flex [&_strong]:items-center [&_strong]:gap-2"
                 dangerouslySetInnerHTML={{
                   __html: isAcademicMode ? briefing.academic_content : briefing.plain_speak_content
                 }}

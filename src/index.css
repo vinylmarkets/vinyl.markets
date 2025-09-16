@@ -51,6 +51,17 @@ All colors MUST be HSL.
     --probability-low: 0 84% 60%; /* Clean Red */
     --probability-neutral: 0 0% 60%; /* Light Gray */
     
+    /* Accent Colors for Visual Interest */
+    --amber: 45 93% 47%; /* Warm amber */
+    --amber-foreground: 0 0% 100%;
+    --purple: 262 83% 58%; /* Rich purple */
+    --purple-foreground: 0 0% 100%;
+    
+    /* Stock Categories */
+    --tech-accent: 262 83% 58%; /* Purple for tech stocks */
+    --finance-accent: 45 93% 47%; /* Amber for finance */
+    --healthcare-accent: 142 71% 45%; /* Green for healthcare */
+    
     /* Typography System - Medium-inspired */
     --font-serif: 'Georgia', 'Times New Roman', serif;
     --font-sans: 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', sans-serif;
