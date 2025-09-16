@@ -508,6 +508,45 @@ export type Database = {
           },
         ]
       }
+      predictions: {
+        Row: {
+          base_rate: number | null
+          confidence: number | null
+          created_at: string
+          current_price: number | null
+          id: number
+          news_adjustment: number | null
+          prediction_date: string | null
+          probability: number | null
+          reddit_adjustment: number | null
+          symbol: string | null
+        }
+        Insert: {
+          base_rate?: number | null
+          confidence?: number | null
+          created_at?: string
+          current_price?: number | null
+          id?: number
+          news_adjustment?: number | null
+          prediction_date?: string | null
+          probability?: number | null
+          reddit_adjustment?: number | null
+          symbol?: string | null
+        }
+        Update: {
+          base_rate?: number | null
+          confidence?: number | null
+          created_at?: string
+          current_price?: number | null
+          id?: number
+          news_adjustment?: number | null
+          prediction_date?: string | null
+          probability?: number | null
+          reddit_adjustment?: number | null
+          symbol?: string | null
+        }
+        Relationships: []
+      }
       query_patterns: {
         Row: {
           created_at: string | null
