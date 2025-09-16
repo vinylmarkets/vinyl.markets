@@ -54,7 +54,7 @@ serve(async (req) => {
     ${stockSymbols ? `Focus stocks: ${stockSymbols.join(', ')}` : ''}
     ${marketConditions ? `Market context: ${JSON.stringify(marketConditions)}` : ''}
     
-    Use HTML strong tags for headers and clear sections. Make headers engaging and descriptive.`;
+    IMPORTANT: Only use HTML strong tags for headers. Do NOT include any HTML document structure like html, head, body, DOCTYPE, or meta tags. Return only the content with strong tags for headers.`;
 
     const plainSpeakPrompt = `Create a plain-language version of the same briefing:
     <strong>Today's Market Story</strong> (simple summary of what happened)
@@ -64,7 +64,7 @@ serve(async (req) => {
     
     Use conversational tone, avoid jargon, explain complex terms simply.
     Same content as academic version but accessible to beginners.
-    Use HTML strong tags for headers that are engaging and descriptive. Do not use ** markdown formatting.`;
+    IMPORTANT: Only use HTML strong tags for headers. Do NOT include any HTML document structure like html, head, body, DOCTYPE, or meta tags. Return only the content with strong tags for headers.`;
 
     // Generate academic content
     const academicResponse = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -84,20 +84,30 @@ serve(async (req) => {
       }),
     });
 
+    // Comprehensive HTML document structure cleaning
+    const cleanHtmlStructure = (content: string): string => {
+      return content
+        // Remove HTML document declarations
+        .replace(/<!DOCTYPE[^>]*>/gi, '')
+        // Remove HTML tags with any attributes
+        .replace(/<\/?html[^>]*>/gi, '')
+        .replace(/<\/?head[^>]*>/gi, '')
+        .replace(/<\/?body[^>]*>/gi, '')
+        .replace(/<\/?title[^>]*>/gi, '')
+        .replace(/<meta[^>]*>/gi, '')
+        .replace(/<link[^>]*>/gi, '')
+        // Remove markdown code blocks
+        .replace(/```html/gi, '')
+        .replace(/```/gi, '')
+        // Remove standalone html text
+        .replace(/^\s*html\s*$/gmi, '')
+        // Clean up extra whitespace
+        .replace(/\n\s*\n\s*\n/g, '\n\n')
+        .trim();
+    };
+
     const academicData = await academicResponse.json();
-    let academicContent = academicData.choices[0].message.content;
-    
-    // Clean up unwanted HTML tags and markdown formatting
-    academicContent = academicContent
-      .replace(/^<\/?html>/gi, '')
-      .replace(/<!DOCTYPE html>/gi, '')
-      .replace(/<\/?body>/gi, '')
-      .replace(/<\/?head>/gi, '')
-      .replace(/<\/?meta[^>]*>/gi, '')
-      .replace(/```html/gi, '')
-      .replace(/```/gi, '')
-      .replace(/^\s*html\s*$/gmi, '')
-      .trim();
+    let academicContent = cleanHtmlStructure(academicData.choices[0].message.content);
 
     // Generate plain speak content
     const plainSpeakResponse = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -118,19 +128,7 @@ serve(async (req) => {
     });
 
     const plainSpeakData = await plainSpeakResponse.json();
-    let plainSpeakContent = plainSpeakData.choices[0].message.content;
-    
-    // Clean up unwanted HTML tags and markdown formatting
-    plainSpeakContent = plainSpeakContent
-      .replace(/^<\/?html>/gi, '')
-      .replace(/<!DOCTYPE html>/gi, '')
-      .replace(/<\/?body>/gi, '')
-      .replace(/<\/?head>/gi, '')
-      .replace(/<\/?meta[^>]*>/gi, '')
-      .replace(/```html/gi, '')
-      .replace(/```/gi, '')
-      .replace(/^\s*html\s*$/gmi, '')
-      .trim();
+    let plainSpeakContent = cleanHtmlStructure(plainSpeakData.choices[0].message.content);
 
     // Generate educational principle
     const educationalResponse = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -188,14 +186,8 @@ serve(async (req) => {
     });
 
     const titleData = await titleResponse.json();
-    const engagingTitle = titleData.choices[0].message.content
-      .replace(/['"]/g, '')
-      .replace(/<!DOCTYPE html>/gi, '')
-      .replace(/<\/?body>/gi, '')
-      .replace(/<\/?head>/gi, '')
-      .replace(/```html/gi, '')
-      .replace(/```/gi, '')
-      .trim();
+    const engagingTitle = cleanHtmlStructure(titleData.choices[0].message.content)
+      .replace(/['"]/g, '');
 
     // Create briefing record in database
     const briefingData = {
