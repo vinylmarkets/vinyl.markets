@@ -85,7 +85,10 @@ serve(async (req) => {
     });
 
     const academicData = await academicResponse.json();
-    const academicContent = academicData.choices[0].message.content;
+    let academicContent = academicData.choices[0].message.content;
+    
+    // Clean up unwanted HTML tags
+    academicContent = academicContent.replace(/^<\/?html>/gi, '').trim();
 
     // Generate plain speak content
     const plainSpeakResponse = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -106,7 +109,10 @@ serve(async (req) => {
     });
 
     const plainSpeakData = await plainSpeakResponse.json();
-    const plainSpeakContent = plainSpeakData.choices[0].message.content;
+    let plainSpeakContent = plainSpeakData.choices[0].message.content;
+    
+    // Clean up unwanted HTML tags
+    plainSpeakContent = plainSpeakContent.replace(/^<\/?html>/gi, '').trim();
 
     // Generate educational principle
     const educationalResponse = await fetch('https://api.openai.com/v1/chat/completions', {
