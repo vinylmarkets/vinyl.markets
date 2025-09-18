@@ -21,6 +21,11 @@ interface Topic {
   last_post_at: string;
   user_id: string;
   category_id: string;
+  profiles?: {
+    username: string;
+    display_name: string;
+    avatar_url: string;
+  };
 }
 
 interface TopicListProps {
@@ -68,8 +73,15 @@ export function TopicList({ topics: initialTopics, isLoading, categorySlug }: To
     try {
       setLoading(true);
       const { data } = await supabase
-        .from('forum_topics' as any)
-        .select('*')
+        .from('forum_topics')
+        .select(`
+          *,
+          profiles:user_id (
+            username,
+            display_name,
+            avatar_url
+          )
+        `)
         .eq('category_id', category.id)
         .order('created_at', { ascending: false });
       
@@ -211,10 +223,17 @@ export function TopicList({ topics: initialTopics, isLoading, categorySlug }: To
             <Link key={topic.id} to={`/forum/topic/${topic.id}`}>
               <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium hover:text-primary">{topic.title}</h3>
-                    <div className="text-sm text-muted-foreground mt-1">
-                      Created {new Date(topic.created_at).toLocaleDateString()}
+                 <div className="flex items-center gap-3">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback>
+                        {topic.profiles?.display_name?.[0] || topic.profiles?.username?.[0] || '?'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="font-medium hover:text-primary">{topic.title}</h3>
+                      <div className="text-sm text-muted-foreground mt-1">
+                        By {topic.profiles?.display_name || topic.profiles?.username || 'Unknown'} • {new Date(topic.created_at).toLocaleDateString()}
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">

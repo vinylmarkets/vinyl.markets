@@ -14,6 +14,11 @@ interface Post {
   like_count: number;
   created_at: string;
   user_id: string;
+  profiles?: {
+    username: string;
+    display_name: string;
+    avatar_url: string;
+  };
 }
 
 interface Topic {
@@ -26,6 +31,11 @@ interface Topic {
   is_pinned: boolean;
   created_at: string;
   user_id: string;
+  profiles?: {
+    username: string;
+    display_name: string;
+    avatar_url: string;
+  };
 }
 
 interface TopicViewProps {
@@ -52,8 +62,15 @@ export function TopicView({ topic: initialTopic, posts: initialPosts, isLoading,
       
       // Load topic
       const { data: topicData, error: topicError } = await supabase
-        .from('forum_topics' as any)
-        .select('*')
+        .from('forum_topics')
+        .select(`
+          *,
+          profiles:user_id (
+            username,
+            display_name,
+            avatar_url
+          )
+        `)
         .eq('id', topicId)
         .maybeSingle();
       
@@ -62,8 +79,15 @@ export function TopicView({ topic: initialTopic, posts: initialPosts, isLoading,
         
         // Load posts
         const { data: postsData, error: postsError } = await supabase
-          .from('forum_posts' as any)
-          .select('*')
+          .from('forum_posts')
+          .select(`
+            *,
+            profiles:user_id (
+              username,
+              display_name,
+              avatar_url
+            )
+          `)
           .eq('topic_id', topicId)
           .order('post_number', { ascending: true });
         
@@ -133,13 +157,17 @@ export function TopicView({ topic: initialTopic, posts: initialPosts, isLoading,
               <CardContent className="p-6">
                 <div className="flex gap-4">
                   <Avatar className="h-10 w-10 mt-1">
-                    <AvatarFallback>U</AvatarFallback>
+                    <AvatarFallback>
+                      {post.profiles?.display_name?.[0] || post.profiles?.username?.[0] || '?'}
+                    </AvatarFallback>
                   </Avatar>
                   
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium">User</span>
+                        <span className="font-medium">
+                          {post.profiles?.display_name || post.profiles?.username || 'Unknown User'}
+                        </span>
                         <Badge variant="outline">#{post.post_number}</Badge>
                       </div>
                       <span className="text-sm text-muted-foreground">
