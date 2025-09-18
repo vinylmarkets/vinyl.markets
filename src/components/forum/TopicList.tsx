@@ -94,7 +94,10 @@ export function TopicList({ topics: initialTopics, isLoading, categorySlug }: To
   };
 
   const createTopic = async () => {
+    console.log('Create topic clicked - starting');
+    
     if (!newTopicTitle.trim()) {
+      console.log('No topic title provided');
       toast({
         title: "Error",
         description: "Please enter a topic title",
@@ -105,9 +108,14 @@ export function TopicList({ topics: initialTopics, isLoading, categorySlug }: To
 
     try {
       setCreating(true);
+      console.log('Getting user authentication...');
+      
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       
+      console.log('Auth result:', { user: !!user, userError, userId: user?.id });
+      
       if (userError) {
+        console.error('User error:', userError);
         toast({
           title: "Authentication Error",
           description: "Please log in to create a topic",
@@ -117,6 +125,7 @@ export function TopicList({ topics: initialTopics, isLoading, categorySlug }: To
       }
 
       if (!user) {
+        console.log('No user found - need to login');
         toast({
           title: "Authentication Required",
           description: "Please log in to create a topic",
@@ -145,6 +154,8 @@ export function TopicList({ topics: initialTopics, isLoading, categorySlug }: To
         .select()
         .single();
 
+      console.log('Insert result:', { data, error });
+
       if (error) {
         console.error('Error creating topic:', error);
         toast({
@@ -165,7 +176,7 @@ export function TopicList({ topics: initialTopics, isLoading, categorySlug }: To
         });
       }
     } catch (error) {
-      console.error('Error creating topic:', error);
+      console.error('Unexpected error creating topic:', error);
       toast({
         title: "Error",
         description: "An unexpected error occurred",
