@@ -20,7 +20,8 @@ import {
   Settings,
   Crown,
   BookOpen,
-  Shield
+  Shield,
+  MessageSquare
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useAdmin } from "@/hooks/useAdmin";
@@ -51,6 +52,11 @@ const navigationItems = [
     title: "Learning Progress",
     url: "/dashboard/progress",
     icon: BookOpen,
+  },
+  {
+    title: "Community Forum",
+    url: "/forum",
+    icon: MessageSquare,
   },
   {
     title: "Portfolio",
