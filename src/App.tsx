@@ -46,6 +46,7 @@ import ProductIntelligence from "./pages/admin/ProductIntelligence";
 import ContentPerformance from "./pages/admin/ContentPerformance";
 import BusinessMetrics from "./pages/admin/BusinessMetrics";
 import ComplianceMonitoring from "./pages/admin/ComplianceMonitoring";
+import ForumPage from "./pages/forum/ForumPage";
 
 const queryClient = new QueryClient();
 
@@ -101,6 +102,10 @@ const App = () => {
               <Route path="/research/papers/pan-poteshman-2006" element={<PanPoteshman2006 />} />
               <Route path="/research/papers/cremers-weinbaum-2010" element={<CremersWeinbaum2010 />} />
               <Route path="/research/papers/:slug" element={<OptionsPaperRouter />} />
+              
+              {/* Forum Routes */}
+              <Route path="/forum" element={<ForumPage />} />
+              
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
