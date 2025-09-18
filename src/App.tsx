@@ -49,6 +49,7 @@ import ContentPerformance from "./pages/admin/ContentPerformance";
 import BusinessMetrics from "./pages/admin/BusinessMetrics";
 import ComplianceMonitoring from "./pages/admin/ComplianceMonitoring";
 import ForumPage from "./pages/forum/ForumPage";
+import Auth from "./pages/Auth";
 
 const queryClient = new QueryClient();
 
@@ -64,6 +65,7 @@ const App = () => {
           <AuthProvider>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
               <Route path="/integration-test" element={<IntegrationTest />} />
               <Route path="/terminal" element={<Terminal />} />
               <Route path="/dashboard" element={<MockDashboard />} />

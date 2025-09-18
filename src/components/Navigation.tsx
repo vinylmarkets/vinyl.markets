@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { 
   NavigationMenu,
   NavigationMenuContent,
@@ -21,21 +21,18 @@ import { Zap, Menu, X, User, LogOut, Settings } from "lucide-react";
 import { siteNavigation } from "@/data/sitemap";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { AuthModal } from "@/components/auth/AuthModal";
 
 export const Navigation = () => {
   const [terminalValue, setTerminalValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>('login');
   const inputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
   
   const { user, signOut } = useAuth();
   
-  const handleAuthModal = (tab: 'login' | 'register') => {
-    setAuthModalTab(tab);
-    setAuthModalOpen(true);
+  const handleAuth = () => {
+    navigate('/auth');
   };
   
   const handleSignOut = async () => {
@@ -217,14 +214,14 @@ export const Navigation = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleAuthModal('login')}
+                  onClick={handleAuth}
                   className="text-secondary hover:text-secondary/80"
                 >
                   Log In
                 </Button>
                 <Button
                   size="sm"
-                  onClick={() => handleAuthModal('register')}
+                  onClick={handleAuth}
                   className="bg-secondary hover:bg-secondary/90 text-secondary-foreground"
                 >
                   Sign Up Free
@@ -306,7 +303,7 @@ export const Navigation = () => {
                     variant="ghost"
                     size="sm"
                     onClick={() => {
-                      handleAuthModal('login');
+                      handleAuth();
                       setMobileMenuOpen(false);
                     }}
                     className="w-full text-secondary hover:text-secondary/80"
@@ -316,7 +313,7 @@ export const Navigation = () => {
                   <Button
                     size="sm"
                     onClick={() => {
-                      handleAuthModal('register');
+                      handleAuth();
                       setMobileMenuOpen(false);
                     }}
                     className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground"
@@ -352,13 +349,6 @@ export const Navigation = () => {
             </div>
           </div>
         )}
-        
-        {/* Auth Modal */}
-        <AuthModal 
-          isOpen={authModalOpen} 
-          onClose={() => setAuthModalOpen(false)}
-          initialTab={authModalTab}
-        />
       </div>
     </header>
   );
