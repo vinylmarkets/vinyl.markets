@@ -133,7 +133,7 @@ export function TopicView({ topic: initialTopic, posts: initialPosts, isLoading,
         <Card>
           <CardHeader>
             <div className="flex items-start justify-between">
-              <div>
+              <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
                   {topic.is_pinned && (
                     <Badge variant="secondary">Pinned</Badge>
@@ -144,6 +144,19 @@ export function TopicView({ topic: initialTopic, posts: initialPosts, isLoading,
                   <span>{topic.reply_count} replies</span>
                   <span>{topic.view_count} views</span>
                   <span>Created {new Date(topic.created_at).toLocaleDateString()}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 ml-4">
+                <Avatar className="h-10 w-10">
+                  <AvatarFallback>
+                    {topic.profiles?.display_name?.[0] || topic.profiles?.username?.[0] || '?'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="text-right">
+                  <div className="font-medium text-sm">
+                    {topic.profiles?.display_name || topic.profiles?.username || 'Unknown User'}
+                  </div>
+                  <div className="text-xs text-muted-foreground">Topic Creator</div>
                 </div>
               </div>
             </div>
