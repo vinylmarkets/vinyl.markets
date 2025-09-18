@@ -9,7 +9,7 @@ import { ArrowLeft, BookOpen, Share2 } from "lucide-react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { EducationalPrincipleBox } from "@/components/briefings/EducationalPrincipleBox";
 import { StockBadge } from "@/components/briefings/StockBadge";
-import { FeaturedImage } from "@/components/briefings/FeaturedImage";
+
 import { ReadingStats } from "@/components/briefings/ReadingStats";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -171,12 +171,6 @@ export default function BriefingDetail() {
           </div>
         </div>
 
-        {/* Featured Image */}
-        <FeaturedImage 
-          title={briefing.title}
-          category={briefing.category}
-          stocks={briefing.stocks_mentioned || []}
-        />
 
         {/* Reading Stats */}
         <ReadingStats 
