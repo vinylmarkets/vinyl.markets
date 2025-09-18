@@ -23,7 +23,7 @@ interface Topic {
 }
 
 interface TopicListProps {
-  topics: Topic[];
+  topics?: Topic[];
   isLoading?: boolean;
   categorySlug?: string;
 }

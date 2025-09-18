@@ -35,6 +35,8 @@ import LearningProgress from "./pages/dashboard/Progress";
 import Portfolio from "./pages/dashboard/Portfolio";
 import SettingsPage from "./pages/dashboard/Settings";
 import Upgrade from "./pages/dashboard/Upgrade";
+import ForumCategory from "./pages/ForumCategory";
+import ForumTopic from "./pages/ForumTopic";
 
 // Admin Dashboard Components
 import { AdminProtected } from "./components/AdminProtected";
@@ -105,6 +107,8 @@ const App = () => {
               
               {/* Forum Routes */}
               <Route path="/forum" element={<ForumPage />} />
+              <Route path="/forum/:categorySlug" element={<ForumCategory />} />
+              <Route path="/forum/topic/:topicId" element={<ForumTopic />} />
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
