@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { MessageCircle, Eye, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 interface Topic {
   id: string;
@@ -34,6 +35,8 @@ export function TopicList({ topics: initialTopics, isLoading, categorySlug }: To
   const [showNewTopic, setShowNewTopic] = useState(false);
   const [newTopicTitle, setNewTopicTitle] = useState('');
   const [loading, setLoading] = useState(isLoading || false);
+  const [creating, setCreating] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (categorySlug) {
@@ -79,15 +82,48 @@ export function TopicList({ topics: initialTopics, isLoading, categorySlug }: To
   };
 
   const createTopic = async () => {
+    if (!newTopicTitle.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a topic title",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      setCreating(true);
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
       
-      if (!user || !newTopicTitle.trim()) return;
+      if (userError) {
+        toast({
+          title: "Authentication Error",
+          description: "Please log in to create a topic",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to create a topic",
+          variant: "destructive"
+        });
+        return;
+      }
 
       const slug = newTopicTitle.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
       
+      console.log('Creating topic with:', {
+        category_id: category.id,
+        user_id: user.id,
+        title: newTopicTitle,
+        slug: slug
+      });
+
       const { data, error } = await supabase
-        .from('forum_topics' as any)
+        .from('forum_topics')
         .insert({
           category_id: category.id,
           user_id: user.id,
@@ -95,15 +131,36 @@ export function TopicList({ topics: initialTopics, isLoading, categorySlug }: To
           slug: slug
         })
         .select()
-        .maybeSingle();
+        .single();
+
+      if (error) {
+        console.error('Error creating topic:', error);
+        toast({
+          title: "Error Creating Topic",
+          description: error.message || "Failed to create topic",
+          variant: "destructive"
+        });
+        return;
+      }
 
       if (data) {
         setTopics([data, ...topics]);
         setNewTopicTitle('');
         setShowNewTopic(false);
+        toast({
+          title: "Success",
+          description: "Topic created successfully!"
+        });
       }
     } catch (error) {
       console.error('Error creating topic:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive"
+      });
+    } finally {
+      setCreating(false);
     }
   };
 
@@ -138,8 +195,10 @@ export function TopicList({ topics: initialTopics, isLoading, categorySlug }: To
                 autoFocus
               />
               <div className="flex gap-2 mt-2">
-                <Button onClick={createTopic} size="sm">Create</Button>
-                <Button onClick={() => setShowNewTopic(false)} variant="outline" size="sm">
+                <Button onClick={createTopic} size="sm" disabled={creating}>
+                  {creating ? "Creating..." : "Create"}
+                </Button>
+                <Button onClick={() => setShowNewTopic(false)} variant="outline" size="sm" disabled={creating}>
                   Cancel
                 </Button>
               </div>
