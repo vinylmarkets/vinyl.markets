@@ -4,7 +4,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -17,7 +22,10 @@ import {
   RefreshCcw,
   Lightbulb,
   ArrowRight,
-  Activity
+  Activity,
+  Calendar as CalendarIcon,
+  Archive,
+  Eye
 } from "lucide-react";
 
 interface AlgorithmMetrics {
@@ -55,12 +63,32 @@ interface RecommendationItem {
   value?: number;
 }
 
+interface PredictionResult {
+  id: string;
+  rank: number;
+  symbol: string;
+  company_name: string;
+  predicted_high: number;
+  predicted_low: number;
+  predicted_close: number;
+  actual_high?: number;
+  actual_low?: number;
+  actual_close?: number;
+  direction_correct?: boolean;
+  expected_gain_percentage: number;
+  actual_gain_percentage?: number;
+}
+
 export default function AlgorithmPerformance() {
   const [metrics, setMetrics] = useState<AlgorithmMetrics | null>(null);
   const [trends, setTrends] = useState<PerformanceTrend[]>([]);
   const [recommendations, setRecommendations] = useState<RecommendationItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [dateRange, setDateRange] = useState(30);
+  const [archiveDate, setArchiveDate] = useState<Date | undefined>(new Date());
+  const [archiveResults, setArchiveResults] = useState<PredictionResult[]>([]);
+  const [archiveLoading, setArchiveLoading] = useState(false);
 
   useEffect(() => {
     fetchPerformanceData();
@@ -75,14 +103,14 @@ export default function AlgorithmPerformance() {
         .select('*')
         .order('date', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
-      // Get performance trends over last 30 days
+      // Get performance trends for selected date range
       const { data: trendData } = await supabase
         .from('algorithm_performance')
         .select('date, directional_accuracy, average_confidence, total_predictions')
         .order('date', { ascending: false })
-        .limit(30);
+        .limit(dateRange);
 
       if (latestMetrics) {
         setMetrics(latestMetrics);
@@ -113,6 +141,65 @@ export default function AlgorithmPerformance() {
     await fetchPerformanceData();
     setRefreshing(false);
   };
+
+  const fetchArchiveData = async (date: Date) => {
+    setArchiveLoading(true);
+    try {
+      const dateStr = format(date, 'yyyy-MM-dd');
+      
+      // Get predictions for the selected date
+      const { data: predictions } = await supabase
+        .from('enhanced_daily_predictions')
+        .select('*')
+        .eq('prediction_date', dateStr)
+        .order('rank', { ascending: true });
+
+      // Get actual results if available
+      const { data: results } = await supabase
+        .from('prediction_results')
+        .select('*')
+        .gte('recorded_at', `${dateStr}T00:00:00.000Z`)
+        .lte('recorded_at', `${dateStr}T23:59:59.999Z`);
+
+      if (predictions) {
+        const enrichedResults: PredictionResult[] = predictions.map(pred => {
+          const result = results?.find(r => r.prediction_id === pred.id);
+          return {
+            id: pred.id,
+            rank: pred.rank,
+            symbol: pred.symbol,
+            company_name: pred.company_name,
+            predicted_high: pred.predicted_high,
+            predicted_low: pred.predicted_low,
+            predicted_close: pred.predicted_close,
+            actual_high: result?.actual_high,
+            actual_low: result?.actual_low,
+            actual_close: result?.actual_close,
+            direction_correct: result?.direction_correct,
+            expected_gain_percentage: pred.expected_gain_percentage,
+            actual_gain_percentage: result ? 
+              ((result.actual_close - pred.previous_close) / pred.previous_close) * 100 : undefined
+          };
+        });
+        
+        setArchiveResults(enrichedResults);
+      }
+    } catch (error) {
+      console.error('Error fetching archive data:', error);
+    } finally {
+      setArchiveLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPerformanceData();
+  }, []);
+
+  useEffect(() => {
+    if (dateRange !== 30) {
+      fetchPerformanceData();
+    }
+  }, [dateRange]);
 
   const generateRecommendations = (metrics: AlgorithmMetrics) => {
     const recs: RecommendationItem[] = [];
@@ -283,10 +370,11 @@ export default function AlgorithmPerformance() {
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="accuracy">Accuracy Metrics</TabsTrigger>
             <TabsTrigger value="signals">Signal Analysis</TabsTrigger>
+            <TabsTrigger value="archive">Archive</TabsTrigger>
             <TabsTrigger value="recommendations">Recommendations</TabsTrigger>
           </TabsList>
 
@@ -367,13 +455,29 @@ export default function AlgorithmPerformance() {
               </Card>
             </div>
 
-            {/* Performance Trend Chart Placeholder */}
+            {/* Performance Trend Chart */}
             <Card>
               <CardHeader>
-                <CardTitle>30-Day Performance Trend</CardTitle>
-                <CardDescription>
-                  Accuracy and confidence trends over the last 30 days
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Performance Trend</CardTitle>
+                    <CardDescription>
+                      Accuracy and confidence trends over the selected period
+                    </CardDescription>
+                  </div>
+                  <Select value={dateRange.toString()} onValueChange={(value) => setDateRange(parseInt(value))}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="7">7 Days</SelectItem>
+                      <SelectItem value="14">14 Days</SelectItem>
+                      <SelectItem value="30">30 Days</SelectItem>
+                      <SelectItem value="60">60 Days</SelectItem>
+                      <SelectItem value="90">90 Days</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="h-64 bg-muted/50 rounded-lg flex items-center justify-center">
@@ -381,7 +485,7 @@ export default function AlgorithmPerformance() {
                     <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
                     <p className="text-muted-foreground">Performance trend chart would be rendered here</p>
                     <p className="text-sm text-muted-foreground">
-                      Showing {trends.length} data points
+                      Showing {trends.length} data points over {dateRange} days
                     </p>
                   </div>
                 </div>
@@ -445,6 +549,108 @@ export default function AlgorithmPerformance() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="archive" className="space-y-6">
+            {/* Archive Date Selector */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Archive className="h-5 w-5 mr-2" />
+                  Prediction Archive
+                </CardTitle>
+                <CardDescription>
+                  Select a date to view predictions vs actual results for that day
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center space-x-4">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-64 justify-start text-left font-normal",
+                          !archiveDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {archiveDate ? format(archiveDate, "PPP") : <span>Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={archiveDate}
+                        onSelect={setArchiveDate}
+                        initialFocus
+                        className="p-3 pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <Button 
+                    onClick={() => archiveDate && fetchArchiveData(archiveDate)}
+                    disabled={!archiveDate || archiveLoading}
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    {archiveLoading ? 'Loading...' : 'View Results'}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Archive Results */}
+            {archiveResults.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    Predictions vs Results - {archiveDate && format(archiveDate, "PPP")}
+                  </CardTitle>
+                  <CardDescription>
+                    TOP 20 predictions and their actual performance
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {archiveResults.map((result) => (
+                      <div key={result.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                        <div className="flex items-center space-x-4">
+                          <Badge variant="outline">#{result.rank}</Badge>
+                          <div>
+                            <p className="font-medium">{result.symbol}</p>
+                            <p className="text-sm text-muted-foreground">{result.company_name}</p>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-4 text-sm">
+                          <div>
+                            <p className="text-muted-foreground">Expected</p>
+                            <p className="font-medium">{result.expected_gain_percentage.toFixed(2)}%</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">Actual</p>
+                            <p className={`font-medium ${result.actual_gain_percentage !== undefined 
+                              ? result.actual_gain_percentage > 0 ? 'text-green-600' : 'text-red-600'
+                              : ''}`}>
+                              {result.actual_gain_percentage !== undefined 
+                                ? `${result.actual_gain_percentage.toFixed(2)}%` 
+                                : 'N/A'}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">Direction</p>
+                            <div className="flex items-center">
+                              {result.direction_correct === true && <CheckCircle className="h-4 w-4 text-green-600" />}
+                              {result.direction_correct === false && <AlertCircle className="h-4 w-4 text-red-600" />}
+                              {result.direction_correct === undefined && <span className="text-muted-foreground">N/A</span>}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           <TabsContent value="signals" className="space-y-6">
