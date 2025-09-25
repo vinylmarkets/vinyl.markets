@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,40 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Check if user is already logged in and redirect to admin
+  const checkCurrentSession = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        console.log('Current session found:', session.user.email);
+        
+        // Check if current user is admin
+        const { data: userData, error } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+
+        if (!error && userData?.role === 'admin') {
+          toast({
+            title: "Already Logged In",
+            description: "Redirecting to admin dashboard...",
+          });
+          navigate('/admin');
+        } else {
+          console.log('User is not admin or error checking role:', error);
+        }
+      }
+    } catch (error) {
+      console.error('Session check error:', error);
+    }
+  };
+
+  // Check session on component mount
+  useEffect(() => {
+    checkCurrentSession();
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
