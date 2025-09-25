@@ -246,7 +246,7 @@ const OptionsValueTool = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-muted/30">
       <AlertDialog open={showRiskDisclaimer} onOpenChange={setShowRiskDisclaimer}>
         <AlertDialogContent className="max-w-3xl">
           <AlertDialogHeader>
@@ -283,79 +283,111 @@ const OptionsValueTool = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Options Value Tool</h1>
-          <p className="text-muted-foreground">
-            Daily analysis of the top 20 opportunities in each strategy category
-          </p>
-        </div>
-        <div className="text-right">
-          <p className="text-sm text-muted-foreground">Analysis Date</p>
-          <p className="font-semibold">{new Date().toLocaleDateString()}</p>
+      {/* Header */}
+      <div className="bg-white border-b">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+                <Calculator className="h-8 w-8 mr-3 text-primary" />
+                Options Value Tool
+              </h1>
+              <p className="text-muted-foreground mt-2">
+                Daily analysis of the top 20 opportunities in each strategy category
+              </p>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Badge variant="outline">
+                Analysis Date: {new Date().toLocaleDateString()}
+              </Badge>
+              <Button onClick={() => loadOpportunities()} variant="outline" disabled={loading}>
+                <Target className="h-4 w-4 mr-2" />
+                Refresh
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
 
-      {userTier === 'free' && (
-        <Card className="border-amber-200 bg-amber-50">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <Target className="h-5 w-5 text-amber-600" />
-              <div>
-                <p className="font-semibold text-amber-900">Free Tier Access</p>
-                <p className="text-sm text-amber-700">
-                  You can view opportunities ranked 11-20 in each category. 
-                  Upgrade to Essential or Pro to access the top 10 highest-value opportunities.
-                </p>
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Tier Notice */}
+        {userTier === 'free' && (
+          <Card className="mb-6 border-amber-200 bg-amber-50/50">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <Target className="h-5 w-5 text-amber-600" />
+                <div>
+                  <p className="font-semibold text-amber-900">Free Tier Access</p>
+                  <p className="text-sm text-amber-700">
+                    You can view opportunities ranked 11-20 in each category. 
+                    Upgrade to Essential or Pro to access the top 10 highest-value opportunities.
+                  </p>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            </CardContent>
+          </Card>
+        )}
 
-      <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="spreads">
-            Spreads ({opportunities.spreads.length})
-          </TabsTrigger>
-          <TabsTrigger value="combinations">
-            Combinations ({opportunities.combinations.length})
-          </TabsTrigger>
-          <TabsTrigger value="directional">
-            Directional ({opportunities.directional.length})
-          </TabsTrigger>
-          <TabsTrigger value="income">
-            Income ({opportunities.income.length})
-          </TabsTrigger>
-        </TabsList>
+        <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="spreads" className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Spreads ({opportunities.spreads.length})
+            </TabsTrigger>
+            <TabsTrigger value="combinations" className="flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              Combinations ({opportunities.combinations.length})
+            </TabsTrigger>
+            <TabsTrigger value="directional" className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Directional ({opportunities.directional.length})
+            </TabsTrigger>
+            <TabsTrigger value="income" className="flex items-center gap-2">
+              <Calculator className="h-4 w-4" />
+              Income ({opportunities.income.length})
+            </TabsTrigger>
+          </TabsList>
 
-        {(['spreads', 'combinations', 'directional', 'income'] as const).map(category => (
-          <TabsContent key={category} value={category} className="space-y-4 mt-6">
-            {opportunities[category].length === 0 ? (
-              <Card>
-                <CardContent className="text-center py-12">
+          {(['spreads', 'combinations', 'directional', 'income'] as const).map(category => (
+            <TabsContent key={category} value={category} className="space-y-4">
+              {opportunities[category].length === 0 ? (
+                <Card className="text-center p-8">
                   <Calculator className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No Opportunities Found</h3>
+                  <h3 className="text-xl font-semibold mb-2">No Opportunities Found</h3>
                   <p className="text-muted-foreground">
                     No {category} opportunities were identified for today's analysis.
                   </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid gap-4">
-                {opportunities[category].map((opportunity) => (
-                  <OpportunityCard
-                    key={opportunity.id}
-                    opportunity={opportunity}
-                    isAccessible={isAccessible(opportunity.rank)}
-                    onView={() => trackOpportunityView(opportunity.id)}
-                  />
-                ))}
-              </div>
-            )}
-          </TabsContent>
-        ))}
-      </Tabs>
+                </Card>
+              ) : (
+                <div className="grid gap-4">
+                  {opportunities[category].map((opportunity) => (
+                    <OpportunityCard
+                      key={opportunity.id}
+                      opportunity={opportunity}
+                      isAccessible={isAccessible(opportunity.rank)}
+                      onView={() => trackOpportunityView(opportunity.id)}
+                    />
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+          ))}
+        </Tabs>
+
+        {/* Educational Disclaimer */}
+        <Card className="mt-8 p-4 bg-yellow-50 border-yellow-200">
+          <div className="flex gap-3">
+            <Shield className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-medium text-yellow-800 mb-1">Educational Content Only</p>
+              <p className="text-yellow-700">
+                These options opportunities are for educational purposes and demonstrate algorithmic analysis techniques. 
+                Not financial advice. Options trading involves substantial risk. Always do your own research and consult with a qualified financial advisor.
+              </p>
+            </div>
+          </div>
+        </Card>
+      </div>
     </div>
   );
 };
@@ -380,10 +412,18 @@ const OpportunityCard: React.FC<OpportunityCardProps> = ({
     }).format(amount);
   };
 
-  const getRiskColor = (riskScore: number) => {
-    if (riskScore <= 3) return "bg-emerald-100 text-emerald-800";
-    if (riskScore <= 6) return "bg-yellow-100 text-yellow-800";
-    return "bg-red-100 text-red-800";
+  const getRiskColor = (riskScore: number | null) => {
+    if (!riskScore) return "bg-muted text-muted-foreground";
+    if (riskScore <= 3) return "bg-emerald-100 text-emerald-800 border-emerald-200";
+    if (riskScore <= 6) return "bg-yellow-100 text-yellow-800 border-yellow-200";
+    return "bg-red-100 text-red-800 border-red-200";
+  };
+
+  const getRiskBadge = (riskScore: number | null) => {
+    if (!riskScore) return <Badge variant="secondary">N/A</Badge>;
+    if (riskScore <= 3) return <Badge className="bg-emerald-600">Low Risk</Badge>;
+    if (riskScore <= 6) return <Badge className="bg-yellow-600">Medium Risk</Badge>;
+    return <Badge className="bg-red-600">High Risk</Badge>;
   };
 
   const handleExpand = () => {
@@ -394,56 +434,69 @@ const OpportunityCard: React.FC<OpportunityCardProps> = ({
   };
 
   return (
-    <Card className={`${!isAccessible ? 'opacity-60' : ''} hover:shadow-lg transition-shadow`}>
+    <Card className={`${!isAccessible ? 'opacity-60' : ''} hover:shadow-lg transition-all duration-200 border-0 shadow-sm`}>
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Badge variant="outline" className="font-mono">
+            <Badge variant="outline" className="font-mono text-xs">
               #{opportunity.rank}
             </Badge>
             <div>
-              <CardTitle className="text-lg">
-                {opportunity.underlying_symbol} - {opportunity.strategy_name}
+              <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                <span className="text-primary font-bold">{opportunity.underlying_symbol}</span>
+                <span className="text-muted-foreground">•</span>
+                <span>{opportunity.strategy_name}</span>
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-sm mt-1">
                 {opportunity.strategy_type} • Expires {new Date(opportunity.expiration_date).toLocaleDateString()}
               </CardDescription>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Badge className={getRiskColor(opportunity.risk_score)}>
-              Risk: {opportunity.risk_score}/10
-            </Badge>
+            {getRiskBadge(opportunity.risk_score)}
             {!isAccessible && (
-              <Badge variant="secondary">Premium Only</Badge>
+              <Badge variant="secondary" className="text-xs">🔒 Premium</Badge>
             )}
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
+        {/* Key Metrics Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center">
-            <p className="text-sm text-muted-foreground">Max Profit</p>
-            <p className="font-semibold text-emerald-600">
+          <div className="text-center p-3 bg-muted/30 rounded-lg">
+            <div className="flex items-center justify-center mb-1">
+              <TrendingUp className="h-4 w-4 text-emerald-600 mr-1" />
+              <span className="text-xs text-muted-foreground">Max Profit</span>
+            </div>
+            <p className="font-bold text-lg text-emerald-600">
               {isAccessible ? formatCurrency(opportunity.max_profit) : '***'}
             </p>
           </div>
-          <div className="text-center">
-            <p className="text-sm text-muted-foreground">Max Loss</p>
-            <p className="font-semibold text-red-600">
+          <div className="text-center p-3 bg-muted/30 rounded-lg">
+            <div className="flex items-center justify-center mb-1">
+              <TrendingDown className="h-4 w-4 text-red-600 mr-1" />
+              <span className="text-xs text-muted-foreground">Max Loss</span>
+            </div>
+            <p className="font-bold text-lg text-red-600">
               {isAccessible ? formatCurrency(Math.abs(opportunity.max_loss)) : '***'}
             </p>
           </div>
-          <div className="text-center">
-            <p className="text-sm text-muted-foreground">ROI Potential</p>
-            <p className="font-semibold">
+          <div className="text-center p-3 bg-muted/30 rounded-lg">
+            <div className="flex items-center justify-center mb-1">
+              <Target className="h-4 w-4 text-primary mr-1" />
+              <span className="text-xs text-muted-foreground">ROI Potential</span>
+            </div>
+            <p className="font-bold text-lg text-primary">
               {isAccessible ? `${opportunity.roi_percentage?.toFixed(1)}%` : '***'}
             </p>
           </div>
-          <div className="text-center">
-            <p className="text-sm text-muted-foreground">Profit Probability</p>
-            <p className="font-semibold">
+          <div className="text-center p-3 bg-muted/30 rounded-lg">
+            <div className="flex items-center justify-center mb-1">
+              <Calculator className="h-4 w-4 text-purple-600 mr-1" />
+              <span className="text-xs text-muted-foreground">Profit Probability</span>
+            </div>
+            <p className="font-bold text-lg text-purple-600">
               {isAccessible ? `${opportunity.probability_of_profit?.toFixed(1)}%` : '***'}
             </p>
           </div>
@@ -451,41 +504,58 @@ const OpportunityCard: React.FC<OpportunityCardProps> = ({
 
         {isAccessible && expanded && (
           <div className="space-y-4 border-t pt-4">
+            {/* Strategy Details */}
             <div>
-              <h4 className="font-semibold mb-2">Strategy Details</h4>
-              <div className="bg-muted p-3 rounded-md">
-                <p className="text-sm">{opportunity.strategy_mechanics}</p>
+              <h4 className="font-semibold mb-2 flex items-center">
+                <Calculator className="h-4 w-4 mr-2" />
+                Strategy Details
+              </h4>
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <p className="text-sm text-muted-foreground">{opportunity.strategy_mechanics}</p>
               </div>
             </div>
 
+            {/* Option Legs */}
             <div>
-              <h4 className="font-semibold mb-2">Option Legs</h4>
+              <h4 className="font-semibold mb-2 flex items-center">
+                <Target className="h-4 w-4 mr-2" />
+                Option Legs
+              </h4>
               <div className="space-y-2">
                 {opportunity.option_legs?.map((leg, index) => (
-                  <div key={index} className="flex items-center justify-between bg-muted p-2 rounded text-sm">
-                    <span className={leg.action === 'buy' ? 'text-emerald-600' : 'text-red-600'}>
+                  <div key={index} className="flex items-center justify-between bg-muted/50 p-3 rounded-lg text-sm">
+                    <span className={`font-medium ${leg.action === 'buy' ? 'text-emerald-600' : 'text-red-600'}`}>
                       {leg.action.toUpperCase()} {leg.quantity} {leg.option_symbol}
                     </span>
-                    <span>{leg.option_type} @ ${leg.strike_price}</span>
-                    <span>{formatCurrency(leg.mid_price)}</span>
+                    <span className="text-muted-foreground">{leg.option_type} @ ${leg.strike_price}</span>
+                    <span className="font-semibold">{formatCurrency(leg.mid_price)}</span>
                   </div>
                 ))}
               </div>
             </div>
 
+            {/* Why This Opportunity Exists */}
             <div>
-              <h4 className="font-semibold mb-2">Why This Opportunity Exists</h4>
-              <p className="text-sm text-muted-foreground">{opportunity.educational_explanation}</p>
+              <h4 className="font-semibold mb-2 flex items-center text-primary">
+                <TrendingUp className="h-4 w-4 mr-2" />
+                Why This Opportunity Exists
+              </h4>
+              <p className="text-sm text-muted-foreground bg-primary/5 p-3 rounded-lg">{opportunity.educational_explanation}</p>
             </div>
 
+            {/* Risk Considerations */}
             <div>
-              <h4 className="font-semibold mb-2 text-red-600">Risk Considerations</h4>
-              <p className="text-sm text-muted-foreground">{opportunity.risk_discussion}</p>
+              <h4 className="font-semibold mb-2 flex items-center text-red-600">
+                <Shield className="h-4 w-4 mr-2" />
+                Risk Considerations
+              </h4>
+              <p className="text-sm text-muted-foreground bg-red-50 p-3 rounded-lg border border-red-100">{opportunity.risk_discussion}</p>
             </div>
           </div>
         )}
 
-        <div className="flex items-center justify-between">
+        {/* Footer */}
+        <div className="flex items-center justify-between pt-2 border-t">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Clock className="h-4 w-4" />
             {opportunity.days_to_expiration} days to expiration
@@ -495,6 +565,7 @@ const OpportunityCard: React.FC<OpportunityCardProps> = ({
             size="sm" 
             onClick={handleExpand}
             disabled={!isAccessible}
+            className="text-xs"
           >
             {expanded ? 'Less Details' : 'More Details'}
           </Button>
