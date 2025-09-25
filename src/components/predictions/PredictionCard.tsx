@@ -208,21 +208,23 @@ export function PredictionCard({ prediction, isPremium, userTier }: PredictionCa
         {/* Primary Factors */}
         <div>
           <p className="text-sm font-medium mb-2">Key Drivers:</p>
-          <div className="space-y-1">
-            {Array.isArray(prediction.primary_factors) ? 
-              prediction.primary_factors.slice(0, 3).map((factor: string, index: number) => (
-                <div key={index} className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-purple-600"></div>
-                  <span className="text-sm text-foreground">
-                    {formatFactorText(factor)}
-                  </span>
+          <div className="p-3 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
+            <div className="flex flex-wrap items-center gap-4">
+              {Array.isArray(prediction.primary_factors) ? 
+                prediction.primary_factors.slice(0, 3).map((factor: string, index: number) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-purple-600"></div>
+                    <span className="text-sm text-black dark:text-white font-medium">
+                      {formatFactorText(factor)}
+                    </span>
+                  </div>
+                )) :
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground"></div>
+                  <span className="text-sm text-black dark:text-white">Analysis pending</span>
                 </div>
-              )) :
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground"></div>
-                <span className="text-sm text-muted-foreground">Analysis pending</span>
-              </div>
-            }
+              }
+            </div>
           </div>
         </div>
 
