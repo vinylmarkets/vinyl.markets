@@ -55,6 +55,10 @@ export function Top20Predictions() {
   }, [user, selectedDate]);
 
   const fetchUserTier = async () => {
+    // Temporarily set to pro tier for testing
+    setUserTier('pro');
+    
+    /* Original code for when payments are ready:
     try {
       const { data, error } = await supabase
         .from('users')
@@ -69,6 +73,7 @@ export function Top20Predictions() {
     } catch (error) {
       console.error('Error fetching user tier:', error);
     }
+    */
   };
 
   const fetchPredictions = async () => {
