@@ -41,6 +41,10 @@ All colors MUST be HSL.
 
     --radius: 0.75rem;
     
+    /* Header styling */
+    --header-background: 75 85% 55%; /* Electric green (same as primary) */
+    --header-foreground: 0 0% 0%; /* Black text */
+    
     /* AtomicMarket Brand Colors */
     --lime-green: 75 85% 55%; /* Primary lime green */
     --olive-green: 75 60% 45%; /* Olive green */
