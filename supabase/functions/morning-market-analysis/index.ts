@@ -157,7 +157,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in morning market analysis:', error);
     return new Response(JSON.stringify({
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
       success: false
     }), {
       status: 500,
@@ -336,14 +336,14 @@ function generateBriefingTopics(analysisResults: any[]) {
   }, {} as Record<string, any[]>);
 
   // Generate topic for each analysis type
-  Object.entries(groupedResults).forEach(([type, results]) => {
+  Object.entries(groupedResults as Record<string, any[]>).forEach(([type, results]) => {
     if (results.length > 0) {
       const topResults = results.slice(0, 5);
       
       topics.push({
         title: getTopicTitle(type),
         category: getCategoryFromType(type),
-        stocks: topResults.map(r => r.symbol),
+        stocks: topResults.map((r: any) => r.symbol),
         analysisData: topResults,
         priority: getTopicPriority(type, results.length)
       });

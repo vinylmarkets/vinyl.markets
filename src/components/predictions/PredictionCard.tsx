@@ -1,8 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CompanyLogo } from "@/components/ui/company-logo";
 import { TrendingUp, TrendingDown, Clock, Target, AlertTriangle, Lock } from "lucide-react";
 import { useState } from "react";
+import { useCompanyLogo } from "@/hooks/useCompanyLogo";
 
 interface PredictionCardProps {
   prediction: {
@@ -31,6 +33,7 @@ interface PredictionCardProps {
 
 export function PredictionCard({ prediction, isPremium, userTier }: PredictionCardProps) {
   const [showExplanation, setShowExplanation] = useState(false);
+  const { logoUrl, isLoading: logoLoading } = useCompanyLogo(prediction.symbol, prediction.company_name);
   const isLocked = prediction.rank <= 10 && userTier === 'free';
   
   const formatPrice = (price: number) => `$${price.toFixed(2)}`;
@@ -68,6 +71,13 @@ export function PredictionCard({ prediction, isPremium, userTier }: PredictionCa
               <Badge variant="secondary" className="font-bold">
                 #{prediction.rank}
               </Badge>
+              <CompanyLogo 
+                symbol={prediction.symbol}
+                companyName={prediction.company_name}
+                logoUrl={logoUrl}
+                size="sm"
+                className="blur-sm"
+              />
               <CardTitle className="text-lg blur-sm">{prediction.symbol}</CardTitle>
             </div>
             <Badge variant="outline" className="blur-sm">
@@ -102,10 +112,16 @@ export function PredictionCard({ prediction, isPremium, userTier }: PredictionCa
             <Badge variant="secondary" className="font-bold">
               #{prediction.rank}
             </Badge>
-            <CardTitle className="text-lg">{prediction.symbol}</CardTitle>
-            <Badge variant="outline" className="text-xs">
-              {prediction.company_name}
-            </Badge>
+            <CompanyLogo 
+              symbol={prediction.symbol}
+              companyName={prediction.company_name}
+              logoUrl={logoUrl}
+              size="sm"
+            />
+            <div className="flex flex-col">
+              <CardTitle className="text-lg">{prediction.symbol}</CardTitle>
+              <span className="text-xs text-muted-foreground">{prediction.company_name}</span>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             {prediction.expected_gain_percentage > 0 ? (
