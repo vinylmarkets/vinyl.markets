@@ -60,35 +60,54 @@ const OptionsValueTool = () => {
   });
   const [selectedCategory, setSelectedCategory] = useState<string>('spreads');
   const [loading, setLoading] = useState(true);
-  const [showRiskDisclaimer, setShowRiskDisclaimer] = useState(false);
+  const [showRiskDisclaimer, setShowRiskDisclaimer] = useState(true); // Start with true to show disclaimer
   const [riskAccepted, setRiskAccepted] = useState(false);
   const [userTier, setUserTier] = useState<string>('free');
 
+  console.log('OptionsValueTool rendering:', { user, loading, showRiskDisclaimer, riskAccepted });
+
   useEffect(() => {
-    checkUserTier();
-    if (!riskAccepted) {
-      setShowRiskDisclaimer(true);
-    } else {
+    console.log('OptionsValueTool useEffect triggered:', { user, riskAccepted });
+    if (user) {
+      checkUserTier();
+    }
+    if (riskAccepted) {
       loadOpportunities();
     }
-  }, [riskAccepted]);
+  }, [user, riskAccepted]);
 
   const checkUserTier = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('No user available for tier check');
+      return;
+    }
     
-    const { data } = await supabase
-      .from('users')
-      .select('subscription_tier')
-      .eq('id', user.id)
-      .single();
+    console.log('Checking user tier for user:', user.id);
     
-    if (data) {
-      setUserTier(data.subscription_tier || 'free');
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('subscription_tier')
+        .eq('id', user.id)
+        .maybeSingle();
+      
+      console.log('User tier query result:', { data, error });
+      
+      if (data) {
+        setUserTier(data.subscription_tier || 'free');
+      } else {
+        // User might not exist in users table, use default
+        setUserTier('free');
+      }
+    } catch (error) {
+      console.error('Error checking user tier:', error);
+      setUserTier('free');
     }
   };
 
   const loadOpportunities = async () => {
     try {
+      console.log('Loading opportunities...');
       setLoading(true);
       const today = new Date().toISOString().split('T')[0];
       
@@ -100,6 +119,8 @@ const OptionsValueTool = () => {
         `)
         .eq('analysis_date', today)
         .order('rank', { ascending: true });
+
+      console.log('Options opportunities query result:', { data, error, today });
 
       if (error) {
         console.error('Error loading opportunities:', error);
@@ -114,12 +135,14 @@ const OptionsValueTool = () => {
           directional: data.filter(d => d.category === 'directional') as OptionsOpportunity[],
           income: data.filter(d => d.category === 'income') as OptionsOpportunity[]
         };
+        console.log('Grouped opportunities:', grouped);
         setOpportunities(grouped);
       }
     } catch (error) {
       console.error('Error:', error);
       toast.error('An error occurred while loading data');
     } finally {
+      console.log('Loading complete');
       setLoading(false);
     }
   };
