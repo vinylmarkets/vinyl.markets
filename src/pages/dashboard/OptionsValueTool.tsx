@@ -46,7 +46,7 @@ interface OptionLeg {
 }
 
 const OptionsValueTool = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [opportunities, setOpportunities] = useState<{
     spreads: OptionsOpportunity[];
     combinations: OptionsOpportunity[];
@@ -64,7 +64,38 @@ const OptionsValueTool = () => {
   const [riskAccepted, setRiskAccepted] = useState(false);
   const [userTier, setUserTier] = useState<string>('free');
 
-  console.log('OptionsValueTool rendering:', { user, loading, showRiskDisclaimer, riskAccepted });
+  console.log('OptionsValueTool rendering:', { user: !!user, authLoading, loading, showRiskDisclaimer, riskAccepted });
+
+  // If still loading auth, show loading state
+  if (authLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="h-8 bg-muted animate-pulse rounded" />
+        <div className="grid gap-4">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-48 bg-muted animate-pulse rounded-lg" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // If not authenticated, show message
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Authentication Required</h2>
+          <p className="text-muted-foreground mb-4">
+            Please log in to access the Options Value Tool.
+          </p>
+          <Button onClick={() => window.location.href = '/auth'}>
+            Go to Login
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   useEffect(() => {
     console.log('OptionsValueTool useEffect triggered:', { user, riskAccepted });
