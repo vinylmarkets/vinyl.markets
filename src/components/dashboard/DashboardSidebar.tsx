@@ -21,7 +21,8 @@ import {
   Crown,
   BookOpen,
   Shield,
-  MessageSquare
+  MessageSquare,
+  Trophy
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useAdmin } from "@/hooks/useAdmin";
@@ -32,6 +33,11 @@ const navigationItems = [
     url: "/dashboard",
     icon: LayoutDashboard,
     exact: true
+  },
+  {
+    title: "TOP 20 Daily Movers",
+    url: "/dashboard/top20",
+    icon: Trophy,
   },
   {
     title: "Market Intelligence",

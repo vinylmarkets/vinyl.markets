@@ -47,6 +47,90 @@ export type Database = {
         }
         Relationships: []
       }
+      algorithm_performance: {
+        Row: {
+          algorithm_version: string
+          average_confidence: number | null
+          best_performing_signal: string | null
+          choppy_market_accuracy: number | null
+          close_accuracy_avg: number | null
+          close_within_half_percent: number | null
+          confidence_accuracy_correlation: number | null
+          confidence_calibration: number | null
+          created_at: string | null
+          date: string
+          directional_accuracy: number | null
+          high_accuracy_avg: number | null
+          high_time_accuracy_minutes: number | null
+          high_volatility_accuracy: number | null
+          high_within_half_percent: number | null
+          id: string
+          low_accuracy_avg: number | null
+          low_time_accuracy_minutes: number | null
+          low_volatility_accuracy: number | null
+          low_within_half_percent: number | null
+          pattern_performance: Json | null
+          signal_performance: Json | null
+          total_predictions: number | null
+          trending_market_accuracy: number | null
+          worst_performing_signal: string | null
+        }
+        Insert: {
+          algorithm_version: string
+          average_confidence?: number | null
+          best_performing_signal?: string | null
+          choppy_market_accuracy?: number | null
+          close_accuracy_avg?: number | null
+          close_within_half_percent?: number | null
+          confidence_accuracy_correlation?: number | null
+          confidence_calibration?: number | null
+          created_at?: string | null
+          date: string
+          directional_accuracy?: number | null
+          high_accuracy_avg?: number | null
+          high_time_accuracy_minutes?: number | null
+          high_volatility_accuracy?: number | null
+          high_within_half_percent?: number | null
+          id?: string
+          low_accuracy_avg?: number | null
+          low_time_accuracy_minutes?: number | null
+          low_volatility_accuracy?: number | null
+          low_within_half_percent?: number | null
+          pattern_performance?: Json | null
+          signal_performance?: Json | null
+          total_predictions?: number | null
+          trending_market_accuracy?: number | null
+          worst_performing_signal?: string | null
+        }
+        Update: {
+          algorithm_version?: string
+          average_confidence?: number | null
+          best_performing_signal?: string | null
+          choppy_market_accuracy?: number | null
+          close_accuracy_avg?: number | null
+          close_within_half_percent?: number | null
+          confidence_accuracy_correlation?: number | null
+          confidence_calibration?: number | null
+          created_at?: string | null
+          date?: string
+          directional_accuracy?: number | null
+          high_accuracy_avg?: number | null
+          high_time_accuracy_minutes?: number | null
+          high_volatility_accuracy?: number | null
+          high_within_half_percent?: number | null
+          id?: string
+          low_accuracy_avg?: number | null
+          low_time_accuracy_minutes?: number | null
+          low_volatility_accuracy?: number | null
+          low_within_half_percent?: number | null
+          pattern_performance?: Json | null
+          signal_performance?: Json | null
+          total_predictions?: number | null
+          trending_market_accuracy?: number | null
+          worst_performing_signal?: string | null
+        }
+        Relationships: []
+      }
       analytics_events: {
         Row: {
           created_at: string | null
@@ -1058,6 +1142,113 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      prediction_results: {
+        Row: {
+          actual_close: number | null
+          actual_high: number | null
+          actual_high_time: string | null
+          actual_low: number | null
+          actual_low_time: string | null
+          actual_open: number | null
+          actual_volume: number | null
+          close_accuracy: number | null
+          direction_correct: boolean | null
+          high_accuracy: number | null
+          hit_predicted_close: boolean | null
+          hit_predicted_high: boolean | null
+          hit_predicted_low: boolean | null
+          id: string
+          low_accuracy: number | null
+          market_condition: string | null
+          prediction_id: string | null
+          recorded_at: string | null
+          sector_performance: number | null
+          spy_performance: number | null
+        }
+        Insert: {
+          actual_close?: number | null
+          actual_high?: number | null
+          actual_high_time?: string | null
+          actual_low?: number | null
+          actual_low_time?: string | null
+          actual_open?: number | null
+          actual_volume?: number | null
+          close_accuracy?: number | null
+          direction_correct?: boolean | null
+          high_accuracy?: number | null
+          hit_predicted_close?: boolean | null
+          hit_predicted_high?: boolean | null
+          hit_predicted_low?: boolean | null
+          id?: string
+          low_accuracy?: number | null
+          market_condition?: string | null
+          prediction_id?: string | null
+          recorded_at?: string | null
+          sector_performance?: number | null
+          spy_performance?: number | null
+        }
+        Update: {
+          actual_close?: number | null
+          actual_high?: number | null
+          actual_high_time?: string | null
+          actual_low?: number | null
+          actual_low_time?: string | null
+          actual_open?: number | null
+          actual_volume?: number | null
+          close_accuracy?: number | null
+          direction_correct?: boolean | null
+          high_accuracy?: number | null
+          hit_predicted_close?: boolean | null
+          hit_predicted_high?: boolean | null
+          hit_predicted_low?: boolean | null
+          id?: string
+          low_accuracy?: number | null
+          market_condition?: string | null
+          prediction_id?: string | null
+          recorded_at?: string | null
+          sector_performance?: number | null
+          spy_performance?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prediction_results_prediction_id_fkey"
+            columns: ["prediction_id"]
+            isOneToOne: false
+            referencedRelation: "enhanced_daily_predictions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prediction_views: {
+        Row: {
+          id: string
+          interaction_type: string | null
+          prediction_date: string
+          predictions_viewed: number[] | null
+          upgraded_during_session: boolean | null
+          user_id: string | null
+          viewed_at: string | null
+        }
+        Insert: {
+          id?: string
+          interaction_type?: string | null
+          prediction_date: string
+          predictions_viewed?: number[] | null
+          upgraded_during_session?: boolean | null
+          user_id?: string | null
+          viewed_at?: string | null
+        }
+        Update: {
+          id?: string
+          interaction_type?: string | null
+          prediction_date?: string
+          predictions_viewed?: number[] | null
+          upgraded_during_session?: boolean | null
+          user_id?: string | null
+          viewed_at?: string | null
+        }
+        Relationships: []
       }
       predictions: {
         Row: {
