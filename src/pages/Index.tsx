@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Navigation } from "@/components/Navigation";
-import homeBackground from "@/assets/home_background.jpg";
+
 import { 
   TrendingUp, 
   BookOpen, 
@@ -68,7 +68,7 @@ export default function Index() {
       {/* Value Propositions */}
       <section 
         className="py-16 px-4 relative bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${homeBackground})` }}
+        style={{ backgroundImage: `url(/home_background.jpg)` }}
       >
         <div className="absolute inset-0 bg-black/40"></div>
         <div className="container mx-auto max-w-6xl relative z-10">
