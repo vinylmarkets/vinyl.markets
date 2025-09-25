@@ -61,7 +61,7 @@ All colors MUST be HSL.
     --healthcare-accent: 75 85% 55%; /* Lime green for healthcare */
     
     /* AtomicMarket Typography System */
-    --font-headline: 'Space Grotesk', 'Inter', sans-serif; /* Vinyl replacement */
+    --font-headline: 'vinyl', sans-serif; /* Adobe VINYL font */
     --font-sans: 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', sans-serif;
     --font-mono: 'Menlo', 'Monaco', 'Courier New', monospace;
 
