@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Navigation } from "@/components/Navigation";
+import homeBackground from "../assets/home_background.jpg";
 
 import { 
   TrendingUp, 
@@ -20,6 +21,7 @@ import {
 
 export default function Index() {
   console.log('Index component is rendering');
+  console.log('Background image path:', '/home_background.jpg');
   
   const [toggleState, setToggleState] = useState<'academic' | 'plain'>('plain');
 
@@ -45,7 +47,10 @@ export default function Index() {
       {/* Hero Section */}
       <section 
         className="relative py-20 md:py-32 px-4 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(/home_background.jpg)` }}
+        style={{ 
+          backgroundImage: `url(${homeBackground})`,
+          minHeight: '500px'
+        }}
       >
         <div className="absolute inset-0 bg-black/40"></div>
         <div className="container mx-auto text-center max-w-4xl relative z-10">
