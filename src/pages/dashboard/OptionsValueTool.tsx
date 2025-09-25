@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { CompanyLogo } from "@/components/ui/company-logo";
 import { TrendingUp, TrendingDown, Calculator, Shield, Clock, Target } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { toast } from "sonner";
@@ -392,9 +393,9 @@ const OpportunityCard: React.FC<OpportunityCardProps> = ({
 
   const getRiskBadge = (riskScore: number | null) => {
     if (!riskScore) return <Badge variant="secondary">N/A</Badge>;
-    if (riskScore <= 3) return <Badge className="bg-emerald-600">Low Risk</Badge>;
-    if (riskScore <= 6) return <Badge className="bg-yellow-600">Medium Risk</Badge>;
-    return <Badge className="bg-red-600">High Risk</Badge>;
+    if (riskScore <= 3) return <Badge className="bg-green-600 text-white">Low Risk</Badge>;
+    if (riskScore <= 6) return <Badge className="bg-yellow-600 text-white">Medium Risk</Badge>;
+    return <Badge className="bg-red-600 text-white">High Risk</Badge>;
   };
 
   const handleExpand = () => {
@@ -405,70 +406,93 @@ const OpportunityCard: React.FC<OpportunityCardProps> = ({
   };
 
   return (
-    <Card className={`${!isAccessible ? 'opacity-60' : ''} hover:shadow-lg transition-all duration-200 border-0 shadow-sm`}>
-      <CardHeader className="pb-4">
+    <Card className={`${!isAccessible ? 'opacity-60' : ''} hover:shadow-lg transition-shadow bg-white border`}>
+      <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Badge variant="outline" className="font-mono text-xs">
+            <span className="text-lg font-bold text-foreground">
               #{opportunity.rank}
-            </Badge>
-            <div>
-              <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                <span className="text-primary font-bold">{opportunity.underlying_symbol}</span>
-                <span className="text-muted-foreground">•</span>
-                <span>{opportunity.strategy_name}</span>
-              </CardTitle>
-              <CardDescription className="text-sm mt-1">
-                {opportunity.strategy_type} • Expires {new Date(opportunity.expiration_date).toLocaleDateString()}
-              </CardDescription>
+            </span>
+            <CompanyLogo 
+              symbol={opportunity.underlying_symbol}
+              companyName={`${opportunity.underlying_symbol} Options`}
+              logoUrl={null}
+              size="sm"
+            />
+            <div className="flex flex-col">
+              <CardTitle className="text-lg font-bold">{opportunity.underlying_symbol}</CardTitle>
+              <span className="text-xs text-muted-foreground">{opportunity.strategy_name}</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {getRiskBadge(opportunity.risk_score)}
+            {opportunity.roi_percentage && opportunity.roi_percentage > 0 ? (
+              <TrendingUp className="h-4 w-4 text-green-600" />
+            ) : (
+              <TrendingDown className="h-4 w-4 text-red-600" />
+            )}
+            <Badge variant="outline">
+              {isAccessible ? `${opportunity.roi_percentage?.toFixed(1)}%` : '***'}
+            </Badge>
             {!isAccessible && (
               <Badge variant="secondary" className="text-xs">🔒 Premium</Badge>
             )}
           </div>
         </div>
+        <div className="text-sm text-muted-foreground mt-1">
+          {opportunity.strategy_type} • Expires {new Date(opportunity.expiration_date).toLocaleDateString()}
+        </div>
       </CardHeader>
 
-      <CardContent className="space-y-6">
-        {/* Key Metrics Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center p-3 bg-muted/30 rounded-lg">
-            <div className="flex items-center justify-center mb-1">
-              <TrendingUp className="h-4 w-4 text-emerald-600 mr-1" />
-              <span className="text-xs text-muted-foreground">Max Profit</span>
-            </div>
-            <p className="font-bold text-lg text-emerald-600">
+      <CardContent className="space-y-4">
+        {/* Key Metrics Grid - Similar to PredictionCard */}
+        <div className="grid grid-cols-4 gap-3">
+          <div>
+            <p className="text-sm text-muted-foreground">Cost Basis</p>
+            <p className="font-semibold text-purple-600">
+              {isAccessible ? formatCurrency(opportunity.cost_basis) : '***'}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Max Profit</p>
+            <p className="font-semibold text-green-600">
               {isAccessible ? formatCurrency(opportunity.max_profit) : '***'}
             </p>
           </div>
-          <div className="text-center p-3 bg-muted/30 rounded-lg">
-            <div className="flex items-center justify-center mb-1">
-              <TrendingDown className="h-4 w-4 text-red-600 mr-1" />
-              <span className="text-xs text-muted-foreground">Max Loss</span>
-            </div>
-            <p className="font-bold text-lg text-red-600">
+          <div>
+            <p className="text-sm text-muted-foreground">Max Loss</p>
+            <p className="font-semibold text-red-600">
               {isAccessible ? formatCurrency(Math.abs(opportunity.max_loss)) : '***'}
             </p>
           </div>
-          <div className="text-center p-3 bg-muted/30 rounded-lg">
-            <div className="flex items-center justify-center mb-1">
-              <Target className="h-4 w-4 text-primary mr-1" />
-              <span className="text-xs text-muted-foreground">ROI Potential</span>
-            </div>
-            <p className="font-bold text-lg text-primary">
+          <div>
+            <p className="text-sm text-muted-foreground">Profit Prob</p>
+            <p className="font-semibold">
+              {isAccessible ? `${opportunity.probability_of_profit?.toFixed(1)}%` : '***'}
+            </p>
+          </div>
+        </div>
+
+        {/* Metrics Row - Similar to PredictionCard */}
+        <div className="grid grid-cols-3 gap-4 pt-2 border-t">
+          <div className="text-center">
+            <Target className="h-4 w-4 mx-auto mb-1 text-purple-600" />
+            <p className="text-xs text-muted-foreground">ROI Potential</p>
+            <p className="font-semibold text-purple-600">
               {isAccessible ? `${opportunity.roi_percentage?.toFixed(1)}%` : '***'}
             </p>
           </div>
-          <div className="text-center p-3 bg-muted/30 rounded-lg">
-            <div className="flex items-center justify-center mb-1">
-              <Calculator className="h-4 w-4 text-purple-600 mr-1" />
-              <span className="text-xs text-muted-foreground">Profit Probability</span>
+          <div className="text-center">
+            <Shield className="h-4 w-4 mx-auto mb-1 text-orange-600" />
+            <p className="text-xs text-muted-foreground">Risk Score</p>
+            <div className="flex justify-center">
+              {getRiskBadge(opportunity.risk_score)}
             </div>
-            <p className="font-bold text-lg text-purple-600">
-              {isAccessible ? `${opportunity.probability_of_profit?.toFixed(1)}%` : '***'}
+          </div>
+          <div className="text-center">
+            <Clock className="h-4 w-4 mx-auto mb-1 text-purple-600" />
+            <p className="text-xs text-muted-foreground">Days Left</p>
+            <p className="font-semibold text-xs">
+              {opportunity.days_to_expiration}
             </p>
           </div>
         </div>
@@ -477,28 +501,22 @@ const OpportunityCard: React.FC<OpportunityCardProps> = ({
           <div className="space-y-4 border-t pt-4">
             {/* Strategy Details */}
             <div>
-              <h4 className="font-semibold mb-2 flex items-center">
-                <Calculator className="h-4 w-4 mr-2" />
-                Strategy Details
-              </h4>
-              <div className="bg-muted/50 p-4 rounded-lg">
+              <p className="text-sm font-medium mb-2">Strategy Mechanics:</p>
+              <div className="p-3 bg-muted/50 rounded-lg">
                 <p className="text-sm text-muted-foreground">{opportunity.strategy_mechanics}</p>
               </div>
             </div>
 
             {/* Option Legs */}
             <div>
-              <h4 className="font-semibold mb-2 flex items-center">
-                <Target className="h-4 w-4 mr-2" />
-                Option Legs
-              </h4>
+              <p className="text-sm font-medium mb-2">Option Legs:</p>
               <div className="space-y-2">
                 {opportunity.option_legs?.map((leg, index) => (
-                  <div key={index} className="flex items-center justify-between bg-muted/50 p-3 rounded-lg text-sm">
-                    <span className={`font-medium ${leg.action === 'buy' ? 'text-emerald-600' : 'text-red-600'}`}>
+                  <div key={index} className="flex items-center justify-between p-3 bg-purple-200 dark:bg-purple-800/30 border border-purple-300 dark:border-purple-700 rounded-lg">
+                    <span className={`font-medium ${leg.action === 'buy' ? 'text-green-600' : 'text-red-600'}`}>
                       {leg.action.toUpperCase()} {leg.quantity} {leg.option_symbol}
                     </span>
-                    <span className="text-muted-foreground">{leg.option_type} @ ${leg.strike_price}</span>
+                    <span className="text-muted-foreground text-sm">{leg.option_type} @ ${leg.strike_price}</span>
                     <span className="font-semibold">{formatCurrency(leg.mid_price)}</span>
                   </div>
                 ))}
@@ -507,20 +525,18 @@ const OpportunityCard: React.FC<OpportunityCardProps> = ({
 
             {/* Why This Opportunity Exists */}
             <div>
-              <h4 className="font-semibold mb-2 flex items-center text-primary">
-                <TrendingUp className="h-4 w-4 mr-2" />
-                Why This Opportunity Exists
-              </h4>
-              <p className="text-sm text-muted-foreground bg-primary/5 p-3 rounded-lg">{opportunity.educational_explanation}</p>
+              <p className="text-sm font-medium mb-2 text-primary">Why This Opportunity Exists:</p>
+              <div className="p-3 bg-primary/5 rounded-lg">
+                <p className="text-sm text-muted-foreground">{opportunity.educational_explanation}</p>
+              </div>
             </div>
 
             {/* Risk Considerations */}
             <div>
-              <h4 className="font-semibold mb-2 flex items-center text-red-600">
-                <Shield className="h-4 w-4 mr-2" />
-                Risk Considerations
-              </h4>
-              <p className="text-sm text-muted-foreground bg-red-50 p-3 rounded-lg border border-red-100">{opportunity.risk_discussion}</p>
+              <p className="text-sm font-medium mb-2 text-red-600">Risk Considerations:</p>
+              <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-100 dark:border-red-800">
+                <p className="text-sm text-muted-foreground">{opportunity.risk_discussion}</p>
+              </div>
             </div>
           </div>
         )}
