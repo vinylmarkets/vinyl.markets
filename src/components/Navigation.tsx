@@ -57,12 +57,14 @@ export const Navigation = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
-            <img 
-              src="/src/assets/atomicmarket-icon.svg" 
-              alt="AtomicMarket"
-              className="w-8 h-8"
-            />
-            <h1 className="text-2xl font-headline font-bold" style={{ color: 'hsl(var(--header-foreground))' }}>AtomicMarket</h1>
+            <div className="flex items-center gap-2">
+              <img 
+                src="/src/assets/atomicmarket-icon.svg" 
+                alt="AtomicMarket"
+                className="w-8 h-8"
+              />
+              <span className="text-xl font-headline font-bold" style={{ color: 'hsl(var(--header-foreground))' }}>ATOMICMARKET</span>
+            </div>
           </Link>
 
           {/* Mobile Menu Button */}
