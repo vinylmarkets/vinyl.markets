@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Mail, Lock, ArrowRight } from "lucide-react";
+import { Shield, Mail, Lock, ArrowRight, RotateCcw } from "lucide-react";
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
@@ -71,6 +71,48 @@ export default function AdminLogin() {
       console.error('Login error:', error);
       toast({
         title: "Login Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    if (!email) {
+      toast({
+        title: "Email Required",
+        description: "Please enter your email address first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/admin-login`,
+      });
+
+      if (error) {
+        toast({
+          title: "Password Reset Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Password Reset Email Sent",
+        description: "Check your email for instructions to reset your password",
+      });
+    } catch (error) {
+      console.error('Password reset error:', error);
+      toast({
+        title: "Password Reset Error",
         description: "An unexpected error occurred",
         variant: "destructive",
       });
@@ -219,6 +261,17 @@ export default function AdminLogin() {
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? "Signing in..." : "Sign In"}
                   <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  className="w-full text-sm" 
+                  onClick={handlePasswordReset}
+                  disabled={loading}
+                >
+                  <RotateCcw className="mr-2 h-4 w-4" />
+                  Forgot Password?
                 </Button>
 
                 <div className="relative">
