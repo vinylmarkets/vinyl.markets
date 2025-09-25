@@ -143,6 +143,12 @@ All colors MUST be HSL.
     font-weight: 400;
   }
 
+  /* Apply Inter Bold to all font-semibold elements */
+  .font-semibold {
+    font-family: var(--font-sans) !important;
+    font-weight: 700 !important;
+  }
+
   /* Stock Ticker Animation */
   @keyframes scroll {
     0% {
