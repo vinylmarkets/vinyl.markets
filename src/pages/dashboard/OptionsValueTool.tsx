@@ -200,7 +200,8 @@ const OptionsValueTool = () => {
     return userTier !== 'free' || rank >= 11;
   };
 
-  if (loading) {
+  // Don't show loading skeleton if we're waiting for risk disclaimer
+  if (loading && riskAccepted) {
     return (
       <div className="space-y-6">
         <div className="h-8 bg-muted animate-pulse rounded" />
