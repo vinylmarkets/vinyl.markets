@@ -499,6 +499,129 @@ export type Database = {
         }
         Relationships: []
       }
+      enhanced_daily_predictions: {
+        Row: {
+          algorithm_version: string
+          all_signals: Json
+          close_confidence: number | null
+          company_name: string
+          created_at: string | null
+          data_quality_score: number | null
+          estimated_high_time: string | null
+          estimated_low_time: string | null
+          expected_gain_dollars: number | null
+          expected_gain_percentage: number
+          explanation: string
+          high_confidence: number | null
+          id: string
+          low_confidence: number | null
+          market_context_strength: number | null
+          market_phase_prediction: string | null
+          methodology_notes: string | null
+          microstructure_signal_strength: number | null
+          model_agreement_score: number | null
+          models_used: string[] | null
+          news_sentiment_strength: number | null
+          options_signal_strength: number | null
+          overall_confidence: number | null
+          predicted_close: number
+          predicted_high: number
+          predicted_low: number
+          prediction_date: string
+          premarket_price: number | null
+          premarket_signal_strength: number | null
+          premarket_volume: number | null
+          previous_close: number
+          primary_factors: Json
+          processing_time_ms: number | null
+          rank: number
+          risk_score: number | null
+          symbol: string
+          technical_signal_strength: number | null
+          volatility_estimate: number | null
+        }
+        Insert: {
+          algorithm_version?: string
+          all_signals: Json
+          close_confidence?: number | null
+          company_name: string
+          created_at?: string | null
+          data_quality_score?: number | null
+          estimated_high_time?: string | null
+          estimated_low_time?: string | null
+          expected_gain_dollars?: number | null
+          expected_gain_percentage: number
+          explanation: string
+          high_confidence?: number | null
+          id?: string
+          low_confidence?: number | null
+          market_context_strength?: number | null
+          market_phase_prediction?: string | null
+          methodology_notes?: string | null
+          microstructure_signal_strength?: number | null
+          model_agreement_score?: number | null
+          models_used?: string[] | null
+          news_sentiment_strength?: number | null
+          options_signal_strength?: number | null
+          overall_confidence?: number | null
+          predicted_close: number
+          predicted_high: number
+          predicted_low: number
+          prediction_date: string
+          premarket_price?: number | null
+          premarket_signal_strength?: number | null
+          premarket_volume?: number | null
+          previous_close: number
+          primary_factors: Json
+          processing_time_ms?: number | null
+          rank: number
+          risk_score?: number | null
+          symbol: string
+          technical_signal_strength?: number | null
+          volatility_estimate?: number | null
+        }
+        Update: {
+          algorithm_version?: string
+          all_signals?: Json
+          close_confidence?: number | null
+          company_name?: string
+          created_at?: string | null
+          data_quality_score?: number | null
+          estimated_high_time?: string | null
+          estimated_low_time?: string | null
+          expected_gain_dollars?: number | null
+          expected_gain_percentage?: number
+          explanation?: string
+          high_confidence?: number | null
+          id?: string
+          low_confidence?: number | null
+          market_context_strength?: number | null
+          market_phase_prediction?: string | null
+          methodology_notes?: string | null
+          microstructure_signal_strength?: number | null
+          model_agreement_score?: number | null
+          models_used?: string[] | null
+          news_sentiment_strength?: number | null
+          options_signal_strength?: number | null
+          overall_confidence?: number | null
+          predicted_close?: number
+          predicted_high?: number
+          predicted_low?: number
+          prediction_date?: string
+          premarket_price?: number | null
+          premarket_signal_strength?: number | null
+          premarket_volume?: number | null
+          previous_close?: number
+          primary_factors?: Json
+          processing_time_ms?: number | null
+          rank?: number
+          risk_score?: number | null
+          symbol?: string
+          technical_signal_strength?: number | null
+          volatility_estimate?: number | null
+        }
+        Relationships: []
+      }
       feature_usage: {
         Row: {
           created_at: string | null
