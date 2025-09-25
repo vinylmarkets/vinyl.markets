@@ -9,7 +9,7 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* AtomicMarket Brand Design System */
-    --background: 45 15% 97%; /* Subtle warm creme background */
+    --background: 45 15% 94%; /* Slightly darker warm creme background */
     --foreground: 0 0% 13%;
 
     --card: 0 0% 100%; /* Keep cards pure white */

@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Navigation } from "@/components/Navigation";
+import homeBackground from "@/assets/home_background.jpg";
 import { 
   TrendingUp, 
   BookOpen, 
@@ -65,37 +66,41 @@ export default function Index() {
       </section>
 
       {/* Value Propositions */}
-      <section className="py-16 px-4 bg-muted/30">
-        <div className="container mx-auto max-w-6xl">
+      <section 
+        className="py-16 px-4 relative bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${homeBackground})` }}
+      >
+        <div className="absolute inset-0 bg-black/40"></div>
+        <div className="container mx-auto max-w-6xl relative z-10">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center">
-              <BookOpen className="h-12 w-12 text-secondary mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Academic & Plain Speak</h3>
-              <p className="text-muted-foreground text-sm">
+              <BookOpen className="h-12 w-12 text-white mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2 text-white">Academic & Plain Speak</h3>
+              <p className="text-white/80 text-sm">
                 Choose your explanation style - from peer-reviewed research to everyday language
               </p>
             </div>
             
             <div className="text-center">
-              <Eye className="h-12 w-12 text-secondary mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Complete Transparency</h3>
-              <p className="text-muted-foreground text-sm">
+              <Eye className="h-12 w-12 text-white mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2 text-white">Complete Transparency</h3>
+              <p className="text-white/80 text-sm">
                 See exactly how we reach every conclusion - methodology fully exposed
               </p>
             </div>
             
             <div className="text-center">
-              <Shield className="h-12 w-12 text-secondary mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Educational Focus</h3>
-              <p className="text-muted-foreground text-sm">
+              <Shield className="h-12 w-12 text-white mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2 text-white">Educational Focus</h3>
+              <p className="text-white/80 text-sm">
                 Learn market analysis - this is education, not investment advice
               </p>
             </div>
             
             <div className="text-center">
-              <Terminal className="h-12 w-12 text-secondary mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">AI-Powered Ask AtomicMarket</h3>
-              <p className="text-muted-foreground text-sm">
+              <Terminal className="h-12 w-12 text-white mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2 text-white">AI-Powered Ask AtomicMarket</h3>
+              <p className="text-white/80 text-sm">
                 Interactive terminal for personalized market education and analysis
               </p>
             </div>
