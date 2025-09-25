@@ -43,12 +43,16 @@ export default function Index() {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="relative py-20 md:py-32 px-4">
-        <div className="container mx-auto text-center max-w-4xl">
-          <h1 className="text-4xl md:text-6xl font-headline font-bold text-foreground mb-6 leading-tight">
+      <section 
+        className="relative py-20 md:py-32 px-4 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(/home_background.jpg)` }}
+      >
+        <div className="absolute inset-0 bg-black/40"></div>
+        <div className="container mx-auto text-center max-w-4xl relative z-10">
+          <h1 className="text-4xl md:text-6xl font-headline font-bold text-white mb-6 leading-tight">
             MARKET ANALYTICS YOU CAN UNDERSTAND
           </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed">
             Get daily market analysis with complete transparency - no black box algorithms
           </p>
           
@@ -59,48 +63,44 @@ export default function Index() {
             Start Learning Free
           </Button>
           
-          <p className="text-sm text-muted-foreground mt-4">
+          <p className="text-sm text-white/80 mt-4">
             No credit card required • Educational content only
           </p>
         </div>
       </section>
 
       {/* Value Propositions */}
-      <section 
-        className="py-16 px-4 relative bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(/home_background.jpg)` }}
-      >
-        <div className="absolute inset-0 bg-black/40"></div>
-        <div className="container mx-auto max-w-6xl relative z-10">
+      <section className="py-16 px-4 bg-muted/30">
+        <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center">
-              <BookOpen className="h-12 w-12 text-white mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2 text-white">Academic & Plain Speak</h3>
-              <p className="text-white/80 text-sm">
+              <BookOpen className="h-12 w-12 text-secondary mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Academic & Plain Speak</h3>
+              <p className="text-muted-foreground text-sm">
                 Choose your explanation style - from peer-reviewed research to everyday language
               </p>
             </div>
             
             <div className="text-center">
-              <Eye className="h-12 w-12 text-white mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2 text-white">Complete Transparency</h3>
-              <p className="text-white/80 text-sm">
+              <Eye className="h-12 w-12 text-secondary mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Complete Transparency</h3>
+              <p className="text-muted-foreground text-sm">
                 See exactly how we reach every conclusion - methodology fully exposed
               </p>
             </div>
             
             <div className="text-center">
-              <Shield className="h-12 w-12 text-white mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2 text-white">Educational Focus</h3>
-              <p className="text-white/80 text-sm">
+              <Shield className="h-12 w-12 text-secondary mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Educational Focus</h3>
+              <p className="text-muted-foreground text-sm">
                 Learn market analysis - this is education, not investment advice
               </p>
             </div>
             
             <div className="text-center">
-              <Terminal className="h-12 w-12 text-white mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2 text-white">AI-Powered Ask AtomicMarket</h3>
-              <p className="text-white/80 text-sm">
+              <Terminal className="h-12 w-12 text-secondary mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">AI-Powered Ask AtomicMarket</h3>
+              <p className="text-muted-foreground text-sm">
                 Interactive terminal for personalized market education and analysis
               </p>
             </div>
