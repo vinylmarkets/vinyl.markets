@@ -74,15 +74,22 @@ export default {
         tech: "hsl(var(--tech-accent))",
         finance: "hsl(var(--finance-accent))",
         healthcare: "hsl(var(--healthcare-accent))",
+        /* AtomicMarket Brand Colors */
+        "lime-green": "hsl(var(--lime-green))",
+        "olive-green": "hsl(var(--olive-green))",
+        "brand-blue": "hsl(var(--brand-blue))",
+        indigo: "hsl(var(--indigo))",
+        "coral-red": "hsl(var(--coral-red))",
+        "orange-gold": "hsl(var(--orange-gold))",
       },
       boxShadow: {
         'subtle': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
         'card': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
       },
       fontFamily: {
+        headline: 'var(--font-headline)', /* For headlines - Vinyl replacement */
+        sans: 'var(--font-sans)', /* Inter for body text */
         mono: 'var(--font-mono)',
-        serif: 'var(--font-serif)',
-        sans: 'var(--font-sans)',
       },
       borderRadius: {
         lg: "var(--radius)",

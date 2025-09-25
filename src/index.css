@@ -8,62 +8,60 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Medium-inspired Clean Design */
-    --background: 0 0% 100%; /* Pure white background */
-    --foreground: 0 0% 13%; /* Dark charcoal text */
+    /* AtomicMarket Brand Design System */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 13%;
 
-    --card: 0 0% 100%; /* Pure white cards */
+    --card: 0 0% 100%;
     --card-foreground: 0 0% 13%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 13%;
 
-    /* Clean Black Primary */
-    --primary: 0 0% 13%;
-    --primary-foreground: 0 0% 100%;
+    /* AtomicMarket Primary - Lime Green */
+    --primary: 75 85% 55%; /* Bright lime green */
+    --primary-foreground: 0 0% 13%;
     
-    /* Medium Green Accent */
-    --secondary: 142 71% 45%;
+    /* AtomicMarket Secondary - Blue */
+    --secondary: 220 85% 55%; /* AtomicMarket blue */
     --secondary-foreground: 0 0% 100%;
 
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
 
-    --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 13%;
+    --accent: 75 60% 45%; /* Olive green accent */
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 75% 60%; /* Coral red */
     --destructive-foreground: 0 0% 100%;
 
     --border: 0 0% 90%;
     --input: 0 0% 90%;
-    --ring: 0 0% 13%;
+    --ring: 75 85% 55%; /* Lime green ring */
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
     
-    /* Clean Header */
-    --header-background: 0 0% 100%;
-    --header-foreground: 0 0% 13%;
+    /* AtomicMarket Brand Colors */
+    --lime-green: 75 85% 55%; /* Primary lime green */
+    --olive-green: 75 60% 45%; /* Olive green */
+    --brand-blue: 220 85% 55%; /* Blue */
+    --indigo: 240 85% 55%; /* Indigo */
+    --coral-red: 0 75% 60%; /* Coral red */
+    --orange-gold: 35 85% 55%; /* Orange gold */
     
-    /* Minimal Color System */
-    --probability-high: 142 71% 45%; /* Medium Green */
-    --probability-medium: 0 0% 45%; /* Medium Gray */
-    --probability-low: 0 84% 60%; /* Clean Red */
-    --probability-neutral: 0 0% 60%; /* Light Gray */
-    
-    /* Accent Colors for Visual Interest */
-    --amber: 45 93% 47%; /* Warm amber */
-    --amber-foreground: 0 0% 100%;
-    --purple: 262 83% 58%; /* Rich purple */
-    --purple-foreground: 0 0% 100%;
+    /* Enhanced Color System */
+    --probability-high: 75 85% 55%; /* Lime green for high probability */
+    --probability-medium: 35 85% 55%; /* Orange gold for medium */
+    --probability-low: 0 75% 60%; /* Coral red for low */
+    --probability-neutral: 0 0% 60%; /* Gray for neutral */
     
     /* Stock Categories */
-    --tech-accent: 262 83% 58%; /* Purple for tech stocks */
-    --finance-accent: 45 93% 47%; /* Amber for finance */
-    --healthcare-accent: 142 71% 45%; /* Green for healthcare */
+    --tech-accent: 240 85% 55%; /* Indigo for tech */
+    --finance-accent: 35 85% 55%; /* Orange gold for finance */
+    --healthcare-accent: 75 85% 55%; /* Lime green for healthcare */
     
-    /* Typography System - Medium-inspired */
-    --font-serif: 'Georgia', 'Times New Roman', serif;
+    /* AtomicMarket Typography System */
+    --font-headline: 'Space Grotesk', 'Inter', sans-serif; /* Vinyl replacement */
     --font-sans: 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', sans-serif;
     --font-mono: 'Menlo', 'Monaco', 'Courier New', monospace;
 
