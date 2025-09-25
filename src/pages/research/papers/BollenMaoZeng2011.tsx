@@ -337,7 +337,7 @@ class SocialSentimentAnalyzer {
                 <CardTitle className="text-center">Response Time</CardTitle>
               </CardHeader>
               <CardContent className="text-center">
-                <div className="text-2xl font-bold text-blue-600 mb-1">2.3min</div>
+                <div className="text-2xl font-bold text-purple-600 mb-1">2.3min</div>
                 <div className="text-sm text-muted-foreground mb-2">vs. 3-4 days original</div>
                 <p className="text-xs text-muted-foreground">
                   Real-time processing vs. batch analysis

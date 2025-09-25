@@ -162,7 +162,7 @@ export function PredictionCard({ prediction, isPremium, userTier }: PredictionCa
         {/* Metrics */}
         <div className="grid grid-cols-3 gap-4 pt-2 border-t">
           <div className="text-center">
-            <Target className="h-4 w-4 mx-auto mb-1 text-blue-600" />
+            <Target className="h-4 w-4 mx-auto mb-1 text-purple-600" />
             <p className="text-xs text-muted-foreground">Confidence</p>
             <p className={`font-semibold ${getConfidenceColor(prediction.overall_confidence)}`}>
               {prediction.overall_confidence}%

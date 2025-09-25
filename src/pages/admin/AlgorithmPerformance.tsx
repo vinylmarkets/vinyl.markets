@@ -495,7 +495,7 @@ export default function AlgorithmPerformance() {
                       <CardTitle className="flex items-center text-lg">
                         {rec.type === 'warning' && <AlertCircle className="h-5 w-5 mr-2 text-red-500" />}
                         {rec.type === 'success' && <CheckCircle className="h-5 w-5 mr-2 text-green-500" />}
-                        {rec.type === 'improvement' && <Lightbulb className="h-5 w-5 mr-2 text-blue-500" />}
+                        {rec.type === 'improvement' && <Lightbulb className="h-5 w-5 mr-2 text-purple-500" />}
                         {rec.title}
                       </CardTitle>
                       <Badge variant={rec.priority === 'high' ? 'destructive' : rec.priority === 'medium' ? 'secondary' : 'outline'}>

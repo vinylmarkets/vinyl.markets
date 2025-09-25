@@ -20,7 +20,7 @@ export const EducationalPrincipleBox = ({ principle }: EducationalPrincipleBoxPr
       case 'advanced':
         return 'bg-red-100 text-red-800 border-red-200';
       default:
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+        return 'bg-purple-100 text-purple-800 border-purple-200';
     }
   };
 
@@ -33,7 +33,7 @@ export const EducationalPrincipleBox = ({ principle }: EducationalPrincipleBoxPr
       case 'advanced':
         return <Info className="h-5 w-5 text-red-600" />;
       default:
-        return <BookOpen className="h-5 w-5 text-blue-600" />;
+        return <BookOpen className="h-5 w-5 text-purple-600" />;
     }
   };
 

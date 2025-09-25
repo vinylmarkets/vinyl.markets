@@ -93,7 +93,7 @@ export default function Upgrade() {
               <CardHeader className="text-center pb-8">
                 <CardTitle className="flex items-center justify-center gap-2">
                   {plan.name === 'Pro' && <Crown className="w-5 h-5 text-yellow-500" />}
-                  {plan.name === 'Essential' && <Zap className="w-5 h-5 text-blue-500" />}
+                  {plan.name === 'Essential' && <Zap className="w-5 h-5 text-purple-500" />}
                   {plan.name}
                 </CardTitle>
                 <div className="mt-4">

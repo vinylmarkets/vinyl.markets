@@ -275,7 +275,7 @@ function updateProbability(baseRate, evidence) {
                 <CardTitle className="text-center">Overconfidence Reduction</CardTitle>
               </CardHeader>
               <CardContent className="text-center">
-                <div className="text-3xl font-bold text-blue-600 mb-2">-41%</div>
+                <div className="text-3xl font-bold text-purple-600 mb-2">-41%</div>
                 <p className="text-sm text-muted-foreground">
                   Reduction in overconfident predictions (probabilities &gt;90%) that turned out wrong
                 </p>

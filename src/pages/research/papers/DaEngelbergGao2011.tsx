@@ -326,7 +326,7 @@ class AttentionAnalyzer {
                 <CardTitle className="text-center">Detection Speed</CardTitle>
               </CardHeader>
               <CardContent className="text-center">
-                <div className="text-2xl font-bold text-blue-600 mb-1">Real-time</div>
+                <div className="text-2xl font-bold text-purple-600 mb-1">Real-time</div>
                 <div className="text-sm text-muted-foreground mb-2">vs. Weekly original</div>
                 <p className="text-xs text-muted-foreground">
                   Intraday attention spike detection

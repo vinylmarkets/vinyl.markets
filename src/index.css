@@ -22,8 +22,8 @@ All colors MUST be HSL.
     --primary: 75 85% 55%; /* Bright lime green */
     --primary-foreground: 0 0% 13%;
     
-    /* AtomicMarket Secondary - Blue */
-    --secondary: 220 85% 55%; /* AtomicMarket blue */
+    /* AtomicMarket Secondary - Purple */
+    --secondary: 270 85% 55%; /* AtomicMarket purple */
     --secondary-foreground: 0 0% 100%;
 
     --muted: 0 0% 96%;
@@ -48,7 +48,7 @@ All colors MUST be HSL.
     /* AtomicMarket Brand Colors */
     --lime-green: 75 85% 55%; /* Primary lime green */
     --olive-green: 75 60% 45%; /* Olive green */
-    --brand-blue: 220 85% 55%; /* Blue */
+    --brand-purple: 270 85% 55%; /* Purple */
     --indigo: 240 85% 55%; /* Indigo */
     --coral-red: 0 75% 60%; /* Coral red */
     --orange-gold: 35 85% 55%; /* Orange gold */

@@ -23,7 +23,7 @@ const GarmanKohlhagen1983 = () => {
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-4">
             <Badge variant="outline" className="px-3 py-1">1983</Badge>
-            <Badge className="bg-blue-100 text-blue-700 px-3 py-1">Options Market Making</Badge>
+            <Badge className="bg-purple-100 text-purple-700 px-3 py-1">Options Market Making</Badge>
           </div>
           
           <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-6">

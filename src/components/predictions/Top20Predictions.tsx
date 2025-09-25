@@ -166,7 +166,7 @@ export function Top20Predictions() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
             <Card className="p-3">
               <div className="text-center">
-                <Target className="h-5 w-5 mx-auto mb-1 text-blue-600" />
+                <Target className="h-5 w-5 mx-auto mb-1 text-purple-600" />
                 <p className="text-xs text-muted-foreground">Direction Accuracy</p>
                 <p className="font-bold text-lg">{performance.directional_accuracy}%</p>
               </div>

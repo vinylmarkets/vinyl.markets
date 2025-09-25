@@ -108,7 +108,7 @@ const DataSources = () => {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <Hash className="h-5 w-5 text-blue-400" />
+                  <Hash className="h-5 w-5 text-purple-400" />
                   <h3 className="text-lg font-semibold text-foreground">Twitter/X Financial Intelligence</h3>
                 </div>
                 <div className="space-y-2 text-sm text-muted-foreground">
@@ -192,7 +192,7 @@ const DataSources = () => {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <Building2 className="h-5 w-5 text-blue-600" />
+                  <Building2 className="h-5 w-5 text-purple-600" />
                   <h3 className="text-lg font-semibold text-foreground">Bloomberg Terminal Integration</h3>
                 </div>
                 <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
@@ -213,7 +213,7 @@ const DataSources = () => {
                 <div className="space-y-4">
                   <div>
                     <div className="flex items-center gap-2 mb-2">
-                      <Shield className="h-4 w-4 text-blue-700" />
+                      <Shield className="h-4 w-4 text-purple-700" />
                       <h4 className="font-medium text-foreground">SEC EDGAR Database APIs:</h4>
                     </div>
                     <div className="grid md:grid-cols-2 gap-2 text-sm text-muted-foreground">

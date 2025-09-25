@@ -230,7 +230,7 @@ export default function AdminLogin() {
         </div>
 
         {/* Admin Setup Instructions */}
-        <Card className="border-blue-200 bg-blue-50/50">
+        <Card className="border-purple-200 bg-purple-50/50">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center">
               <Shield className="h-4 w-4 mr-2" />

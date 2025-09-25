@@ -77,7 +77,7 @@ export default {
         /* AtomicMarket Brand Colors */
         "lime-green": "hsl(var(--lime-green))",
         "olive-green": "hsl(var(--olive-green))",
-        "brand-blue": "hsl(var(--brand-blue))",
+        "brand-purple": "hsl(var(--brand-purple))",
         indigo: "hsl(var(--indigo))",
         "coral-red": "hsl(var(--coral-red))",
         "orange-gold": "hsl(var(--orange-gold))",

@@ -238,7 +238,7 @@ const HoetingMadigan1999 = () => {
                 <CardTitle className="text-center">Volatility Reduction</CardTitle>
               </CardHeader>
               <CardContent className="text-center">
-                <div className="text-3xl font-bold text-blue-600 mb-2">-34%</div>
+                <div className="text-3xl font-bold text-purple-600 mb-2">-34%</div>
                 <p className="text-sm text-muted-foreground">
                   Reduction in prediction variance through model diversification
                 </p>

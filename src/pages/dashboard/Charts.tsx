@@ -112,7 +112,7 @@ export default function Charts() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-blue-500 rounded"></div>
+                <div className="w-3 h-3 bg-purple-500 rounded"></div>
                 <span>Probability Charts - Stock prediction confidence</span>
               </div>
               <div className="flex items-center gap-2">

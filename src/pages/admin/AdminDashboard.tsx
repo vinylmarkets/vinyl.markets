@@ -68,8 +68,8 @@ export default function AdminDashboard() {
       description: "High-level metrics, revenue trends, and key performance indicators",
       icon: BarChart3,
       href: "/admin/executive-overview",
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
+      color: "text-purple-600",
+      bgColor: "bg-purple-50",
       metrics: stats ? [
         { label: "Total Users", value: stats.totalUsers.toLocaleString() },
         { label: "MRR", value: `$${stats.totalRevenue.toLocaleString()}` }
@@ -191,7 +191,7 @@ export default function AdminDashboard() {
           <div className="max-w-7xl mx-auto px-6 py-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">{stats.totalUsers.toLocaleString()}</div>
+                <div className="text-2xl font-bold text-purple-600">{stats.totalUsers.toLocaleString()}</div>
                 <div className="text-sm text-muted-foreground">Total Users</div>
               </div>
               <div className="text-center">
@@ -276,12 +276,12 @@ export default function AdminDashboard() {
                   <Badge variant="default" className="bg-green-600">Good</Badge>
                 </div>
                 
-                <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
                   <div>
                     <div className="font-medium">Database Health</div>
                     <div className="text-sm text-muted-foreground">Uptime: 99.9%</div>
                   </div>
-                  <Badge variant="default" className="bg-blue-600">Excellent</Badge>
+                  <Badge variant="default" className="bg-purple-600">Excellent</Badge>
                 </div>
                 
                 <div className="flex items-center justify-between p-4 bg-yellow-50 rounded-lg">
