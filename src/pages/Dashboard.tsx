@@ -149,7 +149,7 @@ export default function Dashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-serif font-bold text-foreground">
-              Welcome back, {firstName}! 👋
+              Welcome back, {firstName}!
             </h1>
             <p className="text-muted-foreground mt-1">
               Ready to dive into today's market intelligence?
