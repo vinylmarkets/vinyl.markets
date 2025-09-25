@@ -107,8 +107,8 @@ export default function Index() {
       <section className="py-16 px-4">
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-serif font-bold text-foreground mb-4">
-              Daily Intelligence Briefing
+            <h2 className="text-3xl font-headline font-bold text-foreground mb-4 uppercase">
+              DAILY INTELLIGENCE BRIEFING
             </h2>
             <p className="text-muted-foreground">
               See how we transform complex market data into clear, educational insights

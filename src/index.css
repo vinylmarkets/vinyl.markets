@@ -136,6 +136,13 @@ All colors MUST be HSL.
     font-weight: 400;
   }
 
+  /* Apply VINYL font and uppercase to all font-serif elements */
+  .font-serif {
+    font-family: var(--font-headline) !important;
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+
   /* Stock Ticker Animation */
   @keyframes scroll {
     0% {
