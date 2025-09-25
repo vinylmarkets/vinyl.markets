@@ -1075,6 +1075,506 @@ export type Database = {
         }
         Relationships: []
       }
+      option_legs: {
+        Row: {
+          action: string | null
+          ask: number | null
+          bid: number | null
+          created_at: string | null
+          delta: number | null
+          expiration_date: string
+          gamma: number | null
+          id: string
+          implied_volatility: number | null
+          last_price: number | null
+          leg_number: number
+          mid_price: number | null
+          open_interest: number | null
+          opportunity_id: string | null
+          option_symbol: string
+          option_type: string | null
+          quantity: number
+          strike_price: number
+          theta: number | null
+          vega: number | null
+          volume: number | null
+        }
+        Insert: {
+          action?: string | null
+          ask?: number | null
+          bid?: number | null
+          created_at?: string | null
+          delta?: number | null
+          expiration_date: string
+          gamma?: number | null
+          id?: string
+          implied_volatility?: number | null
+          last_price?: number | null
+          leg_number: number
+          mid_price?: number | null
+          open_interest?: number | null
+          opportunity_id?: string | null
+          option_symbol: string
+          option_type?: string | null
+          quantity: number
+          strike_price: number
+          theta?: number | null
+          vega?: number | null
+          volume?: number | null
+        }
+        Update: {
+          action?: string | null
+          ask?: number | null
+          bid?: number | null
+          created_at?: string | null
+          delta?: number | null
+          expiration_date?: string
+          gamma?: number | null
+          id?: string
+          implied_volatility?: number | null
+          last_price?: number | null
+          leg_number?: number
+          mid_price?: number | null
+          open_interest?: number | null
+          opportunity_id?: string | null
+          option_symbol?: string
+          option_type?: string | null
+          quantity?: number
+          strike_price?: number
+          theta?: number | null
+          vega?: number | null
+          volume?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "option_legs_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "options_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      options_algorithm_performance: {
+        Row: {
+          average_roi: number | null
+          best_roi: number | null
+          best_signal_type: string | null
+          combinations_accuracy: number | null
+          created_at: string | null
+          date: string
+          directional_accuracy: number | null
+          id: string
+          income_accuracy: number | null
+          loss_count: number | null
+          probability_calibration: number | null
+          profitable_count: number | null
+          sharpe_ratio: number | null
+          signal_performance: Json | null
+          spreads_accuracy: number | null
+          total_opportunities: number | null
+          win_rate: number | null
+          worst_roi: number | null
+          worst_signal_type: string | null
+        }
+        Insert: {
+          average_roi?: number | null
+          best_roi?: number | null
+          best_signal_type?: string | null
+          combinations_accuracy?: number | null
+          created_at?: string | null
+          date: string
+          directional_accuracy?: number | null
+          id?: string
+          income_accuracy?: number | null
+          loss_count?: number | null
+          probability_calibration?: number | null
+          profitable_count?: number | null
+          sharpe_ratio?: number | null
+          signal_performance?: Json | null
+          spreads_accuracy?: number | null
+          total_opportunities?: number | null
+          win_rate?: number | null
+          worst_roi?: number | null
+          worst_signal_type?: string | null
+        }
+        Update: {
+          average_roi?: number | null
+          best_roi?: number | null
+          best_signal_type?: string | null
+          combinations_accuracy?: number | null
+          created_at?: string | null
+          date?: string
+          directional_accuracy?: number | null
+          id?: string
+          income_accuracy?: number | null
+          loss_count?: number | null
+          probability_calibration?: number | null
+          profitable_count?: number | null
+          sharpe_ratio?: number | null
+          signal_performance?: Json | null
+          spreads_accuracy?: number | null
+          total_opportunities?: number | null
+          win_rate?: number | null
+          worst_roi?: number | null
+          worst_signal_type?: string | null
+        }
+        Relationships: []
+      }
+      options_market_data: {
+        Row: {
+          ask: number | null
+          bid: number | null
+          delta: number | null
+          expiration_date: string
+          gamma: number | null
+          id: string
+          implied_volatility: number | null
+          last_price: number | null
+          open_interest: number | null
+          option_type: string | null
+          rho: number | null
+          strike_price: number
+          symbol: string
+          theta: number | null
+          updated_at: string | null
+          vega: number | null
+          volume: number | null
+        }
+        Insert: {
+          ask?: number | null
+          bid?: number | null
+          delta?: number | null
+          expiration_date: string
+          gamma?: number | null
+          id?: string
+          implied_volatility?: number | null
+          last_price?: number | null
+          open_interest?: number | null
+          option_type?: string | null
+          rho?: number | null
+          strike_price: number
+          symbol: string
+          theta?: number | null
+          updated_at?: string | null
+          vega?: number | null
+          volume?: number | null
+        }
+        Update: {
+          ask?: number | null
+          bid?: number | null
+          delta?: number | null
+          expiration_date?: string
+          gamma?: number | null
+          id?: string
+          implied_volatility?: number | null
+          last_price?: number | null
+          open_interest?: number | null
+          option_type?: string | null
+          rho?: number | null
+          strike_price?: number
+          symbol?: string
+          theta?: number | null
+          updated_at?: string | null
+          vega?: number | null
+          volume?: number | null
+        }
+        Relationships: []
+      }
+      options_opportunities: {
+        Row: {
+          after_hours_change: number | null
+          algorithm_version: string | null
+          analysis_date: string
+          breakeven_points: Json | null
+          category: string
+          confidence_score: number | null
+          cost_basis: number
+          created_at: string | null
+          days_to_expiration: number
+          delta: number | null
+          educational_explanation: string
+          expected_value: number | null
+          expiration_date: string
+          flow_signal: number | null
+          gamma: number | null
+          historical_volatility: number | null
+          id: string
+          implied_volatility: number | null
+          iv_percentile: number | null
+          legs: Json
+          margin_requirement: number | null
+          max_loss: number
+          max_profit: number
+          model_agreement: number | null
+          primary_factors: Json
+          probability_of_max_loss: number | null
+          probability_of_max_profit: number | null
+          probability_of_profit: number | null
+          probability_weighted_return: number | null
+          processing_time_ms: number | null
+          rank: number
+          rho: number | null
+          risk_adjusted_return: number | null
+          risk_category: string | null
+          risk_discussion: string
+          risk_score: number | null
+          roi_percentage: number | null
+          strategy_mechanics: string
+          strategy_name: string
+          strategy_type: string
+          technical_signal: number | null
+          theta: number | null
+          underlying_iv_rank: number | null
+          underlying_price: number
+          underlying_symbol: string
+          underlying_volume: number | null
+          value_signal: number | null
+          vega: number | null
+          volatility_signal: number | null
+          volatility_skew: number | null
+          volume_signal: number | null
+        }
+        Insert: {
+          after_hours_change?: number | null
+          algorithm_version?: string | null
+          analysis_date: string
+          breakeven_points?: Json | null
+          category: string
+          confidence_score?: number | null
+          cost_basis: number
+          created_at?: string | null
+          days_to_expiration: number
+          delta?: number | null
+          educational_explanation: string
+          expected_value?: number | null
+          expiration_date: string
+          flow_signal?: number | null
+          gamma?: number | null
+          historical_volatility?: number | null
+          id?: string
+          implied_volatility?: number | null
+          iv_percentile?: number | null
+          legs: Json
+          margin_requirement?: number | null
+          max_loss: number
+          max_profit: number
+          model_agreement?: number | null
+          primary_factors: Json
+          probability_of_max_loss?: number | null
+          probability_of_max_profit?: number | null
+          probability_of_profit?: number | null
+          probability_weighted_return?: number | null
+          processing_time_ms?: number | null
+          rank: number
+          rho?: number | null
+          risk_adjusted_return?: number | null
+          risk_category?: string | null
+          risk_discussion: string
+          risk_score?: number | null
+          roi_percentage?: number | null
+          strategy_mechanics: string
+          strategy_name: string
+          strategy_type: string
+          technical_signal?: number | null
+          theta?: number | null
+          underlying_iv_rank?: number | null
+          underlying_price: number
+          underlying_symbol: string
+          underlying_volume?: number | null
+          value_signal?: number | null
+          vega?: number | null
+          volatility_signal?: number | null
+          volatility_skew?: number | null
+          volume_signal?: number | null
+        }
+        Update: {
+          after_hours_change?: number | null
+          algorithm_version?: string | null
+          analysis_date?: string
+          breakeven_points?: Json | null
+          category?: string
+          confidence_score?: number | null
+          cost_basis?: number
+          created_at?: string | null
+          days_to_expiration?: number
+          delta?: number | null
+          educational_explanation?: string
+          expected_value?: number | null
+          expiration_date?: string
+          flow_signal?: number | null
+          gamma?: number | null
+          historical_volatility?: number | null
+          id?: string
+          implied_volatility?: number | null
+          iv_percentile?: number | null
+          legs?: Json
+          margin_requirement?: number | null
+          max_loss?: number
+          max_profit?: number
+          model_agreement?: number | null
+          primary_factors?: Json
+          probability_of_max_loss?: number | null
+          probability_of_max_profit?: number | null
+          probability_of_profit?: number | null
+          probability_weighted_return?: number | null
+          processing_time_ms?: number | null
+          rank?: number
+          rho?: number | null
+          risk_adjusted_return?: number | null
+          risk_category?: string | null
+          risk_discussion?: string
+          risk_score?: number | null
+          roi_percentage?: number | null
+          strategy_mechanics?: string
+          strategy_name?: string
+          strategy_type?: string
+          technical_signal?: number | null
+          theta?: number | null
+          underlying_iv_rank?: number | null
+          underlying_price?: number
+          underlying_symbol?: string
+          underlying_volume?: number | null
+          value_signal?: number | null
+          vega?: number | null
+          volatility_signal?: number | null
+          volatility_skew?: number | null
+          volume_signal?: number | null
+        }
+        Relationships: []
+      }
+      options_performance: {
+        Row: {
+          created_at: string | null
+          current_delta: number | null
+          current_gamma: number | null
+          current_theta: number | null
+          current_vega: number | null
+          days_since_entry: number | null
+          days_to_expiration: number | null
+          early_exit_signal: boolean | null
+          final_status: string | null
+          hit_profit_target: boolean | null
+          hit_stop_loss: boolean | null
+          id: string
+          is_expired: boolean | null
+          opportunity_id: string | null
+          realized_pnl: number | null
+          realized_roi: number | null
+          strategy_value: number | null
+          track_date: string
+          underlying_price: number | null
+          unrealized_pnl: number | null
+          unrealized_pnl_percentage: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_delta?: number | null
+          current_gamma?: number | null
+          current_theta?: number | null
+          current_vega?: number | null
+          days_since_entry?: number | null
+          days_to_expiration?: number | null
+          early_exit_signal?: boolean | null
+          final_status?: string | null
+          hit_profit_target?: boolean | null
+          hit_stop_loss?: boolean | null
+          id?: string
+          is_expired?: boolean | null
+          opportunity_id?: string | null
+          realized_pnl?: number | null
+          realized_roi?: number | null
+          strategy_value?: number | null
+          track_date: string
+          underlying_price?: number | null
+          unrealized_pnl?: number | null
+          unrealized_pnl_percentage?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          current_delta?: number | null
+          current_gamma?: number | null
+          current_theta?: number | null
+          current_vega?: number | null
+          days_since_entry?: number | null
+          days_to_expiration?: number | null
+          early_exit_signal?: boolean | null
+          final_status?: string | null
+          hit_profit_target?: boolean | null
+          hit_stop_loss?: boolean | null
+          id?: string
+          is_expired?: boolean | null
+          opportunity_id?: string | null
+          realized_pnl?: number | null
+          realized_roi?: number | null
+          strategy_value?: number | null
+          track_date?: string
+          underlying_price?: number | null
+          unrealized_pnl?: number | null
+          unrealized_pnl_percentage?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "options_performance_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "options_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      options_user_interactions: {
+        Row: {
+          education_module_suggested: boolean | null
+          id: string
+          interaction_time: string | null
+          interaction_type: string | null
+          opportunity_id: string | null
+          risk_disclaimer_accepted: boolean | null
+          user_id: string | null
+        }
+        Insert: {
+          education_module_suggested?: boolean | null
+          id?: string
+          interaction_time?: string | null
+          interaction_type?: string | null
+          opportunity_id?: string | null
+          risk_disclaimer_accepted?: boolean | null
+          user_id?: string | null
+        }
+        Update: {
+          education_module_suggested?: boolean | null
+          id?: string
+          interaction_time?: string | null
+          interaction_type?: string | null
+          opportunity_id?: string | null
+          risk_disclaimer_accepted?: boolean | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "options_user_interactions_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "options_opportunities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "options_user_interactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_analytics_dashboard"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "options_user_interactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       performance_metrics: {
         Row: {
           id: string
@@ -1414,6 +1914,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      unusual_options_activity: {
+        Row: {
+          aggressor: string | null
+          created_at: string | null
+          detection_date: string
+          expiration_date: string | null
+          id: string
+          option_symbol: string
+          option_type: string | null
+          sentiment: string | null
+          significance_score: number | null
+          strike_price: number | null
+          symbol: string
+          trade_price: number | null
+          trade_size: number | null
+          volume_oi_ratio: number | null
+          volume_ratio: number | null
+        }
+        Insert: {
+          aggressor?: string | null
+          created_at?: string | null
+          detection_date: string
+          expiration_date?: string | null
+          id?: string
+          option_symbol: string
+          option_type?: string | null
+          sentiment?: string | null
+          significance_score?: number | null
+          strike_price?: number | null
+          symbol: string
+          trade_price?: number | null
+          trade_size?: number | null
+          volume_oi_ratio?: number | null
+          volume_ratio?: number | null
+        }
+        Update: {
+          aggressor?: string | null
+          created_at?: string | null
+          detection_date?: string
+          expiration_date?: string | null
+          id?: string
+          option_symbol?: string
+          option_type?: string | null
+          sentiment?: string | null
+          significance_score?: number | null
+          strike_price?: number | null
+          symbol?: string
+          trade_price?: number | null
+          trade_size?: number | null
+          volume_oi_ratio?: number | null
+          volume_ratio?: number | null
+        }
+        Relationships: []
       }
       user_achievements: {
         Row: {

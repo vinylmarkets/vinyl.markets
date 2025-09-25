@@ -37,6 +37,7 @@ import Portfolio from "./pages/dashboard/Portfolio";
 import SettingsPage from "./pages/dashboard/Settings";
 import Upgrade from "./pages/dashboard/Upgrade";
 import Top20Predictions from "./pages/dashboard/Top20Predictions";
+import OptionsValueTool from "./pages/dashboard/OptionsValueTool";
 import ForumCategory from "./pages/ForumCategory";
 import ForumTopic from "./pages/ForumTopic";
 
@@ -81,6 +82,7 @@ const App = () => {
               <Route path="/dashboard/settings" element={<SettingsPage />} />
               <Route path="/dashboard/upgrade" element={<Upgrade />} />
               <Route path="/dashboard/top20" element={<Top20Predictions />} />
+              <Route path="/dashboard/options" element={<OptionsValueTool />} />
               
               {/* Admin Dashboard Routes */}
               <Route path="/admin-login" element={<AdminLogin />} />
