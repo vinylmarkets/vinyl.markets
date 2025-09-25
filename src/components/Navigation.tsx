@@ -67,7 +67,7 @@ export const Navigation = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-primary hover:text-primary/80 transition-colors"
+            className="md:hidden p-2 text-white hover:text-white/80 transition-colors"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -80,7 +80,7 @@ export const Navigation = () => {
                   <NavigationMenuItem key={item.href}>
                     {item.children ? (
                       <>
-                        <NavigationMenuTrigger className="text-primary hover:text-primary/80 bg-transparent">
+                        <NavigationMenuTrigger className="text-white hover:text-white/80 bg-transparent">
                           {item.title}
                         </NavigationMenuTrigger>
                          <NavigationMenuContent>
@@ -134,7 +134,7 @@ export const Navigation = () => {
                       <NavigationMenuLink asChild>
                         <Link
                           to={item.href}
-                          className="inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors focus:outline-none"
+                          className="inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-white hover:text-white/80 transition-colors focus:outline-none"
                         >
                           {item.title}
                         </Link>
@@ -193,14 +193,14 @@ export const Navigation = () => {
                   variant="ghost"
                   size="sm"
                   onClick={handleAuth}
-                  className="text-primary hover:text-primary/80"
+                  className="text-white hover:text-white/80"
                 >
                   Log In
                 </Button>
                 <Button
                   size="sm"
                   onClick={handleAuth}
-                  className="bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+                  className="bg-primary hover:bg-primary/90 text-black"
                 >
                   Sign Up Free
                 </Button>
@@ -218,7 +218,7 @@ export const Navigation = () => {
                   <Link
                     to={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block text-primary hover:text-primary/80 font-medium py-2 transition-colors"
+                    className="block text-white hover:text-white/80 font-medium py-2 transition-colors"
                   >
                     {item.title}
                   </Link>
@@ -229,7 +229,7 @@ export const Navigation = () => {
                           key={child.href}
                           to={child.href}
                           onClick={() => setMobileMenuOpen(false)}
-                          className="block text-sm text-primary/70 hover:text-primary/90 py-1 transition-colors"
+                          className="block text-sm text-white/70 hover:text-white/90 py-1 transition-colors"
                         >
                           {child.title}
                         </Link>
@@ -261,14 +261,14 @@ export const Navigation = () => {
                     <Link
                       to="/dashboard"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center gap-2 text-primary hover:text-primary/80 py-2 transition-colors"
+                      className="flex items-center gap-2 text-white hover:text-white/80 py-2 transition-colors"
                     >
                       <User className="h-4 w-4" />
                       Dashboard
                     </Link>
                     <button
                       onClick={handleSignOut}
-                      className="flex items-center gap-2 text-primary hover:text-primary/80 py-2 transition-colors w-full text-left"
+                      className="flex items-center gap-2 text-white hover:text-white/80 py-2 transition-colors w-full text-left"
                     >
                       <LogOut className="h-4 w-4" />
                       Sign Out
@@ -284,7 +284,7 @@ export const Navigation = () => {
                       handleAuth();
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full text-primary hover:text-primary/80"
+                    className="w-full text-white hover:text-white/80"
                   >
                     Log In
                   </Button>
@@ -294,7 +294,7 @@ export const Navigation = () => {
                       handleAuth();
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+                    className="w-full bg-primary hover:bg-primary/90 text-black"
                   >
                     Sign Up Free
                   </Button>
