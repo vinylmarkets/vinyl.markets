@@ -1575,6 +1575,760 @@ export type Database = {
           },
         ]
       }
+      paper_accounts: {
+        Row: {
+          account_name: string | null
+          account_type: string | null
+          average_loss: number | null
+          average_win: number | null
+          buying_power: number
+          created_at: string | null
+          current_cash: number
+          day_trades_count: number | null
+          day_trades_reset_date: string | null
+          id: string
+          is_active: boolean | null
+          is_pattern_day_trader: boolean | null
+          last_reset_date: string | null
+          losing_trades: number | null
+          maintenance_requirement: number | null
+          margin_call_price: number | null
+          margin_used: number | null
+          market_value_long: number | null
+          market_value_short: number | null
+          max_drawdown: number | null
+          max_drawdown_date: string | null
+          options_level: number | null
+          profit_factor: number | null
+          reset_count: number | null
+          sharpe_ratio: number | null
+          starting_capital: number
+          total_equity: number
+          total_realized_pnl: number | null
+          total_trades: number | null
+          total_unrealized_pnl: number | null
+          updated_at: string | null
+          user_id: string | null
+          win_rate: number | null
+          winning_trades: number | null
+        }
+        Insert: {
+          account_name?: string | null
+          account_type?: string | null
+          average_loss?: number | null
+          average_win?: number | null
+          buying_power: number
+          created_at?: string | null
+          current_cash: number
+          day_trades_count?: number | null
+          day_trades_reset_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_pattern_day_trader?: boolean | null
+          last_reset_date?: string | null
+          losing_trades?: number | null
+          maintenance_requirement?: number | null
+          margin_call_price?: number | null
+          margin_used?: number | null
+          market_value_long?: number | null
+          market_value_short?: number | null
+          max_drawdown?: number | null
+          max_drawdown_date?: string | null
+          options_level?: number | null
+          profit_factor?: number | null
+          reset_count?: number | null
+          sharpe_ratio?: number | null
+          starting_capital: number
+          total_equity: number
+          total_realized_pnl?: number | null
+          total_trades?: number | null
+          total_unrealized_pnl?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+          win_rate?: number | null
+          winning_trades?: number | null
+        }
+        Update: {
+          account_name?: string | null
+          account_type?: string | null
+          average_loss?: number | null
+          average_win?: number | null
+          buying_power?: number
+          created_at?: string | null
+          current_cash?: number
+          day_trades_count?: number | null
+          day_trades_reset_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_pattern_day_trader?: boolean | null
+          last_reset_date?: string | null
+          losing_trades?: number | null
+          maintenance_requirement?: number | null
+          margin_call_price?: number | null
+          margin_used?: number | null
+          market_value_long?: number | null
+          market_value_short?: number | null
+          max_drawdown?: number | null
+          max_drawdown_date?: string | null
+          options_level?: number | null
+          profit_factor?: number | null
+          reset_count?: number | null
+          sharpe_ratio?: number | null
+          starting_capital?: number
+          total_equity?: number
+          total_realized_pnl?: number | null
+          total_trades?: number | null
+          total_unrealized_pnl?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+          win_rate?: number | null
+          winning_trades?: number | null
+        }
+        Relationships: []
+      }
+      paper_achievements: {
+        Row: {
+          badge_icon: string | null
+          category: string | null
+          created_at: string | null
+          criteria_type: string | null
+          criteria_value: number | null
+          description: string
+          id: string
+          is_active: boolean | null
+          name: string
+          points: number | null
+        }
+        Insert: {
+          badge_icon?: string | null
+          category?: string | null
+          created_at?: string | null
+          criteria_type?: string | null
+          criteria_value?: number | null
+          description: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          points?: number | null
+        }
+        Update: {
+          badge_icon?: string | null
+          category?: string | null
+          created_at?: string | null
+          criteria_type?: string | null
+          criteria_value?: number | null
+          description?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          points?: number | null
+        }
+        Relationships: []
+      }
+      paper_leaderboards: {
+        Row: {
+          account_id: string | null
+          created_at: string | null
+          id: string
+          period: string | null
+          rank: number | null
+          return_percentage: number | null
+          sharpe_ratio: number | null
+          total_points: number | null
+          total_trades: number | null
+          win_rate: number | null
+        }
+        Insert: {
+          account_id?: string | null
+          created_at?: string | null
+          id?: string
+          period?: string | null
+          rank?: number | null
+          return_percentage?: number | null
+          sharpe_ratio?: number | null
+          total_points?: number | null
+          total_trades?: number | null
+          win_rate?: number | null
+        }
+        Update: {
+          account_id?: string | null
+          created_at?: string | null
+          id?: string
+          period?: string | null
+          rank?: number | null
+          return_percentage?: number | null
+          sharpe_ratio?: number | null
+          total_points?: number | null
+          total_trades?: number | null
+          win_rate?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paper_leaderboards_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "paper_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      paper_orders: {
+        Row: {
+          account_id: string | null
+          asset_type: string
+          average_fill_price: number | null
+          cancelled_at: string | null
+          commission: number | null
+          created_at: string | null
+          executed_at: string | null
+          expiration_date: string | null
+          fill_time: string | null
+          filled_quantity: number | null
+          id: string
+          import_id: string | null
+          import_source: string | null
+          is_multi_leg: boolean | null
+          leg_number: number | null
+          limit_price: number | null
+          option_type: string | null
+          order_type: string
+          parent_order_id: string | null
+          quantity: number
+          side: string
+          slippage: number | null
+          status: string | null
+          stop_loss_price: number | null
+          stop_price: number | null
+          strategy_type: string | null
+          strike_price: number | null
+          symbol: string
+          take_profit_price: number | null
+          trade_rationale: string | null
+        }
+        Insert: {
+          account_id?: string | null
+          asset_type: string
+          average_fill_price?: number | null
+          cancelled_at?: string | null
+          commission?: number | null
+          created_at?: string | null
+          executed_at?: string | null
+          expiration_date?: string | null
+          fill_time?: string | null
+          filled_quantity?: number | null
+          id?: string
+          import_id?: string | null
+          import_source?: string | null
+          is_multi_leg?: boolean | null
+          leg_number?: number | null
+          limit_price?: number | null
+          option_type?: string | null
+          order_type: string
+          parent_order_id?: string | null
+          quantity: number
+          side: string
+          slippage?: number | null
+          status?: string | null
+          stop_loss_price?: number | null
+          stop_price?: number | null
+          strategy_type?: string | null
+          strike_price?: number | null
+          symbol: string
+          take_profit_price?: number | null
+          trade_rationale?: string | null
+        }
+        Update: {
+          account_id?: string | null
+          asset_type?: string
+          average_fill_price?: number | null
+          cancelled_at?: string | null
+          commission?: number | null
+          created_at?: string | null
+          executed_at?: string | null
+          expiration_date?: string | null
+          fill_time?: string | null
+          filled_quantity?: number | null
+          id?: string
+          import_id?: string | null
+          import_source?: string | null
+          is_multi_leg?: boolean | null
+          leg_number?: number | null
+          limit_price?: number | null
+          option_type?: string | null
+          order_type?: string
+          parent_order_id?: string | null
+          quantity?: number
+          side?: string
+          slippage?: number | null
+          status?: string | null
+          stop_loss_price?: number | null
+          stop_price?: number | null
+          strategy_type?: string | null
+          strike_price?: number | null
+          symbol?: string
+          take_profit_price?: number | null
+          trade_rationale?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paper_orders_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "paper_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paper_orders_parent_order_id_fkey"
+            columns: ["parent_order_id"]
+            isOneToOne: false
+            referencedRelation: "paper_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      paper_performance_snapshots: {
+        Row: {
+          account_id: string | null
+          beta: number | null
+          cash_balance: number | null
+          correlation_to_spy: number | null
+          created_at: string | null
+          cumulative_pnl: number | null
+          cumulative_return: number | null
+          daily_pnl: number | null
+          daily_pnl_percentage: number | null
+          daily_var: number | null
+          id: string
+          largest_position_size: number | null
+          market_value: number | null
+          positions_count: number | null
+          sector_concentration: Json | null
+          snapshot_date: string
+          total_equity: number | null
+        }
+        Insert: {
+          account_id?: string | null
+          beta?: number | null
+          cash_balance?: number | null
+          correlation_to_spy?: number | null
+          created_at?: string | null
+          cumulative_pnl?: number | null
+          cumulative_return?: number | null
+          daily_pnl?: number | null
+          daily_pnl_percentage?: number | null
+          daily_var?: number | null
+          id?: string
+          largest_position_size?: number | null
+          market_value?: number | null
+          positions_count?: number | null
+          sector_concentration?: Json | null
+          snapshot_date: string
+          total_equity?: number | null
+        }
+        Update: {
+          account_id?: string | null
+          beta?: number | null
+          cash_balance?: number | null
+          correlation_to_spy?: number | null
+          created_at?: string | null
+          cumulative_pnl?: number | null
+          cumulative_return?: number | null
+          daily_pnl?: number | null
+          daily_pnl_percentage?: number | null
+          daily_var?: number | null
+          id?: string
+          largest_position_size?: number | null
+          market_value?: number | null
+          positions_count?: number | null
+          sector_concentration?: Json | null
+          snapshot_date?: string
+          total_equity?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paper_performance_snapshots_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "paper_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      paper_positions: {
+        Row: {
+          account_id: string | null
+          asset_type: string
+          average_cost: number
+          cost_basis: number
+          current_price: number | null
+          daily_pnl: number | null
+          delta: number | null
+          expiration_date: string | null
+          gamma: number | null
+          id: string
+          implied_volatility: number | null
+          market_value: number | null
+          opened_at: string | null
+          option_type: string | null
+          quantity: number
+          rho: number | null
+          side: string
+          strike_price: number | null
+          symbol: string
+          theta: number | null
+          unrealized_pnl: number | null
+          unrealized_pnl_percentage: number | null
+          updated_at: string | null
+          vega: number | null
+        }
+        Insert: {
+          account_id?: string | null
+          asset_type: string
+          average_cost: number
+          cost_basis: number
+          current_price?: number | null
+          daily_pnl?: number | null
+          delta?: number | null
+          expiration_date?: string | null
+          gamma?: number | null
+          id?: string
+          implied_volatility?: number | null
+          market_value?: number | null
+          opened_at?: string | null
+          option_type?: string | null
+          quantity: number
+          rho?: number | null
+          side: string
+          strike_price?: number | null
+          symbol: string
+          theta?: number | null
+          unrealized_pnl?: number | null
+          unrealized_pnl_percentage?: number | null
+          updated_at?: string | null
+          vega?: number | null
+        }
+        Update: {
+          account_id?: string | null
+          asset_type?: string
+          average_cost?: number
+          cost_basis?: number
+          current_price?: number | null
+          daily_pnl?: number | null
+          delta?: number | null
+          expiration_date?: string | null
+          gamma?: number | null
+          id?: string
+          implied_volatility?: number | null
+          market_value?: number | null
+          opened_at?: string | null
+          option_type?: string | null
+          quantity?: number
+          rho?: number | null
+          side?: string
+          strike_price?: number | null
+          symbol?: string
+          theta?: number | null
+          unrealized_pnl?: number | null
+          unrealized_pnl_percentage?: number | null
+          updated_at?: string | null
+          vega?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paper_positions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "paper_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      paper_trade_journal: {
+        Row: {
+          account_id: string | null
+          ai_feedback: string | null
+          ai_suggestions: string | null
+          common_mistakes_detected: Json | null
+          confidence_level: number | null
+          created_at: string | null
+          emotional_state: string | null
+          entry_reason: string | null
+          exit_reason: string | null
+          id: string
+          lessons_learned: string | null
+          mistakes_made: string | null
+          order_id: string | null
+          risk_reward_ratio: number | null
+          trade_grade: string | null
+          trade_setup: string | null
+          updated_at: string | null
+          what_went_well: string | null
+        }
+        Insert: {
+          account_id?: string | null
+          ai_feedback?: string | null
+          ai_suggestions?: string | null
+          common_mistakes_detected?: Json | null
+          confidence_level?: number | null
+          created_at?: string | null
+          emotional_state?: string | null
+          entry_reason?: string | null
+          exit_reason?: string | null
+          id?: string
+          lessons_learned?: string | null
+          mistakes_made?: string | null
+          order_id?: string | null
+          risk_reward_ratio?: number | null
+          trade_grade?: string | null
+          trade_setup?: string | null
+          updated_at?: string | null
+          what_went_well?: string | null
+        }
+        Update: {
+          account_id?: string | null
+          ai_feedback?: string | null
+          ai_suggestions?: string | null
+          common_mistakes_detected?: Json | null
+          confidence_level?: number | null
+          created_at?: string | null
+          emotional_state?: string | null
+          entry_reason?: string | null
+          exit_reason?: string | null
+          id?: string
+          lessons_learned?: string | null
+          mistakes_made?: string | null
+          order_id?: string | null
+          risk_reward_ratio?: number | null
+          trade_grade?: string | null
+          trade_setup?: string | null
+          updated_at?: string | null
+          what_went_well?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paper_trade_journal_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "paper_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paper_trade_journal_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "paper_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      paper_transactions: {
+        Row: {
+          account_id: string | null
+          asset_type: string
+          commission: number | null
+          cost_basis_adjustment: number | null
+          executed_at: string | null
+          expiration_date: string | null
+          id: string
+          notes: string | null
+          option_type: string | null
+          order_id: string | null
+          other_fees: number | null
+          price: number
+          quantity: number
+          realized_pnl: number | null
+          settlement_date: string | null
+          slippage: number | null
+          strike_price: number | null
+          symbol: string
+          total_amount: number
+          transaction_type: string
+        }
+        Insert: {
+          account_id?: string | null
+          asset_type: string
+          commission?: number | null
+          cost_basis_adjustment?: number | null
+          executed_at?: string | null
+          expiration_date?: string | null
+          id?: string
+          notes?: string | null
+          option_type?: string | null
+          order_id?: string | null
+          other_fees?: number | null
+          price: number
+          quantity: number
+          realized_pnl?: number | null
+          settlement_date?: string | null
+          slippage?: number | null
+          strike_price?: number | null
+          symbol: string
+          total_amount: number
+          transaction_type: string
+        }
+        Update: {
+          account_id?: string | null
+          asset_type?: string
+          commission?: number | null
+          cost_basis_adjustment?: number | null
+          executed_at?: string | null
+          expiration_date?: string | null
+          id?: string
+          notes?: string | null
+          option_type?: string | null
+          order_id?: string | null
+          other_fees?: number | null
+          price?: number
+          quantity?: number
+          realized_pnl?: number | null
+          settlement_date?: string | null
+          slippage?: number | null
+          strike_price?: number | null
+          symbol?: string
+          total_amount?: number
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paper_transactions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "paper_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paper_transactions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "paper_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      paper_user_achievements: {
+        Row: {
+          account_id: string | null
+          achievement_id: string | null
+          earned_at: string | null
+          id: string
+          points_earned: number | null
+        }
+        Insert: {
+          account_id?: string | null
+          achievement_id?: string | null
+          earned_at?: string | null
+          id?: string
+          points_earned?: number | null
+        }
+        Update: {
+          account_id?: string | null
+          achievement_id?: string | null
+          earned_at?: string | null
+          id?: string
+          points_earned?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paper_user_achievements_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "paper_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paper_user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "paper_achievements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      paper_watchlist_items: {
+        Row: {
+          asset_type: string
+          created_at: string | null
+          expiration_date: string | null
+          id: string
+          import_id: string | null
+          import_source: string | null
+          imported_at: string | null
+          notes: string | null
+          option_type: string | null
+          strike_price: number | null
+          symbol: string
+          watchlist_id: string | null
+        }
+        Insert: {
+          asset_type: string
+          created_at?: string | null
+          expiration_date?: string | null
+          id?: string
+          import_id?: string | null
+          import_source?: string | null
+          imported_at?: string | null
+          notes?: string | null
+          option_type?: string | null
+          strike_price?: number | null
+          symbol: string
+          watchlist_id?: string | null
+        }
+        Update: {
+          asset_type?: string
+          created_at?: string | null
+          expiration_date?: string | null
+          id?: string
+          import_id?: string | null
+          import_source?: string | null
+          imported_at?: string | null
+          notes?: string | null
+          option_type?: string | null
+          strike_price?: number | null
+          symbol?: string
+          watchlist_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paper_watchlist_items_watchlist_id_fkey"
+            columns: ["watchlist_id"]
+            isOneToOne: false
+            referencedRelation: "paper_watchlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      paper_watchlists: {
+        Row: {
+          account_id: string | null
+          created_at: string | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          account_id?: string | null
+          created_at?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          account_id?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paper_watchlists_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "paper_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       performance_metrics: {
         Row: {
           id: string
