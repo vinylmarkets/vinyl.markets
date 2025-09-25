@@ -32,13 +32,13 @@ export function DashboardHeader() {
   };
 
   return (
-    <header className="h-16 border-b border-border flex items-center justify-between px-6" style={{ backgroundColor: 'hsl(var(--header-background))', color: 'hsl(var(--header-foreground))' }}>
+    <header className="h-16 border-b border-border flex items-center justify-between px-6 bg-white">
       <div className="flex items-center gap-4">
-        <SidebarTrigger className="-ml-1" />
+        <SidebarTrigger className="-ml-1 text-black hover:text-black/80" />
         
         <Link to="/dashboard" className="flex items-center gap-3">
           <img 
-            src="/atomicmarket-logo-white.png" 
+            src="/atomicmarket-logo-black.png" 
             alt="AtomicMarket"
             className="h-8"
           />
@@ -47,7 +47,7 @@ export function DashboardHeader() {
 
       <div className="flex items-center gap-4">
         {/* Notifications */}
-        <Button variant="ghost" size="sm" className="relative">
+        <Button variant="ghost" size="sm" className="relative text-black hover:text-black/80">
           <Bell className="h-4 w-4" />
           <span className="absolute -top-1 -right-1 h-3 w-3 bg-destructive rounded-full text-xs"></span>
         </Button>
