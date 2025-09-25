@@ -208,7 +208,7 @@ export function PredictionCard({ prediction, isPremium, userTier }: PredictionCa
         {/* Primary Factors */}
         <div>
           <p className="text-sm font-medium mb-2">Key Drivers:</p>
-          <div className="p-3 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
+          <div className="p-3 bg-purple-200 dark:bg-purple-800/30 border border-purple-300 dark:border-purple-700 rounded-lg">
             <div className="flex flex-wrap items-center gap-4">
               {Array.isArray(prediction.primary_factors) ? 
                 prediction.primary_factors.slice(0, 3).map((factor: string, index: number) => (

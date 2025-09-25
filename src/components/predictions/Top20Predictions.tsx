@@ -231,7 +231,7 @@ export function Top20Predictions() {
             </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="all" className="space-y-4">
+          <TabsContent value="all" className="space-y-4 p-4 bg-purple-50 dark:bg-purple-900/10 rounded-lg border border-purple-200 dark:border-purple-800">
             <div className="grid gap-4">
               {predictions.map((prediction) => (
                 <PredictionCard
