@@ -44,8 +44,8 @@ export default function Index() {
       {/* Hero Section */}
       <section className="relative py-20 md:py-32 px-4">
         <div className="container mx-auto text-center max-w-4xl">
-          <h1 className="text-4xl md:text-6xl font-serif font-bold text-foreground mb-6 leading-tight">
-            Transform Market Noise Into Educational Intelligence
+          <h1 className="text-4xl md:text-6xl font-headline font-bold text-foreground mb-6 leading-tight">
+            MARKET ANALYTICS YOU CAN UNDERSTAND
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">
             Get daily market analysis with complete transparency - no black box algorithms
