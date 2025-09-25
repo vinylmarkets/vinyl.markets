@@ -353,7 +353,7 @@ const DataSources = () => {
 
             <Card className="border-primary/20">
               <CardContent className="p-6">
-                <h3 className="text-lg font-semibold text-primary mb-4">What Tubeamp Aggregates</h3>
+                <h3 className="text-lg font-semibold text-primary mb-4">What AtomicMarket Aggregates</h3>
                 <div className="space-y-2 text-sm text-muted-foreground">
                   <p>11 distinct real-time data streams</p>
                   <p>Social sentiment with viral detection</p>
@@ -449,7 +449,7 @@ const DataSources = () => {
               <strong>The Bottom Line:</strong> While other platforms guess based on charts, we know based on data. Every data source serves a specific purpose in building the most complete picture possible of market sentiment, institutional activity, and emerging trends.
             </p>
             <p className="text-secondary font-medium">
-              When you see a 73% probability from Tubeamp, it's backed by intelligence streams that most retail traders never see.
+              When you see a 73% probability from AtomicMarket, it's backed by intelligence streams that most retail traders never see.
             </p>
           </div>
 

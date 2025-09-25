@@ -63,8 +63,8 @@ const ResearchIndex = () => {
           </p>
           <div className="w-24 h-1 bg-primary mx-auto mb-8"></div>
           <p className="text-lg text-muted-foreground max-w-4xl mx-auto">
-            Every prediction from Tubeamp is grounded in peer-reviewed research and institutional-grade data. 
-            Unlike black-box trading platforms, we believe you should understand exactly how our analysis works 
+            Every prediction from AtomicMarket is grounded in peer-reviewed research and institutional-grade data. 
+            Unlike black-box trading platforms, we believe you should understand exactly how our analysis works
             and what drives our probability assessments.
           </p>
         </div>

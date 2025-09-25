@@ -9,7 +9,7 @@ const Methodology = () => {
         {/* Hero Section */}
         <header className="mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-            Tubeamp: Transparent Probabilistic Analysis for Retail Trading
+            AtomicMarket: Transparent Probabilistic Analysis for Retail Trading
           </h1>
           <h2 className="text-xl md:text-2xl text-secondary font-medium mb-8">
             Building Market Intelligence Through Educational Transparency
@@ -18,7 +18,7 @@ const Methodology = () => {
             Traditional trading tools treat probability as a black box. We believe the opposite: <strong>understanding why a prediction was made is more valuable than the prediction itself.</strong>
           </p>
           <p className="text-lg text-muted-foreground leading-relaxed mt-4">
-            Tubeamp transforms market analysis from mystical art to accessible science by making our methodology completely transparent, continuously validated, and inherently educational.
+            AtomicMarket transforms market analysis from mystical art to accessible science by making our methodology completely transparent, continuously validated, and inherently educational.
           </p>
         </header>
 
@@ -152,7 +152,7 @@ const Methodology = () => {
 
             <div className="bg-card border border-border rounded-lg p-6">
               <h3 className="text-xl font-semibold text-foreground mb-4">2. User Query Intelligence</h3>
-              <p className="text-muted-foreground mb-4">Our &quot;Ask Tubeamp&quot; terminal captures user questions to:</p>
+              <p className="text-muted-foreground mb-4">Our &quot;Ask AtomicMarket&quot; terminal captures user questions to:</p>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>• Identify knowledge gaps in our methodology</li>
                 <li>• Prioritize feature development based on actual user needs</li>
@@ -377,7 +377,7 @@ const Methodology = () => {
         {/* Disclaimer */}
         <footer className="text-center text-sm text-muted-foreground border-t border-border pt-8">
           <p>
-            <em>Tubeamp is committed to responsible financial education. All probability assessments are for educational purposes and should not be considered investment advice. Past performance does not guarantee future results. We encourage diversification, risk management, and consultation with qualified financial advisors.</em>
+            <em>AtomicMarket is committed to responsible financial education. All probability assessments are for educational purposes and should not be considered investment advice. Past performance does not guarantee future results. We encourage diversification, risk management, and consultation with qualified financial advisors.</em>
           </p>
         </footer>
       </main>

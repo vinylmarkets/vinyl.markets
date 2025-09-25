@@ -41,7 +41,7 @@ interface QueryLimit {
 const initialMessages: Message[] = [
   {
     id: 1,
-    text: "👋 Welcome to Ask TubeAmp! I'm your educational AI assistant for learning about options trading and market analysis. I can help you understand complex financial concepts, research methodologies, and trading strategies.",
+    text: "👋 Welcome to Ask AtomicMarket! I'm your educational AI assistant for learning about options trading and market analysis. I can help you understand complex financial concepts, research methodologies, and trading strategies.",
     isUser: false,
     timestamp: new Date(),
     sources: []
@@ -367,7 +367,7 @@ export default function Terminal() {
     const allSources = [
       "Cremers-Weinbaum (2010) - Deviations from Put-Call Parity",
       "Boehmer & Jones (2021) - Tracking Retail Investor Activity",
-      "TubeAmp Research Library - Options Basics Module",
+      "AtomicMarket Research Library - Options Basics Module",
       "Academic Paper: Glosten-Milgrom Model Analysis",
       "Educational Module: Understanding Market Microstructure",
       "Research Paper: Information Content of Options Trading"
@@ -387,7 +387,7 @@ export default function Terminal() {
             <Bot className="h-8 w-8 text-primary" />
             <div className="absolute -top-1 -right-1 h-3 w-3 bg-secondary rounded-full animate-pulse" />
           </div>
-          <h1 className="text-3xl font-serif font-bold">Ask TubeAmp</h1>
+          <h1 className="text-3xl font-serif font-bold">Ask AtomicMarket</h1>
         </div>
         <p className="text-muted-foreground max-w-2xl mx-auto">
           Your educational AI assistant for learning about options trading, market analysis, and financial research. 
@@ -417,7 +417,7 @@ export default function Terminal() {
       <Alert className="border-2 border-yellow-200 bg-yellow-50">
         <AlertCircle className="h-4 w-4 text-yellow-600" />
         <AlertDescription className="text-sm">
-          <strong>Educational Platform:</strong> TubeAmp provides educational content only. 
+          <strong>Educational Platform:</strong> AtomicMarket provides educational content only. 
           This is not investment advice. All responses are for learning and research purposes.
         </AlertDescription>
       </Alert>

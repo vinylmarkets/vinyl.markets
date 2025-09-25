@@ -152,7 +152,7 @@ export function RegisterForm({ onClose }: RegisterFormProps) {
 
       console.log('Registration successful');
       toast({
-        title: "Welcome to TubeAmp!",
+        title: "Welcome to AtomicMarket!",
         description: "Please check your email to verify your account.",
       });
       
@@ -324,7 +324,7 @@ export function RegisterForm({ onClose }: RegisterFormProps) {
             className={errors.educationalPurpose ? "border-destructive" : ""}
           />
           <Label htmlFor="educationalPurpose" className="text-sm leading-relaxed">
-            I understand that TubeAmp is for <strong>educational purposes only</strong> and does not provide investment advice, financial advice, or recommendations to buy or sell securities.
+            I understand that AtomicMarket is for <strong>educational purposes only</strong> and does not provide investment advice, financial advice, or recommendations to buy or sell securities.
           </Label>
         </div>
         {errors.educationalPurpose && (

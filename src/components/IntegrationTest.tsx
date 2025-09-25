@@ -350,7 +350,7 @@ export default function IntegrationTest() {
           <CheckCircle2 className="h-4 w-4 text-green-600" />
           <AlertDescription>
             <strong>Integration Complete!</strong> Your frontend is successfully connected to Supabase. 
-            You can now test all features including authentication, briefings, and the Ask TubeAmp terminal.
+            You can now test all features including authentication, briefings, and the Ask AtomicMarket terminal.
           </AlertDescription>
         </Alert>
       )}

@@ -161,7 +161,7 @@ export default function MockDashboard() {
             </CardContent>
           </Card>
 
-          {/* Recent Ask TubeAmp Queries */}
+          {/* Recent Ask AtomicMarket Queries */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -248,7 +248,7 @@ export default function MockDashboard() {
               <ul className="space-y-2 text-sm mb-4">
                 <li className="flex items-center gap-2">
                   <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
-                  Unlimited Ask TubeAmp queries
+                  Unlimited Ask AtomicMarket queries
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
@@ -274,7 +274,7 @@ export default function MockDashboard() {
               <div className="space-y-2">
                 <h3 className="font-semibold text-sm">Educational Platform Notice</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  TubeAmp provides educational market analysis and research for learning purposes only. 
+                  AtomicMarket provides educational market analysis and research for learning purposes only. 
                   This is not investment advice, financial advice, or recommendations to buy or sell securities.
                 </p>
               </div>
