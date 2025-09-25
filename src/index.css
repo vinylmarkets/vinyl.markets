@@ -130,6 +130,12 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 
+  /* Apply VINYL font to all heading elements */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-headline);
+    font-weight: 400;
+  }
+
   /* Stock Ticker Animation */
   @keyframes scroll {
     0% {
