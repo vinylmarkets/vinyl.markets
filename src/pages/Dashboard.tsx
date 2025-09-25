@@ -268,33 +268,33 @@ export default function Dashboard() {
 
           {/* Upgrade Prompt (for free tier) */}
           {userTier === "free" && (
-            <Card className="border-2 border-dashed border-yellow-200 bg-gradient-to-br from-yellow-50 to-orange-50">
+            <Card className="border-2 border-dashed border-primary/30 bg-gradient-to-br from-primary/10 to-primary/20">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <Crown className="h-5 w-5 text-yellow-600" />
+                  <Crown className="h-5 w-5 text-primary" />
                   Unlock More Features
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm mb-4">
                   <li className="flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-yellow-600"></div>
+                    <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
                     Unlimited Ask AtomicMarket queries
                   </li>
                   <li className="flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-yellow-600"></div>
+                    <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
                     Advanced portfolio tracking
                   </li>
                   <li className="flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-yellow-600"></div>
+                    <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
                     Real-time market alerts
                   </li>
                   <li className="flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-yellow-600"></div>
+                    <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
                     Weekly deep-dive reports
                   </li>
                 </ul>
-                <Button size="sm" className="w-full bg-yellow-600 hover:bg-yellow-700 text-white">
+                <Button size="sm" className="w-full bg-accent hover:bg-accent/80 text-accent-foreground">
                   Upgrade to Essential - $29/mo
                 </Button>
               </CardContent>
