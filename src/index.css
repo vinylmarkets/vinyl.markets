@@ -136,11 +136,11 @@ All colors MUST be HSL.
     font-weight: 400;
   }
 
-  /* Apply VINYL font and uppercase to all font-serif elements */
-  .font-serif {
+  /* Apply VINYL font and uppercase to all font-serif elements - HIGH SPECIFICITY */
+  .font-serif, h1.font-serif, h2.font-serif, h3.font-serif, h4.font-serif, h5.font-serif, h6.font-serif {
     font-family: var(--font-headline) !important;
-    text-transform: uppercase;
-    font-weight: 400;
+    text-transform: uppercase !important;
+    font-weight: 400 !important;
   }
 
   /* Apply Inter Bold to all font-semibold elements */
