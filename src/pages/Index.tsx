@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Navigation } from "@/components/Navigation";
-import homeBackground from "../assets/home_background.jpg";
+import heroGradientBackground from "../assets/hero-gradient-background.jpg";
 
 import { 
   TrendingUp, 
@@ -48,7 +48,7 @@ export default function Index() {
       <section 
         className="relative py-20 md:py-32 px-4 bg-cover bg-center bg-no-repeat"
         style={{ 
-          backgroundImage: `url(${homeBackground})`,
+          backgroundImage: `url(${heroGradientBackground})`,
           minHeight: '500px'
         }}
       >
