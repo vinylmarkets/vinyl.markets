@@ -164,9 +164,9 @@ export function DashboardSidebar() {
         {!isCollapsed && userTier === "free" && (
           <SidebarGroup>
             <SidebarGroupContent>
-              <div className="mx-2 p-3 bg-gradient-to-br from-secondary/20 to-secondary/10 rounded-lg border">
+              <div className="mx-2 p-3 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg border">
                 <div className="flex items-center gap-2 mb-2">
-                  <Crown className="h-4 w-4 text-yellow-500" />
+                  <Crown className="h-4 w-4 text-primary" />
                   <span className="text-sm font-medium">Upgrade</span>
                 </div>
                 <p className="text-xs text-muted-foreground mb-3">
@@ -174,7 +174,7 @@ export function DashboardSidebar() {
                 </p>
                 <NavLink 
                   to="/dashboard/upgrade" 
-                  className="block text-center bg-secondary text-secondary-foreground py-1.5 px-3 rounded text-xs font-medium hover:bg-secondary/90 transition-colors"
+                  className="block text-center bg-accent text-accent-foreground py-1.5 px-3 rounded text-xs font-medium hover:bg-accent/90 transition-colors"
                 >
                   View Plans
                 </NavLink>
