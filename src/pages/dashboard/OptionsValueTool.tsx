@@ -60,45 +60,12 @@ const OptionsValueTool = () => {
   });
   const [selectedCategory, setSelectedCategory] = useState<string>('spreads');
   const [loading, setLoading] = useState(true);
-  const [showRiskDisclaimer, setShowRiskDisclaimer] = useState(true); // Start with true to show disclaimer
+  const [showRiskDisclaimer, setShowRiskDisclaimer] = useState(true);
   const [riskAccepted, setRiskAccepted] = useState(false);
   const [userTier, setUserTier] = useState<string>('free');
 
-  console.log('OptionsValueTool rendering:', { user: !!user, authLoading, loading, showRiskDisclaimer, riskAccepted });
-
-  // If still loading auth, show loading state
-  if (authLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="h-8 bg-muted animate-pulse rounded" />
-        <div className="grid gap-4">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="h-48 bg-muted animate-pulse rounded-lg" />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  // If not authenticated, show message
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Authentication Required</h2>
-          <p className="text-muted-foreground mb-4">
-            Please log in to access the Options Value Tool.
-          </p>
-          <Button onClick={() => window.location.href = '/auth'}>
-            Go to Login
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
+  // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL LOGIC
   useEffect(() => {
-    console.log('OptionsValueTool useEffect triggered:', { user, riskAccepted });
     if (user) {
       checkUserTier();
     }
@@ -107,13 +74,9 @@ const OptionsValueTool = () => {
     }
   }, [user, riskAccepted]);
 
+  // Define all functions after hooks but before conditional returns
   const checkUserTier = async () => {
-    if (!user) {
-      console.log('No user available for tier check');
-      return;
-    }
-    
-    console.log('Checking user tier for user:', user.id);
+    if (!user) return;
     
     try {
       const { data, error } = await supabase
@@ -122,12 +85,9 @@ const OptionsValueTool = () => {
         .eq('id', user.id)
         .maybeSingle();
       
-      console.log('User tier query result:', { data, error });
-      
       if (data) {
         setUserTier(data.subscription_tier || 'free');
       } else {
-        // User might not exist in users table, use default
         setUserTier('free');
       }
     } catch (error) {
@@ -138,7 +98,6 @@ const OptionsValueTool = () => {
 
   const loadOpportunities = async () => {
     try {
-      console.log('Loading opportunities...');
       setLoading(true);
       const today = new Date().toISOString().split('T')[0];
       
@@ -150,8 +109,6 @@ const OptionsValueTool = () => {
         `)
         .eq('analysis_date', today)
         .order('rank', { ascending: true });
-
-      console.log('Options opportunities query result:', { data, error, today });
 
       if (error) {
         console.error('Error loading opportunities:', error);
@@ -166,14 +123,12 @@ const OptionsValueTool = () => {
           directional: data.filter(d => d.category === 'directional') as OptionsOpportunity[],
           income: data.filter(d => d.category === 'income') as OptionsOpportunity[]
         };
-        console.log('Grouped opportunities:', grouped);
         setOpportunities(grouped);
       }
     } catch (error) {
       console.error('Error:', error);
       toast.error('An error occurred while loading data');
     } finally {
-      console.log('Loading complete');
       setLoading(false);
     }
   };
@@ -214,12 +169,6 @@ const OptionsValueTool = () => {
     }
   };
 
-  const getRiskColor = (riskScore: number) => {
-    if (riskScore <= 3) return "bg-emerald-100 text-emerald-800";
-    if (riskScore <= 6) return "bg-yellow-100 text-yellow-800";
-    return "bg-red-100 text-red-800";
-  };
-
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -231,7 +180,36 @@ const OptionsValueTool = () => {
     return userTier !== 'free' || rank >= 11;
   };
 
-  // Don't show loading skeleton if we're waiting for risk disclaimer
+  // NOW conditional rendering can happen after all hooks are defined
+  if (authLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="h-8 bg-muted animate-pulse rounded" />
+        <div className="grid gap-4">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-48 bg-muted animate-pulse rounded-lg" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Authentication Required</h2>
+          <p className="text-muted-foreground mb-4">
+            Please log in to access the Options Value Tool.
+          </p>
+          <Button onClick={() => window.location.href = '/auth'}>
+            Go to Login
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   if (loading && riskAccepted) {
     return (
       <div className="space-y-6">
@@ -410,13 +388,6 @@ const OpportunityCard: React.FC<OpportunityCardProps> = ({
       style: 'currency',
       currency: 'USD'
     }).format(amount);
-  };
-
-  const getRiskColor = (riskScore: number | null) => {
-    if (!riskScore) return "bg-muted text-muted-foreground";
-    if (riskScore <= 3) return "bg-emerald-100 text-emerald-800 border-emerald-200";
-    if (riskScore <= 6) return "bg-yellow-100 text-yellow-800 border-yellow-200";
-    return "bg-red-100 text-red-800 border-red-200";
   };
 
   const getRiskBadge = (riskScore: number | null) => {
