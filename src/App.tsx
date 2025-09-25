@@ -49,6 +49,7 @@ import ProductIntelligence from "./pages/admin/ProductIntelligence";
 import ContentPerformance from "./pages/admin/ContentPerformance";
 import BusinessMetrics from "./pages/admin/BusinessMetrics";
 import ComplianceMonitoring from "./pages/admin/ComplianceMonitoring";
+import AlgorithmPerformance from "./pages/admin/AlgorithmPerformance";
 import ForumPage from "./pages/forum/ForumPage";
 import Auth from "./pages/Auth";
 
@@ -89,6 +90,7 @@ const App = () => {
               <Route path="/admin/content-performance" element={<AdminProtected><ContentPerformance /></AdminProtected>} />
               <Route path="/admin/business-metrics" element={<AdminProtected><BusinessMetrics /></AdminProtected>} />
               <Route path="/admin/compliance-monitoring" element={<AdminProtected><ComplianceMonitoring /></AdminProtected>} />
+              <Route path="/admin/algorithm-performance" element={<AdminProtected><AlgorithmPerformance /></AdminProtected>} />
               
               <Route path="/dashboard-test" element={<DashboardTest />} />
               <Route path="/dashboard-old" element={<Dashboard />} />

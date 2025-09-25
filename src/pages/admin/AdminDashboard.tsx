@@ -124,6 +124,18 @@ export default function AdminDashboard() {
       ]
     },
     {
+      title: "Algorithm Performance",
+      description: "Algorithm accuracy metrics, signal analysis, and optimization recommendations",
+      icon: Brain,
+      href: "/admin/algorithm-performance",
+      color: "text-indigo-600",
+      bgColor: "bg-indigo-50",
+      metrics: [
+        { label: "Accuracy", value: "73.2%" },
+        { label: "Confidence", value: "82%" }
+      ]
+    },
+    {
       title: "Compliance Monitoring",
       description: "Risk management, content flags, and regulatory compliance",
       icon: Shield,
