@@ -38,7 +38,7 @@ export function DashboardHeader() {
         
         <Link to="/dashboard" className="flex items-center gap-3">
           <img 
-            src="/atomicmarket-logo.png" 
+            src="/atomicmarket-logo-white.png" 
             alt="AtomicMarket"
             className="h-8"
           />
