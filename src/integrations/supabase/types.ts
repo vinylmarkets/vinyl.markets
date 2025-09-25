@@ -1901,6 +1901,10 @@ export type Database = {
         Args: { query_text: string }
         Returns: undefined
       }
+      calculate_daily_algorithm_performance: {
+        Args: { target_date?: string }
+        Returns: undefined
+      }
       check_and_award_achievements: {
         Args: { user_uuid: string }
         Returns: undefined
