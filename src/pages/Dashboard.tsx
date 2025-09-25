@@ -180,7 +180,7 @@ export default function Dashboard() {
                   <p className="text-sm text-muted-foreground">Briefings Read</p>
                   <p className="text-2xl font-bold">{mockStats.briefingsRead}</p>
                 </div>
-                <BookOpen className="h-8 w-8 text-secondary" />
+                <BookOpen className="h-8 w-8 text-primary" />
               </div>
             </CardContent>
           </Card>
@@ -192,7 +192,7 @@ export default function Dashboard() {
                   <p className="text-sm text-muted-foreground">Questions Asked</p>
                   <p className="text-2xl font-bold">{mockStats.questionsAsked}</p>
                 </div>
-                <MessageSquare className="h-8 w-8 text-secondary" />
+                <MessageSquare className="h-8 w-8 text-primary" />
               </div>
             </CardContent>
           </Card>
@@ -204,7 +204,7 @@ export default function Dashboard() {
                   <p className="text-sm text-muted-foreground">Learning Streak</p>
                   <p className="text-2xl font-bold">{mockStats.learningStreak} days</p>
                 </div>
-                <Target className="h-8 w-8 text-secondary" />
+                <Target className="h-8 w-8 text-primary" />
               </div>
             </CardContent>
           </Card>
@@ -216,7 +216,7 @@ export default function Dashboard() {
                   <p className="text-sm text-muted-foreground">Achievements</p>
                   <p className="text-2xl font-bold">{mockStats.achievementsEarned}</p>
                 </div>
-                <Award className="h-8 w-8 text-secondary" />
+                <Award className="h-8 w-8 text-primary" />
               </div>
             </CardContent>
           </Card>
@@ -232,7 +232,7 @@ export default function Dashboard() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
-                <TrendingUp className="h-5 w-5 text-secondary" />
+                <TrendingUp className="h-5 w-5 text-primary" />
                 Learning Progress
               </CardTitle>
             </CardHeader>
@@ -305,7 +305,7 @@ export default function Dashboard() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
-                <BarChart3 className="h-5 w-5 text-secondary" />
+                <BarChart3 className="h-5 w-5 text-primary" />
                 Quick Actions
               </CardTitle>
             </CardHeader>

@@ -87,7 +87,7 @@ export default function MockDashboard() {
                   <p className="text-sm text-muted-foreground">Briefings Read</p>
                   <p className="text-2xl font-bold">{mockStats.briefingsRead}</p>
                 </div>
-                <BookOpen className="h-8 w-8 text-secondary" />
+                <BookOpen className="h-8 w-8 text-primary" />
               </div>
             </CardContent>
           </Card>
@@ -99,7 +99,7 @@ export default function MockDashboard() {
                   <p className="text-sm text-muted-foreground">Questions Asked</p>
                   <p className="text-2xl font-bold">{mockStats.questionsAsked}</p>
                 </div>
-                <MessageSquare className="h-8 w-8 text-secondary" />
+                <MessageSquare className="h-8 w-8 text-primary" />
               </div>
             </CardContent>
           </Card>
@@ -111,7 +111,7 @@ export default function MockDashboard() {
                   <p className="text-sm text-muted-foreground">Learning Streak</p>
                   <p className="text-2xl font-bold">{mockStats.learningStreak} days</p>
                 </div>
-                <Target className="h-8 w-8 text-secondary" />
+                <Target className="h-8 w-8 text-primary" />
               </div>
             </CardContent>
           </Card>
@@ -123,7 +123,7 @@ export default function MockDashboard() {
                   <p className="text-sm text-muted-foreground">Achievements</p>
                   <p className="text-2xl font-bold">{mockStats.achievementsEarned}</p>
                 </div>
-                <Award className="h-8 w-8 text-secondary" />
+                <Award className="h-8 w-8 text-primary" />
               </div>
             </CardContent>
           </Card>
@@ -135,7 +135,7 @@ export default function MockDashboard() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-secondary" />
+                  <Calendar className="h-5 w-5 text-primary" />
                   Today's Intelligence
                 </CardTitle>
                 <Badge variant="secondary" className="bg-secondary/20 text-secondary">
@@ -165,7 +165,7 @@ export default function MockDashboard() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="h-5 w-5 text-secondary" />
+                <MessageSquare className="h-5 w-5 text-primary" />
                 Recent Questions
               </CardTitle>
             </CardHeader>
@@ -202,7 +202,7 @@ export default function MockDashboard() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
-                <TrendingUp className="h-5 w-5 text-secondary" />
+                <TrendingUp className="h-5 w-5 text-primary" />
                 Learning Progress
               </CardTitle>
             </CardHeader>

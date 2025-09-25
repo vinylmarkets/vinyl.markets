@@ -27,7 +27,7 @@ export function IntelligenceBriefing() {
   };
 
   const getIcon = (probability: number) => {
-    if (probability > 0.6) return <TrendingUp className="w-5 h-5 text-secondary" />;
+    if (probability > 0.6) return <TrendingUp className="w-5 h-5 text-primary" />;
     if (probability < 0.4) return <TrendingDown className="w-5 h-5 text-destructive" />;
     return <Minus className="w-5 h-5 text-primary" />;
   };

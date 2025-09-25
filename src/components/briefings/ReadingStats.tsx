@@ -19,7 +19,7 @@ export const ReadingStats = ({ publicationDate, contentLength, stocksCount, cate
       case 'individual-stock':
         return <BookOpen className="w-4 h-4 text-amber" />;
       default:
-        return <Eye className="w-4 h-4 text-secondary" />;
+        return <Eye className="w-4 h-4 text-primary" />;
     }
   };
 

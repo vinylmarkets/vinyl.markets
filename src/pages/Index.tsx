@@ -79,7 +79,7 @@ export default function Index() {
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center">
-              <BookOpen className="h-12 w-12 text-secondary mx-auto mb-4" />
+              <BookOpen className="h-12 w-12 text-primary mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">Academic & Plain Speak</h3>
               <p className="text-muted-foreground text-sm">
                 Choose your explanation style - from peer-reviewed research to everyday language
@@ -87,7 +87,7 @@ export default function Index() {
             </div>
             
             <div className="text-center">
-              <Eye className="h-12 w-12 text-secondary mx-auto mb-4" />
+              <Eye className="h-12 w-12 text-primary mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">Complete Transparency</h3>
               <p className="text-muted-foreground text-sm">
                 See exactly how we reach every conclusion - methodology fully exposed
@@ -95,7 +95,7 @@ export default function Index() {
             </div>
             
             <div className="text-center">
-              <Shield className="h-12 w-12 text-secondary mx-auto mb-4" />
+              <Shield className="h-12 w-12 text-primary mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">Educational Focus</h3>
               <p className="text-muted-foreground text-sm">
                 Learn market analysis - this is education, not investment advice
@@ -103,7 +103,7 @@ export default function Index() {
             </div>
             
             <div className="text-center">
-              <Terminal className="h-12 w-12 text-secondary mx-auto mb-4" />
+              <Terminal className="h-12 w-12 text-primary mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">AI-Powered Ask AtomicMarket</h3>
               <p className="text-muted-foreground text-sm">
                 Interactive terminal for personalized market education and analysis
@@ -160,7 +160,7 @@ export default function Index() {
                   </Badge>
                 </div>
                 <div className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-secondary" />
+                  <TrendingUp className="h-5 w-5 text-primary" />
                   <span className="text-sm font-medium">High Confidence</span>
                 </div>
               </div>
@@ -201,19 +201,19 @@ export default function Index() {
               <CardContent>
                 <ul className="space-y-3">
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-secondary" />
+                    <CheckCircle className="h-4 w-4 text-primary" />
                     <span className="text-sm">Daily market briefing</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-secondary" />
+                    <CheckCircle className="h-4 w-4 text-primary" />
                     <span className="text-sm">Academic/Plain speak toggle</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-secondary" />
+                    <CheckCircle className="h-4 w-4 text-primary" />
                     <span className="text-sm">Research methodology access</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-secondary" />
+                    <CheckCircle className="h-4 w-4 text-primary" />
                     <span className="text-sm">5 Ask AtomicMarket queries/day</span>
                   </li>
                 </ul>
@@ -313,7 +313,7 @@ export default function Index() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <Card>
               <CardHeader>
-                <BarChart3 className="h-8 w-8 text-secondary mb-2" />
+                <BarChart3 className="h-8 w-8 text-primary mb-2" />
                 <CardTitle className="text-lg">Real-Time Analysis</CardTitle>
               </CardHeader>
               <CardContent>
@@ -325,7 +325,7 @@ export default function Index() {
 
             <Card>
               <CardHeader>
-                <FileText className="h-8 w-8 text-secondary mb-2" />
+                <FileText className="h-8 w-8 text-primary mb-2" />
                 <CardTitle className="text-lg">Research Archive</CardTitle>
               </CardHeader>
               <CardContent>
@@ -337,7 +337,7 @@ export default function Index() {
 
             <Card>
               <CardHeader>
-                <Users className="h-8 w-8 text-secondary mb-2" />
+                <Users className="h-8 w-8 text-primary mb-2" />
                 <CardTitle className="text-lg">Community Learning</CardTitle>
               </CardHeader>
               <CardContent>
