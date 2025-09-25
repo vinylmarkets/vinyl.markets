@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { IntelligenceBriefing } from "@/components/intelligence-briefing";
-import { AskTubeAmp } from "@/components/ask-tubeamp";
+import { AskAtomicMarket } from "@/components/ask-atomicmarket";
 import { 
   BookOpen, 
   TrendingUp, 
@@ -229,7 +229,7 @@ export default function Dashboard() {
             <IntelligenceBriefing />
           </div>
           <div>
-            <AskTubeAmp />
+            <AskAtomicMarket />
           </div>
         </div>
 
@@ -285,7 +285,7 @@ export default function Dashboard() {
                 <ul className="space-y-2 text-sm mb-4">
                   <li className="flex items-center gap-2">
                     <div className="h-1.5 w-1.5 rounded-full bg-yellow-600"></div>
-                    Unlimited Ask TubeAmp queries
+                    Unlimited Ask AtomicMarket queries
                   </li>
                   <li className="flex items-center gap-2">
                     <div className="h-1.5 w-1.5 rounded-full bg-yellow-600"></div>
@@ -342,7 +342,7 @@ export default function Dashboard() {
               <div className="space-y-2">
                 <h3 className="font-semibold text-sm">Educational Platform Notice</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  TubeAmp provides educational market analysis and research for learning purposes only. 
+                  AtomicMarket provides educational market analysis and research for learning purposes only. 
                   This is not investment advice, financial advice, or recommendations to buy or sell securities. 
                   All content is for educational and informational purposes. Please consult with qualified 
                   financial professionals before making investment decisions.

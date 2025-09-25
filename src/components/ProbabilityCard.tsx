@@ -94,7 +94,7 @@ export const ProbabilityCard = ({
 
         <div className="mt-3 md:mt-4 p-3 md:p-4 bg-muted/30 rounded-lg border border-border/20">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs md:text-sm font-medium text-primary">Tubeamp Report</span>
+            <span className="text-xs md:text-sm font-medium text-primary">AtomicMarket Report</span>
           </div>
           <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">{aiSummary}</p>
         </div>

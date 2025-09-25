@@ -140,7 +140,7 @@ export function LoginForm({ onClose }: LoginFormProps) {
 
       {/* Educational Reminder */}
       <div className="text-xs text-center text-muted-foreground bg-muted/50 p-3 rounded-md">
-        🎓 Remember: TubeAmp is for educational purposes only, not investment advice.
+        🎓 Remember: AtomicMarket is for educational purposes only, not investment advice.
       </div>
     </form>
   );

@@ -18,7 +18,7 @@ export function AuthModal({ isOpen, onClose, initialTab = 'login' }: AuthModalPr
       <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-serif text-center">
-            {activeTab === 'login' ? 'Welcome Back' : 'Join TubeAmp'}
+            {activeTab === 'login' ? 'Welcome Back' : 'Join AtomicMarket'}
           </DialogTitle>
         </DialogHeader>
 

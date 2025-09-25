@@ -57,10 +57,12 @@ export const Navigation = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded bg-secondary flex items-center justify-center">
-              <Zap className="w-5 h-5 text-white" />
-            </div>
-            <h1 className="text-2xl font-bold" style={{ color: 'hsl(var(--header-foreground))' }}>Tubeamp</h1>
+            <img 
+              src="/src/assets/atomicmarket-icon.svg" 
+              alt="AtomicMarket"
+              className="w-8 h-8"
+            />
+            <h1 className="text-2xl font-headline font-bold" style={{ color: 'hsl(var(--header-foreground))' }}>AtomicMarket</h1>
           </Link>
 
           {/* Mobile Menu Button */}
@@ -144,7 +146,7 @@ export const Navigation = () => {
               </NavigationMenuList>
             </NavigationMenu>
 
-            {/* Terminal-style Ask Tubeamp - Desktop */}
+            {/* Terminal-style Ask AtomicMarket - Desktop */}
             <div className="flex items-center gap-2 bg-black/90 border border-secondary/30 rounded px-3 py-2">
               <span className="text-secondary text-sm font-mono">$</span>
               <div className="relative flex items-center">
@@ -155,7 +157,7 @@ export const Navigation = () => {
                   onChange={(e) => setTerminalValue(e.target.value)}
                   onFocus={() => setIsFocused(true)}
                   onBlur={() => setIsFocused(false)}
-                  placeholder="Ask Tubeamp anything..."
+                  placeholder="Ask AtomicMarket anything..."
                   className="bg-transparent text-secondary text-sm font-mono placeholder:text-secondary/50 focus:outline-none w-48"
                 />
                 <span className={`text-secondary font-mono text-sm ml-0.5 animate-pulse`}>|</span>
@@ -324,7 +326,7 @@ export const Navigation = () => {
               )}
             </nav>
 
-            {/* Terminal-style Ask Tubeamp - Mobile */}
+            {/* Terminal-style Ask AtomicMarket - Mobile */}
             <div className="mt-6">
               <div className="flex items-center gap-2 bg-black/90 border border-secondary/30 rounded px-3 py-2">
                 <span className="text-secondary text-sm font-mono">$</span>
@@ -335,7 +337,7 @@ export const Navigation = () => {
                     onChange={(e) => setTerminalValue(e.target.value)}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
-                    placeholder="Ask Tubeamp anything..."
+                    placeholder="Ask AtomicMarket anything..."
                     className="bg-transparent text-secondary text-sm font-mono placeholder:text-secondary/50 focus:outline-none w-full"
                   />
                   <span className={`text-secondary font-mono text-sm ml-0.5 animate-pulse`}>|</span>

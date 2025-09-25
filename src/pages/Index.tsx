@@ -94,7 +94,7 @@ export default function Index() {
             
             <div className="text-center">
               <Terminal className="h-12 w-12 text-secondary mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">AI-Powered Ask TubeAmp</h3>
+              <h3 className="text-lg font-semibold mb-2">AI-Powered Ask AtomicMarket</h3>
               <p className="text-muted-foreground text-sm">
                 Interactive terminal for personalized market education and analysis
               </p>
@@ -204,7 +204,7 @@ export default function Index() {
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-secondary" />
-                    <span className="text-sm">5 Ask TubeAmp queries/day</span>
+                    <span className="text-sm">5 Ask AtomicMarket queries/day</span>
                   </li>
                 </ul>
                 <Button className="w-full mt-6" variant="outline">
@@ -239,7 +239,7 @@ export default function Index() {
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-secondary" />
-                    <span className="text-sm">100 Ask TubeAmp queries/day</span>
+                    <span className="text-sm">100 Ask AtomicMarket queries/day</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-secondary" />
@@ -275,7 +275,7 @@ export default function Index() {
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-secondary" />
-                    <span className="text-sm">Unlimited Ask TubeAmp</span>
+                    <span className="text-sm">Unlimited AtomicMarket</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-secondary" />
@@ -388,7 +388,7 @@ export default function Index() {
             <div className="flex items-start gap-2">
               <AlertTriangle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
               <p>
-                <strong>Educational Content Only:</strong> TubeAmp provides educational market analysis and research. This is not investment advice, financial advice, or recommendations to buy or sell securities. All content is for educational and informational purposes only.
+                <strong>Educational Content Only:</strong> AtomicMarket provides educational market analysis and research. This is not investment advice, financial advice, or recommendations to buy or sell securities. All content is for educational and informational purposes only.
               </p>
             </div>
             
@@ -402,7 +402,7 @@ export default function Index() {
             <div className="flex items-start gap-2">
               <AlertTriangle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
               <p>
-                <strong>No Financial Services:</strong> TubeAmp is not a registered investment advisor, broker-dealer, or financial services provider. We do not provide personalized investment advice or manage assets. Our platform is designed for educational purposes and market research transparency.
+                <strong>No Financial Services:</strong> AtomicMarket is not a registered investment advisor, broker-dealer, or financial services provider. We do not provide personalized investment advice or manage assets. Our platform is designed for educational purposes and market research transparency.
               </p>
             </div>
           </div>
@@ -410,7 +410,7 @@ export default function Index() {
           <Separator className="my-8" />
           
           <div className="text-center text-sm text-muted-foreground">
-            <p>&copy; 2024 TubeAmp. All rights reserved. Built for market education and research transparency.</p>
+            <p>&copy; 2024 AtomicMarket. All rights reserved. Built for market education and research transparency.</p>
           </div>
         </div>
       </footer>

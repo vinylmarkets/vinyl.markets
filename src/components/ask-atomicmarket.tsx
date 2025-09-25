@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export function AskTubeAmp() {
+export function AskAtomicMarket() {
   const [query, setQuery] = useState('');
   const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
@@ -146,7 +146,7 @@ Error: ${error.message}
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="bg-card rounded-lg shadow-lg p-6 border">
-        <h2 className="text-2xl font-bold mb-4 text-foreground">Ask TubeAmp Terminal</h2>
+        <h2 className="text-2xl font-headline font-bold mb-4 text-foreground">Ask AtomicMarket Terminal</h2>
         
         <form onSubmit={handleSubmit} className="mb-6">
           <div className="flex gap-2">
