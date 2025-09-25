@@ -9,7 +9,7 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* AtomicMarket Brand Design System */
-    --background: 45 15% 94%; /* Slightly darker warm creme background */
+    --background: 45 15% 79%; /* Darkened creme background by 15% */
     --foreground: 0 0% 13%;
 
     --card: 0 0% 100%; /* Keep cards pure white */
@@ -134,10 +134,18 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 
-  /* Apply VINYL font to all heading elements */
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-headline);
-    font-weight: 400;
+  /* H1 and H2: UPPERCASE VINYL font */
+  h1, h2 {
+    font-family: var(--font-headline) !important;
+    text-transform: uppercase !important;
+    font-weight: 400 !important;
+  }
+
+  /* H3-H6: BOLD INTER font */
+  h3, h4, h5, h6 {
+    font-family: var(--font-sans) !important;
+    font-weight: 700 !important;
+    text-transform: none !important;
   }
 
   /* Apply VINYL font and uppercase to all font-serif elements - HIGH SPECIFICITY */
