@@ -32,15 +32,16 @@ export function DashboardHeader() {
   };
 
   return (
-    <header className="h-16 border-b border-border bg-background flex items-center justify-between px-6">
+    <header className="h-16 border-b border-border flex items-center justify-between px-6" style={{ backgroundColor: 'hsl(var(--header-background))', color: 'hsl(var(--header-foreground))' }}>
       <div className="flex items-center gap-4">
         <SidebarTrigger className="-ml-1" />
         
         <Link to="/dashboard" className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded bg-secondary flex items-center justify-center">
-            <Zap className="w-5 h-5 text-white" />
-          </div>
-          <h1 className="text-xl font-headline font-bold text-foreground">AtomicMarket</h1>
+          <img 
+            src="/atomicmarket-logo.png" 
+            alt="AtomicMarket"
+            className="h-8"
+          />
         </Link>
       </div>
 

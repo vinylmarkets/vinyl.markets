@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { IntelligenceBriefing } from "@/components/intelligence-briefing";
-import { AskAtomicMarket } from "@/components/ask-atomicmarket";
 import { 
   BookOpen, 
   TrendingUp, 
@@ -223,14 +222,9 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* Real-time Intelligence and Query Interface */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <div>
-            <IntelligenceBriefing />
-          </div>
-          <div>
-            <AskAtomicMarket />
-          </div>
+        {/* Real-time Intelligence */}
+        <div className="mb-8">
+          <IntelligenceBriefing />
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">

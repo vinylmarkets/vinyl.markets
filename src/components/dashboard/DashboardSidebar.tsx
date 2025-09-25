@@ -39,7 +39,7 @@ const navigationItems = [
     icon: FileText,
   },
   {
-    title: "Ask AtomicMarket",
+    title: "Analytics Terminal",
     url: "/dashboard/terminal",
     icon: Terminal,
   },
