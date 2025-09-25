@@ -420,7 +420,7 @@ export default function Index() {
           <Separator className="my-8" />
           
           <div className="text-center text-sm text-muted-foreground">
-            <p>&copy; 2024 AtomicMarket. All rights reserved. Built for market education and research transparency.</p>
+            <p>&copy; 2025 AtomicMarket. All rights reserved. Built for market education and research transparency.</p>
           </div>
         </div>
       </footer>
