@@ -3278,6 +3278,10 @@ export type Database = {
         }
         Returns: string
       }
+      update_paper_account_equity: {
+        Args: { account_uuid: string }
+        Returns: undefined
+      }
       update_user_engagement: {
         Args: { p_event_type: string; p_user_id: string }
         Returns: undefined

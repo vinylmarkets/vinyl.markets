@@ -15,6 +15,7 @@ import {
   LayoutDashboard,
   FileText,
   Terminal,
+  Target,
   TrendingUp,
   Briefcase,
   Settings,
@@ -48,6 +49,11 @@ const navigationItems = [
     title: "Analytics Terminal",
     url: "/dashboard/terminal",
     icon: Terminal,
+  },
+  {
+    title: "Paper Trading",
+    url: "/dashboard/paper-trading",
+    icon: Target,
   },
   {
     title: "Charts & Analytics",
