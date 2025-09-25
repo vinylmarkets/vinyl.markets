@@ -91,7 +91,7 @@ export function DashboardSidebar() {
   const getNavClassName = (path: string, exact = false) => {
     const active = isActive(path, exact);
     return active 
-      ? "bg-secondary text-secondary-foreground font-medium" 
+      ? "bg-primary text-primary-foreground font-medium" 
       : "hover:bg-muted/50";
   };
 
