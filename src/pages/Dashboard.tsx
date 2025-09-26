@@ -94,19 +94,6 @@ export default function Dashboard() {
   return (
     <DashboardLayout>
       <div className="space-y-8">
-        {/* Latest Articles Section */}
-        <section className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold text-foreground">Latest Articles</h2>
-            <Link 
-              to="/articles" 
-              className="text-primary hover:text-primary/80 transition-colors font-medium"
-            >
-              View All Articles →
-            </Link>
-          </div>
-          <BlogGrid />
-        </section>
         {/* Welcome Section */}
         <div className="flex items-center justify-between">
           <div className="space-y-2">
@@ -132,6 +119,20 @@ export default function Dashboard() {
             </Badge>
           </div>
         </div>
+
+        {/* Latest Articles Section */}
+        <section className="mb-12">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-semibold text-foreground">Latest Articles</h2>
+            <Link 
+              to="/articles" 
+              className="text-primary hover:text-primary/80 transition-colors font-medium"
+            >
+              View All Articles →
+            </Link>
+          </div>
+          <BlogGrid />
+        </section>
 
         {/* Educational Disclaimer */}
         <Card className="border-2 border-muted">
