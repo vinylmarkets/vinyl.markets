@@ -302,7 +302,7 @@ serve(async (req) => {
     console.error('Error in morning market analysis:', error);
     return new Response(JSON.stringify({ 
       error: 'Failed to generate morning analysis',
-      details: error.message 
+      details: error instanceof Error ? error.message : 'Unknown error'
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

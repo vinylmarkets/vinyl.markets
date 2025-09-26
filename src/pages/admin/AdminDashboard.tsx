@@ -19,8 +19,11 @@ import {
   Briefcase,
   Edit3,
   Plus,
-  Tag
+  Tag,
+  Play,
+  Clock
 } from "lucide-react";
+import { toast } from "sonner";
 
 interface AdminStats {
   totalUsers: number;
@@ -33,6 +36,7 @@ interface AdminStats {
 export default function AdminDashboard() {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [generatingPredictions, setGeneratingPredictions] = useState(false);
 
   useEffect(() => {
     fetchAdminStats();
@@ -64,6 +68,48 @@ export default function AdminDashboard() {
       console.error('Error fetching admin stats:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const generateTodaysPredictions = async () => {
+    setGeneratingPredictions(true);
+    try {
+      // Check if predictions already exist for today
+      const today = new Date().toISOString().split('T')[0];
+      const { data: existingPredictions } = await supabase
+        .from('enhanced_daily_predictions')
+        .select('id')
+        .eq('prediction_date', today)
+        .limit(1);
+
+      if (existingPredictions && existingPredictions.length > 0) {
+        toast.info('Predictions already exist for today');
+        return;
+      }
+
+      // Call the edge function
+      const { data, error } = await supabase.functions.invoke('morning-market-analysis', {
+        body: { manual_trigger: true }
+      });
+
+      if (error) {
+        console.error('Edge function error:', error);
+        toast.error('Failed to generate predictions. Check logs for details.');
+        return;
+      }
+
+      console.log('Prediction generation response:', data);
+      
+      if (data.success) {
+        toast.success(`Successfully generated ${data.predictions_generated} predictions for today!`);
+      } else {
+        toast.error(data.message || 'Failed to generate predictions');
+      }
+    } catch (error) {
+      console.error('Error generating predictions:', error);
+      toast.error('Failed to generate predictions');
+    } finally {
+      setGeneratingPredictions(false);
     }
   };
 
@@ -330,6 +376,54 @@ export default function AdminDashboard() {
               </Button>
             </Link>
           </div>
+        </div>
+
+        {/* Prediction Management */}
+        <div className="mt-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Brain className="h-5 w-5 mr-2" />
+                Daily Predictions Management
+              </CardTitle>
+              <CardDescription>
+                Generate and manage daily stock predictions using AI algorithms
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+                <div>
+                  <div className="font-medium">Today's Predictions</div>
+                  <div className="text-sm text-muted-foreground">
+                    Generate new predictions for {new Date().toLocaleDateString()}
+                  </div>
+                </div>
+                <Button 
+                  onClick={generateTodaysPredictions} 
+                  disabled={generatingPredictions}
+                  className="ml-4"
+                >
+                  {generatingPredictions ? (
+                    <>
+                      <Activity className="h-4 w-4 mr-2 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-4 w-4 mr-2" />
+                      Generate Now
+                    </>
+                  )}
+                </Button>
+              </div>
+              <div className="mt-4 text-sm text-muted-foreground">
+                <div className="flex items-center">
+                  <Clock className="h-4 w-4 mr-2" />
+                  Automatic generation: Daily at 6:00 AM EST
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Quick Actions */}
