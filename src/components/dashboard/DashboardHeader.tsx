@@ -42,7 +42,7 @@ export function DashboardHeader() {
               <img 
                 src="/atomicmarket-logo-purple.png" 
                 alt="AtomicMarket"
-                className="h-8"
+                className="h-9"
               />
             </div>
           </Link>

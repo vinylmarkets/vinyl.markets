@@ -60,7 +60,7 @@ export const Navigation = () => {
             <img 
               src="/atomicmarket-logo-purple.png" 
               alt="AtomicMarket"
-              className="h-8"
+              className="h-9"
             />
           </Link>
 
