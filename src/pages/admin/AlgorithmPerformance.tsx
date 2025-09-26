@@ -106,58 +106,75 @@ export default function AlgorithmPerformance() {
   const fetchPerformanceData = async () => {
     setLoading(true);
     try {
-      // Get latest algorithm performance metrics
-      const { data: latestMetrics } = await supabase
+      // Get performance data from 9/25 forward only
+      const { data: metricsFromSept25 } = await supabase
         .from('algorithm_performance')
         .select('*')
-        .order('date', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+        .gte('date', '2025-09-25')
+        .order('date', { ascending: false });
 
-      // Get performance trends for selected date range with target metrics
-      const { data: trendData } = await supabase
-        .from('algorithm_performance')
-        .select('date, directional_accuracy, average_confidence, total_predictions')
-        .order('date', { ascending: false })
-        .limit(dateRange);
+      if (metricsFromSept25 && metricsFromSept25.length > 0) {
+        // Calculate averages from all data since 9/25
+        const avgHighAccuracy = metricsFromSept25.reduce((sum, m) => sum + m.high_accuracy_avg, 0) / metricsFromSept25.length;
+        const avgLowAccuracy = metricsFromSept25.reduce((sum, m) => sum + m.low_accuracy_avg, 0) / metricsFromSept25.length;
+        const avgCloseAccuracy = metricsFromSept25.reduce((sum, m) => sum + m.close_accuracy_avg, 0) / metricsFromSept25.length;
+        const avgDirectionalAccuracy = metricsFromSept25.reduce((sum, m) => sum + m.directional_accuracy, 0) / metricsFromSept25.length;
+        const avgTrendingAccuracy = metricsFromSept25.reduce((sum, m) => sum + m.trending_market_accuracy, 0) / metricsFromSept25.length;
+        const avgChoppyAccuracy = metricsFromSept25.reduce((sum, m) => sum + m.choppy_market_accuracy, 0) / metricsFromSept25.length;
+        const avgConfidenceCalibration = metricsFromSept25.reduce((sum, m) => sum + m.confidence_calibration, 0) / metricsFromSept25.length;
+        const avgConfidenceCorrelation = metricsFromSept25.reduce((sum, m) => sum + m.confidence_accuracy_correlation, 0) / metricsFromSept25.length;
 
-      if (latestMetrics) {
-        // Calculate actual average confidence from all predictions
+        // Get actual average confidence from predictions since 9/25
         const { data: allPredictions, error: predError } = await supabase
           .from('enhanced_daily_predictions')
-          .select('overall_confidence');
+          .select('overall_confidence')
+          .gte('prediction_date', '2025-09-25');
+        
+        let actualAvgConfidence = 0;
+        let totalPredictions = 0;
         
         if (!predError && allPredictions) {
           const validConfidences = allPredictions
             .map(p => p.overall_confidence)
             .filter(conf => conf !== null && conf !== undefined);
           
-          const actualAvgConfidence = validConfidences.length > 0 
+          actualAvgConfidence = validConfidences.length > 0 
             ? validConfidences.reduce((sum, conf) => sum + conf, 0) / validConfidences.length / 100
             : 0;
           
-          // Override with actual calculated values
-          const updatedMetrics = {
-            ...latestMetrics,
-            average_confidence: actualAvgConfidence,
-            total_predictions: allPredictions.length // Total across all days
-          };
-          
-          setMetrics(updatedMetrics);
-        } else {
-          setMetrics(latestMetrics);
+          totalPredictions = allPredictions.length;
         }
+
+        // Use the latest entry as base but override with calculated averages
+        const latestMetrics = metricsFromSept25[0];
+        const updatedMetrics = {
+          ...latestMetrics,
+          high_accuracy_avg: avgHighAccuracy,
+          low_accuracy_avg: avgLowAccuracy,
+          close_accuracy_avg: avgCloseAccuracy,
+          directional_accuracy: avgDirectionalAccuracy,
+          trending_market_accuracy: avgTrendingAccuracy,
+          choppy_market_accuracy: avgChoppyAccuracy,
+          confidence_calibration: avgConfidenceCalibration,
+          confidence_accuracy_correlation: avgConfidenceCorrelation,
+          average_confidence: actualAvgConfidence,
+          total_predictions: totalPredictions
+        };
+        
+        setMetrics(updatedMetrics);
       }
 
+      // Get performance trends for selected date range with target metrics - only from 9/25 forward
+      const { data: trendData } = await supabase
+        .from('algorithm_performance')
+        .select('date, directional_accuracy, average_confidence, total_predictions')
+        .gte('date', '2025-09-25')
+        .order('date', { ascending: false })
+        .limit(dateRange);
+
       if (trendData) {
-        // Calculate target metrics for each date
         // Filter data to only show from Sept 25th onwards and sort chronologically
         const filteredTrendData = trendData
-          .filter(item => {
-            const itemDate = new Date(item.date);
-            const sept25 = new Date('2025-09-25');
-            return itemDate >= sept25;
-          })
           .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
         const trendsWithTargets = await Promise.all(filteredTrendData.map(async (item) => {
@@ -244,9 +261,9 @@ export default function AlgorithmPerformance() {
         setTrends(trendsWithTargets);
       }
 
-      // Generate recommendations based on metrics
-      if (latestMetrics) {
-        generateRecommendations(latestMetrics);
+      // Generate recommendations based on current metrics
+      if (metrics) {
+        generateRecommendations(metrics);
       }
     } catch (error) {
       console.error('Error fetching algorithm performance:', error);
