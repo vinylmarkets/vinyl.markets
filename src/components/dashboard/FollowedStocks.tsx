@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface StockProjection {
   symbol: string;
@@ -55,12 +56,12 @@ export function FollowedStocks() {
             <TrendingUp className="w-4 h-4" />
             Followed Stocks
           </CardTitle>
-          <a
-            href="#"
+          <Link
+            to="/dashboard/briefings"
             className="text-xs text-primary hover:text-primary/80 transition-colors"
           >
             Follow More Stocks
-          </a>
+          </Link>
         </div>
       </CardHeader>
       <CardContent>
