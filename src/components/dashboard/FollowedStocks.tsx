@@ -50,10 +50,18 @@ export function FollowedStocks() {
   return (
     <Card className="h-fit">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <TrendingUp className="w-4 h-4" />
-          Followed Stocks
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <TrendingUp className="w-4 h-4" />
+            Followed Stocks
+          </CardTitle>
+          <a
+            href="#"
+            className="text-xs text-primary hover:text-primary/80 transition-colors"
+          >
+            Follow More Stocks
+          </a>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-3">
