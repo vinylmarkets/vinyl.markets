@@ -22,24 +22,36 @@ serve(async (req) => {
       )
     }
 
-    console.log('Generating DALL-E 2 image with prompt:', prompt.substring(0, 100) + '...')
+    console.log('Starting image generation process...')
+    console.log('Prompt length:', prompt.length)
 
     // Get OpenAI API key from environment
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY')
     if (!openaiApiKey) {
-      console.error('OpenAI API key not found in environment')
-      throw new Error('OpenAI API key not found')
+      console.error('OpenAI API key not found in environment variables')
+      return new Response(
+        JSON.stringify({ error: 'OpenAI API key not configured' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      )
     }
 
-    // Generate image using DALL-E 2 (more widely supported)
+    console.log('OpenAI API key found, making request...')
+
+    // Test OpenAI API with a simple request first
     const openaiPayload = {
       model: 'dall-e-2',
-      prompt: prompt,
+      prompt: prompt.length > 1000 ? prompt.substring(0, 1000) : prompt, // Truncate long prompts
       n: 1,
-      size: '1024x1024'
+      size: '512x512', // Use smaller size for faster testing
+      response_format: 'url'
     }
     
-    console.log('Making OpenAI API request with payload:', JSON.stringify(openaiPayload, null, 2))
+    console.log('Sending request to OpenAI with payload:', JSON.stringify({
+      model: openaiPayload.model,
+      promptLength: openaiPayload.prompt.length,
+      n: openaiPayload.n,
+      size: openaiPayload.size
+    }))
 
     const response = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
@@ -51,79 +63,141 @@ serve(async (req) => {
     })
 
     console.log('OpenAI API response status:', response.status)
+    console.log('OpenAI API response headers:', Object.fromEntries(response.headers.entries()))
 
     if (!response.ok) {
-      const error = await response.json()
-      console.error('OpenAI API error response:', JSON.stringify(error, null, 2))
-      throw new Error(`OpenAI API error: ${error.error?.message || 'Unknown error'}`)
+      const errorText = await response.text()
+      console.error('OpenAI API error status:', response.status)
+      console.error('OpenAI API error text:', errorText)
+      
+      let errorData
+      try {
+        errorData = JSON.parse(errorText)
+      } catch {
+        errorData = { error: { message: errorText } }
+      }
+      
+      return new Response(
+        JSON.stringify({ 
+          error: `OpenAI API error (${response.status}): ${errorData.error?.message || errorText}`,
+          details: errorData 
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      )
     }
 
     const data = await response.json()
     console.log('OpenAI API success response received')
     
-    // DALL-E 2 returns image URLs
-    const imageUrl = data.data[0].url
-    
-    if (!imageUrl) {
-      throw new Error('No image URL received from OpenAI')
+    if (!data.data || !data.data[0] || !data.data[0].url) {
+      console.error('Invalid response structure from OpenAI:', data)
+      return new Response(
+        JSON.stringify({ error: 'Invalid response from OpenAI API' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      )
     }
     
+    const imageUrl = data.data[0].url
     console.log('Image URL received, downloading...')
     
-    // Download the image to convert to base64
+    // Download the image
     const imageResponse = await fetch(imageUrl)
     if (!imageResponse.ok) {
-      throw new Error(`Failed to download generated image: ${imageResponse.status}`)
+      console.error('Failed to download image:', imageResponse.status)
+      return new Response(
+        JSON.stringify({ error: `Failed to download image: ${imageResponse.status}` }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      )
     }
     
     const imageBuffer = await imageResponse.arrayBuffer()
-    const imageBase64 = btoa(String.fromCharCode(...new Uint8Array(imageBuffer)))
-    const imageData = `data:image/png;base64,${imageBase64}`
-
-    console.log('Image converted to base64, saving to database...')
+    const imageBytes = new Uint8Array(imageBuffer)
+    
+    console.log('Image downloaded, size:', imageBytes.length, 'bytes')
 
     // Get Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error('Supabase credentials not found')
+      return new Response(
+        JSON.stringify({ error: 'Supabase configuration missing' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      )
+    }
+    
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     // Get user from JWT token
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
-      throw new Error('No authorization header')
+      return new Response(
+        JSON.stringify({ error: 'No authorization header' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+      )
     }
 
     const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''))
     if (authError || !user) {
       console.error('Auth error:', authError)
-      throw new Error('Invalid authentication')
+      return new Response(
+        JSON.stringify({ error: 'Invalid authentication' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+      )
     }
+
+    console.log('User authenticated, uploading to storage...')
 
     // Generate filename
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
     const filename = `admin-generated-${timestamp}.png`
+    
+    // Upload to Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('generated-images')
+      .upload(filename, imageBytes, {
+        contentType: 'image/png'
+      })
+
+    if (uploadError) {
+      console.error('Storage upload error:', uploadError)
+      return new Response(
+        JSON.stringify({ error: 'Failed to upload image to storage' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      )
+    }
+
+    console.log('Image uploaded to storage:', uploadData.path)
+
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from('generated-images')
+      .getPublicUrl(filename)
 
     // Save to database
     const { data: savedImage, error: dbError } = await supabase
       .from('generated_images')
       .insert({
         prompt,
-        image_url: imageData,
+        image_url: urlData.publicUrl,
         filename,
         created_by: user.id,
         tags: tags || [],
-        usage_notes: usageNotes,
-        image_data: imageBase64
+        usage_notes: usageNotes
       })
       .select()
       .single()
 
     if (dbError) {
       console.error('Database error:', dbError)
-      throw new Error('Failed to save image to database')
+      return new Response(
+        JSON.stringify({ error: 'Failed to save image record to database' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      )
     }
 
-    console.log('Image saved to database successfully:', savedImage.id)
+    console.log('Image generation completed successfully:', savedImage.id)
 
     return new Response(
       JSON.stringify({ 
@@ -135,10 +209,11 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error in generate-admin-image function:', error)
+    console.error('Unexpected error in generate-admin-image function:', error)
     return new Response(
       JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'An unexpected error occurred' 
+        error: 'An unexpected error occurred',
+        details: error instanceof Error ? error.message : String(error)
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     )
