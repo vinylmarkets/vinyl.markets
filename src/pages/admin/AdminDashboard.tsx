@@ -274,6 +274,18 @@ export default function AdminDashboard() {
         { label: "New", value: "Article" },
         { label: "Publishing", value: "Ready" }
       ]
+    },
+    {
+      title: "Launch Checklist",
+      description: "Track beta launch readiness across functionality, copy, layout, and compliance",
+      icon: Rocket,
+      href: "/admin/launch-checklist",
+      color: "text-red-600",
+      bgColor: "bg-red-50",
+      metrics: [
+        { label: "Progress", value: "Tracking" },
+        { label: "Readiness", value: "Monitor" }
+      ]
     }
   ];
 

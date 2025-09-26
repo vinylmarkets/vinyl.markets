@@ -1206,6 +1206,106 @@ export type Database = {
         }
         Relationships: []
       }
+      launch_checklist_activity: {
+        Row: {
+          action_type: string
+          created_at: string | null
+          field_changed: string | null
+          id: string
+          new_value: string | null
+          old_value: string | null
+          page_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          created_at?: string | null
+          field_changed?: string | null
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+          page_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          created_at?: string | null
+          field_changed?: string | null
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+          page_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "launch_checklist_activity_page_id_fkey"
+            columns: ["page_id"]
+            isOneToOne: false
+            referencedRelation: "launch_checklist_pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      launch_checklist_pages: {
+        Row: {
+          compliance_status: string | null
+          copy_status: string | null
+          created_at: string | null
+          functionality_status: string | null
+          id: string
+          last_updated_by: string | null
+          layout_status: string | null
+          notes: string | null
+          page_name: string
+          page_path: string | null
+          page_section: string
+          parent_page_id: string | null
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          compliance_status?: string | null
+          copy_status?: string | null
+          created_at?: string | null
+          functionality_status?: string | null
+          id?: string
+          last_updated_by?: string | null
+          layout_status?: string | null
+          notes?: string | null
+          page_name: string
+          page_path?: string | null
+          page_section: string
+          parent_page_id?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          compliance_status?: string | null
+          copy_status?: string | null
+          created_at?: string | null
+          functionality_status?: string | null
+          id?: string
+          last_updated_by?: string | null
+          layout_status?: string | null
+          notes?: string | null
+          page_name?: string
+          page_path?: string | null
+          page_section?: string
+          parent_page_id?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "launch_checklist_pages_parent_page_id_fkey"
+            columns: ["parent_page_id"]
+            isOneToOne: false
+            referencedRelation: "launch_checklist_pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       market_data: {
         Row: {
           close_price: number | null
