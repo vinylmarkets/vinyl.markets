@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,8 @@ import {
   Users,
   Globe,
   Shield,
-  Activity
+  Activity,
+  ArrowLeft
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -265,6 +267,12 @@ export default function LaunchChecklist() {
           <Badge variant="secondary" className="text-lg px-4 py-2">
             {getOverallProgress()}% Complete
           </Badge>
+          <Button variant="outline" asChild>
+            <Link to="/admin">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Admin Dashboard
+            </Link>
+          </Button>
         </div>
       </div>
 
