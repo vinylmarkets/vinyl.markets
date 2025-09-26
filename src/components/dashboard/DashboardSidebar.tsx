@@ -112,7 +112,7 @@ export function DashboardSidebar() {
   const getNavClassName = (path: string, exact = false) => {
     const active = isActive(path, exact);
     return active 
-      ? "bg-primary text-primary-foreground font-medium" 
+      ? "bg-gradient-primary text-white font-medium" 
       : "hover:bg-muted/50";
   };
 
