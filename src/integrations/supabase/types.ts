@@ -230,6 +230,152 @@ export type Database = {
           },
         ]
       }
+      blog_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          post_count: number | null
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          post_count?: number | null
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          post_count?: number | null
+          slug?: string
+        }
+        Relationships: []
+      }
+      blog_posts: {
+        Row: {
+          author_avatar_url: string | null
+          author_bio: string | null
+          author_id: string | null
+          author_name: string
+          category: string | null
+          content: string
+          created_at: string
+          excerpt: string | null
+          featured_image_alt: string | null
+          featured_image_url: string | null
+          id: string
+          keywords: string[] | null
+          like_count: number | null
+          meta_description: string | null
+          meta_title: string | null
+          published: boolean | null
+          published_at: string | null
+          reading_time_minutes: number | null
+          seo_schema: Json | null
+          slug: string
+          tags: string[] | null
+          title: string
+          updated_at: string
+          view_count: number | null
+        }
+        Insert: {
+          author_avatar_url?: string | null
+          author_bio?: string | null
+          author_id?: string | null
+          author_name: string
+          category?: string | null
+          content: string
+          created_at?: string
+          excerpt?: string | null
+          featured_image_alt?: string | null
+          featured_image_url?: string | null
+          id?: string
+          keywords?: string[] | null
+          like_count?: number | null
+          meta_description?: string | null
+          meta_title?: string | null
+          published?: boolean | null
+          published_at?: string | null
+          reading_time_minutes?: number | null
+          seo_schema?: Json | null
+          slug: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          view_count?: number | null
+        }
+        Update: {
+          author_avatar_url?: string | null
+          author_bio?: string | null
+          author_id?: string | null
+          author_name?: string
+          category?: string | null
+          content?: string
+          created_at?: string
+          excerpt?: string | null
+          featured_image_alt?: string | null
+          featured_image_url?: string | null
+          id?: string
+          keywords?: string[] | null
+          like_count?: number | null
+          meta_description?: string | null
+          meta_title?: string | null
+          published?: boolean | null
+          published_at?: string | null
+          reading_time_minutes?: number | null
+          seo_schema?: Json | null
+          slug?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          view_count?: number | null
+        }
+        Relationships: []
+      }
+      blog_views: {
+        Row: {
+          id: string
+          ip_address: string | null
+          post_id: string
+          referrer: string | null
+          user_agent: string | null
+          user_id: string | null
+          viewed_at: string
+        }
+        Insert: {
+          id?: string
+          ip_address?: string | null
+          post_id: string
+          referrer?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          viewed_at?: string
+        }
+        Update: {
+          id?: string
+          ip_address?: string | null
+          post_id?: string
+          referrer?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_views_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       briefing_categories: {
         Row: {
           daily_target: number
@@ -3227,6 +3373,10 @@ export type Database = {
           p_portfolio_id?: string
           p_user_id: string
         }
+        Returns: string
+      }
+      generate_blog_slug: {
+        Args: { title_text: string }
         Returns: string
       }
       generate_daily_metrics: {
