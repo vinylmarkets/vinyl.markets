@@ -23,7 +23,8 @@ import {
   Play,
   Clock,
   Sparkles,
-  Images
+  Images,
+  Rocket
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -225,39 +226,15 @@ export default function AdminDashboard() {
       ]
     },
     {
-      title: "Analytics Terminal",
-      description: "Advanced analytics terminal for market data and insights",
-      icon: Terminal,
-      href: "/dashboard/terminal",
-      color: "text-cyan-600",
-      bgColor: "bg-cyan-50",
+      title: "Product Development",
+      description: "Phase 2 features and development roadmap for advanced tools",
+      icon: Rocket,
+      href: "/admin/product-development",
+      color: "text-violet-600",
+      bgColor: "bg-violet-50",
       metrics: [
-        { label: "Status", value: "Beta" },
-        { label: "Features", value: "Advanced" }
-      ]
-    },
-    {
-      title: "Charts & Analytics",
-      description: "Interactive charts and comprehensive analytics dashboard",
-      icon: TrendingUp,
-      href: "/dashboard/charts",
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-      metrics: [
-        { label: "Charts", value: "Interactive" },
-        { label: "Data", value: "Real-time" }
-      ]
-    },
-    {
-      title: "Portfolio Manager",
-      description: "Manage and track investment portfolios and performance",
-      icon: Briefcase,
-      href: "/dashboard/portfolio",
-      color: "text-amber-600",
-      bgColor: "bg-amber-50",
-      metrics: [
-        { label: "Tracking", value: "Portfolio" },
-        { label: "Status", value: "Phase 2" }
+        { label: "Phase 2", value: "Features" },
+        { label: "Status", value: "In Progress" }
       ]
     },
     {
