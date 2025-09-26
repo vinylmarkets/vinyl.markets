@@ -1,7 +1,5 @@
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Clock, User } from 'lucide-react';
 
 interface BlogCardProps {
   id: string;
@@ -40,44 +38,12 @@ export function BlogCard({
         />
       </div>
       
-      <CardContent className="p-6">
-        <div className="flex items-center gap-2 mb-3">
-          <Badge variant="secondary" className="text-xs">
-            {category}
-          </Badge>
-          {tags.slice(0, 2).map((tag) => (
-            <Badge key={tag} variant="outline" className="text-xs">
-              {tag}
-            </Badge>
-          ))}
-        </div>
-        
+      <CardContent className="p-4">
         <Link to={`/articles/${slug}`} className="block group-hover:text-primary transition-colors">
-          <h3 className="text-xl font-semibold leading-tight mb-3 line-clamp-2">
+          <h3 className="text-base font-medium leading-tight line-clamp-2">
             {title}
           </h3>
         </Link>
-        
-        <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
-          {excerpt}
-        </p>
-        
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <User className="w-3 h-3" />
-            <span>{authorName}</span>
-          </div>
-          
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              <span>{readingTime} min read</span>
-            </div>
-            <time dateTime={publishedAt}>
-              {new Date(publishedAt).toLocaleDateString()}
-            </time>
-          </div>
-        </div>
       </CardContent>
     </Card>
   );
