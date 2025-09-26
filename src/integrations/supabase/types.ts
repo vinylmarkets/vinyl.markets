@@ -2695,6 +2695,7 @@ export type Database = {
           actual_open: number | null
           actual_volume: number | null
           close_accuracy: number | null
+          confidence_score: number | null
           direction_correct: boolean | null
           high_accuracy: number | null
           hit_predicted_close: boolean | null
@@ -2703,10 +2704,16 @@ export type Database = {
           id: string
           low_accuracy: number | null
           market_condition: string | null
+          predicted_close: number | null
+          predicted_high: number | null
+          predicted_low: number | null
+          prediction_date: string | null
           prediction_id: string | null
+          rank: number | null
           recorded_at: string | null
           sector_performance: number | null
           spy_performance: number | null
+          symbol: string | null
         }
         Insert: {
           actual_close?: number | null
@@ -2717,6 +2724,7 @@ export type Database = {
           actual_open?: number | null
           actual_volume?: number | null
           close_accuracy?: number | null
+          confidence_score?: number | null
           direction_correct?: boolean | null
           high_accuracy?: number | null
           hit_predicted_close?: boolean | null
@@ -2725,10 +2733,16 @@ export type Database = {
           id?: string
           low_accuracy?: number | null
           market_condition?: string | null
+          predicted_close?: number | null
+          predicted_high?: number | null
+          predicted_low?: number | null
+          prediction_date?: string | null
           prediction_id?: string | null
+          rank?: number | null
           recorded_at?: string | null
           sector_performance?: number | null
           spy_performance?: number | null
+          symbol?: string | null
         }
         Update: {
           actual_close?: number | null
@@ -2739,6 +2753,7 @@ export type Database = {
           actual_open?: number | null
           actual_volume?: number | null
           close_accuracy?: number | null
+          confidence_score?: number | null
           direction_correct?: boolean | null
           high_accuracy?: number | null
           hit_predicted_close?: boolean | null
@@ -2747,16 +2762,22 @@ export type Database = {
           id?: string
           low_accuracy?: number | null
           market_condition?: string | null
+          predicted_close?: number | null
+          predicted_high?: number | null
+          predicted_low?: number | null
+          prediction_date?: string | null
           prediction_id?: string | null
+          rank?: number | null
           recorded_at?: string | null
           sector_performance?: number | null
           spy_performance?: number | null
+          symbol?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "prediction_results_prediction_id_fkey"
             columns: ["prediction_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "enhanced_daily_predictions"
             referencedColumns: ["id"]
           },
