@@ -77,6 +77,21 @@ export function PaperTradingLeaderboard() {
     }
   };
 
+  const getPercentageBadgeColor = (rank: number, isPositive: boolean): React.CSSProperties | undefined => {
+    if (!isPositive) return undefined;
+    
+    // Create gradient from mid-green (#10) to electric green (#1)
+    const intensity = (11 - rank) / 10; // 0.1 for rank 10, 1.0 for rank 1
+    const greenValue = Math.round(50 + (200 * intensity)); // 50-250 range
+    const redValue = Math.round(255 * (1 - intensity * 0.8)); // Reduce red as rank improves
+    
+    return {
+      backgroundColor: `rgb(${redValue}, ${greenValue}, 50)`,
+      color: intensity > 0.6 ? '#000' : '#fff', // Dark text for bright colors
+      border: 'none'
+    } as React.CSSProperties;
+  };
+
   const formatPercentage = (value: number) => {
     const sign = value >= 0 ? '+' : '';
     return `${sign}${value.toFixed(2)}%`;
@@ -146,8 +161,9 @@ export function PaperTradingLeaderboard() {
                     ${((entry.return_percentage / 100) * 100000).toLocaleString()}
                   </span>
                   <Badge
-                    variant={entry.return_percentage >= 0 ? 'default' : 'destructive'}
+                    variant={entry.return_percentage >= 0 ? undefined : 'destructive'}
                     className="text-xs min-w-[60px] text-center"
+                    style={entry.return_percentage >= 0 ? getPercentageBadgeColor(entry.rank, true) : undefined}
                   >
                     {formatPercentage(entry.return_percentage)}
                   </Badge>
