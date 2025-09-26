@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
-import { FileText, AlertTriangle, Clock, ThumbsUp, BookOpen, TrendingUp } from "lucide-react";
+import { FileText, AlertTriangle, Clock, ThumbsUp, BookOpen, TrendingUp, ArrowLeft } from "lucide-react";
 
 interface ContentPerformanceData {
   popularTopics: Array<{ topic: string; views: number; engagement: number }>;
@@ -148,7 +150,15 @@ export default function ContentPerformance() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Content Performance</h1>
-        <Badge variant="secondary">Content Analytics</Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary">Content Analytics</Badge>
+          <Button variant="outline" asChild>
+            <Link to="/admin">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Admin Dashboard
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Summary Cards */}

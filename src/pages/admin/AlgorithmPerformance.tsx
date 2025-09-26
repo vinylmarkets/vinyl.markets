@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,7 +26,8 @@ import {
   Activity,
   Calendar as CalendarIcon,
   Archive,
-  Eye
+  Eye,
+  ArrowLeft
 } from "lucide-react";
 
 interface AlgorithmMetrics {
@@ -362,6 +364,12 @@ export default function AlgorithmPerformance() {
               <Button onClick={refreshData} variant="outline" disabled={refreshing}>
                 <RefreshCcw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
                 Refresh
+              </Button>
+              <Button variant="outline" asChild>
+                <Link to="/admin">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back to Admin Dashboard
+                </Link>
               </Button>
             </div>
           </div>

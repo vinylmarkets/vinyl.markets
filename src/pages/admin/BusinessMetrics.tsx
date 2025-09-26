@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, LineChart, Line, BarChart, Bar, ComposedChart } from "recharts";
-import { DollarSign, Users, TrendingUp, Target, HeadphonesIcon, Zap } from "lucide-react";
+import { DollarSign, Users, TrendingUp, Target, HeadphonesIcon, Zap, ArrowLeft } from "lucide-react";
 
 interface BusinessMetricsData {
   revenueData: Array<{ date: string; revenue: number; projection: number }>;
@@ -143,7 +145,15 @@ export default function BusinessMetrics() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Business Metrics</h1>
-        <Badge variant="secondary">Financial & Operations</Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary">Financial & Operations</Badge>
+          <Button variant="outline" asChild>
+            <Link to="/admin">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Admin Dashboard
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Key Financial Metrics */}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { Save, Eye, FileText, Image, Tag, Zap, Globe } from 'lucide-react';
+import { Save, Eye, FileText, Image, Tag, Zap, Globe, ArrowLeft } from 'lucide-react';
 
 interface BlogPost {
   id?: string;
@@ -278,6 +278,13 @@ export default function BlogEditor() {
           >
             <Globe className="w-4 h-4 mr-2" />
             Publish
+          </Button>
+
+          <Button variant="outline" asChild>
+            <Link to="/admin">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Admin Dashboard
+            </Link>
           </Button>
         </div>
       </div>

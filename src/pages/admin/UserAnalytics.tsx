@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from "recharts";
-import { Users, UserPlus, Crown, Globe, Star, Clock } from "lucide-react";
+import { Users, UserPlus, Crown, Globe, Star, Clock, ArrowLeft } from "lucide-react";
 
 interface UserAnalyticsData {
   signupTrends: Array<{ date: string; signups: number; paidSignups: number }>;
@@ -140,7 +142,15 @@ export default function UserAnalytics() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">User Analytics</h1>
-        <Badge variant="secondary">Real-time data</Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary">Real-time data</Badge>
+          <Button variant="outline" asChild>
+            <Link to="/admin">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Admin Dashboard
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Summary Cards */}

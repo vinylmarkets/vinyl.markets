@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
-import { Users, DollarSign, TrendingUp, TrendingDown, Activity, Target } from "lucide-react";
+import { Users, DollarSign, TrendingUp, TrendingDown, Activity, Target, ArrowLeft } from "lucide-react";
 
 interface ExecutiveMetrics {
   totalUsers: number;
@@ -93,7 +95,15 @@ export default function ExecutiveOverview() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Executive Overview</h1>
-        <Badge variant="secondary">Last updated: {new Date().toLocaleTimeString()}</Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary">Last updated: {new Date().toLocaleTimeString()}</Badge>
+          <Button variant="outline" asChild>
+            <Link to="/admin">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Admin Dashboard
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Key Metrics Grid */}

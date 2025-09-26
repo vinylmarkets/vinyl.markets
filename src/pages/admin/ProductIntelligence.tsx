@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
-import { FileText, MessageSquare, GraduationCap, Award, TrendingUp, Star } from "lucide-react";
+import { FileText, MessageSquare, GraduationCap, Award, TrendingUp, Star, ArrowLeft } from "lucide-react";
 
 interface ProductIntelligenceData {
   briefingDeliveryRate: number;
@@ -111,7 +113,15 @@ export default function ProductIntelligence() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Product Intelligence</h1>
-        <Badge variant="secondary">Feature Performance</Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary">Feature Performance</Badge>
+          <Button variant="outline" asChild>
+            <Link to="/admin">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Admin Dashboard
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Key Performance Indicators */}

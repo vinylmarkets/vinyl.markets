@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit3, Eye, Trash2, Search, Filter } from 'lucide-react';
+import { Plus, Edit3, Eye, Trash2, Search, Filter, ArrowLeft } from 'lucide-react';
 
 interface BlogPost {
   id: string;
@@ -106,12 +106,20 @@ export default function BlogManagement() {
     <div className="max-w-6xl mx-auto p-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Blog Management</h1>
-        <Link to="/admin/blog/new">
-          <Button>
-            <Plus className="w-4 h-4 mr-2" />
-            Create New Article
+        <div className="flex items-center gap-2">
+          <Link to="/admin/blog/new">
+            <Button>
+              <Plus className="w-4 h-4 mr-2" />
+              Create New Article
+            </Button>
+          </Link>
+          <Button variant="outline" asChild>
+            <Link to="/admin">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Admin Dashboard
+            </Link>
           </Button>
-        </Link>
+        </div>
       </div>
 
       {/* Filters */}
