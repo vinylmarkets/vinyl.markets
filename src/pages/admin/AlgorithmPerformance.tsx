@@ -151,7 +151,7 @@ export default function AlgorithmPerformance() {
     try {
       const dateStr = format(date, 'yyyy-MM-dd');
       
-      // First try to get from predictions table since results table might not exist or be properly populated
+      // Get predictions first
       const { data: predictions, error: predError } = await supabase
         .from('enhanced_daily_predictions')
         .select('*')
@@ -165,9 +165,41 @@ export default function AlgorithmPerformance() {
         return;
       }
       
-      if (predictions && predictions.length > 0) {
-        // Convert to display format
-        const displayResults: PredictionResult[] = predictions.map((pred) => ({
+      if (!predictions || predictions.length === 0) {
+        setArchiveResults([]);
+        toast.info(`No predictions found for ${dateStr}`);
+        return;
+      }
+      
+      // Get the prediction IDs
+      const predictionIds = predictions.map(p => p.id);
+      
+      // Get results for these predictions
+      const { data: results, error: resultError } = await supabase
+        .from('prediction_results')
+        .select('*')
+        .in('prediction_id', predictionIds);
+      
+      if (resultError) {
+        console.error('Error fetching results:', resultError);
+      }
+      
+      // Create a map of prediction_id to results
+      const resultsMap = new Map();
+      if (results) {
+        results.forEach(result => {
+          resultsMap.set(result.prediction_id, result);
+        });
+      }
+      
+      // Convert to display format
+      const displayResults: PredictionResult[] = predictions.map((pred) => {
+        const result = resultsMap.get(pred.id);
+        const actualGain = result?.actual_close && pred.previous_close 
+          ? ((result.actual_close - pred.previous_close) / pred.previous_close) * 100
+          : undefined;
+        
+        return {
           id: pred.id,
           rank: pred.rank,
           symbol: pred.symbol,
@@ -176,20 +208,18 @@ export default function AlgorithmPerformance() {
           predicted_low: pred.predicted_low,
           predicted_close: pred.predicted_close,
           expected_gain_percentage: pred.expected_gain_percentage || 0,
-          // Actual values will be populated when post-market analysis runs
-          actual_high: undefined,
-          actual_low: undefined,
-          actual_close: undefined,
-          direction_correct: undefined,
-          actual_gain_percentage: undefined
-        }));
-        
-        setArchiveResults(displayResults);
-        toast.success(`Loaded ${predictions.length} predictions for ${dateStr}`);
-      } else {
-        setArchiveResults([]);
-        toast.info(`No predictions found for ${dateStr}`);
-      }
+          actual_high: result?.actual_high,
+          actual_low: result?.actual_low,
+          actual_close: result?.actual_close,
+          direction_correct: result?.direction_correct,
+          actual_gain_percentage: actualGain
+        };
+      });
+      
+      setArchiveResults(displayResults);
+      const resultsCount = results ? results.length : 0;
+      toast.success(`Loaded ${predictions.length} predictions (${resultsCount} with results) for ${dateStr}`);
+      
     } catch (error) {
       console.error('Error fetching archive data:', error);
       toast.error('Error fetching archive data');
