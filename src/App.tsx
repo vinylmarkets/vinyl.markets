@@ -32,13 +32,13 @@ import Briefings from "./pages/dashboard/Briefings";
 import BriefingDetail from "./pages/dashboard/BriefingDetail";
 import Terminal from "./pages/dashboard/Terminal";
 import PaperTrading from "./pages/dashboard/PaperTrading";
+import OptionsValueTool from "./pages/dashboard/OptionsValueTool";
 import Charts from "./pages/dashboard/Charts";
 import LearningProgress from "./pages/dashboard/Progress";
 import Portfolio from "./pages/dashboard/Portfolio";
 import SettingsPage from "./pages/dashboard/Settings";
 import Upgrade from "./pages/dashboard/Upgrade";
 import Top20Predictions from "./pages/dashboard/Top20Predictions";
-import OptionsValueTool from "./pages/dashboard/OptionsValueTool";
 import ForumCategory from "./pages/ForumCategory";
 import ForumTopic from "./pages/ForumTopic";
 
@@ -77,14 +77,14 @@ const App = () => {
               <Route path="/dashboard/briefings" element={<Briefings />} />
               <Route path="/dashboard/briefings/:id" element={<BriefingDetail />} />
               <Route path="/dashboard/terminal" element={<Terminal />} />
-              <Route path="/dashboard/paper-trading" element={<PaperTrading />} />
+            <Route path="/dashboard/paper-trading" element={<PaperTrading />} />
+            <Route path="/dashboard/options-value-tool" element={<OptionsValueTool />} />
               <Route path="/dashboard/charts" element={<Charts />} />
               <Route path="/dashboard/progress" element={<LearningProgress />} />
               <Route path="/dashboard/portfolio" element={<Portfolio />} />
               <Route path="/dashboard/settings" element={<SettingsPage />} />
               <Route path="/dashboard/upgrade" element={<Upgrade />} />
               <Route path="/dashboard/top20" element={<Top20Predictions />} />
-              <Route path="/dashboard/options" element={<OptionsValueTool />} />
               
               {/* Admin Dashboard Routes */}
               <Route path="/admin-login" element={<AdminLogin />} />

@@ -16,6 +16,7 @@ import {
   FileText,
   Terminal,
   Target,
+  BarChart3,
   TrendingUp,
   Briefcase,
   Settings,
@@ -54,6 +55,11 @@ const navigationItems = [
     title: "Paper Trading",
     url: "/dashboard/paper-trading",
     icon: Target,
+  },
+  {
+    title: "Options Value Tool",
+    url: "/dashboard/options-value-tool",
+    icon: BarChart3,
   },
   {
     title: "Charts & Analytics",
