@@ -308,6 +308,12 @@ export default function AdminDashboard() {
               <Badge variant="outline">
                 Last updated: {new Date().toLocaleTimeString()}
               </Badge>
+              <Link to="/dashboard">
+                <Button variant="outline" size="sm">
+                  <Users className="h-4 w-4 mr-2" />
+                  User Dashboard
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
