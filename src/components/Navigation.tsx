@@ -58,7 +58,7 @@ export const Navigation = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
             <img 
-              src="/atomicmarket-logo-black.png" 
+              src="/atomicmarket-logo-purple.png" 
               alt="AtomicMarket"
               className="h-8"
             />
