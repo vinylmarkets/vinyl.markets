@@ -157,18 +157,22 @@ export function ImageLibrary() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-            <Images className="h-8 w-8" />
-            Image Library
-          </h1>
-          <p className="text-muted-foreground">
-            Manage your AI-generated images and assets
-          </p>
-        </div>
-      </div>
+    <div className="container mx-auto px-4 py-6 space-y-6">
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-3xl font-bold tracking-tight flex items-center gap-2">
+                <Images className="h-8 w-8" />
+                Image Library
+              </CardTitle>
+              <p className="text-muted-foreground mt-1">
+                Manage your AI-generated images and assets
+              </p>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
 
       {/* Controls */}
       <Card>

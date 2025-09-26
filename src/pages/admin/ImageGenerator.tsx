@@ -90,15 +90,19 @@ export function ImageGenerator() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">AI Image Generator</h1>
-          <p className="text-muted-foreground">
-            Create custom visuals for your homepage and landing pages
-          </p>
-        </div>
-      </div>
+    <div className="container mx-auto px-4 py-6 space-y-6">
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-3xl font-bold tracking-tight">AI Image Generator</CardTitle>
+              <p className="text-muted-foreground mt-1">
+                Create custom visuals for your homepage and landing pages
+              </p>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Generator Form */}
