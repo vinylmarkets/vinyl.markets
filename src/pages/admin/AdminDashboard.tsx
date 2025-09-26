@@ -347,7 +347,7 @@ export default function AdminDashboard() {
           {dashboardSections.map((section) => {
             const IconComponent = section.icon;
             return (
-              <Card key={section.title} className="group hover:shadow-lg transition-all duration-200 border-2 hover:border-primary/20">
+              <Card key={section.title} className="group hover:shadow-lg transition-all duration-200 border-2 hover:border-primary/20 flex flex-col">
                 <CardHeader className="pb-4">
                   <div className="flex items-center justify-between">
                     <div className={`p-3 rounded-lg ${section.bgColor}`}>
@@ -361,44 +361,48 @@ export default function AdminDashboard() {
                   </CardDescription>
                 </CardHeader>
                 
-                <CardContent className="pt-0">
-                  {section.metrics.length > 0 && (
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                      {section.metrics.map((metric, index) => (
-                        <div key={index} className="text-center p-2 bg-muted/50 rounded">
-                          <div className="font-semibold text-sm">{metric.value}</div>
-                          <div className="text-xs text-muted-foreground">{metric.label}</div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                <CardContent className="pt-0 flex-1 flex flex-col">
+                  <div className="flex-1">
+                    {section.metrics.length > 0 && (
+                      <div className="grid grid-cols-2 gap-4 mb-4">
+                        {section.metrics.map((metric, index) => (
+                          <div key={index} className="text-center p-2 bg-muted/50 rounded">
+                            <div className="font-semibold text-sm">{metric.value}</div>
+                            <div className="text-xs text-muted-foreground">{metric.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                   
-                  {section.isAction ? (
-                    <Button 
-                      onClick={section.actionHandler} 
-                      disabled={generatingPredictions}
-                      className="w-full group-hover:bg-primary/90 transition-colors"
-                    >
-                      {generatingPredictions ? (
-                        <>
-                          <Activity className="h-4 w-4 mr-2 animate-spin" />
-                          Generating...
-                        </>
-                      ) : (
-                        <>
-                          Generate Now
-                          <Play className="h-4 w-4 ml-2" />
-                        </>
-                      )}
-                    </Button>
-                  ) : (
-                    <Link to={section.href}>
-                      <Button className="w-full group-hover:bg-primary/90 transition-colors">
-                        View Dashboard
-                        <TrendingUp className="h-4 w-4 ml-2" />
+                  <div className="mt-auto">
+                    {section.isAction ? (
+                      <Button 
+                        onClick={section.actionHandler} 
+                        disabled={generatingPredictions}
+                        className="w-full group-hover:bg-primary/90 transition-colors"
+                      >
+                        {generatingPredictions ? (
+                          <>
+                            <Activity className="h-4 w-4 mr-2 animate-spin" />
+                            Generating...
+                          </>
+                        ) : (
+                          <>
+                            Generate Now
+                            <Play className="h-4 w-4 ml-2" />
+                          </>
+                        )}
                       </Button>
-                    </Link>
-                  )}
+                    ) : (
+                      <Link to={section.href}>
+                        <Button className="w-full group-hover:bg-primary/90 transition-colors">
+                          View Dashboard
+                          <TrendingUp className="h-4 w-4 ml-2" />
+                        </Button>
+                      </Link>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             );
