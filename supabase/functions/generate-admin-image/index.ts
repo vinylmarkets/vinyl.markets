@@ -22,53 +22,67 @@ serve(async (req) => {
       )
     }
 
-    console.log('Generating image with prompt:', prompt)
+    console.log('Generating DALL-E 3 image with prompt:', prompt.substring(0, 100) + '...')
 
     // Get OpenAI API key from environment
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY')
     if (!openaiApiKey) {
+      console.error('OpenAI API key not found in environment')
       throw new Error('OpenAI API key not found')
     }
 
-    // Generate image using OpenAI
+    // Generate image using DALL-E 3
+    const openaiPayload = {
+      model: 'dall-e-3',
+      prompt: prompt,
+      n: 1,
+      size: '1024x1024',
+      quality: 'hd',
+      response_format: 'url'
+    }
+    
+    console.log('Making OpenAI API request with payload:', JSON.stringify(openaiPayload, null, 2))
+
     const response = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${openaiApiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        model: 'dall-e-3',
-        prompt: prompt,
-        n: 1,
-        size: '1024x1024',
-        quality: 'hd'
-      }),
+      body: JSON.stringify(openaiPayload),
     })
+
+    console.log('OpenAI API response status:', response.status)
 
     if (!response.ok) {
       const error = await response.json()
-      console.error('OpenAI API error:', error)
+      console.error('OpenAI API error response:', JSON.stringify(error, null, 2))
       throw new Error(`OpenAI API error: ${error.error?.message || 'Unknown error'}`)
     }
 
     const data = await response.json()
-    // dall-e-3 model returns image URLs, not base64 data
+    console.log('OpenAI API success response received')
+    
+    // DALL-E 3 returns image URLs
     const imageUrl = data.data[0].url
     
-    console.log('Image URL received:', imageUrl)
+    if (!imageUrl) {
+      throw new Error('No image URL received from OpenAI')
+    }
+    
+    console.log('Image URL received, downloading...')
     
     // Download the image to convert to base64
     const imageResponse = await fetch(imageUrl)
     if (!imageResponse.ok) {
-      throw new Error('Failed to download generated image')
+      throw new Error(`Failed to download generated image: ${imageResponse.status}`)
     }
     
     const imageBuffer = await imageResponse.arrayBuffer()
     const imageBase64 = btoa(String.fromCharCode(...new Uint8Array(imageBuffer)))
     const imageData = `data:image/png;base64,${imageBase64}`
 
-    console.log('Image generated successfully')
+    console.log('Image converted to base64, saving to database...')
 
     // Get Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
@@ -111,7 +125,7 @@ serve(async (req) => {
       throw new Error('Failed to save image to database')
     }
 
-    console.log('Image saved to database:', savedImage.id)
+    console.log('Image saved to database successfully:', savedImage.id)
 
     return new Response(
       JSON.stringify({ 
