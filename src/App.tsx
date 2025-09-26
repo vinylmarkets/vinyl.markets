@@ -56,6 +56,8 @@ import ContentPerformance from "./pages/admin/ContentPerformance";
 import BusinessMetrics from "./pages/admin/BusinessMetrics";
 import ComplianceMonitoring from "./pages/admin/ComplianceMonitoring";
 import AlgorithmPerformance from "./pages/admin/AlgorithmPerformance";
+import { ImageGenerator } from "./pages/admin/ImageGenerator";
+import { ImageLibrary } from "./pages/admin/ImageLibrary";
 import ForumPage from "./pages/forum/ForumPage";
 import Auth from "./pages/Auth";
 
@@ -113,6 +115,8 @@ const App = () => {
               <Route path="/admin/business-metrics" element={<AdminProtected><BusinessMetrics /></AdminProtected>} />
               <Route path="/admin/compliance-monitoring" element={<AdminProtected><ComplianceMonitoring /></AdminProtected>} />
               <Route path="/admin/algorithm-performance" element={<AdminProtected><AlgorithmPerformance /></AdminProtected>} />
+              <Route path="/admin/image-generator" element={<AdminProtected><ImageGenerator /></AdminProtected>} />
+              <Route path="/admin/image-library" element={<AdminProtected><ImageLibrary /></AdminProtected>} />
               <Route path="/admin/blog" element={<AdminProtected><BlogEditor /></AdminProtected>} />
               <Route path="/admin/blog/:id" element={<AdminProtected><BlogEditor /></AdminProtected>} />
               

@@ -21,7 +21,9 @@ import {
   Plus,
   Tag,
   Play,
-  Clock
+  Clock,
+  Sparkles,
+  Images
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -197,6 +199,30 @@ export default function AdminDashboard() {
         { label: "Pending Flags", value: stats.pendingFlags.toString() },
         { label: "Compliance", value: "98%" }
       ] : []
+    },
+    {
+      title: "Image Generator",
+      description: "AI-powered image generation for homepage and landing pages",
+      icon: Sparkles,
+      href: "/admin/image-generator",
+      color: "text-purple-600",
+      bgColor: "bg-purple-50",
+      metrics: [
+        { label: "Generate", value: "New Images" },
+        { label: "AI Powered", value: "GPT-4" }
+      ]
+    },
+    {
+      title: "Image Library",
+      description: "Manage and organize your generated images and assets",
+      icon: Images,
+      href: "/admin/image-library",  
+      color: "text-green-600",
+      bgColor: "bg-green-50",
+      metrics: [
+        { label: "Browse", value: "All Images" },
+        { label: "Download", value: "& Share" }
+      ]
     }
   ];
 

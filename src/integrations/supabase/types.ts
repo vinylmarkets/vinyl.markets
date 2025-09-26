@@ -1113,6 +1113,48 @@ export type Database = {
           },
         ]
       }
+      generated_images: {
+        Row: {
+          created_at: string
+          created_by: string
+          filename: string
+          id: string
+          image_data: string | null
+          image_url: string
+          is_featured: boolean | null
+          prompt: string
+          tags: string[] | null
+          updated_at: string
+          usage_notes: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          filename: string
+          id?: string
+          image_data?: string | null
+          image_url: string
+          is_featured?: boolean | null
+          prompt: string
+          tags?: string[] | null
+          updated_at?: string
+          usage_notes?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          filename?: string
+          id?: string
+          image_data?: string | null
+          image_url?: string
+          is_featured?: boolean | null
+          prompt?: string
+          tags?: string[] | null
+          updated_at?: string
+          usage_notes?: string | null
+        }
+        Relationships: []
+      }
       intelligence_briefings: {
         Row: {
           algorithm_version: string
