@@ -58,6 +58,8 @@ interface PerformanceTrend {
   predictions_count: number;
   hit_target_rate?: number;
   closed_target_rate?: number;
+  high_accuracy?: number;
+  low_accuracy?: number;
 }
 
 interface RecommendationItem {
@@ -167,7 +169,7 @@ export default function AlgorithmPerformance() {
       // Get performance trends for selected date range with target metrics - only from 9/25 forward
       const { data: trendData } = await supabase
         .from('algorithm_performance')
-        .select('date, directional_accuracy, average_confidence, total_predictions')
+        .select('date, directional_accuracy, average_confidence, total_predictions, high_accuracy_avg, low_accuracy_avg')
         .gte('date', '2025-09-25')
         .order('date', { ascending: false })
         .limit(dateRange);
@@ -232,7 +234,9 @@ export default function AlgorithmPerformance() {
             confidence: item.average_confidence || 0,
             predictions_count: item.total_predictions || 0,
             hit_target_rate: hitTargetRate,
-            closed_target_rate: closedTargetRate
+            closed_target_rate: closedTargetRate,
+            high_accuracy: item.high_accuracy_avg || 0,
+            low_accuracy: item.low_accuracy_avg || 0
           };
         }));
         
@@ -253,7 +257,9 @@ export default function AlgorithmPerformance() {
               confidence: 0.8, // Default confidence for today
               predictions_count: total,
               hit_target_rate: total > 0 ? hitTargetSuccesses / total : 0,
-              closed_target_rate: total > 0 ? closedTargetSuccesses / total : 0
+              closed_target_rate: total > 0 ? closedTargetSuccesses / total : 0,
+              high_accuracy: 0.8, // Default for today since we don't have calculated values yet
+              low_accuracy: 0.8 // Default for today since we don't have calculated values yet
             });
           }
         }
@@ -772,6 +778,14 @@ export default function AlgorithmPerformance() {
                           <div className="w-3 h-3 bg-purple-500 rounded mr-2"></div>
                           <span>Closed Target Rate</span>
                         </div>
+                        <div className="flex items-center">
+                          <div className="w-3 h-3 bg-orange-500 rounded mr-2"></div>
+                          <span>High Price Accuracy</span>
+                        </div>
+                        <div className="flex items-center">
+                          <div className="w-3 h-3 bg-red-500 rounded mr-2"></div>
+                          <span>Low Price Accuracy</span>
+                        </div>
                       </div>
                     </div>
                     <div className="relative">
@@ -791,6 +805,8 @@ export default function AlgorithmPerformance() {
                             const accuracyY = 180 - (trend.accuracy * 160);
                             const hitTargetY = 180 - ((trend.hit_target_rate || 0) * 160);
                             const closedTargetY = 180 - ((trend.closed_target_rate || 0) * 160);
+                            const highAccuracyY = 180 - ((trend.high_accuracy || 0) * 160);
+                            const lowAccuracyY = 180 - ((trend.low_accuracy || 0) * 160);
                             
                             return (
                               <g key={index}>
@@ -822,6 +838,25 @@ export default function AlgorithmPerformance() {
                                 >
                                   <title>{`${format(new Date(trend.date), 'MMM dd')}: ${((trend.closed_target_rate || 0) * 100).toFixed(1)}% Closed Target Rate`}</title>
                                 </circle>
+                                <circle 
+                                  cx={x} 
+                                  cy={highAccuracyY} 
+                                  r="4" 
+                                  fill="#f97316"
+                                  className="hover:r-6 cursor-pointer transition-all"
+                                >
+                                  <title>{`${format(new Date(trend.date), 'MMM dd')}: ${((trend.high_accuracy || 0) * 100).toFixed(1)}% High Price Accuracy`}</title>
+                                </circle>
+                                <circle 
+                                  cx={x} 
+                                  cy={lowAccuracyY} 
+                                  r="4" 
+                                  fill="#ef4444"
+                                  className="hover:r-6 cursor-pointer transition-all"
+                                >
+                                  <title>{`${format(new Date(trend.date), 'MMM dd')}: ${((trend.low_accuracy || 0) * 100).toFixed(1)}% Low Price Accuracy`}</title>
+                                </circle>
+                                
                                 
                                 {/* Connect lines */}
                                 {index > 0 && (
@@ -849,9 +884,25 @@ export default function AlgorithmPerformance() {
                                       y2={closedTargetY}
                                       stroke="#8b5cf6"
                                       strokeWidth="2"
-                                    />
-                                  </>
-                                )}
+                                     />
+                                     <line
+                                       x1={60 + ((index - 1) / Math.max(trends.length - 1, 1)) * (100 - 70)}
+                                       y1={180 - ((trends[index - 1].high_accuracy || 0) * 160)}
+                                       x2={x}
+                                       y2={highAccuracyY}
+                                       stroke="#f97316"
+                                       strokeWidth="2"
+                                     />
+                                     <line
+                                       x1={60 + ((index - 1) / Math.max(trends.length - 1, 1)) * (100 - 70)}
+                                       y1={180 - ((trends[index - 1].low_accuracy || 0) * 160)}
+                                       x2={x}
+                                       y2={lowAccuracyY}
+                                       stroke="#ef4444"
+                                       strokeWidth="2"
+                                     />
+                                   </>
+                                 )}
                               </g>
                             );
                           })}
