@@ -22,7 +22,7 @@ serve(async (req) => {
       )
     }
 
-    console.log('Generating DALL-E 3 image with prompt:', prompt.substring(0, 100) + '...')
+    console.log('Generating DALL-E 2 image with prompt:', prompt.substring(0, 100) + '...')
 
     // Get OpenAI API key from environment
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY')
@@ -31,14 +31,12 @@ serve(async (req) => {
       throw new Error('OpenAI API key not found')
     }
 
-    // Generate image using DALL-E 3
+    // Generate image using DALL-E 2 (more widely supported)
     const openaiPayload = {
-      model: 'dall-e-3',
+      model: 'dall-e-2',
       prompt: prompt,
       n: 1,
-      size: '1024x1024',
-      quality: 'hd',
-      response_format: 'url'
+      size: '1024x1024'
     }
     
     console.log('Making OpenAI API request with payload:', JSON.stringify(openaiPayload, null, 2))
@@ -63,7 +61,7 @@ serve(async (req) => {
     const data = await response.json()
     console.log('OpenAI API success response received')
     
-    // DALL-E 3 returns image URLs
+    // DALL-E 2 returns image URLs
     const imageUrl = data.data[0].url
     
     if (!imageUrl) {
