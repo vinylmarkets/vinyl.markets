@@ -92,6 +92,10 @@ export default function Dashboard() {
   return (
     <DashboardLayout>
       <div className="space-y-8">
+        {/* Debug: This should show a cleaned dashboard */}
+        <div style={{ background: '#ff0000', color: 'white', padding: '10px', marginBottom: '20px' }}>
+          DEBUG: CLEAN DASHBOARD VERSION - If you see this red box, the changes took effect
+        </div>
         {/* Welcome Section */}
         <div className="flex items-center justify-between">
           <div className="space-y-2">
