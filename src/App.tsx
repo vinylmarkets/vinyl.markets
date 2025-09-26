@@ -41,6 +41,9 @@ import Upgrade from "./pages/dashboard/Upgrade";
 import Top20Predictions from "./pages/dashboard/Top20Predictions";
 import ForumCategory from "./pages/ForumCategory";
 import ForumTopic from "./pages/ForumTopic";
+import BlogArchive from "./pages/BlogArchive";
+import BlogPost from "./pages/BlogPost";
+import BlogEditor from "./pages/admin/BlogEditor";
 
 // Admin Dashboard Components
 import { AdminProtected } from "./components/AdminProtected";
@@ -74,6 +77,10 @@ const App = () => {
               <Route path="/integration-test" element={<IntegrationTest />} />
               <Route path="/terminal" element={<Terminal />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              
+              {/* Blog Routes */}
+              <Route path="/articles" element={<BlogArchive />} />
+              <Route path="/articles/:slug" element={<BlogPost />} />
               <Route path="/dashboard/briefings" element={<Briefings />} />
               <Route path="/dashboard/briefings/:id" element={<BriefingDetail />} />
               <Route path="/dashboard/terminal" element={<Terminal />} />
@@ -96,6 +103,8 @@ const App = () => {
               <Route path="/admin/business-metrics" element={<AdminProtected><BusinessMetrics /></AdminProtected>} />
               <Route path="/admin/compliance-monitoring" element={<AdminProtected><ComplianceMonitoring /></AdminProtected>} />
               <Route path="/admin/algorithm-performance" element={<AdminProtected><AlgorithmPerformance /></AdminProtected>} />
+              <Route path="/admin/blog" element={<AdminProtected><BlogEditor /></AdminProtected>} />
+              <Route path="/admin/blog/:id" element={<AdminProtected><BlogEditor /></AdminProtected>} />
               
               <Route path="/dashboard-test" element={<DashboardTest />} />
               <Route path="/dashboard-old" element={<Dashboard />} />

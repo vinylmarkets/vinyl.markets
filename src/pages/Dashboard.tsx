@@ -1,7 +1,9 @@
+import { Link } from "react-router-dom";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { BlogGrid } from "@/components/blog/BlogGrid";
 import { AlertCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -92,10 +94,19 @@ export default function Dashboard() {
   return (
     <DashboardLayout>
       <div className="space-y-8">
-        {/* Debug: This should show a cleaned dashboard */}
-        <div style={{ background: '#ff0000', color: 'white', padding: '10px', marginBottom: '20px' }}>
-          DEBUG: CLEAN DASHBOARD VERSION - If you see this red box, the changes took effect
-        </div>
+        {/* Latest Articles Section */}
+        <section className="mb-12">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-semibold text-foreground">Latest Articles</h2>
+            <Link 
+              to="/articles" 
+              className="text-primary hover:text-primary/80 transition-colors font-medium"
+            >
+              View All Articles →
+            </Link>
+          </div>
+          <BlogGrid />
+        </section>
         {/* Welcome Section */}
         <div className="flex items-center justify-between">
           <div className="space-y-2">
