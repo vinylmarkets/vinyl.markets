@@ -6,6 +6,7 @@ import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { BlogGrid } from "@/components/blog/BlogGrid";
 import { PaperTradingLeaderboard } from "@/components/dashboard/PaperTradingLeaderboard";
 import { FollowedStocks } from "@/components/dashboard/FollowedStocks";
+import { TickerBanner } from "@/components/TickerBanner";
 import { AlertCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -95,7 +96,8 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8">
+      <TickerBanner />
+      <div className="space-y-8 p-6">
         {/* Welcome Section */}
         <div className="flex items-center justify-between">
           <div className="space-y-2">

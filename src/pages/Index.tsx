@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Navigation } from "@/components/Navigation";
+import { TickerBanner } from "@/components/TickerBanner";
 import heroGradientBackground from "../assets/hero-gradient-background.jpg";
 
 import { 
@@ -43,6 +44,7 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      <TickerBanner />
       
       {/* Hero Section */}
       <section className="relative overflow-hidden py-24 md:py-32">
