@@ -38,11 +38,11 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-image-1',
+        model: 'dall-e-3',
         prompt: prompt,
         n: 1,
         size: '1024x1024',
-        quality: 'high'
+        quality: 'hd'
       }),
     })
 
@@ -53,7 +53,7 @@ serve(async (req) => {
     }
 
     const data = await response.json()
-    // gpt-image-1 model returns image URLs, not base64 data
+    // dall-e-3 model returns image URLs, not base64 data
     const imageUrl = data.data[0].url
     
     console.log('Image URL received:', imageUrl)
