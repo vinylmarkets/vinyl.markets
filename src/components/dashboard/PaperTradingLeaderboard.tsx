@@ -105,9 +105,9 @@ export function PaperTradingLeaderboard() {
   return (
     <Card className="h-fit">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <TrendingUp className="w-5 h-5" />
-          Paper Trading Leaderboard
+        <CardTitle className="flex items-center gap-2 text-base">
+          <TrendingUp className="w-4 h-4" />
+          Trading Leaders
         </CardTitle>
       </CardHeader>
       <CardContent>
