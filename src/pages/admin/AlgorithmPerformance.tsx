@@ -35,6 +35,7 @@ import {
 interface AlgorithmMetrics {
   directional_accuracy: number;
   confidence_accuracy_correlation: number;
+  confidence_calibration: number;
   average_confidence: number;
   high_accuracy_avg: number;
   low_accuracy_avg: number;
@@ -45,7 +46,6 @@ interface AlgorithmMetrics {
   choppy_market_accuracy: number;
   total_predictions: number;
   date: string;
-  confidence_calibration: number;
   high_within_half_percent: number;
   low_within_half_percent: number;
   close_within_half_percent: number;
@@ -598,12 +598,21 @@ export default function AlgorithmPerformance() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between">
-                    <div className={`text-2xl font-bold ${getStatusColor(metrics.confidence_accuracy_correlation, 'confidence')}`}>
-                      {(metrics.confidence_accuracy_correlation * 100).toFixed(1)}%
+                    <div className={`text-2xl font-bold ${getStatusColor(Math.abs(metrics.confidence_calibration), 'confidence')}`}>
+                      {(metrics.confidence_calibration * 100).toFixed(1)}%
                     </div>
-                    {getStatusBadge(metrics.confidence_accuracy_correlation, 'confidence')}
+                    <Badge variant={
+                      Math.abs(metrics.confidence_calibration) <= 0.1 ? "default" : 
+                      Math.abs(metrics.confidence_calibration) <= 0.2 ? "secondary" : "destructive"
+                    }>
+                      {Math.abs(metrics.confidence_calibration) <= 0.1 ? "Excellent" :
+                       Math.abs(metrics.confidence_calibration) <= 0.2 ? "Good" : "Poor"}
+                    </Badge>
                   </div>
-                  <Progress value={metrics.confidence_accuracy_correlation * 100} className="mt-2" />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {metrics.confidence_calibration < 0 ? "Algorithm is underconfident" : "Algorithm is overconfident"}
+                  </p>
+                  <Progress value={50 + (metrics.confidence_calibration * 50)} className="mt-2" />
                 </CardContent>
               </Card>
 
