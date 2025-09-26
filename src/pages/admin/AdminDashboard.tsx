@@ -14,7 +14,9 @@ import {
   ArrowRight,
   TrendingUp,
   AlertTriangle,
-  Activity
+  Activity,
+  Terminal,
+  Briefcase
 } from "lucide-react";
 
 interface AdminStats {
@@ -299,6 +301,32 @@ export default function AdminDashboard() {
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Phase 2 Products */}
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold mb-4">Phase 2 Products</h2>
+          <p className="text-muted-foreground mb-4">Features in development for future release</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Link to="/dashboard/terminal">
+              <Button variant="outline" className="w-full justify-start">
+                <Terminal className="h-4 w-4 mr-2" />
+                Analytics Terminal
+              </Button>
+            </Link>
+            <Link to="/dashboard/charts">
+              <Button variant="outline" className="w-full justify-start">
+                <TrendingUp className="h-4 w-4 mr-2" />
+                Charts & Analytics
+              </Button>
+            </Link>
+            <Link to="/dashboard/portfolio">
+              <Button variant="outline" className="w-full justify-start">
+                <Briefcase className="h-4 w-4 mr-2" />
+                Portfolio
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Quick Actions */}

@@ -47,11 +47,6 @@ const navigationItems = [
     icon: FileText,
   },
   {
-    title: "Analytics Terminal",
-    url: "/dashboard/terminal",
-    icon: Terminal,
-  },
-  {
     title: "Paper Trading",
     url: "/dashboard/paper-trading",
     icon: Target,
@@ -62,11 +57,6 @@ const navigationItems = [
     icon: BarChart3,
   },
   {
-    title: "Charts & Analytics",
-    url: "/dashboard/charts",
-    icon: TrendingUp,
-  },
-  {
     title: "Learning Progress",
     url: "/dashboard/progress",
     icon: BookOpen,
@@ -75,12 +65,6 @@ const navigationItems = [
     title: "Community Forum",
     url: "/forum",
     icon: MessageSquare,
-  },
-  {
-    title: "Portfolio",
-    url: "/dashboard/portfolio",
-    icon: Briefcase,
-    premium: true
   },
   {
     title: "Settings",
@@ -125,33 +109,22 @@ export function DashboardSidebar() {
           
           <SidebarGroupContent>
             <SidebarMenu>
-              {navigationItems.map((item) => {
-                const isDisabled = item.premium && userTier === "free";
-                
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild disabled={isDisabled}>
-                      <NavLink 
-                        to={isDisabled ? "#" : item.url} 
-                        className={getNavClassName(item.url, item.exact)}
-                        end={item.exact}
-                      >
-                        <item.icon className="h-4 w-4" />
-                        {!isCollapsed && (
-                          <div className="flex items-center justify-between w-full">
-                            <span className={isDisabled ? "text-muted-foreground" : ""}>
-                              {item.title}
-                            </span>
-                            {item.premium && userTier === "free" && (
-                              <Crown className="h-3 w-3 text-yellow-500" />
-                            )}
-                          </div>
-                        )}
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
+              {navigationItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink 
+                      to={item.url} 
+                      className={getNavClassName(item.url, item.exact)}
+                      end={item.exact}
+                    >
+                      <item.icon className="h-4 w-4" />
+                      {!isCollapsed && (
+                        <span>{item.title}</span>
+                      )}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
               
               {/* Admin Dashboard Link - Only show for admin users */}
               {isAdmin && (
