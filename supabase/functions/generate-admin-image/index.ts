@@ -42,8 +42,7 @@ serve(async (req) => {
         prompt: prompt,
         n: 1,
         size: '1024x1024',
-        quality: 'standard',
-        response_format: 'b64_json'
+        quality: 'standard'
       }),
     })
 
@@ -54,7 +53,19 @@ serve(async (req) => {
     }
 
     const data = await response.json()
-    const imageBase64 = data.data[0].b64_json
+    // gpt-image-1 model returns image URLs, not base64 data
+    const imageUrl = data.data[0].url
+    
+    console.log('Image URL received:', imageUrl)
+    
+    // Download the image to convert to base64
+    const imageResponse = await fetch(imageUrl)
+    if (!imageResponse.ok) {
+      throw new Error('Failed to download generated image')
+    }
+    
+    const imageBuffer = await imageResponse.arrayBuffer()
+    const imageBase64 = btoa(String.fromCharCode(...new Uint8Array(imageBuffer)))
     const imageData = `data:image/png;base64,${imageBase64}`
 
     console.log('Image generated successfully')
