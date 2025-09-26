@@ -1,63 +1,10 @@
 import { useAuth } from "@/components/auth/AuthProvider";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { IntelligenceBriefing } from "@/components/intelligence-briefing";
-import { 
-  BookOpen, 
-  TrendingUp, 
-  AlertCircle, 
-  MessageSquare,
-  Award,
-  Calendar,
-  ArrowRight,
-  Crown,
-  BarChart3,
-  Target,
-  Clock,
-  FileText
-} from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-
-// Mock data - replace with real Supabase queries
-const mockStats = {
-  briefingsRead: 12,
-  questionsAsked: 45,
-  achievementsEarned: 3,
-  learningStreak: 7
-};
-
-const mockRecentQueries = [
-  {
-    id: 1,
-    question: "What's the difference between put-call parity and covered call strategies?",
-    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-    answered: true
-  },
-  {
-    id: 2,
-    question: "How does unusual options activity indicate smart money moves?",
-    timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 hours ago
-    answered: true
-  },
-  {
-    id: 3,
-    question: "Can you explain the Cremers-Weinbaum methodology in simple terms?",
-    timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-    answered: true
-  }
-];
-
-const mockTodaysBriefing = {
-  title: "Big Money Moves in Tech Sector",
-  summary: "Unusual options activity detected in major tech stocks with 73% confidence level. Smart money appears to be positioning for earnings season.",
-  confidence: "High",
-  readTime: "3 min read",
-  published: new Date()
-};
 
 export default function Dashboard() {
   console.log('Dashboard component: Starting to render');
