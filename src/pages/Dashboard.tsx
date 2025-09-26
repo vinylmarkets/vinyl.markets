@@ -144,20 +144,20 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Welcome Section */}
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-serif font-bold text-foreground">
+          <div className="space-y-2">
+            <h1 className="text-4xl font-bold tracking-tight bg-gradient-primary bg-clip-text text-transparent">
               Welcome back, {firstName}!
             </h1>
-            <p className="text-muted-foreground mt-1">
+            <p className="text-muted-foreground text-lg">
               Ready to dive into today's market intelligence?
             </p>
           </div>
           
           <div className="text-right">
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground mb-2">
               {new Date().toLocaleDateString('en-US', { 
                 weekday: 'long', 
                 year: 'numeric', 
@@ -165,58 +165,66 @@ export default function Dashboard() {
                 day: 'numeric' 
               })}
             </div>
-            <Badge variant="outline" className="mt-1">
+            <Badge variant="secondary" className="bg-primary-light text-primary border-primary/20">
               {userTier.charAt(0).toUpperCase() + userTier.slice(1)} Plan
             </Badge>
           </div>
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <Card className="border-0 shadow-fillow hover:shadow-fillow-lg transition-all duration-300 bg-gradient-card">
+            <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Briefings Read</p>
-                  <p className="text-2xl font-bold">{mockStats.briefingsRead}</p>
+                  <p className="text-sm text-muted-foreground font-medium mb-1">Briefings Read</p>
+                  <p className="text-3xl font-bold text-foreground">{mockStats.briefingsRead}</p>
                 </div>
-                <BookOpen className="h-8 w-8 text-primary" />
+                <div className="p-3 rounded-lg bg-primary-light">
+                  <BookOpen className="h-6 w-6 text-primary" />
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-4">
+          <Card className="border-0 shadow-fillow hover:shadow-fillow-lg transition-all duration-300 bg-gradient-card">
+            <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Questions Asked</p>
-                  <p className="text-2xl font-bold">{mockStats.questionsAsked}</p>
+                  <p className="text-sm text-muted-foreground font-medium mb-1">Questions Asked</p>
+                  <p className="text-3xl font-bold text-foreground">{mockStats.questionsAsked}</p>
                 </div>
-                <MessageSquare className="h-8 w-8 text-primary" />
+                <div className="p-3 rounded-lg bg-accent/10">
+                  <MessageSquare className="h-6 w-6 text-accent" />
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-4">
+          <Card className="border-0 shadow-fillow hover:shadow-fillow-lg transition-all duration-300 bg-gradient-card">
+            <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Learning Streak</p>
-                  <p className="text-2xl font-bold">{mockStats.learningStreak} days</p>
+                  <p className="text-sm text-muted-foreground font-medium mb-1">Learning Streak</p>
+                  <p className="text-3xl font-bold text-foreground">{mockStats.learningStreak} <span className="text-lg">days</span></p>
                 </div>
-                <Target className="h-8 w-8 text-primary" />
+                <div className="p-3 rounded-lg bg-success/10">
+                  <Target className="h-6 w-6 text-success" />
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-4">
+          <Card className="border-0 shadow-fillow hover:shadow-fillow-lg transition-all duration-300 bg-gradient-card">
+            <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Achievements</p>
-                  <p className="text-2xl font-bold">{mockStats.achievementsEarned}</p>
+                  <p className="text-sm text-muted-foreground font-medium mb-1">Achievements</p>
+                  <p className="text-3xl font-bold text-foreground">{mockStats.achievementsEarned}</p>
                 </div>
-                <Award className="h-8 w-8 text-primary" />
+                <div className="p-3 rounded-lg bg-warning/10">
+                  <Award className="h-6 w-6 text-warning" />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -229,10 +237,12 @@ export default function Dashboard() {
 
         <div className="grid md:grid-cols-3 gap-6">
           {/* Learning Progress */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <TrendingUp className="h-5 w-5 text-primary" />
+          <Card className="border-0 shadow-fillow hover:shadow-fillow-lg transition-all duration-300">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-3 text-lg">
+                <div className="p-2 rounded-lg bg-success/10">
+                  <TrendingUp className="h-5 w-5 text-success" />
+                </div>
                 Learning Progress
               </CardTitle>
             </CardHeader>
@@ -240,27 +250,27 @@ export default function Dashboard() {
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between text-sm mb-2">
-                    <span>Options Basics</span>
-                    <span>85%</span>
+                    <span className="font-medium">Options Basics</span>
+                    <span className="text-success font-semibold">85%</span>
                   </div>
                   <Progress value={85} className="h-2" />
                 </div>
                 <div>
                   <div className="flex justify-between text-sm mb-2">
-                    <span>Market Analysis</span>
-                    <span>65%</span>
+                    <span className="font-medium">Market Analysis</span>
+                    <span className="text-warning font-semibold">65%</span>
                   </div>
                   <Progress value={65} className="h-2" />
                 </div>
                 <div>
                   <div className="flex justify-between text-sm mb-2">
-                    <span>Risk Management</span>
-                    <span>40%</span>
+                    <span className="font-medium">Risk Management</span>
+                    <span className="text-muted-foreground font-semibold">40%</span>
                   </div>
                   <Progress value={40} className="h-2" />
                 </div>
               </div>
-              <Button variant="outline" size="sm" className="w-full mt-4">
+              <Button variant="outline" size="sm" className="w-full mt-6 font-medium">
                 Continue Learning
               </Button>
             </CardContent>
@@ -268,33 +278,36 @@ export default function Dashboard() {
 
           {/* Upgrade Prompt (for free tier) */}
           {userTier === "free" && (
-            <Card className="border-2 border-dashed border-primary/30 bg-gradient-to-br from-primary/10 to-primary/20">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Crown className="h-5 w-5 text-primary" />
+            <Card className="border-0 shadow-fillow hover:shadow-fillow-lg transition-all duration-300 bg-gradient-to-br from-primary/5 to-primary/10 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent" />
+              <CardHeader className="pb-4 relative">
+                <CardTitle className="flex items-center gap-3 text-lg">
+                  <div className="p-2 rounded-lg bg-primary-light">
+                    <Crown className="h-5 w-5 text-primary" />
+                  </div>
                   Unlock More Features
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm mb-4">
-                  <li className="flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
-                    Unlimited Ask AtomicMarket queries
+              <CardContent className="relative">
+                <ul className="space-y-3 text-sm mb-6">
+                  <li className="flex items-center gap-3">
+                    <div className="h-2 w-2 rounded-full bg-primary flex-shrink-0"></div>
+                    <span className="text-foreground">Unlimited Ask AtomicMarket queries</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
-                    Advanced portfolio tracking
+                  <li className="flex items-center gap-3">
+                    <div className="h-2 w-2 rounded-full bg-primary flex-shrink-0"></div>
+                    <span className="text-foreground">Advanced portfolio tracking</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
-                    Real-time market alerts
+                  <li className="flex items-center gap-3">
+                    <div className="h-2 w-2 rounded-full bg-primary flex-shrink-0"></div>
+                    <span className="text-foreground">Real-time market alerts</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
-                    Weekly deep-dive reports
+                  <li className="flex items-center gap-3">
+                    <div className="h-2 w-2 rounded-full bg-primary flex-shrink-0"></div>
+                    <span className="text-foreground">Weekly deep-dive reports</span>
                   </li>
                 </ul>
-                <Button size="sm" className="w-full bg-accent hover:bg-accent/80 text-accent-foreground">
+                <Button size="sm" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium">
                   Upgrade to Essential - $29/mo
                 </Button>
               </CardContent>
@@ -302,25 +315,27 @@ export default function Dashboard() {
           )}
 
           {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <BarChart3 className="h-5 w-5 text-primary" />
+          <Card className="border-0 shadow-fillow hover:shadow-fillow-lg transition-all duration-300">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-3 text-lg">
+                <div className="p-2 rounded-lg bg-accent/10">
+                  <BarChart3 className="h-5 w-5 text-accent" />
+                </div>
                 Quick Actions
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                <Button variant="outline" size="sm" className="w-full justify-start">
-                  <FileText className="mr-2 h-4 w-4" />
+                <Button variant="outline" size="sm" className="w-full justify-start h-10 font-medium">
+                  <FileText className="mr-3 h-4 w-4" />
                   View All Briefings
                 </Button>
-                <Button variant="outline" size="sm" className="w-full justify-start">
-                  <BookOpen className="mr-2 h-4 w-4" />
+                <Button variant="outline" size="sm" className="w-full justify-start h-10 font-medium">
+                  <BookOpen className="mr-3 h-4 w-4" />
                   Browse Research Library
                 </Button>
-                <Button variant="outline" size="sm" className="w-full justify-start">
-                  <TrendingUp className="mr-2 h-4 w-4" />
+                <Button variant="outline" size="sm" className="w-full justify-start h-10 font-medium">
+                  <TrendingUp className="mr-3 h-4 w-4" />
                   Check Market Status
                 </Button>
               </div>
