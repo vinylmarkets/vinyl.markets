@@ -79,7 +79,6 @@ interface PredictionData {
   high_confidence: number;
   low_confidence: number;
   close_confidence: number;
-  overall_confidence: number;
   expected_gain_percentage: number;
   volatility_estimate: number;
   risk_score: number;
@@ -129,7 +128,6 @@ async function generateMarketAnalysis(stocks: typeof TOP_STOCKS): Promise<Predic
       high_confidence: Math.floor(Math.random() * 25) + 70, // 70-95
       low_confidence: Math.floor(Math.random() * 25) + 70,
       close_confidence: Math.floor(Math.random() * 25) + 70,
-      overall_confidence: Math.floor(Math.random() * 25) + 70,
       expected_gain_percentage: Math.round(gainPct * 100) / 100,
       volatility_estimate: Math.round(volatility * 100) / 100,
       risk_score: Math.floor(Math.random() * 8) + 2, // 2-10
