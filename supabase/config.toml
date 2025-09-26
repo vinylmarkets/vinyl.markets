@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.morning-market-analysis]
 verify_jwt = false
+
+[functions.post-market-analysis]
+verify_jwt = false
