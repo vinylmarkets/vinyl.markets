@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -27,7 +28,8 @@ import {
   Calendar as CalendarIcon,
   Archive,
   Eye,
-  ArrowLeft
+  ArrowLeft,
+  Play
 } from "lucide-react";
 
 interface AlgorithmMetrics {
@@ -149,45 +151,48 @@ export default function AlgorithmPerformance() {
     try {
       const dateStr = format(date, 'yyyy-MM-dd');
       
-      // Get predictions for the selected date
-      const { data: predictions } = await supabase
+      // First try to get from predictions table since results table might not exist or be properly populated
+      const { data: predictions, error: predError } = await supabase
         .from('enhanced_daily_predictions')
         .select('*')
         .eq('prediction_date', dateStr)
-        .order('rank', { ascending: true });
-
-      // Get actual results if available
-      const { data: results } = await supabase
-        .from('prediction_results')
-        .select('*')
-        .gte('recorded_at', `${dateStr}T00:00:00.000Z`)
-        .lte('recorded_at', `${dateStr}T23:59:59.999Z`);
-
-      if (predictions) {
-        const enrichedResults: PredictionResult[] = predictions.map(pred => {
-          const result = results?.find(r => r.prediction_id === pred.id);
-          return {
-            id: pred.id,
-            rank: pred.rank,
-            symbol: pred.symbol,
-            company_name: pred.company_name,
-            predicted_high: pred.predicted_high,
-            predicted_low: pred.predicted_low,
-            predicted_close: pred.predicted_close,
-            actual_high: result?.actual_high,
-            actual_low: result?.actual_low,
-            actual_close: result?.actual_close,
-            direction_correct: result?.direction_correct,
-            expected_gain_percentage: pred.expected_gain_percentage,
-            actual_gain_percentage: result ? 
-              ((result.actual_close - pred.previous_close) / pred.previous_close) * 100 : undefined
-          };
-        });
+        .order('rank')
+        .limit(20);
+      
+      if (predError) {
+        console.error('Error fetching predictions:', predError);
+        toast.error('Error fetching archive data');
+        return;
+      }
+      
+      if (predictions && predictions.length > 0) {
+        // Convert to display format
+        const displayResults: PredictionResult[] = predictions.map((pred) => ({
+          id: pred.id,
+          rank: pred.rank,
+          symbol: pred.symbol,
+          company_name: pred.company_name || pred.symbol,
+          predicted_high: pred.predicted_high,
+          predicted_low: pred.predicted_low,
+          predicted_close: pred.predicted_close,
+          expected_gain_percentage: pred.expected_gain_percentage || 0,
+          // Actual values will be populated when post-market analysis runs
+          actual_high: undefined,
+          actual_low: undefined,
+          actual_close: undefined,
+          direction_correct: undefined,
+          actual_gain_percentage: undefined
+        }));
         
-        setArchiveResults(enrichedResults);
+        setArchiveResults(displayResults);
+        toast.success(`Loaded ${predictions.length} predictions for ${dateStr}`);
+      } else {
+        setArchiveResults([]);
+        toast.info(`No predictions found for ${dateStr}`);
       }
     } catch (error) {
       console.error('Error fetching archive data:', error);
+      toast.error('Error fetching archive data');
     } finally {
       setArchiveLoading(false);
     }
@@ -602,6 +607,30 @@ export default function AlgorithmPerformance() {
                   >
                     <Eye className="h-4 w-4 mr-2" />
                     {archiveLoading ? 'Loading...' : 'View Results'}
+                  </Button>
+                  <Button 
+                    onClick={async () => {
+                      if (!archiveDate) return;
+                      try {
+                        const dateStr = format(archiveDate, 'yyyy-MM-dd');
+                        toast.info('Running post-market analysis...');
+                        const { data, error } = await supabase.functions.invoke('post-market-analysis', {
+                          body: { date: dateStr }
+                        });
+                        if (error) throw error;
+                        toast.success('Post-market analysis completed successfully');
+                        // Refresh the data
+                        fetchArchiveData(archiveDate);
+                      } catch (error) {
+                        console.error('Error running post-market analysis:', error);
+                        toast.error('Error running post-market analysis');
+                      }
+                    }}
+                    variant="outline"
+                    disabled={!archiveDate}
+                  >
+                    <Play className="h-4 w-4 mr-2" />
+                    Run Analysis
                   </Button>
                 </div>
               </CardContent>

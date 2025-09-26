@@ -173,7 +173,7 @@ async function processMarketResults(targetDate: string) {
     date: targetDate,
     algorithm_version: 'v1.0',
     total_predictions: totalPredictions,
-    directional_accuracy,
+    directional_accuracy: directionalAccuracy,
     high_accuracy_avg: avgHighAccuracy,
     low_accuracy_avg: avgLowAccuracy,
     close_accuracy_avg: avgCloseAccuracy,
@@ -230,7 +230,7 @@ serve(async (req) => {
     console.error('Error in post-market analysis:', error);
     return new Response(
       JSON.stringify({ 
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error occurred',
         success: false 
       }),
       { 
