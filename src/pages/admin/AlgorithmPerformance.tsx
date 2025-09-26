@@ -234,14 +234,21 @@ export default function AlgorithmPerformance() {
       // Get the prediction IDs
       const predictionIds = predictions.map(p => p.id);
       
-      // Get results for these predictions
-      const { data: results, error: resultError } = await supabase
+      // Try to get results from prediction_results table first
+      let { data: results, error: resultError } = await supabase
         .from('prediction_results')
         .select('*')
         .in('prediction_id', predictionIds);
       
       if (resultError) {
         console.error('Error fetching results:', resultError);
+      }
+      
+      // If no results found in prediction_results, show predictions without results
+      if (!results || results.length === 0) {
+        console.log('No results found in prediction_results table for date:', dateStr);
+        // Set results to empty so we show predictions with N/A values
+        results = [];
       }
       
       // Create a map of prediction_id to results
@@ -650,7 +657,7 @@ export default function AlgorithmPerformance() {
               </CardHeader>
               <CardContent>
                 {trends.length > 0 ? (
-                  <div className="h-64">
+                  <div className="h-80">
                     <div className="flex justify-between items-center mb-4 text-sm">
                       <div className="flex items-center space-x-4">
                         <div className="flex items-center">
@@ -667,61 +674,118 @@ export default function AlgorithmPerformance() {
                         </div>
                       </div>
                     </div>
-                    <svg width="100%" height="200" className="overflow-visible">
-                      <g>
-                        {/* Chart lines */}
-                        {trends.map((trend, index) => {
-                          const x = (index / (trends.length - 1)) * 100;
-                          const accuracyY = 180 - (trend.accuracy * 160);
-                          const hitTargetY = 180 - ((trend.hit_target_rate || 0) * 160);
-                          const closedTargetY = 180 - ((trend.closed_target_rate || 0) * 160);
-                          
-                          return (
-                            <g key={index}>
-                              {/* Data points */}
-                              <circle cx={`${x}%`} cy={accuracyY} r="3" fill="#3b82f6" />
-                              <circle cx={`${x}%`} cy={hitTargetY} r="3" fill="#10b981" />
-                              <circle cx={`${x}%`} cy={closedTargetY} r="3" fill="#8b5cf6" />
-                              
-                              {/* Connect lines */}
-                              {index > 0 && (
-                                <>
-                                  <line
-                                    x1={`${((index - 1) / (trends.length - 1)) * 100}%`}
-                                    y1={180 - (trends[index - 1].accuracy * 160)}
-                                    x2={`${x}%`}
-                                    y2={accuracyY}
-                                    stroke="#3b82f6"
-                                    strokeWidth="2"
-                                  />
-                                  <line
-                                    x1={`${((index - 1) / (trends.length - 1)) * 100}%`}
-                                    y1={180 - ((trends[index - 1].hit_target_rate || 0) * 160)}
-                                    x2={`${x}%`}
-                                    y2={hitTargetY}
-                                    stroke="#10b981"
-                                    strokeWidth="2"
-                                  />
-                                  <line
-                                    x1={`${((index - 1) / (trends.length - 1)) * 100}%`}
-                                    y1={180 - ((trends[index - 1].closed_target_rate || 0) * 160)}
-                                    x2={`${x}%`}
-                                    y2={closedTargetY}
-                                    stroke="#8b5cf6"
-                                    strokeWidth="2"
-                                  />
-                                </>
-                              )}
-                            </g>
-                          );
-                        })}
+                    <div className="relative">
+                      <svg width="100%" height="250" className="overflow-visible">
+                        {/* Grid lines */}
+                        <defs>
+                          <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+                            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#e5e7eb" strokeWidth="0.5"/>
+                          </pattern>
+                        </defs>
+                        <rect width="100%" height="200" fill="url(#grid)" opacity="0.5" />
                         
-                        {/* Y-axis labels */}
-                        <text x="10" y="20" fontSize="12" fill="#6b7280">100%</text>
-                        <text x="10" y="100" fontSize="12" fill="#6b7280">50%</text>
-                        <text x="10" y="180" fontSize="12" fill="#6b7280">0%</text>
-                      </g>
-                    </svg>
+                        <g>
+                          {/* Chart lines and data points */}
+                          {trends.map((trend, index) => {
+                            const x = 40 + (index / Math.max(trends.length - 1, 1)) * (100 - 50); // Adjusted for margins
+                            const accuracyY = 180 - (trend.accuracy * 160);
+                            const hitTargetY = 180 - ((trend.hit_target_rate || 0) * 160);
+                            const closedTargetY = 180 - ((trend.closed_target_rate || 0) * 160);
+                            
+                            return (
+                              <g key={index}>
+                                {/* Data points with hover effect */}
+                                <circle 
+                                  cx={x} 
+                                  cy={accuracyY} 
+                                  r="4" 
+                                  fill="#3b82f6" 
+                                  className="hover:r-6 cursor-pointer transition-all"
+                                >
+                                  <title>{`${format(new Date(trend.date), 'MMM dd')}: ${(trend.accuracy * 100).toFixed(1)}% Directional Accuracy`}</title>
+                                </circle>
+                                <circle 
+                                  cx={x} 
+                                  cy={hitTargetY} 
+                                  r="4" 
+                                  fill="#10b981"
+                                  className="hover:r-6 cursor-pointer transition-all"
+                                >
+                                  <title>{`${format(new Date(trend.date), 'MMM dd')}: ${((trend.hit_target_rate || 0) * 100).toFixed(1)}% Hit Target Rate`}</title>
+                                </circle>
+                                <circle 
+                                  cx={x} 
+                                  cy={closedTargetY} 
+                                  r="4" 
+                                  fill="#8b5cf6"
+                                  className="hover:r-6 cursor-pointer transition-all"
+                                >
+                                  <title>{`${format(new Date(trend.date), 'MMM dd')}: ${((trend.closed_target_rate || 0) * 100).toFixed(1)}% Closed Target Rate`}</title>
+                                </circle>
+                                
+                                {/* Connect lines */}
+                                {index > 0 && (
+                                  <>
+                                    <line
+                                      x1={40 + ((index - 1) / Math.max(trends.length - 1, 1)) * (100 - 50)}
+                                      y1={180 - (trends[index - 1].accuracy * 160)}
+                                      x2={x}
+                                      y2={accuracyY}
+                                      stroke="#3b82f6"
+                                      strokeWidth="2"
+                                    />
+                                    <line
+                                      x1={40 + ((index - 1) / Math.max(trends.length - 1, 1)) * (100 - 50)}
+                                      y1={180 - ((trends[index - 1].hit_target_rate || 0) * 160)}
+                                      x2={x}
+                                      y2={hitTargetY}
+                                      stroke="#10b981"
+                                      strokeWidth="2"
+                                    />
+                                    <line
+                                      x1={40 + ((index - 1) / Math.max(trends.length - 1, 1)) * (100 - 50)}
+                                      y1={180 - ((trends[index - 1].closed_target_rate || 0) * 160)}
+                                      x2={x}
+                                      y2={closedTargetY}
+                                      stroke="#8b5cf6"
+                                      strokeWidth="2"
+                                    />
+                                  </>
+                                )}
+                              </g>
+                            );
+                          })}
+                          
+                          {/* Y-axis labels */}
+                          <text x="10" y="20" fontSize="12" fill="#6b7280">100%</text>
+                          <text x="10" y="60" fontSize="12" fill="#6b7280">75%</text>
+                          <text x="10" y="100" fontSize="12" fill="#6b7280">50%</text>
+                          <text x="10" y="140" fontSize="12" fill="#6b7280">25%</text>
+                          <text x="10" y="180" fontSize="12" fill="#6b7280">0%</text>
+                          
+                          {/* X-axis date labels */}
+                          {trends.map((trend, index) => {
+                            if (index % Math.ceil(trends.length / 6) === 0 || index === trends.length - 1) {
+                              const x = 40 + (index / Math.max(trends.length - 1, 1)) * (100 - 50);
+                              return (
+                                <text 
+                                  key={`date-${index}`}
+                                  x={x} 
+                                  y="210" 
+                                  fontSize="10" 
+                                  fill="#6b7280" 
+                                  textAnchor="middle"
+                                  transform={`rotate(-45, ${x}, 210)`}
+                                >
+                                  {format(new Date(trend.date), 'MMM dd')}
+                                </text>
+                              );
+                            }
+                            return null;
+                          })}
+                        </g>
+                      </svg>
+                    </div>
                   </div>
                 ) : (
                   <div className="h-64 bg-muted/50 rounded-lg flex items-center justify-center">
