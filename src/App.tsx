@@ -73,7 +73,7 @@ const App = () => {
               <Route path="/auth" element={<Auth />} />
               <Route path="/integration-test" element={<IntegrationTest />} />
               <Route path="/terminal" element={<Terminal />} />
-              <Route path="/dashboard" element={<MockDashboard />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/dashboard/briefings" element={<Briefings />} />
               <Route path="/dashboard/briefings/:id" element={<BriefingDetail />} />
               <Route path="/dashboard/terminal" element={<Terminal />} />
