@@ -16,7 +16,10 @@ import {
   AlertTriangle,
   Activity,
   Terminal,
-  Briefcase
+  Briefcase,
+  Edit3,
+  Plus,
+  Tag
 } from "lucide-react";
 
 interface AdminStats {
@@ -333,6 +336,12 @@ export default function AdminDashboard() {
         <div className="mt-8">
           <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Link to="/admin/blog">
+              <Button variant="outline" className="w-full justify-start">
+                <Edit3 className="h-4 w-4 mr-2" />
+                Manage Blog
+              </Button>
+            </Link>
             <Link to="/admin/compliance-monitoring">
               <Button variant="outline" className="w-full justify-start">
                 <AlertTriangle className="h-4 w-4 mr-2" />
@@ -351,10 +360,52 @@ export default function AdminDashboard() {
                 Revenue Analysis
               </Button>
             </Link>
-            <Link to="/admin/executive-overview">
-              <Button variant="outline" className="w-full justify-start">
-                <BarChart3 className="h-4 w-4 mr-2" />
-                Executive Summary
+          </div>
+        </div>
+
+        {/* Blog Management Section */}
+        <div className="mt-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Blog Management</h2>
+            <Link to="/admin/blog/new">
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Create New Article
+              </Button>
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Link to="/admin/blog">
+              <Button variant="outline" className="w-full justify-start h-auto p-4">
+                <div className="text-left">
+                  <div className="flex items-center">
+                    <FileText className="h-4 w-4 mr-2" />
+                    All Articles
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">View and manage all blog posts</p>
+                </div>
+              </Button>
+            </Link>
+            <Link to="/admin/blog/categories">
+              <Button variant="outline" className="w-full justify-start h-auto p-4">
+                <div className="text-left">
+                  <div className="flex items-center">
+                    <Tag className="h-4 w-4 mr-2" />
+                    Categories
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">Manage blog categories</p>
+                </div>
+              </Button>
+            </Link>
+            <Link to="/admin/content-performance">
+              <Button variant="outline" className="w-full justify-start h-auto p-4">
+                <div className="text-left">
+                  <div className="flex items-center">
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    Analytics
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">Content performance metrics</p>
+                </div>
               </Button>
             </Link>
           </div>

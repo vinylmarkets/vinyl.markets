@@ -43,12 +43,12 @@ import ForumCategory from "./pages/ForumCategory";
 import ForumTopic from "./pages/ForumTopic";
 import BlogArchive from "./pages/BlogArchive";
 import BlogPost from "./pages/BlogPost";
-import BlogEditor from "./pages/admin/BlogEditor";
-
 // Admin Dashboard Components
 import { AdminProtected } from "./components/AdminProtected";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import BlogManagement from "./pages/admin/BlogManagement";
+import BlogEditor from "./pages/admin/BlogEditor";
 import ExecutiveOverview from "./pages/admin/ExecutiveOverview";
 import UserAnalytics from "./pages/admin/UserAnalytics";
 import ProductIntelligence from "./pages/admin/ProductIntelligence";
@@ -92,10 +92,20 @@ const App = () => {
               <Route path="/dashboard/settings" element={<SettingsPage />} />
               <Route path="/dashboard/upgrade" element={<Upgrade />} />
               <Route path="/dashboard/top20" element={<Top20Predictions />} />
+              <Route path="/admin/executive-overview" element={<AdminProtected><ExecutiveOverview /></AdminProtected>} />
+              <Route path="/admin/user-analytics" element={<AdminProtected><UserAnalytics /></AdminProtected>} />
+              <Route path="/admin/product-intelligence" element={<AdminProtected><ProductIntelligence /></AdminProtected>} />
+              <Route path="/admin/content-performance" element={<AdminProtected><ContentPerformance /></AdminProtected>} />
+              <Route path="/admin/business-metrics" element={<AdminProtected><BusinessMetrics /></AdminProtected>} />
+              <Route path="/admin/compliance-monitoring" element={<AdminProtected><ComplianceMonitoring /></AdminProtected>} />
+              <Route path="/admin/algorithm-performance" element={<AdminProtected><AlgorithmPerformance /></AdminProtected>} />
               
               {/* Admin Dashboard Routes */}
               <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="/admin" element={<AdminProtected><AdminDashboard /></AdminProtected>} />
+              <Route path="/admin/blog" element={<AdminProtected><BlogManagement /></AdminProtected>} />
+              <Route path="/admin/blog/new" element={<AdminProtected><BlogEditor /></AdminProtected>} />
+              <Route path="/admin/blog/:id" element={<AdminProtected><BlogEditor /></AdminProtected>} />
               <Route path="/admin/executive-overview" element={<AdminProtected><ExecutiveOverview /></AdminProtected>} />
               <Route path="/admin/user-analytics" element={<AdminProtected><UserAnalytics /></AdminProtected>} />
               <Route path="/admin/product-intelligence" element={<AdminProtected><ProductIntelligence /></AdminProtected>} />
