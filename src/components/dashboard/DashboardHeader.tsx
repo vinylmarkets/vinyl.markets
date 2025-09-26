@@ -39,12 +39,11 @@ export function DashboardHeader() {
           
           <Link to="/dashboard" className="flex items-center gap-3 group">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center">
-                <Zap className="h-5 w-5 text-white" />
-              </div>
-              <span className="font-display font-semibold text-xl text-foreground group-hover:text-primary transition-colors">
-                AtomicMarket
-              </span>
+              <img 
+                src="/atomicmarket-logo-purple.png" 
+                alt="AtomicMarket"
+                className="h-8"
+              />
             </div>
           </Link>
         </div>
