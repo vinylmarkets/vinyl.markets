@@ -78,15 +78,18 @@ export function PaperTradingLeaderboard() {
   };
 
   const getPercentageBadgeColor = (rank: number, isPositive: boolean): React.CSSProperties | undefined => {
-    if (!isPositive) return undefined;
+    if (!isPositive) return undefined; // Keep red for actual losses
     
-    // Create gradient from mid-green (#10) to electric green (#1)
+    // Create gradient from purple (#10) to electric green (#1)
     const intensity = (11 - rank) / 10; // 0.1 for rank 10, 1.0 for rank 1
-    const greenValue = Math.round(50 + (200 * intensity)); // 50-250 range
-    const redValue = Math.round(255 * (1 - intensity * 0.8)); // Reduce red as rank improves
+    
+    // Purple to green transition
+    const red = Math.round(128 + (127 * (1 - intensity))); // 255 (purple) to 0 (green)
+    const green = Math.round(50 + (200 * intensity)); // 50 (purple) to 250 (electric green)
+    const blue = Math.round(255 * (1 - intensity)); // 255 (purple) to 0 (green)
     
     return {
-      backgroundColor: `rgb(${redValue}, ${greenValue}, 50)`,
+      backgroundColor: `rgb(${red}, ${green}, ${blue})`,
       color: intensity > 0.6 ? '#000' : '#fff', // Dark text for bright colors
       border: 'none'
     } as React.CSSProperties;
