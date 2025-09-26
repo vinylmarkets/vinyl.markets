@@ -57,34 +57,40 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        /* Modern Status Colors */
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          foreground: "hsl(var(--info-foreground))",
+        },
         probability: {
           high: "hsl(var(--probability-high))",
           medium: "hsl(var(--probability-medium))",
           low: "hsl(var(--probability-low))",
           neutral: "hsl(var(--probability-neutral))",
         },
-        amber: {
-          DEFAULT: "hsl(var(--amber))",
-          foreground: "hsl(var(--amber-foreground))",
-        },
-        purple: {
-          DEFAULT: "hsl(var(--purple))",
-          foreground: "hsl(var(--purple-foreground))",
-        },
         tech: "hsl(var(--tech-accent))",
         finance: "hsl(var(--finance-accent))",
         healthcare: "hsl(var(--healthcare-accent))",
-        /* AtomicMarket Brand Colors */
-        "lime-green": "hsl(var(--lime-green))",
-        "olive-green": "hsl(var(--olive-green))",
-        "brand-purple": "hsl(var(--brand-purple))",
-        indigo: "hsl(var(--indigo))",
-        "coral-red": "hsl(var(--coral-red))",
-        "orange-gold": "hsl(var(--orange-gold))",
       },
       boxShadow: {
         'subtle': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
-        'card': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+        'card': 'var(--shadow-card)',
+        'card-hover': 'var(--shadow-card-hover)',
+        'modern': '0 1px 3px 0 hsl(240 4% 46% / 0.1), 0 1px 2px -1px hsl(240 4% 46% / 0.1)',
+        'modern-lg': '0 10px 15px -3px hsl(240 4% 46% / 0.1), 0 4px 6px -2px hsl(240 4% 46% / 0.05)',
+      },
+      backgroundImage: {
+        'gradient-primary': 'var(--gradient-primary)',
+        'gradient-secondary': 'var(--gradient-secondary)',
+        'gradient-accent': 'var(--gradient-accent)',
       },
       fontFamily: {
         headline: 'var(--font-headline)', /* For headlines - Vinyl replacement */

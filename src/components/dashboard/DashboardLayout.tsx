@@ -12,14 +12,16 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full">
+      <div className="min-h-screen flex w-full bg-background">
         <DashboardSidebar />
         
         <div className="flex-1 flex flex-col">
           <DashboardHeader />
           
-          <main className="flex-1 p-6 bg-muted/30">
-            {children}
+          <main className="flex-1 p-6 bg-gradient-secondary">
+            <div className="max-w-7xl mx-auto">
+              {children}
+            </div>
           </main>
         </div>
       </div>

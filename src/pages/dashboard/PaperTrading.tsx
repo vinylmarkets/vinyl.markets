@@ -276,83 +276,104 @@ export default function PaperTrading() {
   const totalReturnPercentage = (totalReturn / account.starting_capital) * 100;
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
             {account.account_name}
           </h1>
-          <p className="text-muted-foreground">
-            {account.account_type === 'margin' ? 'Margin Account' : 'Cash Account'} • 
-            Options Level {account.options_level}
-          </p>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Badge variant="secondary" className="bg-secondary/80">
+              {account.account_type === 'margin' ? 'Margin Account' : 'Cash Account'}
+            </Badge>
+            <Badge variant="outline">
+              Options Level {account.options_level}
+            </Badge>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            <Import className="mr-2 h-4 w-4" />
+        <div className="flex gap-3">
+          <Button variant="outline" size="default" className="gap-2">
+            <Import className="h-4 w-4" />
             Import from TOP 20
           </Button>
-          <Button variant="outline" size="sm">
-            <Settings className="mr-2 h-4 w-4" />
+          <Button variant="outline" size="default" className="gap-2">
+            <Settings className="h-4 w-4" />
             Settings
           </Button>
         </div>
       </div>
 
       {/* Account Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Wallet className="h-4 w-4" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="border-0 shadow-modern">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
+              <div className="p-2 rounded-md bg-primary/10">
+                <Wallet className="h-4 w-4 text-primary" />
+              </div>
               Total Equity
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(account.total_equity)}</div>
-            <div className={`text-sm ${getPnLColor(totalReturn)} flex items-center gap-1`}>
+            <div className="text-3xl font-bold mb-1">{formatCurrency(account.total_equity)}</div>
+            <div className={`text-sm ${getPnLColor(totalReturn)} flex items-center gap-1 font-medium`}>
               {totalReturn >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
               {formatCurrency(totalReturn)} ({formatPercentage(totalReturnPercentage)})
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Cash Balance</CardTitle>
+        <Card className="border-0 shadow-modern">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
+              <div className="p-2 rounded-md bg-success/10">
+                <DollarSign className="h-4 w-4 text-success" />
+              </div>
+              Cash Balance
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(account.current_cash)}</div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-3xl font-bold mb-1">{formatCurrency(account.current_cash)}</div>
+            <div className="text-sm text-muted-foreground font-medium">
               Available to trade
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Unrealized P&L</CardTitle>
+        <Card className="border-0 shadow-modern">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
+              <div className={`p-2 rounded-md ${(account.total_unrealized_pnl || 0) >= 0 ? 'bg-success/10' : 'bg-destructive/10'}`}>
+                <PieChart className={`h-4 w-4 ${(account.total_unrealized_pnl || 0) >= 0 ? 'text-success' : 'text-destructive'}`} />
+              </div>
+              Unrealized P&L
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${getPnLColor(account.total_unrealized_pnl || 0)}`}>
+            <div className={`text-3xl font-bold mb-1 ${getPnLColor(account.total_unrealized_pnl || 0)}`}>
               {formatCurrency(account.total_unrealized_pnl || 0)}
             </div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground font-medium">
               Open positions
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Win Rate</CardTitle>
+        <Card className="border-0 shadow-modern">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
+              <div className="p-2 rounded-md bg-info/10">
+                <Target className="h-4 w-4 text-info" />
+              </div>
+              Win Rate
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-3xl font-bold mb-1">
               {account.win_rate ? `${account.win_rate.toFixed(1)}%` : '0%'}
             </div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground font-medium">
               {account.winning_trades}W / {account.losing_trades}L
             </div>
           </CardContent>
@@ -361,7 +382,7 @@ export default function PaperTrading() {
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-5 bg-secondary/50 h-12">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="positions">Positions</TabsTrigger>
           <TabsTrigger value="orders">Orders</TabsTrigger>
