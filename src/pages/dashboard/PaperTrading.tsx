@@ -306,17 +306,17 @@ export default function PaperTrading() {
 
       {/* Account Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="border-0 shadow-modern">
+        <Card className="border-0 shadow-fillow hover:shadow-fillow-lg transition-all duration-300 bg-gradient-card">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
-              <div className="p-2 rounded-md bg-primary/10">
+            <CardTitle className="text-sm font-medium flex items-center gap-3 text-muted-foreground">
+              <div className="p-2.5 rounded-lg bg-primary-light">
                 <Wallet className="h-4 w-4 text-primary" />
               </div>
               Total Equity
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold mb-1">{formatCurrency(account.total_equity)}</div>
+            <div className="text-3xl font-bold mb-1 text-foreground">{formatCurrency(account.total_equity)}</div>
             <div className={`text-sm ${getPnLColor(totalReturn)} flex items-center gap-1 font-medium`}>
               {totalReturn >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
               {formatCurrency(totalReturn)} ({formatPercentage(totalReturnPercentage)})
@@ -324,17 +324,17 @@ export default function PaperTrading() {
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-modern">
+        <Card className="border-0 shadow-fillow hover:shadow-fillow-lg transition-all duration-300 bg-gradient-card">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
-              <div className="p-2 rounded-md bg-success/10">
+            <CardTitle className="text-sm font-medium flex items-center gap-3 text-muted-foreground">
+              <div className="p-2.5 rounded-lg bg-success/10">
                 <DollarSign className="h-4 w-4 text-success" />
               </div>
               Cash Balance
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold mb-1">{formatCurrency(account.current_cash)}</div>
+            <div className="text-3xl font-bold mb-1 text-foreground">{formatCurrency(account.current_cash)}</div>
             <div className="text-sm text-muted-foreground font-medium">
               Available to trade
             </div>

@@ -22,6 +22,7 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          light: "hsl(var(--primary-light))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -57,7 +58,7 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        /* Modern Status Colors */
+        /* Fillow Status Colors */
         success: {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",
@@ -70,27 +71,29 @@ export default {
           DEFAULT: "hsl(var(--info))",
           foreground: "hsl(var(--info-foreground))",
         },
-        probability: {
-          high: "hsl(var(--probability-high))",
-          medium: "hsl(var(--probability-medium))",
-          low: "hsl(var(--probability-low))",
-          neutral: "hsl(var(--probability-neutral))",
+        /* Chart Colors */
+        chart: {
+          1: "hsl(var(--chart-1))",
+          2: "hsl(var(--chart-2))",
+          3: "hsl(var(--chart-3))",
+          4: "hsl(var(--chart-4))",
+          5: "hsl(var(--chart-5))",
+          6: "hsl(var(--chart-6))",
         },
-        tech: "hsl(var(--tech-accent))",
-        finance: "hsl(var(--finance-accent))",
-        healthcare: "hsl(var(--healthcare-accent))",
       },
       boxShadow: {
-        'subtle': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+        'sm': 'var(--shadow-sm)',
         'card': 'var(--shadow-card)',
         'card-hover': 'var(--shadow-card-hover)',
-        'modern': '0 1px 3px 0 hsl(240 4% 46% / 0.1), 0 1px 2px -1px hsl(240 4% 46% / 0.1)',
-        'modern-lg': '0 10px 15px -3px hsl(240 4% 46% / 0.1), 0 4px 6px -2px hsl(240 4% 46% / 0.05)',
+        'lg': 'var(--shadow-lg)',
+        'fillow': '0 1px 3px 0 hsl(215 25% 27% / 0.1), 0 1px 2px 0 hsl(215 25% 27% / 0.06)',
+        'fillow-lg': '0 10px 15px -3px hsl(215 25% 27% / 0.1), 0 4px 6px -2px hsl(215 25% 27% / 0.05)',
       },
       backgroundImage: {
         'gradient-primary': 'var(--gradient-primary)',
         'gradient-secondary': 'var(--gradient-secondary)',
         'gradient-accent': 'var(--gradient-accent)',
+        'gradient-card': 'var(--gradient-card)',
       },
       fontFamily: {
         headline: 'var(--font-headline)', /* For headlines - Vinyl replacement */

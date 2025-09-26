@@ -8,66 +8,70 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Fillow-Inspired Modern Design System */
-    --background: 240 10% 98%; /* Very light grayish blue */
-    --foreground: 224 71% 4%; /* Deep navy text */
+    /* Fillow Light Theme - Exact Color Specifications */
+    --background: 240 10% 99%; /* Very light blue-tinted white */
+    --foreground: 215 25% 27%; /* Dark blue-gray text */
 
     --card: 0 0% 100%; /* Pure white cards */
-    --card-foreground: 224 71% 4%;
+    --card-foreground: 215 25% 27%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 224 71% 4%;
+    --popover-foreground: 215 25% 27%;
 
-    /* Primary - Modern Purple (Fillow-inspired) */
-    --primary: 262 83% 58%; /* Rich purple */
+    /* Fillow Purple System */
+    --primary: 258 100% 65%; /* Fillow signature purple */
     --primary-foreground: 0 0% 100%;
+    --primary-light: 258 100% 85%; /* Light purple for backgrounds */
     
-    /* Secondary - Light Purple */
-    --secondary: 270 95% 98%; /* Very light purple background */
-    --secondary-foreground: 262 83% 58%;
+    /* Fillow Secondary Colors */
+    --secondary: 240 6% 97%; /* Ultra light gray */
+    --secondary-foreground: 215 25% 27%;
 
-    --muted: 240 5% 96%; /* Cool light gray */
-    --muted-foreground: 240 4% 46%;
+    --muted: 240 5% 96%; /* Subtle gray background */
+    --muted-foreground: 215 16% 47%; /* Medium gray text */
 
-    --accent: 217 91% 60%; /* Bright blue accent */
+    /* Fillow Accent Colors */
+    --accent: 208 100% 60%; /* Bright blue accent */
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%; /* Modern red */
+    /* Status Colors - Fillow Style */
+    --destructive: 0 91% 58%; /* Bright red */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 6% 90%; /* Subtle border */
-    --input: 240 6% 90%;
-    --ring: 262 83% 58%; /* Purple focus ring */
+    /* UI Element Colors */
+    --border: 240 6% 90%; /* Subtle border color */
+    --input: 240 6% 95%; /* Input background */
+    --ring: 258 100% 65%; /* Focus ring - matches primary */
 
-    --radius: 0.5rem; /* Slightly smaller radius for modern look */
+    --radius: 8px; /* Fillow's border radius */
     
-    /* Modern Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(262 83% 58%), hsl(262 83% 68%));
-    --gradient-secondary: linear-gradient(135deg, hsl(240 10% 98%), hsl(240 5% 96%));
-    --gradient-accent: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 70%));
+    /* Fillow Gradient System */
+    --gradient-primary: linear-gradient(135deg, hsl(258 100% 65%), hsl(275 100% 70%));
+    --gradient-secondary: linear-gradient(135deg, hsl(240 10% 99%), hsl(240 6% 97%));
+    --gradient-accent: linear-gradient(135deg, hsl(208 100% 60%), hsl(208 100% 70%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(240 6% 99%));
     
-    /* Success & Status Colors (Fillow-inspired) */
-    --success: 142 76% 36%; /* Modern green */
+    /* Fillow Status Colors */
+    --success: 142 69% 58%; /* Green */
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%; /* Vibrant orange */
+    --warning: 38 100% 60%; /* Orange */
     --warning-foreground: 0 0% 100%;
-    --info: 217 91% 60%; /* Bright blue */
+    --info: 208 100% 60%; /* Blue - matches accent */
     --info-foreground: 0 0% 100%;
     
-    /* Enhanced Color System */
-    --probability-high: 142 76% 36%; /* Modern green for high probability */
-    --probability-medium: 38 92% 50%; /* Orange for medium */
-    --probability-low: 0 84% 60%; /* Modern red for low */
-    --probability-neutral: 240 4% 46%; /* Gray for neutral */
+    /* Data Visualization Colors (Fillow Palette) */
+    --chart-1: 258 100% 65%; /* Primary purple */
+    --chart-2: 208 100% 60%; /* Blue */
+    --chart-3: 142 69% 58%; /* Green */
+    --chart-4: 38 100% 60%; /* Orange */
+    --chart-5: 0 91% 58%; /* Red */
+    --chart-6: 280 100% 75%; /* Light purple */
     
-    /* Stock Categories - Modern Palette */
-    --tech-accent: 217 91% 60%; /* Bright blue for tech */
-    --finance-accent: 38 92% 50%; /* Orange for finance */
-    --healthcare-accent: 142 76% 36%; /* Green for healthcare */
-    
-    /* Card Shadows */
-    --shadow-card: 0 1px 3px 0 hsl(240 4% 46% / 0.1), 0 1px 2px -1px hsl(240 4% 46% / 0.1);
-    --shadow-card-hover: 0 4px 6px -1px hsl(240 4% 46% / 0.1), 0 2px 4px -2px hsl(240 4% 46% / 0.1);
+    /* Enhanced Shadows - Fillow Style */
+    --shadow-sm: 0 1px 2px 0 hsl(215 25% 27% / 0.05);
+    --shadow-card: 0 1px 3px 0 hsl(215 25% 27% / 0.1), 0 1px 2px 0 hsl(215 25% 27% / 0.06);
+    --shadow-card-hover: 0 4px 6px -1px hsl(215 25% 27% / 0.1), 0 2px 4px -1px hsl(215 25% 27% / 0.06);
+    --shadow-lg: 0 10px 15px -3px hsl(215 25% 27% / 0.1), 0 4px 6px -2px hsl(215 25% 27% / 0.05);
     
     /* AtomicMarket Typography System */
     --font-headline: 'vinyl', sans-serif; /* Adobe VINYL font */
