@@ -223,6 +223,116 @@ export default function AdminDashboard() {
         { label: "Browse", value: "All Images" },
         { label: "Download", value: "& Share" }
       ]
+    },
+    {
+      title: "Analytics Terminal",
+      description: "Advanced analytics terminal for market data and insights",
+      icon: Terminal,
+      href: "/dashboard/terminal",
+      color: "text-cyan-600",
+      bgColor: "bg-cyan-50",
+      metrics: [
+        { label: "Status", value: "Beta" },
+        { label: "Features", value: "Advanced" }
+      ]
+    },
+    {
+      title: "Charts & Analytics",
+      description: "Interactive charts and comprehensive analytics dashboard",
+      icon: TrendingUp,
+      href: "/dashboard/charts",
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
+      metrics: [
+        { label: "Charts", value: "Interactive" },
+        { label: "Data", value: "Real-time" }
+      ]
+    },
+    {
+      title: "Portfolio Manager",
+      description: "Manage and track investment portfolios and performance",
+      icon: Briefcase,
+      href: "/dashboard/portfolio",
+      color: "text-amber-600",
+      bgColor: "bg-amber-50",
+      metrics: [
+        { label: "Tracking", value: "Portfolio" },
+        { label: "Status", value: "Phase 2" }
+      ]
+    },
+    {
+      title: "Daily Predictions",
+      description: "Generate and manage AI-powered daily stock predictions",
+      icon: Brain,
+      href: "#",
+      color: "text-violet-600",
+      bgColor: "bg-violet-50",
+      metrics: [
+        { label: "Today", value: new Date().toLocaleDateString() },
+        { label: "AI", value: "Powered" }
+      ],
+      isAction: true,
+      actionHandler: () => generateTodaysPredictions()
+    },
+    {
+      title: "Blog Management",
+      description: "Create, edit, and manage blog posts and categories",
+      icon: Edit3,
+      href: "/admin/blog",
+      color: "text-pink-600",
+      bgColor: "bg-pink-50",
+      metrics: [
+        { label: "Posts", value: "Manage" },
+        { label: "Categories", value: "Organize" }
+      ]
+    },
+    {
+      title: "Create Blog Post",
+      description: "Write and publish new articles for your blog",
+      icon: Plus,
+      href: "/admin/blog/new",
+      color: "text-emerald-600",
+      bgColor: "bg-emerald-50",
+      metrics: [
+        { label: "New", value: "Article" },
+        { label: "Publishing", value: "Ready" }
+      ]
+    },
+    {
+      title: "Review Flags",
+      description: "Review and manage content compliance flags",
+      icon: AlertTriangle,
+      href: "/admin/compliance-monitoring",
+      color: "text-red-600",
+      bgColor: "bg-red-50",
+      metrics: stats ? [
+        { label: "Pending", value: stats.pendingFlags.toString() },
+        { label: "Priority", value: "High" }
+      ] : []
+    },
+    {
+      title: "User Reports",
+      description: "Detailed user analytics and engagement reports",
+      icon: Users,
+      href: "/admin/user-analytics",
+      color: "text-green-600",
+      bgColor: "bg-green-50",
+      metrics: [
+        { label: "Analytics", value: "Deep" },
+        { label: "Reports", value: "Detailed" }
+      ]
+    },
+    {
+      title: "Revenue Analysis", 
+      description: "Financial performance and revenue analytics dashboard",
+      icon: DollarSign,
+      href: "/admin/business-metrics",
+      color: "text-emerald-600",
+      bgColor: "bg-emerald-50",
+      metrics: [
+        { label: "Revenue", value: "Analysis" },
+        { label: "Growth", value: "Metrics" }
+      ]
     }
   ];
 
@@ -322,12 +432,32 @@ export default function AdminDashboard() {
                     </div>
                   )}
                   
-                  <Link to={section.href}>
-                    <Button className="w-full group-hover:bg-primary/90 transition-colors">
-                      View Dashboard
-                      <TrendingUp className="h-4 w-4 ml-2" />
+                  {section.isAction ? (
+                    <Button 
+                      onClick={section.actionHandler} 
+                      disabled={generatingPredictions}
+                      className="w-full group-hover:bg-primary/90 transition-colors"
+                    >
+                      {generatingPredictions ? (
+                        <>
+                          <Activity className="h-4 w-4 mr-2 animate-spin" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          Generate Now
+                          <Play className="h-4 w-4 ml-2" />
+                        </>
+                      )}
                     </Button>
-                  </Link>
+                  ) : (
+                    <Link to={section.href}>
+                      <Button className="w-full group-hover:bg-primary/90 transition-colors">
+                        View Dashboard
+                        <TrendingUp className="h-4 w-4 ml-2" />
+                      </Button>
+                    </Link>
+                  )}
                 </CardContent>
               </Card>
             );
@@ -376,159 +506,6 @@ export default function AdminDashboard() {
               </div>
             </CardContent>
           </Card>
-        </div>
-
-        {/* Phase 2 Products */}
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">Phase 2 Products</h2>
-          <p className="text-muted-foreground mb-4">Features in development for future release</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link to="/dashboard/terminal">
-              <Button variant="outline" className="w-full justify-start">
-                <Terminal className="h-4 w-4 mr-2" />
-                Analytics Terminal
-              </Button>
-            </Link>
-            <Link to="/dashboard/charts">
-              <Button variant="outline" className="w-full justify-start">
-                <TrendingUp className="h-4 w-4 mr-2" />
-                Charts & Analytics
-              </Button>
-            </Link>
-            <Link to="/dashboard/portfolio">
-              <Button variant="outline" className="w-full justify-start">
-                <Briefcase className="h-4 w-4 mr-2" />
-                Portfolio
-              </Button>
-            </Link>
-          </div>
-        </div>
-
-        {/* Prediction Management */}
-        <div className="mt-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Brain className="h-5 w-5 mr-2" />
-                Daily Predictions Management
-              </CardTitle>
-              <CardDescription>
-                Generate and manage daily stock predictions using AI algorithms
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
-                <div>
-                  <div className="font-medium">Today's Predictions</div>
-                  <div className="text-sm text-muted-foreground">
-                    Generate new predictions for {new Date().toLocaleDateString()}
-                  </div>
-                </div>
-                <Button 
-                  onClick={generateTodaysPredictions} 
-                  disabled={generatingPredictions}
-                  className="ml-4"
-                >
-                  {generatingPredictions ? (
-                    <>
-                      <Activity className="h-4 w-4 mr-2 animate-spin" />
-                      Generating...
-                    </>
-                  ) : (
-                    <>
-                      <Play className="h-4 w-4 mr-2" />
-                      Generate Now
-                    </>
-                  )}
-                </Button>
-              </div>
-              <div className="mt-4 text-sm text-muted-foreground">
-                <div className="flex items-center">
-                  <Clock className="h-4 w-4 mr-2" />
-                  Automatic generation: Daily at 6:00 AM EST
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Link to="/admin/blog">
-              <Button variant="outline" className="w-full justify-start">
-                <Edit3 className="h-4 w-4 mr-2" />
-                Manage Blog
-              </Button>
-            </Link>
-            <Link to="/admin/compliance-monitoring">
-              <Button variant="outline" className="w-full justify-start">
-                <AlertTriangle className="h-4 w-4 mr-2" />
-                Review Flags
-              </Button>
-            </Link>
-            <Link to="/admin/user-analytics">
-              <Button variant="outline" className="w-full justify-start">
-                <Users className="h-4 w-4 mr-2" />
-                User Reports
-              </Button>
-            </Link>
-            <Link to="/admin/business-metrics">
-              <Button variant="outline" className="w-full justify-start">
-                <DollarSign className="h-4 w-4 mr-2" />
-                Revenue Analysis
-              </Button>
-            </Link>
-          </div>
-        </div>
-
-        {/* Blog Management Section */}
-        <div className="mt-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Blog Management</h2>
-            <Link to="/admin/blog/new">
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Create New Article
-              </Button>
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link to="/admin/blog">
-              <Button variant="outline" className="w-full justify-start h-auto p-4">
-                <div className="text-left">
-                  <div className="flex items-center">
-                    <FileText className="h-4 w-4 mr-2" />
-                    All Articles
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">View and manage all blog posts</p>
-                </div>
-              </Button>
-            </Link>
-            <Link to="/admin/blog/categories">
-              <Button variant="outline" className="w-full justify-start h-auto p-4">
-                <div className="text-left">
-                  <div className="flex items-center">
-                    <Tag className="h-4 w-4 mr-2" />
-                    Categories
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">Manage blog categories</p>
-                </div>
-              </Button>
-            </Link>
-            <Link to="/admin/content-performance">
-              <Button variant="outline" className="w-full justify-start h-auto p-4">
-                <div className="text-left">
-                  <div className="flex items-center">
-                    <BarChart3 className="h-4 w-4 mr-2" />
-                    Analytics
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">Content performance metrics</p>
-                </div>
-              </Button>
-            </Link>
-          </div>
         </div>
       </div>
     </div>
