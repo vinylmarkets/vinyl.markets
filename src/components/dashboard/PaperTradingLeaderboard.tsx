@@ -127,43 +127,30 @@ export function PaperTradingLeaderboard() {
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {leaderboard.map((entry) => (
               <div
                 key={entry.account_id}
-                className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors text-xs"
               >
-                <div className="flex items-center justify-center w-6 h-6">
-                  {getRankIcon(entry.rank)}
-                </div>
-                
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">
-                    {entry.account_name}
-                  </p>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span>{entry.total_trades} trades</span>
-                    {entry.win_rate > 0 && (
-                      <>
-                        <span>•</span>
-                        <span>{entry.win_rate.toFixed(1)}% win rate</span>
-                      </>
-                    )}
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <div className="flex items-center justify-center w-5 h-5 text-xs">
+                    {getRankIcon(entry.rank)}
                   </div>
+                  <span className="font-medium truncate">{entry.account_name}</span>
                 </div>
                 
-                <div className="text-right">
+                <div className="flex items-center gap-3 text-xs">
+                  <span className="text-muted-foreground">{entry.total_trades} trades</span>
+                  <span className="text-muted-foreground">
+                    ${((entry.return_percentage / 100) * 100000).toLocaleString()}
+                  </span>
                   <Badge
                     variant={entry.return_percentage >= 0 ? 'default' : 'destructive'}
-                    className="text-xs"
+                    className="text-xs min-w-[60px] text-center"
                   >
                     {formatPercentage(entry.return_percentage)}
                   </Badge>
-                  {entry.total_points > 0 && (
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {entry.total_points} pts
-                    </p>
-                  )}
                 </div>
               </div>
             ))}
