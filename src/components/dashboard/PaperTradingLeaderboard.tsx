@@ -23,6 +23,7 @@ export function PaperTradingLeaderboard() {
   useEffect(() => {
     async function fetchLeaderboard() {
       try {
+        console.log('Fetching leaderboard data...');
         const { data, error } = await supabase
           .from('paper_leaderboards')
           .select(`
@@ -32,7 +33,12 @@ export function PaperTradingLeaderboard() {
           .order('return_percentage', { ascending: false })
           .limit(10);
 
-        if (error) throw error;
+        console.log('Leaderboard query result:', { data, error });
+
+        if (error) {
+          console.error('Supabase error:', error);
+          throw error;
+        }
 
         const formattedData = data?.map((entry, index) => ({
           rank: index + 1,
@@ -42,10 +48,11 @@ export function PaperTradingLeaderboard() {
           win_rate: entry.win_rate || 0,
           total_trades: entry.total_trades || 0,
           total_points: entry.total_points || 0,
-          account_name: entry.paper_accounts.account_name || 'Anonymous',
-          user_id: entry.paper_accounts.user_id
+          account_name: entry.paper_accounts?.account_name || 'Anonymous',
+          user_id: entry.paper_accounts?.user_id
         })) || [];
 
+        console.log('Formatted leaderboard data:', formattedData);
         setLeaderboard(formattedData);
       } catch (error) {
         console.error('Error fetching leaderboard:', error);
