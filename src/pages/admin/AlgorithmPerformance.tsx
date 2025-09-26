@@ -56,6 +56,8 @@ interface PerformanceTrend {
   accuracy: number;
   confidence: number;
   predictions_count: number;
+  hit_target_rate?: number;
+  closed_target_rate?: number;
 }
 
 interface RecommendationItem {
@@ -81,6 +83,9 @@ interface PredictionResult {
   direction_correct?: boolean;
   expected_gain_percentage: number;
   actual_gain_percentage?: number;
+  hit_target?: boolean;
+  closed_target?: boolean;
+  previous_close?: number;
 }
 
 export default function AlgorithmPerformance() {
@@ -109,7 +114,7 @@ export default function AlgorithmPerformance() {
         .limit(1)
         .maybeSingle();
 
-      // Get performance trends for selected date range
+      // Get performance trends for selected date range with target metrics
       const { data: trendData } = await supabase
         .from('algorithm_performance')
         .select('date, directional_accuracy, average_confidence, total_predictions')
@@ -121,12 +126,67 @@ export default function AlgorithmPerformance() {
       }
 
       if (trendData) {
-        setTrends(trendData.map(item => ({
-          date: item.date,
-          accuracy: item.directional_accuracy || 0,
-          confidence: item.average_confidence || 0,
-          predictions_count: item.total_predictions || 0
-        })));
+        // Calculate target metrics for each date
+        const trendsWithTargets = await Promise.all(trendData.map(async (item) => {
+          const dateStr = item.date;
+          
+          // Get predictions and results for this date to calculate target rates
+          const { data: predictions } = await supabase
+            .from('enhanced_daily_predictions')
+            .select('id, previous_close, expected_gain_percentage')
+            .eq('prediction_date', dateStr);
+            
+          const { data: results } = await supabase
+            .from('prediction_results')
+            .select('prediction_id, actual_high, actual_low, actual_close')
+            .in('prediction_id', predictions?.map(p => p.id) || []);
+            
+          let hitTargetRate = 0;
+          let closedTargetRate = 0;
+          
+          if (predictions && results && predictions.length > 0) {
+            const resultsMap = new Map(results.map(r => [r.prediction_id, r]));
+            let hitCount = 0;
+            let closedCount = 0;
+            let validCount = 0;
+            
+            predictions.forEach(pred => {
+              const result = resultsMap.get(pred.id);
+              if (result && pred.previous_close && pred.expected_gain_percentage !== undefined) {
+                validCount++;
+                const targetPrice = pred.previous_close * (1 + pred.expected_gain_percentage / 100);
+                
+                // Check hit target
+                if (pred.expected_gain_percentage >= 0 && result.actual_high >= targetPrice) {
+                  hitCount++;
+                } else if (pred.expected_gain_percentage < 0 && result.actual_low <= targetPrice) {
+                  hitCount++;
+                }
+                
+                // Check closed target
+                if (pred.expected_gain_percentage >= 0 && result.actual_close >= targetPrice) {
+                  closedCount++;
+                } else if (pred.expected_gain_percentage < 0 && result.actual_close <= targetPrice) {
+                  closedCount++;
+                }
+              }
+            });
+            
+            hitTargetRate = validCount > 0 ? hitCount / validCount : 0;
+            closedTargetRate = validCount > 0 ? closedCount / validCount : 0;
+          }
+          
+          return {
+            date: item.date,
+            accuracy: item.directional_accuracy || 0,
+            confidence: item.average_confidence || 0,
+            predictions_count: item.total_predictions || 0,
+            hit_target_rate: hitTargetRate,
+            closed_target_rate: closedTargetRate
+          };
+        }));
+        
+        setTrends(trendsWithTargets);
       }
 
       // Generate recommendations based on metrics
@@ -199,6 +259,33 @@ export default function AlgorithmPerformance() {
           ? ((result.actual_close - pred.previous_close) / pred.previous_close) * 100
           : undefined;
         
+        // Calculate target price based on expected gain
+        const targetPrice = pred.previous_close * (1 + pred.expected_gain_percentage / 100);
+        
+        // Calculate HIT TARGET (reached target during day)
+        let hitTarget: boolean | undefined;
+        if (result?.actual_high && result?.actual_low && pred.expected_gain_percentage !== undefined) {
+          if (pred.expected_gain_percentage >= 0) {
+            // For positive predictions, check if high reached target
+            hitTarget = result.actual_high >= targetPrice;
+          } else {
+            // For negative predictions, check if low reached target
+            hitTarget = result.actual_low <= targetPrice;
+          }
+        }
+        
+        // Calculate CLOSED TARGET (closed at/above target for positive, at/below for negative)
+        let closedTarget: boolean | undefined;
+        if (result?.actual_close && pred.expected_gain_percentage !== undefined) {
+          if (pred.expected_gain_percentage >= 0) {
+            // For positive predictions, check if close >= target
+            closedTarget = result.actual_close >= targetPrice;
+          } else {
+            // For negative predictions, check if close <= target
+            closedTarget = result.actual_close <= targetPrice;
+          }
+        }
+        
         return {
           id: pred.id,
           rank: pred.rank,
@@ -212,7 +299,10 @@ export default function AlgorithmPerformance() {
           actual_low: result?.actual_low,
           actual_close: result?.actual_close,
           direction_correct: result?.direction_correct,
-          actual_gain_percentage: actualGain
+          actual_gain_percentage: actualGain,
+          hit_target: hitTarget,
+          closed_target: closedTarget,
+          previous_close: pred.previous_close
         };
       });
       
@@ -423,7 +513,7 @@ export default function AlgorithmPerformance() {
 
           <TabsContent value="overview" className="space-y-6">
             {/* Key Metrics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium flex items-center">
@@ -496,6 +586,42 @@ export default function AlgorithmPerformance() {
                   </div>
                 </CardContent>
               </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium flex items-center">
+                    <Target className="h-4 w-4 mr-2" />
+                    Hit Target Rate
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className={`text-2xl font-bold ${trends.length > 0 ? getStatusColor(trends[0]?.hit_target_rate || 0) : ''}`}>
+                    {trends.length > 0 ? `${((trends[0]?.hit_target_rate || 0) * 100).toFixed(1)}%` : 'N/A'}
+                  </div>
+                  <div className="text-sm text-muted-foreground mt-1">
+                    Reached target during day
+                  </div>
+                  <Progress value={trends.length > 0 ? (trends[0]?.hit_target_rate || 0) * 100 : 0} className="mt-2" />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium flex items-center">
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Closed Target Rate
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className={`text-2xl font-bold ${trends.length > 0 ? getStatusColor(trends[0]?.closed_target_rate || 0) : ''}`}>
+                    {trends.length > 0 ? `${((trends[0]?.closed_target_rate || 0) * 100).toFixed(1)}%` : 'N/A'}
+                  </div>
+                  <div className="text-sm text-muted-foreground mt-1">
+                    Closed at/above target
+                  </div>
+                  <Progress value={trends.length > 0 ? (trends[0]?.closed_target_rate || 0) * 100 : 0} className="mt-2" />
+                </CardContent>
+              </Card>
             </div>
 
             {/* Performance Trend Chart */}
@@ -523,15 +649,88 @@ export default function AlgorithmPerformance() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="h-64 bg-muted/50 rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-muted-foreground">Performance trend chart would be rendered here</p>
-                    <p className="text-sm text-muted-foreground">
-                      Showing {trends.length} data points over {dateRange} days
-                    </p>
+                {trends.length > 0 ? (
+                  <div className="h-64">
+                    <div className="flex justify-between items-center mb-4 text-sm">
+                      <div className="flex items-center space-x-4">
+                        <div className="flex items-center">
+                          <div className="w-3 h-3 bg-blue-500 rounded mr-2"></div>
+                          <span>Directional Accuracy</span>
+                        </div>
+                        <div className="flex items-center">
+                          <div className="w-3 h-3 bg-green-500 rounded mr-2"></div>
+                          <span>Hit Target Rate</span>
+                        </div>
+                        <div className="flex items-center">
+                          <div className="w-3 h-3 bg-purple-500 rounded mr-2"></div>
+                          <span>Closed Target Rate</span>
+                        </div>
+                      </div>
+                    </div>
+                    <svg width="100%" height="200" className="overflow-visible">
+                      <g>
+                        {/* Chart lines */}
+                        {trends.map((trend, index) => {
+                          const x = (index / (trends.length - 1)) * 100;
+                          const accuracyY = 180 - (trend.accuracy * 160);
+                          const hitTargetY = 180 - ((trend.hit_target_rate || 0) * 160);
+                          const closedTargetY = 180 - ((trend.closed_target_rate || 0) * 160);
+                          
+                          return (
+                            <g key={index}>
+                              {/* Data points */}
+                              <circle cx={`${x}%`} cy={accuracyY} r="3" fill="#3b82f6" />
+                              <circle cx={`${x}%`} cy={hitTargetY} r="3" fill="#10b981" />
+                              <circle cx={`${x}%`} cy={closedTargetY} r="3" fill="#8b5cf6" />
+                              
+                              {/* Connect lines */}
+                              {index > 0 && (
+                                <>
+                                  <line
+                                    x1={`${((index - 1) / (trends.length - 1)) * 100}%`}
+                                    y1={180 - (trends[index - 1].accuracy * 160)}
+                                    x2={`${x}%`}
+                                    y2={accuracyY}
+                                    stroke="#3b82f6"
+                                    strokeWidth="2"
+                                  />
+                                  <line
+                                    x1={`${((index - 1) / (trends.length - 1)) * 100}%`}
+                                    y1={180 - ((trends[index - 1].hit_target_rate || 0) * 160)}
+                                    x2={`${x}%`}
+                                    y2={hitTargetY}
+                                    stroke="#10b981"
+                                    strokeWidth="2"
+                                  />
+                                  <line
+                                    x1={`${((index - 1) / (trends.length - 1)) * 100}%`}
+                                    y1={180 - ((trends[index - 1].closed_target_rate || 0) * 160)}
+                                    x2={`${x}%`}
+                                    y2={closedTargetY}
+                                    stroke="#8b5cf6"
+                                    strokeWidth="2"
+                                  />
+                                </>
+                              )}
+                            </g>
+                          );
+                        })}
+                        
+                        {/* Y-axis labels */}
+                        <text x="10" y="20" fontSize="12" fill="#6b7280">100%</text>
+                        <text x="10" y="100" fontSize="12" fill="#6b7280">50%</text>
+                        <text x="10" y="180" fontSize="12" fill="#6b7280">0%</text>
+                      </g>
+                    </svg>
                   </div>
-                </div>
+                ) : (
+                  <div className="h-64 bg-muted/50 rounded-lg flex items-center justify-center">
+                    <div className="text-center">
+                      <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-muted-foreground">No trend data available</p>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -688,30 +887,46 @@ export default function AlgorithmPerformance() {
                             <p className="text-sm text-muted-foreground">{result.company_name}</p>
                           </div>
                         </div>
-                        <div className="grid grid-cols-3 gap-4 text-sm">
-                          <div>
-                            <p className="text-muted-foreground">Expected</p>
-                            <p className="font-medium">{result.expected_gain_percentage.toFixed(2)}%</p>
-                          </div>
-                          <div>
-                            <p className="text-muted-foreground">Actual</p>
-                            <p className={`font-medium ${result.actual_gain_percentage !== undefined 
-                              ? result.actual_gain_percentage > 0 ? 'text-green-600' : 'text-red-600'
-                              : ''}`}>
-                              {result.actual_gain_percentage !== undefined 
-                                ? `${result.actual_gain_percentage.toFixed(2)}%` 
-                                : 'N/A'}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-muted-foreground">Direction</p>
-                            <div className="flex items-center">
-                              {result.direction_correct === true && <CheckCircle className="h-4 w-4 text-green-600" />}
-                              {result.direction_correct === false && <AlertCircle className="h-4 w-4 text-red-600" />}
-                              {result.direction_correct === undefined && <span className="text-muted-foreground">N/A</span>}
-                            </div>
-                          </div>
-                        </div>
+                         <div className="grid grid-cols-5 gap-4 text-sm">
+                           <div>
+                             <p className="text-muted-foreground">Expected</p>
+                             <p className="font-medium">{result.expected_gain_percentage.toFixed(2)}%</p>
+                           </div>
+                           <div>
+                             <p className="text-muted-foreground">Actual</p>
+                             <p className={`font-medium ${result.actual_gain_percentage !== undefined 
+                               ? result.actual_gain_percentage > 0 ? 'text-green-600' : 'text-red-600'
+                               : ''}`}>
+                               {result.actual_gain_percentage !== undefined 
+                                 ? `${result.actual_gain_percentage.toFixed(2)}%` 
+                                 : 'N/A'}
+                             </p>
+                           </div>
+                           <div>
+                             <p className="text-muted-foreground">Direction</p>
+                             <div className="flex items-center">
+                               {result.direction_correct === true && <CheckCircle className="h-4 w-4 text-green-600" />}
+                               {result.direction_correct === false && <AlertCircle className="h-4 w-4 text-red-600" />}
+                               {result.direction_correct === undefined && <span className="text-muted-foreground">N/A</span>}
+                             </div>
+                           </div>
+                           <div>
+                             <p className="text-muted-foreground">Hit Target</p>
+                             <div className="flex items-center">
+                               {result.hit_target === true && <Badge className="bg-green-600 text-xs">SUCCESS</Badge>}
+                               {result.hit_target === false && <Badge variant="destructive" className="text-xs">FAIL</Badge>}
+                               {result.hit_target === undefined && <span className="text-muted-foreground text-xs">N/A</span>}
+                             </div>
+                           </div>
+                           <div>
+                             <p className="text-muted-foreground">Closed Target</p>
+                             <div className="flex items-center">
+                               {result.closed_target === true && <Badge className="bg-green-600 text-xs">SUCCESS</Badge>}
+                               {result.closed_target === false && <Badge variant="destructive" className="text-xs">FAIL</Badge>}
+                               {result.closed_target === undefined && <span className="text-muted-foreground text-xs">N/A</span>}
+                             </div>
+                           </div>
+                         </div>
                       </div>
                     ))}
                   </div>
