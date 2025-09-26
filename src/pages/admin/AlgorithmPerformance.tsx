@@ -267,11 +267,22 @@ export default function AlgorithmPerformance() {
           : undefined;
         
         // Calculate target price based on expected gain
-        const targetPrice = pred.previous_close * (1 + pred.expected_gain_percentage / 100);
+        const targetPrice = pred.previous_close && pred.expected_gain_percentage !== undefined
+          ? pred.previous_close * (1 + pred.expected_gain_percentage / 100)
+          : undefined;
+        
+        console.log(`Debug ${pred.symbol}:`, {
+          previous_close: pred.previous_close,
+          expected_gain: pred.expected_gain_percentage,
+          target_price: targetPrice,
+          actual_high: result?.actual_high,
+          actual_low: result?.actual_low,
+          actual_close: result?.actual_close
+        });
         
         // Calculate HIT TARGET (reached target during day)
         let hitTarget: boolean | undefined;
-        if (result?.actual_high && result?.actual_low && pred.expected_gain_percentage !== undefined) {
+        if (result?.actual_high !== null && result?.actual_low !== null && targetPrice !== undefined) {
           if (pred.expected_gain_percentage >= 0) {
             // For positive predictions, check if high reached target
             hitTarget = result.actual_high >= targetPrice;
@@ -283,7 +294,7 @@ export default function AlgorithmPerformance() {
         
         // Calculate CLOSED TARGET (closed at/above target for positive, at/below for negative)
         let closedTarget: boolean | undefined;
-        if (result?.actual_close && pred.expected_gain_percentage !== undefined) {
+        if (result?.actual_close !== null && targetPrice !== undefined) {
           if (pred.expected_gain_percentage >= 0) {
             // For positive predictions, check if close >= target
             closedTarget = result.actual_close >= targetPrice;
@@ -292,6 +303,13 @@ export default function AlgorithmPerformance() {
             closedTarget = result.actual_close <= targetPrice;
           }
         }
+        
+        console.log(`Target calculation for ${pred.symbol}:`, {
+          hitTarget,
+          closedTarget,
+          expected_gain: pred.expected_gain_percentage,
+          target_price: targetPrice
+        });
         
         return {
           id: pred.id,
@@ -302,9 +320,9 @@ export default function AlgorithmPerformance() {
           predicted_low: pred.predicted_low,
           predicted_close: pred.predicted_close,
           expected_gain_percentage: pred.expected_gain_percentage || 0,
-          actual_high: result?.actual_high,
-          actual_low: result?.actual_low,
-          actual_close: result?.actual_close,
+          actual_high: result?.actual_high || undefined,
+          actual_low: result?.actual_low || undefined,
+          actual_close: result?.actual_close || undefined,
           direction_correct: result?.direction_correct,
           actual_gain_percentage: actualGain,
           hit_target: hitTarget,
@@ -315,6 +333,7 @@ export default function AlgorithmPerformance() {
       
       setArchiveResults(displayResults);
       const resultsCount = results ? results.length : 0;
+      console.log('Archive results processed:', displayResults.length, 'predictions with', resultsCount, 'results');
       toast.success(`Loaded ${predictions.length} predictions (${resultsCount} with results) for ${dateStr}`);
       
     } catch (error) {
