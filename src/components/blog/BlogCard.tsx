@@ -40,7 +40,7 @@ export function BlogCard({
       
       <CardContent className="p-4">
         <Link to={`/articles/${slug}`} className="block group-hover:text-primary transition-colors">
-          <h3 className="text-base font-medium leading-tight line-clamp-2">
+          <h3 className="text-sm font-medium leading-tight line-clamp-2">
             {title}
           </h3>
         </Link>
