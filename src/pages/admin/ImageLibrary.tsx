@@ -14,10 +14,12 @@ import {
   Filter,
   Grid,
   List,
-  Calendar
+  Calendar,
+  ArrowLeft
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
 
 interface GeneratedImage {
   id: string;
@@ -36,6 +38,7 @@ export function ImageLibrary() {
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [filterFeatured, setFilterFeatured] = useState(false);
+  const navigate = useNavigate();
 
   const loadImages = async () => {
     try {
@@ -170,6 +173,14 @@ export function ImageLibrary() {
                 Manage your AI-generated images and assets
               </p>
             </div>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/admin')}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Dashboard
+            </Button>
           </div>
         </CardHeader>
       </Card>

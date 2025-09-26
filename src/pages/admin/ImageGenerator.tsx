@@ -5,9 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Sparkles, Download, Copy, Tag, FileText } from 'lucide-react';
+import { Loader2, Sparkles, Download, Copy, Tag, FileText, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
 
 interface GeneratedImage {
   id: string;
@@ -25,6 +26,7 @@ export function ImageGenerator() {
   const [usageNotes, setUsageNotes] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<GeneratedImage | null>(null);
+  const navigate = useNavigate();
 
   const generateImage = async () => {
     if (!prompt.trim()) {
@@ -100,6 +102,14 @@ export function ImageGenerator() {
                 Create custom visuals for your homepage and landing pages
               </p>
             </div>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/admin')}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Dashboard
+            </Button>
           </div>
         </CardHeader>
       </Card>
