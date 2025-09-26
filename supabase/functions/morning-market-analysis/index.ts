@@ -100,28 +100,15 @@ async function generateMarketAnalysis(stocks: typeof TOP_STOCKS): Promise<Predic
   const today = new Date().toISOString().split('T')[0];
   
   console.log('Generating market analysis for', stocks.length, 'stocks');
+  console.log('OpenAI API Key exists:', !!openAIApiKey);
   
-  const prompt = `As a quantitative analyst, generate detailed daily stock predictions for ${today}. 
+  // Check if OpenAI API key is available
+  if (!openAIApiKey) {
+    console.error('OpenAI API key is not configured');
+    throw new Error('OpenAI API key is missing');
+  }
 
-Analyze these ${stocks.length} stocks and select the TOP 20 most promising opportunities based on:
-- Technical analysis patterns
-- Market sentiment and news flow
-- Options flow and unusual activity  
-- Pre-market indicators
-- Sector rotation dynamics
-- Macroeconomic factors
-
-For each stock, provide realistic predictions with the following constraints:
-- Previous close should be realistic for each stock (AAPL ~$150-200, MSFT ~$300-400, etc.)
-- Predicted prices should be within 1-5% of previous close for most stocks
-- High volatility stocks (TSLA, NVDA) can have wider ranges (up to 8%)
-- Confidence scores: 60-95% range
-- Expected gains: -3% to +8% daily range
-- Risk scores: 1-10 scale
-
-Stocks to analyze: ${stocks.map(s => `${s.symbol} (${s.name})`).join(', ')}
-
-Return EXACTLY this JSON structure for the TOP 20 stocks ranked by opportunity score:
+  const prompt = `Generate TOP 20 stock predictions for ${today}. Return ONLY valid JSON array with this exact structure:
 
 [
   {
@@ -145,28 +132,23 @@ Return EXACTLY this JSON structure for the TOP 20 stocks ranked by opportunity s
     "options_signal_strength": 0.81,
     "microstructure_signal_strength": 0.69,
     "premarket_signal_strength": 0.77,
-    "explanation": "Strong technical setup with bullish momentum. Options flow indicates institutional accumulation. Earnings expectations remain positive with strong iPhone demand in China.",
-    "methodology_notes": "Analysis based on 20-day technical patterns, options flow analysis, and sentiment indicators. Model incorporates pre-market activity and sector rotation dynamics.",
+    "explanation": "Strong technical setup with bullish momentum.",
+    "methodology_notes": "Analysis based on technical patterns and sentiment.",
     "primary_factors": {
-      "technical_setup": "Bullish flag pattern completion",
-      "options_activity": "Heavy call buying at $190 strikes",
-      "sentiment": "Positive analyst revisions",
-      "catalysts": "Strong China iPhone sales data"
+      "technical_setup": "Bullish pattern",
+      "sentiment": "Positive"
     },
     "all_signals": {
       "rsi": 58.2,
-      "macd_signal": "bullish",
-      "support_level": 182.50,
-      "resistance_level": 191.00,
-      "volume_profile": "above_average",
-      "institutional_flow": "accumulation"
+      "macd_signal": "bullish"
     }
   }
 ]
 
-Ensure predictions are realistic, well-researched, and properly ranked by opportunity quality.`;
+Use realistic stock prices. Return exactly 20 stocks ranked 1-20.`;
 
   try {
+    console.log('Making OpenAI API call...');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -174,31 +156,44 @@ Ensure predictions are realistic, well-researched, and properly ranked by opport
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4o-mini',
         messages: [
           { 
             role: 'system', 
-            content: 'You are a quantitative analyst specializing in daily stock predictions. Always return valid JSON only, no additional text.' 
+            content: 'You are a stock analyst. Return only valid JSON, no additional text.' 
           },
           { role: 'user', content: prompt }
         ],
-        max_tokens: 8000,
+        max_tokens: 4000,
         temperature: 0.3,
       }),
     });
 
+    console.log('OpenAI response status:', response.status);
+    
     if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('OpenAI API error:', response.status, errorText);
+      throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
+    console.log('OpenAI response received, parsing...');
+    
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      throw new Error('Invalid OpenAI response structure');
+    }
+    
     const content = data.choices[0].message.content;
+    console.log('Content length:', content.length);
     
     // Parse JSON and add required fields
     const predictions = JSON.parse(content);
+    console.log('Parsed', predictions.length, 'predictions');
     
-    return predictions.map((pred: any) => ({
+    return predictions.map((pred: any, index: number) => ({
       ...pred,
+      rank: index + 1, // Ensure rank is set
       prediction_date: today,
       algorithm_version: 'v1.0',
       estimated_high_time: `${Math.floor(Math.random() * 6) + 10}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}:00`,
@@ -252,37 +247,56 @@ serve(async (req) => {
 
   try {
     console.log('Starting morning market analysis...');
+    console.log('Environment check:', {
+      supabaseUrl: !!supabaseUrl,
+      supabaseServiceKey: !!supabaseServiceKey,
+      openAIApiKey: !!openAIApiKey
+    });
+    
     const startTime = Date.now();
     
     // Check if predictions already exist for today
     const today = new Date().toISOString().split('T')[0];
-    const { data: existingPredictions } = await supabase
+    console.log('Checking for existing predictions for:', today);
+    
+    const { data: existingPredictions, error: checkError } = await supabase
       .from('enhanced_daily_predictions')
       .select('id')
       .eq('prediction_date', today)
       .limit(1);
       
+    if (checkError) {
+      console.error('Error checking existing predictions:', checkError);
+      throw new Error(`Database error: ${checkError.message}`);
+    }
+      
     if (existingPredictions && existingPredictions.length > 0) {
       console.log('Predictions already exist for today:', today);
       return new Response(JSON.stringify({ 
+        success: false,
         message: 'Predictions already exist for today',
-        date: today
+        date: today,
+        existing_count: existingPredictions.length
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
+    console.log('No existing predictions found, generating new ones...');
+    
     // Generate new predictions
     const predictions = await generateMarketAnalysis(TOP_STOCKS);
     console.log('Generated', predictions.length, 'predictions');
     
     // Save to database
     await savePredictionsToDatabase(predictions);
+    console.log('Predictions saved to database successfully');
     
     // Calculate algorithm performance for yesterday (if data exists)
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayStr = yesterday.toISOString().split('T')[0];
+    console.log('Calculating algorithm performance for:', yesterdayStr);
     await calculateAlgorithmPerformance(yesterdayStr);
     
     const executionTime = Date.now() - startTime;
@@ -290,7 +304,7 @@ serve(async (req) => {
     
     return new Response(JSON.stringify({ 
       success: true,
-      message: 'Morning market analysis completed',
+      message: 'Morning market analysis completed successfully',
       predictions_generated: predictions.length,
       execution_time_ms: executionTime,
       date: today
@@ -300,9 +314,13 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in morning market analysis:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error details:', errorMessage);
+    
     return new Response(JSON.stringify({ 
+      success: false,
       error: 'Failed to generate morning analysis',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      details: errorMessage
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
