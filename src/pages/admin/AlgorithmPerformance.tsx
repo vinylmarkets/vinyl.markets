@@ -127,7 +127,16 @@ export default function AlgorithmPerformance() {
 
       if (trendData) {
         // Calculate target metrics for each date
-        const trendsWithTargets = await Promise.all(trendData.map(async (item) => {
+        // Filter data to only show from Sept 25th onwards and sort chronologically
+        const filteredTrendData = trendData
+          .filter(item => {
+            const itemDate = new Date(item.date);
+            const sept25 = new Date('2025-09-25');
+            return itemDate >= sept25;
+          })
+          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+        const trendsWithTargets = await Promise.all(filteredTrendData.map(async (item) => {
           const dateStr = item.date;
           
           // Get predictions and results for this date to calculate target rates
@@ -185,6 +194,28 @@ export default function AlgorithmPerformance() {
             closed_target_rate: closedTargetRate
           };
         }));
+        
+        // Add today's data if we have archive results and it's not already included
+        if (archiveResults.length > 0) {
+          const today = format(new Date(), 'yyyy-MM-dd');
+          const todayExists = trendsWithTargets.some(t => format(new Date(t.date), 'yyyy-MM-dd') === today);
+          
+          if (!todayExists) {
+            const hitTargetSuccesses = archiveResults.filter(r => r.hit_target === true).length;
+            const closedTargetSuccesses = archiveResults.filter(r => r.closed_target === true).length;
+            const directionalSuccesses = archiveResults.filter(r => r.direction_correct === true).length;
+            const total = archiveResults.length;
+            
+            trendsWithTargets.push({
+              date: today,
+              accuracy: total > 0 ? directionalSuccesses / total : 0,
+              confidence: 0.8, // Default confidence for today
+              predictions_count: total,
+              hit_target_rate: total > 0 ? hitTargetSuccesses / total : 0,
+              closed_target_rate: total > 0 ? closedTargetSuccesses / total : 0
+            });
+          }
+        }
         
         setTrends(trendsWithTargets);
       }
@@ -706,7 +737,7 @@ export default function AlgorithmPerformance() {
                         <g>
                           {/* Chart lines and data points */}
                           {trends.map((trend, index) => {
-                            const x = 40 + (index / Math.max(trends.length - 1, 1)) * (100 - 50); // Adjusted for margins
+                            const x = 60 + (index / Math.max(trends.length - 1, 1)) * (100 - 70); // Better margins for readability
                             const accuracyY = 180 - (trend.accuracy * 160);
                             const hitTargetY = 180 - ((trend.hit_target_rate || 0) * 160);
                             const closedTargetY = 180 - ((trend.closed_target_rate || 0) * 160);
@@ -746,7 +777,7 @@ export default function AlgorithmPerformance() {
                                 {index > 0 && (
                                   <>
                                     <line
-                                      x1={40 + ((index - 1) / Math.max(trends.length - 1, 1)) * (100 - 50)}
+                                      x1={60 + ((index - 1) / Math.max(trends.length - 1, 1)) * (100 - 70)}
                                       y1={180 - (trends[index - 1].accuracy * 160)}
                                       x2={x}
                                       y2={accuracyY}
@@ -754,7 +785,7 @@ export default function AlgorithmPerformance() {
                                       strokeWidth="2"
                                     />
                                     <line
-                                      x1={40 + ((index - 1) / Math.max(trends.length - 1, 1)) * (100 - 50)}
+                                      x1={60 + ((index - 1) / Math.max(trends.length - 1, 1)) * (100 - 70)}
                                       y1={180 - ((trends[index - 1].hit_target_rate || 0) * 160)}
                                       x2={x}
                                       y2={hitTargetY}
@@ -762,7 +793,7 @@ export default function AlgorithmPerformance() {
                                       strokeWidth="2"
                                     />
                                     <line
-                                      x1={40 + ((index - 1) / Math.max(trends.length - 1, 1)) * (100 - 50)}
+                                      x1={60 + ((index - 1) / Math.max(trends.length - 1, 1)) * (100 - 70)}
                                       y1={180 - ((trends[index - 1].closed_target_rate || 0) * 160)}
                                       x2={x}
                                       y2={closedTargetY}
@@ -782,19 +813,22 @@ export default function AlgorithmPerformance() {
                           <text x="10" y="140" fontSize="12" fill="#6b7280">25%</text>
                           <text x="10" y="180" fontSize="12" fill="#6b7280">0%</text>
                           
-                          {/* X-axis date labels */}
+                          {/* X-axis date labels - improved spacing */}
                           {trends.map((trend, index) => {
-                            if (index % Math.ceil(trends.length / 6) === 0 || index === trends.length - 1) {
-                              const x = 40 + (index / Math.max(trends.length - 1, 1)) * (100 - 50);
+                            // Show every 2nd date if less than 10 points, otherwise show fewer
+                            const showEvery = trends.length <= 5 ? 1 : trends.length <= 10 ? 2 : Math.ceil(trends.length / 5);
+                            
+                            if (index % showEvery === 0 || index === trends.length - 1) {
+                              const x = 60 + (index / Math.max(trends.length - 1, 1)) * (100 - 70);
                               return (
                                 <text 
                                   key={`date-${index}`}
                                   x={x} 
                                   y="210" 
-                                  fontSize="10" 
+                                  fontSize="11" 
                                   fill="#6b7280" 
                                   textAnchor="middle"
-                                  transform={`rotate(-45, ${x}, 210)`}
+                                  transform={`rotate(-35, ${x}, 210)`}
                                 >
                                   {format(new Date(trend.date), 'MMM dd')}
                                 </text>
