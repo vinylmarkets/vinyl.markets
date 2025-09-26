@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { BlogGrid } from "@/components/blog/BlogGrid";
 import { PaperTradingLeaderboard } from "@/components/dashboard/PaperTradingLeaderboard";
+import { FollowedStocks } from "@/components/dashboard/FollowedStocks";
 import { AlertCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -135,10 +136,13 @@ export default function Dashboard() {
           <BlogGrid />
         </div>
 
-        {/* Leaderboard Section */}
-        <div className="flex justify-end mb-8">
-          <div className="w-full max-w-md">
-            <PaperTradingLeaderboard />
+        {/* Dashboard Widgets Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <FollowedStocks />
+          <div className="flex justify-end">
+            <div className="w-full max-w-md">
+              <PaperTradingLeaderboard />
+            </div>
           </div>
         </div>
 
