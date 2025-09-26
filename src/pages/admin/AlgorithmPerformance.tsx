@@ -122,7 +122,31 @@ export default function AlgorithmPerformance() {
         .limit(dateRange);
 
       if (latestMetrics) {
-        setMetrics(latestMetrics);
+        // Calculate actual average confidence from all predictions
+        const { data: allPredictions, error: predError } = await supabase
+          .from('enhanced_daily_predictions')
+          .select('overall_confidence');
+        
+        if (!predError && allPredictions) {
+          const validConfidences = allPredictions
+            .map(p => p.overall_confidence)
+            .filter(conf => conf !== null && conf !== undefined);
+          
+          const actualAvgConfidence = validConfidences.length > 0 
+            ? validConfidences.reduce((sum, conf) => sum + conf, 0) / validConfidences.length / 100
+            : 0;
+          
+          // Override with actual calculated values
+          const updatedMetrics = {
+            ...latestMetrics,
+            average_confidence: actualAvgConfidence,
+            total_predictions: allPredictions.length // Total across all days
+          };
+          
+          setMetrics(updatedMetrics);
+        } else {
+          setMetrics(latestMetrics);
+        }
       }
 
       if (trendData) {
