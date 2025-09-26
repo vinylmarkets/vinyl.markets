@@ -21,6 +21,7 @@ import { Zap, Menu, X, User, LogOut, Settings } from "lucide-react";
 import { siteNavigation } from "@/data/sitemap";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth/AuthProvider";
+import atomicLogo from "@/assets/atomic_logo.png";
 
 export const Navigation = () => {
   const [terminalValue, setTerminalValue] = useState("");
@@ -58,7 +59,7 @@ export const Navigation = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
             <img 
-              src="/atomicmarket-logo-purple.png" 
+              src={atomicLogo} 
               alt="AtomicMarket"
               className="h-9"
             />
