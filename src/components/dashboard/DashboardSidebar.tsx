@@ -1,4 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
+import { useState } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -8,9 +9,13 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   LayoutDashboard,
   FileText,
@@ -24,10 +29,16 @@ import {
   BookOpen,
   Shield,
   MessageSquare,
-  Trophy
+  Trophy,
+  ChevronRight,
+  Search,
+  TrendingDown,
+  Users,
+  Info
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useAdmin } from "@/hooks/useAdmin";
+import { siteNavigation } from "@/data/sitemap";
 
 const navigationItems = [
   {
@@ -78,10 +89,18 @@ export function DashboardSidebar() {
   const location = useLocation();
   const { user } = useAuth();
   const { isAdmin } = useAdmin();
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
   
   // Mock user tier - in real app, fetch from user profile
   const userTier = "free"; // "free", "essential", "pro"
   const isCollapsed = state === "collapsed";
+
+  const toggleMenu = (menuTitle: string) => {
+    setOpenMenus(prev => ({
+      ...prev,
+      [menuTitle]: !prev[menuTitle]
+    }));
+  };
   
   const isActive = (path: string, exact = false) => {
     if (exact) {
@@ -97,6 +116,23 @@ export function DashboardSidebar() {
       : "hover:bg-muted/50";
   };
 
+  const getIconForNavItem = (title: string) => {
+    switch (title) {
+      case "Home":
+        return LayoutDashboard;
+      case "Research":
+        return Search;
+      case "Documentation":
+        return BookOpen;
+      case "Performance":
+        return TrendingUp;
+      case "About":
+        return Info;
+      default:
+        return FileText;
+    }
+  };
+
   return (
     <Sidebar
       collapsible="icon"
@@ -104,7 +140,7 @@ export function DashboardSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className={isCollapsed ? "sr-only" : ""}>
-            Navigation
+            Dashboard
           </SidebarGroupLabel>
           
           <SidebarGroupContent>
@@ -147,6 +183,76 @@ export function DashboardSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               )}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Site Navigation with Submenus */}
+        <SidebarGroup>
+          <SidebarGroupLabel className={isCollapsed ? "sr-only" : ""}>
+            Site Navigation
+          </SidebarGroupLabel>
+          
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {siteNavigation.map((item) => {
+                const IconComponent = getIconForNavItem(item.title);
+                const hasChildren = item.children && item.children.length > 0;
+                const isMenuOpen = openMenus[item.title];
+                
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    {hasChildren ? (
+                      <Collapsible
+                        open={isMenuOpen}
+                        onOpenChange={() => toggleMenu(item.title)}
+                      >
+                        <CollapsibleTrigger asChild>
+                          <SidebarMenuButton className={getNavClassName(item.href)}>
+                            <IconComponent className="h-4 w-4" />
+                            {!isCollapsed && (
+                              <>
+                                <span>{item.title}</span>
+                                <ChevronRight className={`h-4 w-4 ml-auto transition-transform ${isMenuOpen ? 'rotate-90' : ''}`} />
+                              </>
+                            )}
+                          </SidebarMenuButton>
+                        </CollapsibleTrigger>
+                        {!isCollapsed && (
+                          <CollapsibleContent>
+                            <SidebarMenuSub>
+                              {item.children?.map((child) => (
+                                <SidebarMenuSubItem key={child.href}>
+                                  <SidebarMenuSubButton asChild>
+                                    <NavLink 
+                                      to={child.href}
+                                      className={getNavClassName(child.href)}
+                                    >
+                                      <span>{child.title}</span>
+                                    </NavLink>
+                                  </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                              ))}
+                            </SidebarMenuSub>
+                          </CollapsibleContent>
+                        )}
+                      </Collapsible>
+                    ) : (
+                      <SidebarMenuButton asChild>
+                        <NavLink 
+                          to={item.href} 
+                          className={getNavClassName(item.href)}
+                        >
+                          <IconComponent className="h-4 w-4" />
+                          {!isCollapsed && (
+                            <span>{item.title}</span>
+                          )}
+                        </NavLink>
+                      </SidebarMenuButton>
+                    )}
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
