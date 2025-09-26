@@ -274,42 +274,6 @@ export default function AdminDashboard() {
         { label: "New", value: "Article" },
         { label: "Publishing", value: "Ready" }
       ]
-    },
-    {
-      title: "Review Flags",
-      description: "Review and manage content compliance flags",
-      icon: AlertTriangle,
-      href: "/admin/compliance-monitoring",
-      color: "text-red-600",
-      bgColor: "bg-red-50",
-      metrics: stats ? [
-        { label: "Pending", value: stats.pendingFlags.toString() },
-        { label: "Priority", value: "High" }
-      ] : []
-    },
-    {
-      title: "User Reports",
-      description: "Detailed user analytics and engagement reports",
-      icon: Users,
-      href: "/admin/user-analytics",
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-      metrics: [
-        { label: "Analytics", value: "Deep" },
-        { label: "Reports", value: "Detailed" }
-      ]
-    },
-    {
-      title: "Revenue Analysis", 
-      description: "Financial performance and revenue analytics dashboard",
-      icon: DollarSign,
-      href: "/admin/business-metrics",
-      color: "text-emerald-600",
-      bgColor: "bg-emerald-50",
-      metrics: [
-        { label: "Revenue", value: "Analysis" },
-        { label: "Growth", value: "Metrics" }
-      ]
     }
   ];
 
