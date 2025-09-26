@@ -32,70 +32,74 @@ export function DashboardHeader() {
   };
 
   return (
-    <header className="h-16 border-b border-border flex items-center justify-between px-6 bg-white">
-      <div className="flex items-center gap-4">
-        <SidebarTrigger className="-ml-1 text-black hover:text-black/80" />
-        
-        <Link to="/dashboard" className="flex items-center gap-3">
-          <img 
-            src="/atomicmarket-logo-black.png" 
-            alt="AtomicMarket"
-            className="h-8"
-          />
-        </Link>
-      </div>
-
-      <div className="flex items-center gap-4">
-        {/* Notifications */}
-        <Button variant="ghost" size="sm" className="relative text-black hover:text-black/80">
-          <Bell className="h-4 w-4" />
-          <span className="absolute -top-1 -right-1 h-3 w-3 bg-destructive rounded-full text-xs"></span>
-        </Button>
-
-        {/* User Menu */}
-        {user && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
-                    {getUserInitials(user)}
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-background border-border" align="end" forceMount>
-              <div className="flex items-center justify-start gap-2 p-2">
-                <div className="flex flex-col space-y-1 leading-none">
-                  <p className="font-medium text-sm">
-                    {user.user_metadata?.full_name || "User"}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {user.email}
-                  </p>
-                </div>
+    <header className="h-16 border-b border-border bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/50">
+      <div className="flex items-center justify-between px-6 h-full">
+        <div className="flex items-center gap-4">
+          <SidebarTrigger className="-ml-1 text-foreground hover:text-primary transition-colors" />
+          
+          <Link to="/dashboard" className="flex items-center gap-3 group">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center">
+                <Zap className="h-5 w-5 text-white" />
               </div>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link to="/dashboard/profile" className="w-full cursor-pointer">
+              <span className="font-display font-semibold text-xl text-foreground group-hover:text-primary transition-colors">
+                AtomicMarket
+              </span>
+            </div>
+          </Link>
+        </div>
+
+        <div className="flex items-center gap-3">
+          {/* Notifications */}
+          <Button variant="ghost" size="sm" className="relative text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">
+            <Bell className="h-4 w-4" />
+            <span className="absolute -top-1 -right-1 h-2 w-2 bg-destructive rounded-full"></span>
+          </Button>
+
+          {/* User Menu */}
+          {user && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-9 w-9 rounded-full hover:bg-accent/50 transition-all">
+                  <Avatar className="h-8 w-8 border-2 border-primary/20">
+                    <AvatarFallback className="text-xs font-medium bg-primary text-primary-foreground">
+                      {getUserInitials(user)}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 shadow-fillow border-0" align="end" forceMount>
+                <div className="flex items-center justify-start gap-2 p-3">
+                  <div className="flex flex-col space-y-1 leading-none">
+                    <p className="font-medium text-sm text-foreground">
+                      {user?.user_metadata?.full_name || 'User'}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {user?.email}
+                    </p>
+                  </div>
+                </div>
+                <DropdownMenuSeparator className="bg-border/50" />
+                <DropdownMenuItem className="cursor-pointer hover:bg-accent/50 transition-colors">
                   <User className="mr-2 h-4 w-4" />
-                  Profile
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/dashboard/settings" className="w-full cursor-pointer">
+                  <span>Profile</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer hover:bg-accent/50 transition-colors">
                   <Settings className="mr-2 h-4 w-4" />
-                  Settings
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
-                <LogOut className="mr-2 h-4 w-4" />
-                Sign out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+                  <span>Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-border/50" />
+                <DropdownMenuItem 
+                  className="cursor-pointer text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sign out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
       </div>
     </header>
   );

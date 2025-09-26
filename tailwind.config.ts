@@ -96,8 +96,8 @@ export default {
         'gradient-card': 'var(--gradient-card)',
       },
       fontFamily: {
-        headline: 'var(--font-headline)', /* For headlines - Vinyl replacement */
         sans: 'var(--font-sans)', /* Inter for body text */
+        display: 'var(--font-display)', /* Plus Jakarta Sans for headings */
         mono: 'var(--font-mono)',
       },
       borderRadius: {

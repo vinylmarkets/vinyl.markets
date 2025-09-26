@@ -73,58 +73,60 @@ All colors MUST be HSL.
     --shadow-card-hover: 0 4px 6px -1px hsl(215 25% 27% / 0.1), 0 2px 4px -1px hsl(215 25% 27% / 0.06);
     --shadow-lg: 0 10px 15px -3px hsl(215 25% 27% / 0.1), 0 4px 6px -2px hsl(215 25% 27% / 0.05);
     
-    /* AtomicMarket Typography System */
-    --font-headline: 'vinyl', sans-serif; /* Adobe VINYL font */
-    --font-sans: 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', sans-serif;
-    --font-mono: 'Menlo', 'Monaco', 'Courier New', monospace;
+    
+    /* Modern Typography System */
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', monospace;
 
     /* Modern Sidebar (Fillow-inspired) */
     --sidebar-background: 0 0% 100%; /* Pure white sidebar */
-    --sidebar-foreground: 224 71% 4%;
-    --sidebar-primary: 262 83% 58%; /* Purple primary */
+    --sidebar-foreground: 215 25% 27%;
+    --sidebar-primary: 258 100% 65%; /* Purple primary */
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 270 95% 98%; /* Very light purple hover */
-    --sidebar-accent-foreground: 262 83% 58%;
+    --sidebar-accent: 258 100% 95%; /* Very light purple hover */
+    --sidebar-accent-foreground: 258 100% 65%;
     --sidebar-border: 240 6% 90%;
-    --sidebar-ring: 262 83% 58%;
+    --sidebar-ring: 258 100% 65%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 224 71% 4%;
     --foreground: 210 40% 98%;
 
-    --card: 222.2 84% 4.9%;
+    --card: 224 71% 4%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222.2 84% 4.9%;
+    --popover: 224 71% 4%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 258 100% 65%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 240 6% 10%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
+    --muted: 240 6% 10%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 208 100% 60%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 91% 58%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --border: 240 6% 20%;
+    --input: 240 6% 20%;
+    --ring: 258 100% 65%;
+    
+    --sidebar-background: 240 6% 10%;
+    --sidebar-foreground: 240 5% 95%;
+    --sidebar-primary: 258 100% 65%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 240 4% 16%;
+    --sidebar-accent-foreground: 240 5% 95%;
+    --sidebar-border: 240 4% 16%;
+    --sidebar-ring: 258 100% 65%;
   }
 }
 
@@ -134,47 +136,51 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
   }
 
-  /* H1 and H2: UPPERCASE VINYL font */
-  h1, h2 {
-    font-family: var(--font-headline) !important;
-    text-transform: uppercase !important;
-    font-weight: 400 !important;
+  /* Modern Typography System */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
   }
 
-  /* H3-H6: BOLD INTER font */
-  h3, h4, h5, h6 {
-    font-family: var(--font-sans) !important;
-    font-weight: 700 !important;
-    text-transform: none !important;
+  h1 {
+    @apply text-4xl font-bold;
   }
 
-  /* Apply VINYL font and uppercase to all font-serif elements - HIGH SPECIFICITY */
-  .font-serif, h1.font-serif, h2.font-serif, h3.font-serif, h4.font-serif, h5.font-serif, h6.font-serif {
-    font-family: var(--font-headline) !important;
-    text-transform: uppercase !important;
-    font-weight: 400 !important;
+  h2 {
+    @apply text-3xl font-semibold;
   }
 
-  /* Apply Inter Bold to all font-semibold elements */
-  .font-semibold {
-    font-family: var(--font-sans) !important;
-    font-weight: 700 !important;
+  h3 {
+    @apply text-2xl font-semibold;
   }
 
-  /* Stock Ticker Animation */
-  @keyframes scroll {
-    0% {
-      transform: translateX(0);
-    }
-    100% {
-      transform: translateX(-50%);
-    }
+  p, span, div {
+    font-family: var(--font-sans);
   }
-  
-  .animate-scroll {
-    animation: scroll 60s linear infinite;
+
+  /* Remove old font classes */
+  .font-serif {
+    font-family: var(--font-display) !important;
+  }
+
+  /* Button and component improvements */
+  button {
+    font-family: var(--font-sans);
+    font-weight: 500;
+  }
+
+  /* Remove old animations, add modern ones */
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 }
