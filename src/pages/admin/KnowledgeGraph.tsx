@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { supabase } from '@/integrations/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -8,7 +9,7 @@ import { KGPatternAccuracy } from '@/components/admin/KGPatternAccuracy'
 import { KGCorrelationHeatmap } from '@/components/admin/KGCorrelationHeatmap'
 import { KGPredictionEnhancement } from '@/components/admin/KGPredictionEnhancement'
 import { useToast } from '@/hooks/use-toast'
-import { Brain, RefreshCw, TrendingUp, Network } from 'lucide-react'
+import { Brain, RefreshCw, TrendingUp, Network, ArrowLeft } from 'lucide-react'
 
 export default function KnowledgeGraph() {
   const [graphStats, setGraphStats] = useState({
@@ -104,23 +105,31 @@ export default function KnowledgeGraph() {
             Monitor and manage AtomicMarket's prediction enhancement system
           </p>
         </div>
-        <Button 
-          onClick={triggerKGUpdate} 
-          disabled={updating}
-          className="bg-primary hover:bg-primary/90"
-        >
-          {updating ? (
-            <>
-              <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-              Updating...
-            </>
-          ) : (
-            <>
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Update Graph
-            </>
-          )}
-        </Button>
+        <div className="flex items-center gap-4">
+          <Button 
+            onClick={triggerKGUpdate} 
+            disabled={updating}
+            className="bg-primary hover:bg-primary/90"
+          >
+            {updating ? (
+              <>
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                Updating...
+              </>
+            ) : (
+              <>
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Update Graph
+              </>
+            )}
+          </Button>
+          <Button variant="outline" asChild>
+            <Link to="/admin">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Admin Dashboard
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}

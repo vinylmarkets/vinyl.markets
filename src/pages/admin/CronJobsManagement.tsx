@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { supabase } from '@/integrations/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -8,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
-import { Clock, Settings, PlayCircle, PauseCircle, Calendar } from 'lucide-react'
+import { Clock, Settings, PlayCircle, PauseCircle, Calendar, ArrowLeft } from 'lucide-react'
 
 interface CronJob {
   id: string
@@ -220,11 +221,19 @@ export default function CronJobsManagement() {
             Manage automated tasks and their schedules
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Clock className="w-5 h-5 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">
-            {cronJobs.filter(j => j.status === 'active').length} active jobs
-          </span>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Clock className="w-5 h-5 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">
+              {cronJobs.filter(j => j.status === 'active').length} active jobs
+            </span>
+          </div>
+          <Button variant="outline" asChild>
+            <Link to="/admin">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Admin Dashboard
+            </Link>
+          </Button>
         </div>
       </div>
 
