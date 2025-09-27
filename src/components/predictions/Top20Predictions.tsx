@@ -162,7 +162,7 @@ export function Top20Predictions() {
           <Trophy className="h-8 w-8 text-primary" />
           <h1 className="text-4xl font-bold">Daily Stock Analytics</h1>
         </div>
-        <p className="text-sm text-muted-foreground max-w-3xl text-left">
+        <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
           The top 20 stock briefings on the top stocks our algorithm projects moving during trading today. 
           These are not predictions, but a statistical analysis with an explanation of the signals our model factors in. 
           Each day we choose 20 stocks to highlight. All users receive the same analysis.
@@ -171,28 +171,28 @@ export function Top20Predictions() {
         {/* Performance Metrics */}
         {performance && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
-            <Card className="p-3 bg-amber-50 dark:bg-amber-900/20">
+            <Card className="p-3 border-purple-200 dark:border-purple-800">
               <div className="text-center">
                 <Target className="h-5 w-5 mx-auto mb-1 text-purple-600" />
                 <p className="text-xs text-muted-foreground">Direction Accuracy</p>
                 <p className="font-bold text-lg">{performance.directional_accuracy}%</p>
               </div>
             </Card>
-            <Card className="p-3 bg-amber-50 dark:bg-amber-900/20">
+            <Card className="p-3 border-purple-200 dark:border-purple-800">
               <div className="text-center">
                 <TrendingUp className="h-5 w-5 mx-auto mb-1 text-green-600" />
                 <p className="text-xs text-muted-foreground">Price Accuracy</p>
                 <p className="font-bold text-lg">{performance.close_accuracy_avg.toFixed(1)}%</p>
               </div>
             </Card>
-            <Card className="p-3 bg-amber-50 dark:bg-amber-900/20">
+            <Card className="p-3 border-purple-200 dark:border-purple-800">
               <div className="text-center">
                 <Clock className="h-5 w-5 mx-auto mb-1 text-purple-600" />
                 <p className="text-xs text-muted-foreground">Confidence</p>
                 <p className="font-bold text-lg">{performance.confidence_calibration}%</p>
               </div>
             </Card>
-            <Card className="p-3 bg-amber-50 dark:bg-amber-900/20">
+            <Card className="p-3 border-purple-200 dark:border-purple-800">
               <div className="text-center">
                 <AlertCircle className="h-5 w-5 mx-auto mb-1 text-orange-600" />
                 <p className="text-xs text-muted-foreground">Predictions</p>
