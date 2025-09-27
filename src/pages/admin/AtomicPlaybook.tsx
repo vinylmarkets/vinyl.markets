@@ -20,6 +20,7 @@ import {
   Users,
   Brain
 } from 'lucide-react'
+import { KnowledgeBaseManager } from '@/components/playbook/KnowledgeBaseManager'
 
 interface PlaybookStats {
   currentPhase: string
@@ -271,28 +272,9 @@ export default function AtomicPlaybook() {
             </Card>
           </TabsContent>
 
-          {/* Other Tabs - Coming Soon Placeholders */}
+          {/* Knowledge Base Tab */}
           <TabsContent value="knowledge" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BookOpen className="h-5 w-5" />
-                  Company Knowledge Base
-                </CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Searchable wiki of all company knowledge from the Atomic Bible
-                </p>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-12 text-muted-foreground">
-                  Knowledge base implementation coming soon...
-                  <br />
-                  <Button className="mt-4" variant="outline">
-                    Import Atomic Bible
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <KnowledgeBaseManager />
           </TabsContent>
 
           <TabsContent value="projects" className="space-y-6">
