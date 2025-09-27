@@ -17,7 +17,8 @@ import {
   Globe,
   Shield,
   Activity,
-  ArrowLeft
+  ArrowLeft,
+  RefreshCw
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -266,6 +267,10 @@ export default function LaunchChecklist() {
           <p className="text-muted-foreground">Track beta launch readiness across all platform pages</p>
         </div>
         <div className="flex items-center gap-4">
+          <Button variant="outline" size="sm" onClick={loadPages} disabled={loading}>
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
           <Badge variant="secondary" className="text-lg px-4 py-2">
             {getOverallProgress()}% Complete
           </Badge>
