@@ -280,9 +280,16 @@ export default function PaperTrading() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div className="space-y-2">
-          <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            {account.account_name}
-          </h1>
+          <div className="flex items-center gap-3">
+            <img 
+              src="/atomicmarket-logo-black.png" 
+              alt="AtomicMarket"
+              className="h-10"
+            />
+            <h1 className="text-4xl font-bold text-foreground">
+              Paper Trading
+            </h1>
+          </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             <Badge variant="secondary" className="bg-secondary/80">
               {account.account_type === 'margin' ? 'Margin Account' : 'Cash Account'}
