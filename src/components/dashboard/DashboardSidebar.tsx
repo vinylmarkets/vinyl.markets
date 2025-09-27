@@ -48,7 +48,7 @@ const navigationItems = [
     exact: true
   },
   {
-    title: "TOP 20 Daily Movers",
+    title: "Daily Stock Analytics",
     url: "/dashboard/top20",
     icon: Trophy,
   },

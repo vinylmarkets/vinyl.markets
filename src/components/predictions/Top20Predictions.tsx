@@ -160,11 +160,17 @@ export function Top20Predictions() {
       <div className="text-center space-y-4">
         <div className="flex items-center justify-center gap-2">
           <Trophy className="h-8 w-8 text-primary" />
-          <h1 className="text-4xl font-bold">AtomicMarket TOP 20</h1>
+          <h1 className="text-4xl font-bold">Daily Stock Analytics</h1>
         </div>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Daily stock predictions powered by advanced AI algorithms analyzing ~8,000 US stocks
-        </p>
+        <div className="max-w-3xl mx-auto space-y-3">
+          <p className="text-lg text-muted-foreground">
+            The top 20 stock briefings on the top stocks our algorithm projects moving during trading today
+          </p>
+          <p className="text-sm text-muted-foreground">
+            These are not predictions, but a statistical analysis with an explanation of the signals our model factors in. 
+            Each day we choose 20 stocks to highlight. All users receive the same analysis.
+          </p>
+        </div>
         
         {/* Performance Metrics */}
         {performance && (
