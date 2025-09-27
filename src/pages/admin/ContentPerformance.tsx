@@ -880,37 +880,6 @@ export default function ContentPerformance() {
                         className="w-full"
                       />
                     </div>
-                    <Select value={selectedPost} onValueChange={setSelectedPost}>
-                      <SelectTrigger className="w-[400px] bg-primary text-primary-foreground border-primary hover:bg-primary/90">
-                        <SelectValue placeholder="Select an article to analyze" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {filteredBlogPosts.length > 0 ? (
-                          filteredBlogPosts.map((post) => (
-                            <SelectItem key={post.id} value={post.id}>
-                              <div className="flex flex-col gap-1">
-                                <span className="font-medium">{post.title}</span>
-                                <div className="flex gap-2 text-xs text-muted-foreground">
-                                  <span>By {post.author_name}</span>
-                                  {post.category && (
-                                    <>
-                                      <span>•</span>
-                                      <span>{post.category}</span>
-                                    </>
-                                  )}
-                                  <span>•</span>
-                                  <span>{post.view_count.toLocaleString()} views</span>
-                                </div>
-                              </div>
-                            </SelectItem>
-                          ))
-                        ) : (
-                          <SelectItem value="no-posts" disabled>
-                            {blogPosts.length === 0 ? "No published articles available" : "No articles match your search"}
-                          </SelectItem>
-                        )}
-                      </SelectContent>
-                    </Select>
                     
                     {selectedPost && (
                       <Button variant="outline" asChild>
