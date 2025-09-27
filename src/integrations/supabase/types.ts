@@ -1206,6 +1206,199 @@ export type Database = {
         }
         Relationships: []
       }
+      kg_edges: {
+        Row: {
+          created_at: string | null
+          id: string
+          properties: Json | null
+          relationship_type: string
+          source_node_id: string | null
+          strength: number | null
+          target_node_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          properties?: Json | null
+          relationship_type: string
+          source_node_id?: string | null
+          strength?: number | null
+          target_node_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          properties?: Json | null
+          relationship_type?: string
+          source_node_id?: string | null
+          strength?: number | null
+          target_node_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kg_edges_source_node_id_fkey"
+            columns: ["source_node_id"]
+            isOneToOne: false
+            referencedRelation: "kg_nodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kg_edges_target_node_id_fkey"
+            columns: ["target_node_id"]
+            isOneToOne: false
+            referencedRelation: "kg_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kg_insights_cache: {
+        Row: {
+          cache_key: string
+          created_at: string | null
+          expires_at: string
+          id: string
+          insight_result: Json
+          query_text: string
+        }
+        Insert: {
+          cache_key: string
+          created_at?: string | null
+          expires_at: string
+          id?: string
+          insight_result: Json
+          query_text: string
+        }
+        Update: {
+          cache_key?: string
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          insight_result?: Json
+          query_text?: string
+        }
+        Relationships: []
+      }
+      kg_nodes: {
+        Row: {
+          created_at: string | null
+          entity_id: string
+          id: string
+          node_type: string
+          properties: Json
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          entity_id: string
+          id?: string
+          node_type: string
+          properties?: Json
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          entity_id?: string
+          id?: string
+          node_type?: string
+          properties?: Json
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      kg_pattern_accuracy: {
+        Row: {
+          accuracy_score: number | null
+          actual_outcome: string | null
+          confidence_at_detection: number | null
+          created_at: string | null
+          detected_at: string
+          id: string
+          metadata: Json | null
+          pattern_name: string
+          pattern_node_id: string | null
+          predicted_outcome: string
+          symbol: string
+        }
+        Insert: {
+          accuracy_score?: number | null
+          actual_outcome?: string | null
+          confidence_at_detection?: number | null
+          created_at?: string | null
+          detected_at: string
+          id?: string
+          metadata?: Json | null
+          pattern_name: string
+          pattern_node_id?: string | null
+          predicted_outcome: string
+          symbol: string
+        }
+        Update: {
+          accuracy_score?: number | null
+          actual_outcome?: string | null
+          confidence_at_detection?: number | null
+          created_at?: string | null
+          detected_at?: string
+          id?: string
+          metadata?: Json | null
+          pattern_name?: string
+          pattern_node_id?: string | null
+          predicted_outcome?: string
+          symbol?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kg_pattern_accuracy_pattern_node_id_fkey"
+            columns: ["pattern_node_id"]
+            isOneToOne: false
+            referencedRelation: "kg_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kg_signal_validation: {
+        Row: {
+          confidence_adjustment: number | null
+          created_at: string | null
+          graph_evidence: Json | null
+          id: string
+          prediction_id: string | null
+          symbol: string
+          validation_result: Json
+          validation_type: string
+        }
+        Insert: {
+          confidence_adjustment?: number | null
+          created_at?: string | null
+          graph_evidence?: Json | null
+          id?: string
+          prediction_id?: string | null
+          symbol: string
+          validation_result: Json
+          validation_type: string
+        }
+        Update: {
+          confidence_adjustment?: number | null
+          created_at?: string | null
+          graph_evidence?: Json | null
+          id?: string
+          prediction_id?: string | null
+          symbol?: string
+          validation_result?: Json
+          validation_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kg_signal_validation_prediction_id_fkey"
+            columns: ["prediction_id"]
+            isOneToOne: false
+            referencedRelation: "enhanced_daily_predictions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       launch_checklist_activity: {
         Row: {
           action_type: string
@@ -3607,6 +3800,10 @@ export type Database = {
       check_terminal_query_limits: {
         Args: { user_uuid: string }
         Returns: boolean
+      }
+      clean_expired_insights_cache: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       create_user_briefing: {
         Args: {

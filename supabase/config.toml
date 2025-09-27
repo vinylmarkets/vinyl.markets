@@ -8,3 +8,9 @@ verify_jwt = false
 
 [functions.post-market-analysis]
 verify_jwt = false
+
+[functions.kg-prediction-enhancer]
+verify_jwt = false
+
+[functions.kg-daily-update]
+verify_jwt = false

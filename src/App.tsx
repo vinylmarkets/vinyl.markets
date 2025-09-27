@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import KnowledgeGraph from "./pages/admin/KnowledgeGraph";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import DashboardTest from "./pages/DashboardTest";
@@ -121,6 +122,7 @@ const App = () => {
               <Route path="/admin/image-library" element={<AdminProtected><ImageLibrary /></AdminProtected>} />
               <Route path="/admin/product-development" element={<AdminProtected><ProductDevelopment /></AdminProtected>} />
               <Route path="/admin/launch-checklist" element={<AdminProtected><LaunchChecklist /></AdminProtected>} />
+              <Route path="/admin/knowledge-graph" element={<AdminProtected><KnowledgeGraph /></AdminProtected>} />
               <Route path="/admin/blog" element={<AdminProtected><BlogEditor /></AdminProtected>} />
               <Route path="/admin/blog/:id" element={<AdminProtected><BlogEditor /></AdminProtected>} />
               
