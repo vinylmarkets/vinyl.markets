@@ -291,7 +291,7 @@ export default function PaperTrading() {
         <div className="space-y-2">
           <div className="flex items-center gap-3">
             <img 
-              src="/atomicmarket-logo-black.png" 
+              src={atomicLogo} 
               alt="AtomicMarket"
               className="h-10"
             />
