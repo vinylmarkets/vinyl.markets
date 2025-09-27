@@ -138,7 +138,9 @@ export default function LaunchChecklist() {
       { name: 'Business Metrics', path: '/admin/metrics', section: 'Admin', order: 4 },
       { name: 'Algorithm Performance', path: '/admin/performance', section: 'Admin', order: 5 },
       { name: 'Content Performance', path: '/admin/content', section: 'Admin', order: 6 },
-      { name: 'Launch Checklist', path: '/admin/launch-checklist', section: 'Admin', order: 7 },
+      { name: 'Image Generator', path: '/admin/image-generator', section: 'Admin', order: 7 },
+      { name: 'Image Library', path: '/admin/image-library', section: 'Admin', order: 8 },
+      { name: 'Launch Checklist', path: '/admin/launch-checklist', section: 'Admin', order: 9 },
     ];
 
     try {
