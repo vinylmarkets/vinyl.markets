@@ -417,19 +417,55 @@ export default function PaperTrading() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button className="w-full justify-start" variant="outline">
+                <Button 
+                  className="w-full justify-start" 
+                  variant="outline"
+                  onClick={() => {
+                    toast({
+                      title: "Coming Soon",
+                      description: "Import from TOP 20 predictions feature is in development.",
+                    });
+                  }}
+                >
                   <Import className="mr-2 h-4 w-4" />
                   Import from TOP 20 Predictions
                 </Button>
-                <Button className="w-full justify-start" variant="outline">
+                <Button 
+                  className="w-full justify-start" 
+                  variant="outline"
+                  onClick={() => {
+                    toast({
+                      title: "Coming Soon",
+                      description: "Import from Options Value Tool feature is in development.",
+                    });
+                  }}
+                >
                   <Target className="mr-2 h-4 w-4" />
                   Import from Options Value Tool
                 </Button>
-                <Button className="w-full justify-start" variant="outline">
+                <Button 
+                  className="w-full justify-start" 
+                  variant="outline"
+                  onClick={() => {
+                    toast({
+                      title: "Coming Soon",
+                      description: "Manual order placement feature is in development.",
+                    });
+                  }}
+                >
                   <Plus className="mr-2 h-4 w-4" />
                   Place Manual Order
                 </Button>
-                <Button className="w-full justify-start" variant="outline">
+                <Button 
+                  className="w-full justify-start" 
+                  variant="outline"
+                  onClick={() => {
+                    toast({
+                      title: "Coming Soon",
+                      description: "Trade journal feature is in development.",
+                    });
+                  }}
+                >
                   <BookOpen className="mr-2 h-4 w-4" />
                   View Trade Journal
                 </Button>
