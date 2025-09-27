@@ -35,6 +35,8 @@ interface AdminStats {
   pendingFlags: number;
   systemHealth: string;
   conversionRate?: string;
+  complianceScore: number;
+  totalComplaints: number;
 }
 
 export default function AdminDashboard() {
@@ -74,11 +76,29 @@ export default function AdminDashboard() {
         .select('id')
         .eq('reviewed', false);
 
+      // Get user complaints for compliance tracking
+      const { data: complaints } = await supabase
+        .from('user_complaints')
+        .select('id, status');
+
       // Calculate active users (users with any activity in engagement table)
       const { data: engagementData } = await supabase
         .from('user_engagement_summary')
         .select('user_id')
         .not('last_active_at', 'is', null);
+
+      // Calculate compliance score based on resolved complaints and reviewed flags
+      const totalComplaintsCount = complaints?.length || 0;
+      const resolvedComplaints = complaints?.filter(c => c.status === 'resolved' || c.status === 'closed').length || 0;
+      const totalFlags = await supabase.from('content_flags').select('id', { count: 'exact', head: true });
+      const reviewedFlags = await supabase.from('content_flags').select('id', { count: 'exact', head: true }).eq('reviewed', true);
+      
+      let complianceScore = 100;
+      if (totalComplaintsCount > 0 || (totalFlags.count || 0) > 0) {
+        const complaintResolutionRate = totalComplaintsCount > 0 ? (resolvedComplaints / totalComplaintsCount) : 1;
+        const flagReviewRate = (totalFlags.count || 0) > 0 ? ((reviewedFlags.count || 0) / (totalFlags.count || 1)) : 1;
+        complianceScore = Math.round((complaintResolutionRate * 0.6 + flagReviewRate * 0.4) * 100);
+      }
 
       // Calculate conversion metrics
       const totalUsers = userCount || 0;
@@ -86,14 +106,15 @@ export default function AdminDashboard() {
       const paidUsers = subscriptionData?.filter(u => u.subscription_tier !== 'free').length || 0;
       const conversionRate = totalUsers > 0 ? ((paidUsers / totalUsers) * 100).toFixed(1) : '0.0';
 
-
       setStats({
         totalUsers,
         activeUsers,
         totalRevenue: metrics?.mrr || 0,
         pendingFlags: flags?.length || 0,
         systemHealth: 'Excellent',
-        conversionRate: `${conversionRate}%`
+        conversionRate: `${conversionRate}%`,
+        complianceScore,
+        totalComplaints: totalComplaintsCount
       });
     } catch (error) {
       console.error('Error fetching admin stats:', error);
@@ -104,7 +125,9 @@ export default function AdminDashboard() {
         totalRevenue: 0,
         pendingFlags: 0,
         systemHealth: 'Unknown',
-        conversionRate: '0.0%'
+        conversionRate: '0.0%',
+        complianceScore: 0,
+        totalComplaints: 0
       });
     } finally {
       setLoading(false);
@@ -291,7 +314,8 @@ export default function AdminDashboard() {
       bgColor: "bg-red-50",
       metrics: stats ? [
         { label: "Pending Flags", value: stats.pendingFlags.toString() },
-        { label: "Compliance", value: "98%" }
+        { label: "Compliance", value: `${stats.complianceScore}%` },
+        { label: "Complaints", value: stats.totalComplaints.toString() }
       ] : []
     },
     {
