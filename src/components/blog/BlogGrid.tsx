@@ -30,6 +30,7 @@ const imageMap: Record<string, string> = {
 export function BlogGrid() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [contentReady, setContentReady] = useState(false);
 
   useEffect(() => {
     async function fetchPosts() {
@@ -47,6 +48,8 @@ export function BlogGrid() {
         console.error('Error fetching blog posts:', error);
       } finally {
         setLoading(false);
+        // Small delay for smooth transition
+        setTimeout(() => setContentReady(true), 150);
       }
     }
 
@@ -71,11 +74,15 @@ export function BlogGrid() {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {posts.map((post) => (
-        <BlogCard
+    <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 transition-all duration-700 ${contentReady ? 'opacity-100 animate-fade-in' : 'opacity-0'}`}>
+      {posts.map((post, index) => (
+        <div
           key={post.id}
-          id={post.id}
+          className={`transition-all duration-500 ${contentReady ? 'animate-scale-in' : ''}`}
+          style={{ animationDelay: `${index * 100}ms` }}
+        >
+          <BlogCard
+            id={post.id}
           title={post.title}
           slug={post.slug}
           excerpt={post.excerpt || ''}
@@ -85,8 +92,9 @@ export function BlogGrid() {
           readingTime={post.reading_time_minutes || 5}
           publishedAt={post.published_at}
           category={post.category || 'Education'}
-          tags={post.tags || []}
-        />
+            tags={post.tags || []}
+          />
+        </div>
       ))}
     </div>
   );

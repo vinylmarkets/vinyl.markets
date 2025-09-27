@@ -15,6 +15,7 @@ export default function Dashboard() {
   
   const { user, loading } = useAuth();
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [contentReady, setContentReady] = useState(false);
 
   console.log('Dashboard component: Auth state -', { user: !!user, loading });
 
@@ -58,6 +59,17 @@ export default function Dashboard() {
     }
   }, [user]);
 
+  // Set content ready after all auth and profile loading is complete
+  useEffect(() => {
+    if (!loading && (user || (!import.meta.env.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL === 'https://placeholder.supabase.co'))) {
+      // Small delay to ensure smooth transition
+      const timer = setTimeout(() => {
+        setContentReady(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [loading, user]);
+
   if (loading) {
     console.log('Dashboard: Showing loading state');
     return (
@@ -95,7 +107,7 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8 p-6">
+      <div className={`space-y-8 p-6 transition-all duration-500 ${contentReady ? 'opacity-100 animate-fade-in' : 'opacity-0'}`}>
         {/* Welcome Section */}
         <div className="flex items-center justify-between">
           <div className="space-y-2">
@@ -123,7 +135,7 @@ export default function Dashboard() {
         </div>
 
         {/* Latest Articles Section */}
-        <div className="mb-8">
+        <div className={`mb-8 transition-all duration-700 ${contentReady ? 'opacity-100 animate-fade-in' : 'opacity-0'}`} style={{ animationDelay: '150ms' }}>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-semibold text-foreground">Latest Articles</h2>
             <Link 
@@ -137,7 +149,7 @@ export default function Dashboard() {
         </div>
 
         {/* Dashboard Widgets Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 transition-all duration-700 ${contentReady ? 'opacity-100 animate-fade-in' : 'opacity-0'}`} style={{ animationDelay: '300ms' }}>
           <FollowedStocks />
           <div className="flex justify-end">
             <div className="w-full max-w-md">
@@ -147,7 +159,7 @@ export default function Dashboard() {
         </div>
 
         {/* Educational Disclaimer */}
-        <Card className="border-2 border-muted">
+        <Card className={`border-2 border-muted transition-all duration-700 ${contentReady ? 'opacity-100 animate-fade-in' : 'opacity-0'}`} style={{ animationDelay: '450ms' }}>
           <CardContent className="pt-6">
             <div className="flex items-start gap-3">
               <AlertCircle className="h-5 w-5 text-destructive mt-0.5 flex-shrink-0" />

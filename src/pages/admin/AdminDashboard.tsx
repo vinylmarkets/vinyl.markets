@@ -44,6 +44,7 @@ export default function AdminDashboard() {
   const [contentStats, setContentStats] = useState<{ avgRating: number; avgReadTime: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [generatingPredictions, setGeneratingPredictions] = useState(false);
+  const [contentReady, setContentReady] = useState(false);
 
   useEffect(() => {
     fetchAdminStats();
@@ -133,6 +134,17 @@ export default function AdminDashboard() {
       setLoading(false);
     }
   };
+
+  // Set content ready after all data loading is complete
+  useEffect(() => {
+    if (!loading && stats && contentStats) {
+      // Small delay to ensure smooth transition
+      const timer = setTimeout(() => {
+        setContentReady(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [loading, stats, contentStats]);
 
   const fetchContentStats = async () => {
     try {
@@ -421,9 +433,9 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className={`min-h-screen bg-muted/30 transition-all duration-500 ${contentReady ? 'opacity-100' : 'opacity-0'}`}>
       {/* Header */}
-      <div className="bg-white border-b">
+      <div className={`bg-white border-b transition-all duration-700 ${contentReady ? 'opacity-100 animate-fade-in' : 'opacity-0'}`}>
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="flex items-center justify-between">
             <div>
@@ -453,7 +465,7 @@ export default function AdminDashboard() {
 
       {/* Quick Stats Bar */}
       {stats && (
-        <div className="bg-white border-b">
+        <div className={`bg-white border-b transition-all duration-700 ${contentReady ? 'opacity-100 animate-fade-in' : 'opacity-0'}`} style={{ animationDelay: '150ms' }}>
           <div className="max-w-7xl mx-auto px-6 py-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div className="text-center">
@@ -480,12 +492,16 @@ export default function AdminDashboard() {
       )}
 
       {/* Dashboard Sections */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className={`max-w-7xl mx-auto px-6 py-8 transition-all duration-700 ${contentReady ? 'opacity-100 animate-fade-in' : 'opacity-0'}`} style={{ animationDelay: '300ms' }}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {dashboardSections.map((section) => {
+          {dashboardSections.map((section, index) => {
             const IconComponent = section.icon;
             return (
-              <Card key={section.title} className="group hover:shadow-lg transition-all duration-200 border-2 hover:border-primary/20 flex flex-col">
+              <Card 
+                key={section.title} 
+                className={`group hover:shadow-lg transition-all duration-200 border-2 hover:border-primary/20 flex flex-col ${contentReady ? 'animate-scale-in' : ''}`}
+                style={{ animationDelay: `${450 + (index * 50)}ms` }}
+              >
                 <CardHeader className="pb-4">
                   <div className="flex items-center justify-between">
                     <div className={`p-3 rounded-lg ${section.bgColor}`}>
