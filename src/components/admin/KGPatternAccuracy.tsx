@@ -8,6 +8,7 @@ interface PatternAccuracyData {
   accuracy: number
   sampleSize: number
   recentAccuracy: number
+  description: string
 }
 
 export function KGPatternAccuracy() {
@@ -19,6 +20,17 @@ export function KGPatternAccuracy() {
   }, [])
 
   const loadPatternAccuracy = async () => {
+    // Pattern descriptions for educational purposes
+    const patternDescriptions: Record<string, string> = {
+      'rsi_divergence': 'A momentum oscillator that identifies when price and RSI move in opposite directions, often signaling trend reversals.',
+      'ascending_triangle': 'A bullish continuation pattern with horizontal resistance and rising support, indicating accumulation before breakout.',
+      'head_shoulders': 'A reliable reversal pattern featuring three peaks with the middle one highest, signaling trend change.',
+      'double_bottom': 'A bullish reversal pattern showing two distinct lows at similar levels, indicating strong support and potential upward movement.',
+      'macd_crossover': 'A trend-following momentum indicator that signals when the MACD line crosses above or below the signal line.',
+      'volume_spike': 'Unusual increase in trading volume often preceding significant price movements, indicating institutional interest.',
+      'options_flow': 'Analysis of large options trades that may indicate informed trading activity and future price direction.'
+    };
+
     try {
       // Get all pattern nodes
       const { data: patterns } = await supabase
@@ -61,7 +73,8 @@ export function KGPatternAccuracy() {
           pattern: pattern.entity_id.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
           accuracy: Math.round(overallAccuracy * 100) / 100,
           sampleSize: allAccuracy?.length || 0,
-          recentAccuracy: Math.round(recentAvg * 100) / 100
+          recentAccuracy: Math.round(recentAvg * 100) / 100,
+          description: patternDescriptions[pattern.entity_id] || 'Technical trading pattern used for market analysis.'
         })
       }
 
@@ -144,6 +157,7 @@ export function KGPatternAccuracy() {
           <Card key={pattern.pattern}>
             <CardHeader className="pb-2">
               <CardTitle className="text-lg">{pattern.pattern}</CardTitle>
+              <p className="text-sm text-muted-foreground leading-relaxed">{pattern.description}</p>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
