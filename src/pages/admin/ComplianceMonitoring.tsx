@@ -187,7 +187,7 @@ export default function ComplianceMonitoring() {
 
     } catch (error) {
       console.error('Error fetching compliance data:', error);
-      // Set fallback data on error
+      // Set empty data on error - no fallback mock data
       setComplianceData({
         flaggingAlerts: [],
         reviewQueue: [],
