@@ -181,49 +181,26 @@ export function PredictionCard({ prediction, isPremium, userTier }: PredictionCa
           <div className="border-l pl-3">
             <div className="space-y-2">
               <div className="grid grid-cols-3 gap-1 items-center text-xs">
-                <Target className="h-3 w-3 text-purple-600" />
+                <Target className="h-3 w-3 text-muted-foreground" />
                 <span className="text-muted-foreground">Confidence</span>
                 <span className={`font-semibold text-right ${getConfidenceColor(prediction.overall_confidence)}`}>
                   {prediction.overall_confidence}%
                 </span>
               </div>
               <div className="grid grid-cols-3 gap-1 items-center text-xs">
-                <AlertTriangle className="h-3 w-3 text-orange-600" />
+                <AlertTriangle className="h-3 w-3 text-muted-foreground" />
                 <span className="text-muted-foreground">Risk</span>
                 <span className={`font-semibold text-right ${getRiskColor(prediction.risk_score)}`}>
                   {prediction.risk_score}/10
                 </span>
               </div>
               <div className="grid grid-cols-3 gap-1 items-center text-xs">
-                <Clock className="h-3 w-3 text-purple-600" />
+                <Clock className="h-3 w-3 text-muted-foreground" />
                 <span className="text-muted-foreground">Phase</span>
                 <span className="font-semibold text-right capitalize text-xs">
                   {prediction.market_phase_prediction?.replace('_', ' ') || 'TBD'}
                 </span>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Primary Factors */}
-        <div>
-          <p className="text-sm font-medium mb-2">Key Drivers:</p>
-          <div className="p-3 bg-purple-200 dark:bg-purple-800/30 border border-purple-300 dark:border-purple-700 rounded-lg">
-            <div className="flex flex-wrap items-center gap-4">
-              {Array.isArray(prediction.primary_factors) ? 
-                prediction.primary_factors.slice(0, 3).map((factor: string, index: number) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-purple-600"></div>
-                    <span className="text-sm text-black dark:text-white font-medium">
-                      {formatFactorText(factor)}
-                    </span>
-                  </div>
-                )) :
-                <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground"></div>
-                  <span className="text-sm text-black dark:text-white">Analysis pending</span>
-                </div>
-              }
             </div>
           </div>
         </div>
