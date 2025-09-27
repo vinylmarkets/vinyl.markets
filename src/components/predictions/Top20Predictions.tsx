@@ -162,15 +162,11 @@ export function Top20Predictions() {
           <Trophy className="h-8 w-8 text-primary" />
           <h1 className="text-4xl font-bold">Daily Stock Analytics</h1>
         </div>
-        <div className="max-w-3xl mx-auto space-y-3">
-          <p className="text-lg text-muted-foreground">
-            The top 20 stock briefings on the top stocks our algorithm projects moving during trading today
-          </p>
-          <p className="text-sm text-muted-foreground">
-            These are not predictions, but a statistical analysis with an explanation of the signals our model factors in. 
-            Each day we choose 20 stocks to highlight. All users receive the same analysis.
-          </p>
-        </div>
+        <p className="text-sm text-muted-foreground max-w-3xl mx-auto">
+          The top 20 stock briefings on the top stocks our algorithm projects moving during trading today. 
+          These are not predictions, but a statistical analysis with an explanation of the signals our model factors in. 
+          Each day we choose 20 stocks to highlight. All users receive the same analysis.
+        </p>
         
         {/* Performance Metrics */}
         {performance && (
