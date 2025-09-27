@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useToast } from '@/hooks/use-toast'
+import { KnowledgeDetailView } from './KnowledgeDetailView'
 import {
   BookOpen,
   Download,
@@ -22,7 +23,9 @@ import {
   Filter,
   Upload,
   X,
-  Loader2
+  Loader2,
+  Eye,
+  Clock
 } from 'lucide-react'
 
 interface KnowledgeItem {
@@ -62,6 +65,8 @@ export function KnowledgeBaseManager() {
   const [importStats, setImportStats] = useState<ImportStats | null>(null)
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [selectedItem, setSelectedItem] = useState<KnowledgeItem | null>(null)
+  const [detailViewOpen, setDetailViewOpen] = useState(false)
   const [uploadForm, setUploadForm] = useState<UploadFormData>({
     file: null,
     category: 'strategy',
@@ -253,8 +258,22 @@ export function KnowledgeBaseManager() {
       financial: 'bg-yellow-100 text-yellow-800 border-yellow-200',
       legal: 'bg-red-100 text-red-800 border-red-200',
       team: 'bg-orange-100 text-orange-800 border-orange-200',
+      research: 'bg-indigo-100 text-indigo-800 border-indigo-200',
     }
     return colors[category as keyof typeof colors] || 'bg-gray-100 text-gray-800 border-gray-200'
+  }
+
+  const handleItemClick = (item: KnowledgeItem) => {
+    setSelectedItem(item)
+    setDetailViewOpen(true)
+  }
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    })
   }
 
   if (loading) {
@@ -479,7 +498,11 @@ export function KnowledgeBaseManager() {
       ) : (
         <div className="grid gap-4">
           {filteredItems.map((item) => (
-            <Card key={item.id} className="hover:shadow-md transition-shadow">
+            <Card 
+              key={item.id} 
+              className="hover:shadow-md transition-all cursor-pointer hover:border-primary/50 group"
+              onClick={() => handleItemClick(item)}
+            >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -488,56 +511,80 @@ export function KnowledgeBaseManager() {
                         {item.category}
                       </Badge>
                       {item.subcategory && (
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant="outline" className="bg-muted">
                           {item.subcategory}
                         </Badge>
                       )}
-                      <Badge variant="outline" className="text-xs">
-                        {item.source}
-                      </Badge>
                     </div>
-                    <CardTitle className="text-lg">{item.title}</CardTitle>
+                    <CardTitle className="text-lg group-hover:text-primary transition-colors flex items-center gap-2">
+                      {item.title}
+                      <Eye className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </CardTitle>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Clock className="h-3 w-3" />
+                    {formatDate(item.created_at)}
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="prose prose-sm max-w-none">
-                    <p className="text-muted-foreground line-clamp-3">
-                      {item.content.substring(0, 300)}...
-                    </p>
-                  </div>
-                  
-                  {item.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {item.tags.map((tag, index) => (
-                        <Badge key={index} variant="secondary" className="text-xs">
-                          <Tag className="h-3 w-3 mr-1" />
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-
+                <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+                  {item.content.length > 200 ? `${item.content.substring(0, 200)}...` : item.content}
+                </p>
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     <div className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      {new Date(item.created_at).toLocaleDateString()}
+                      <FileText className="h-3 w-3" />
+                      {item.source}
                     </div>
-                    {item.metadata?.phase && (
+                    {item.created_by && (
                       <div className="flex items-center gap-1">
-                        <Badge variant="outline" className="text-xs">
-                          {item.metadata.phase}
-                        </Badge>
+                        <User className="h-3 w-3" />
+                        {item.created_by}
                       </div>
                     )}
                   </div>
+                  {item.tags.length > 0 && (
+                    <div className="flex gap-1 flex-wrap">
+                      {item.tags.slice(0, 3).map((tag, tagIndex) => (
+                        <Badge key={tagIndex} variant="secondary" className="text-xs">
+                          {tag}
+                        </Badge>
+                      ))}
+                      {item.tags.length > 3 && (
+                        <Badge variant="secondary" className="text-xs">
+                          +{item.tags.length - 3}
+                        </Badge>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <div className="mt-3 pt-3 border-t">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleItemClick(item)
+                    }}
+                  >
+                    <Eye className="h-3 w-3 mr-1" />
+                    View Full Content
+                  </Button>
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
       )}
+
+      {/* Detail View Modal */}
+      <KnowledgeDetailView
+        item={selectedItem}
+        open={detailViewOpen}
+        onOpenChange={setDetailViewOpen}
+      />
     </div>
   )
 }
