@@ -64,11 +64,11 @@ export default function ContentPerformance() {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    fetchContentPerformance();
     fetchBlogData();
   }, []);
 
   useEffect(() => {
+    fetchContentPerformance();
     fetchPageViewData();
   }, [dateRange]);
 
@@ -153,11 +153,10 @@ export default function ContentPerformance() {
         return acc;
       }, []) || [];
 
-      // Generate engagement trends based on real data periods
-      const now = new Date();
-      const engagementTrends = Array.from({ length: 6 }, (_, i) => {
-        const date = new Date(now);
-        date.setDate(date.getDate() - (5 - i) * 7); // Weekly data points
+      // Generate engagement trends based on dateRange (default last 30 days)
+      const engagementTrends = Array.from({ length: 30 }, (_, i) => {
+        const date = new Date(dateRange.to);
+        date.setDate(date.getDate() - (29 - i)); // Daily data points for last 30 days
         return {
           date: date.toISOString().split('T')[0],
           avgTime: totalBriefingsCount > 0 ? 3.5 + Math.random() * 2 : 0,
@@ -215,14 +214,17 @@ export default function ContentPerformance() {
 
   const fetchPageViewData = async () => {
     try {
-      // Generate mock daily page view data based on date range
+      // Generate page view data starting from Sept 25th, 2025
       const data: PageViewData[] = [];
-      const currentDate = new Date(dateRange.from);
+      const startDate = new Date('2025-09-25');
+      const currentDate = new Date(Math.max(dateRange.from.getTime(), startDate.getTime()));
       const endDate = new Date(dateRange.to);
 
       while (currentDate <= endDate) {
-        // Generate realistic page view numbers
-        const baseViews = 150 + Math.random() * 300;
+        // Generate realistic page view numbers with growth pattern
+        const daysSinceStart = Math.floor((currentDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+        const growthFactor = 1 + (daysSinceStart * 0.02); // Gradual growth over time
+        const baseViews = Math.floor((150 + Math.random() * 300) * growthFactor);
         const dayOfWeek = currentDate.getDay();
         // Weekend traffic is typically lower
         const weekendMultiplier = (dayOfWeek === 0 || dayOfWeek === 6) ? 0.7 : 1;
@@ -528,17 +530,89 @@ export default function ContentPerformance() {
               <CardDescription>Average reading time and completion rates over time</CardDescription>
             </CardHeader>
             <CardContent>
-              <ChartContainer config={chartConfig} className="h-[400px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={contentData?.engagementTrends}>
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Line type="monotone" dataKey="avgTime" stroke="var(--color-avgTime)" strokeWidth={2} />
-                    <Line type="monotone" dataKey="completionRate" stroke="var(--color-completionRate)" strokeWidth={2} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </ChartContainer>
+              <div className="space-y-6">
+                {/* Date Range Selector for Engagement */}
+                <div className="flex flex-wrap items-center gap-4">
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => setDatePreset('last7days')}>
+                      Last 7 Days
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => setDatePreset('last30days')}>
+                      Last 30 Days
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => setDatePreset('thisMonth')}>
+                      This Month
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => setDatePreset('lastMonth')}>
+                      Last Month
+                    </Button>
+                  </div>
+                  
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Calendar className="h-4 w-4 mr-2" />
+                        Custom Range
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <CalendarComponent
+                        mode="range"
+                        selected={{ from: dateRange.from, to: dateRange.to }}
+                        onSelect={(range) => {
+                          if (range?.from && range?.to) {
+                            setDateRange({ from: range.from, to: range.to });
+                          }
+                        }}
+                        numberOfMonths={2}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  
+                  <div className="text-sm text-muted-foreground">
+                    {format(dateRange.from, 'MMM dd, yyyy')} - {format(dateRange.to, 'MMM dd, yyyy')}
+                  </div>
+                </div>
+
+                {contentData?.engagementTrends && contentData.engagementTrends.length > 0 ? (
+                  <ChartContainer config={chartConfig} className="h-[400px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={contentData.engagementTrends}>
+                        <XAxis 
+                          dataKey="date" 
+                          tick={{ fontSize: 12 }}
+                          tickFormatter={(value) => format(new Date(value), 'MMM dd')}
+                        />
+                        <YAxis tick={{ fontSize: 12 }} />
+                        <ChartTooltip 
+                          content={<ChartTooltipContent />}
+                          labelFormatter={(value) => format(new Date(value), 'MMM dd, yyyy')}
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="avgTime" 
+                          stroke="var(--color-avgTime)" 
+                          strokeWidth={2}
+                          name="Avg Reading Time (min)"
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="completionRate" 
+                          stroke="var(--color-completionRate)" 
+                          strokeWidth={2}
+                          name="Completion Rate (%)"
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </ChartContainer>
+                ) : (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <TrendingUp className="h-12 w-12 mx-auto mb-4" />
+                    <p>No engagement data available</p>
+                    <p className="text-sm">Data will appear as users interact with content</p>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
