@@ -305,16 +305,24 @@ export default function ComplianceMonitoring() {
               <CardDescription>Timeline of content flags and compliance alerts</CardDescription>
             </CardHeader>
             <CardContent>
-              <ChartContainer config={chartConfig} className="h-[400px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={complianceData?.flaggingAlerts}>
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Line type="monotone" dataKey="count" stroke="var(--color-count)" strokeWidth={2} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </ChartContainer>
+              {complianceData?.flaggingAlerts && complianceData.flaggingAlerts.length > 0 ? (
+                <ChartContainer config={chartConfig} className="h-[400px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={complianceData?.flaggingAlerts}>
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Line type="monotone" dataKey="count" stroke="var(--color-count)" strokeWidth={2} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <AlertTriangle className="h-12 w-12 mx-auto mb-4 text-green-500" />
+                  <p>No flagging alerts</p>
+                  <p className="text-sm">Alert timeline will appear when content flags are raised</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -420,25 +428,33 @@ export default function ComplianceMonitoring() {
               <CardDescription>Recent system events and compliance activities</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4 max-h-96 overflow-y-auto">
-                {complianceData?.auditLogs.map((log, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 rounded-lg border">
-                    <div className="flex items-center space-x-3">
-                      <div className={`w-2 h-2 rounded-full ${
-                        log.riskLevel === 'high' ? 'bg-destructive' :
-                        log.riskLevel === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
-                      }`}></div>
-                      <div>
-                        <div className="font-medium text-sm">{log.event}</div>
-                        <div className="text-xs text-muted-foreground">by {log.user} at {log.timestamp}</div>
+              {complianceData?.auditLogs && complianceData.auditLogs.length > 0 ? (
+                <div className="space-y-4 max-h-96 overflow-y-auto">
+                  {complianceData?.auditLogs.map((log, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 rounded-lg border">
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-2 h-2 rounded-full ${
+                          log.riskLevel === 'high' ? 'bg-destructive' :
+                          log.riskLevel === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+                        }`}></div>
+                        <div>
+                          <div className="font-medium text-sm">{log.event}</div>
+                          <div className="text-xs text-muted-foreground">by {log.user} at {log.timestamp}</div>
+                        </div>
                       </div>
+                      <Badge variant="outline" className="text-xs">
+                        {log.riskLevel}
+                      </Badge>
                     </div>
-                    <Badge variant="outline" className="text-xs">
-                      {log.riskLevel}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Shield className="h-12 w-12 mx-auto mb-4 text-green-500" />
+                  <p>No audit logs</p>
+                  <p className="text-sm">System events will appear when compliance activities occur</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -477,43 +493,51 @@ export default function ComplianceMonitoring() {
               <CardDescription>Current risk levels across all flagged content</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <ChartContainer config={{}} className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={complianceData?.riskDistribution}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={100}
-                        paddingAngle={5}
-                        dataKey="count"
-                      >
-                        {complianceData?.riskDistribution.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
-                
-                <div className="space-y-4">
-                  {complianceData?.riskDistribution.map((risk, index) => (
-                    <div key={risk.level} className="flex items-center justify-between p-4 rounded-lg border">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-4 h-4 rounded" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
-                        <span className="font-medium">{risk.level} Risk</span>
+              {complianceData?.riskDistribution && complianceData.riskDistribution.length > 0 ? (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <ChartContainer config={{}} className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={complianceData?.riskDistribution}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={100}
+                          paddingAngle={5}
+                          dataKey="count"
+                        >
+                          {complianceData?.riskDistribution.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </ChartContainer>
+                  
+                  <div className="space-y-4">
+                    {complianceData?.riskDistribution.map((risk, index) => (
+                      <div key={risk.level} className="flex items-center justify-between p-4 rounded-lg border">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-4 h-4 rounded" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
+                          <span className="font-medium">{risk.level} Risk</span>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-bold">{risk.count}</div>
+                          <div className="text-sm text-muted-foreground">{risk.percentage.toFixed(1)}%</div>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <div className="font-bold">{risk.count}</div>
-                        <div className="text-sm text-muted-foreground">{risk.percentage.toFixed(1)}%</div>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <TrendingDown className="h-12 w-12 mx-auto mb-4 text-green-500" />
+                  <p>No risk data</p>
+                  <p className="text-sm">Risk assessment charts will appear when content flags are analyzed</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
