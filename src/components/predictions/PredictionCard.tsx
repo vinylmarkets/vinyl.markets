@@ -154,8 +154,8 @@ export function PredictionCard({ prediction, isPremium, userTier }: PredictionCa
       </CardHeader>
       
       <CardContent className="space-y-4">
-        {/* Price Targets */}
-        <div className="grid grid-cols-4 gap-3">
+        {/* Price Targets and Metrics */}
+        <div className="grid grid-cols-5 gap-3">
           <div>
             <p className="text-sm text-muted-foreground">Opening Price</p>
             <p className="font-semibold text-purple-600">{formatPrice(prediction.previous_close)}</p>
@@ -178,30 +178,30 @@ export function PredictionCard({ prediction, isPremium, userTier }: PredictionCa
               {prediction.estimated_low_time ? `~${prediction.estimated_low_time}` : 'TBD'}
             </p>
           </div>
-        </div>
-
-        {/* Metrics */}
-        <div className="grid grid-cols-3 gap-4 pt-2 border-t">
-          <div className="text-center">
-            <Target className="h-4 w-4 mx-auto mb-1 text-purple-600" />
-            <p className="text-xs text-muted-foreground">Confidence</p>
-            <p className={`font-semibold ${getConfidenceColor(prediction.overall_confidence)}`}>
-              {prediction.overall_confidence}%
-            </p>
-          </div>
-          <div className="text-center">
-            <AlertTriangle className="h-4 w-4 mx-auto mb-1 text-orange-600" />
-            <p className="text-xs text-muted-foreground">Risk</p>
-            <p className={`font-semibold ${getRiskColor(prediction.risk_score)}`}>
-              {prediction.risk_score}/10
-            </p>
-          </div>
-          <div className="text-center">
-            <Clock className="h-4 w-4 mx-auto mb-1 text-purple-600" />
-            <p className="text-xs text-muted-foreground">Phase</p>
-            <p className="font-semibold text-xs capitalize">
-              {prediction.market_phase_prediction?.replace('_', ' ') || 'TBD'}
-            </p>
+          <div className="border-l pl-3">
+            <div className="space-y-2">
+              <div className="grid grid-cols-3 gap-1 items-center text-xs">
+                <Target className="h-3 w-3 text-purple-600" />
+                <span className="text-muted-foreground">Confidence</span>
+                <span className={`font-semibold text-right ${getConfidenceColor(prediction.overall_confidence)}`}>
+                  {prediction.overall_confidence}%
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-1 items-center text-xs">
+                <AlertTriangle className="h-3 w-3 text-orange-600" />
+                <span className="text-muted-foreground">Risk</span>
+                <span className={`font-semibold text-right ${getRiskColor(prediction.risk_score)}`}>
+                  {prediction.risk_score}/10
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-1 items-center text-xs">
+                <Clock className="h-3 w-3 text-purple-600" />
+                <span className="text-muted-foreground">Phase</span>
+                <span className="font-semibold text-right capitalize text-xs">
+                  {prediction.market_phase_prediction?.replace('_', ' ') || 'TBD'}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
