@@ -34,6 +34,7 @@ interface AdminStats {
   totalRevenue: number;
   pendingFlags: number;
   systemHealth: string;
+  conversionRate?: string;
 }
 
 export default function AdminDashboard() {
@@ -47,28 +48,62 @@ export default function AdminDashboard() {
 
   const fetchAdminStats = async () => {
     try {
-      // Fetch key metrics for the overview
+      // Fetch latest metrics (use maybeSingle to handle empty tables)
       const { data: metrics } = await supabase
         .from('daily_metrics')
         .select('*')
         .order('date', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
+      // Get actual user count directly from users table
+      const { count: userCount } = await supabase
+        .from('users')
+        .select('*', { count: 'exact', head: true });
+
+      // Get subscription data for conversion rate
+      const { data: subscriptionData } = await supabase
+        .from('users')
+        .select('subscription_tier');
+
+      // Get pending content flags
       const { data: flags } = await supabase
         .from('content_flags')
         .select('id')
         .eq('reviewed', false);
 
+      // Calculate active users (users with any activity in engagement table)
+      const { data: engagementData } = await supabase
+        .from('user_engagement_summary')
+        .select('user_id')
+        .not('last_active_at', 'is', null);
+
+      // Calculate conversion metrics
+      const totalUsers = userCount || 0;
+      const activeUsers = engagementData?.length || 0;
+      const paidUsers = subscriptionData?.filter(u => u.subscription_tier !== 'free').length || 0;
+      const conversionRate = totalUsers > 0 ? ((paidUsers / totalUsers) * 100).toFixed(1) : '0.0';
+
+
       setStats({
-        totalUsers: metrics?.total_users || 0,
-        activeUsers: metrics?.active_users || 0,
+        totalUsers,
+        activeUsers,
         totalRevenue: metrics?.mrr || 0,
         pendingFlags: flags?.length || 0,
-        systemHealth: 'Excellent'
+        systemHealth: 'Excellent',
+        conversionRate: `${conversionRate}%`
       });
     } catch (error) {
       console.error('Error fetching admin stats:', error);
+      // Set default values if there's an error
+      setStats({
+        totalUsers: 0,
+        activeUsers: 0,
+        totalRevenue: 0,
+        pendingFlags: 0,
+        systemHealth: 'Unknown',
+        conversionRate: '0.0%'
+      });
     } finally {
       setLoading(false);
     }
@@ -137,8 +172,8 @@ export default function AdminDashboard() {
       color: "text-green-600",
       bgColor: "bg-green-50",
       metrics: stats ? [
-        { label: "Active Users", value: stats.activeUsers.toLocaleString() },
-        { label: "Growth", value: "+12.5%" }
+        { label: "Total Users", value: stats.totalUsers.toLocaleString() },
+        { label: "Active Users", value: stats.activeUsers.toLocaleString() }
       ] : []
     },
     {
