@@ -21,6 +21,7 @@ import {
   Brain
 } from 'lucide-react'
 import { KnowledgeBaseManager } from '@/components/playbook/KnowledgeBaseManager'
+import { AIAssistant } from '@/components/playbook/AIAssistant'
 
 interface PlaybookStats {
   currentPhase: string
@@ -335,24 +336,7 @@ export default function AtomicPlaybook() {
           </TabsContent>
 
           <TabsContent value="ai-assistant" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5" />
-                  AI Assistant Terminal
-                </CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Natural language interface to your entire playbook
-                </p>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-12 text-muted-foreground">
-                  AI Assistant coming soon...
-                  <br />
-                  <small className="text-xs">Will have full knowledge of the Atomic Company Bible</small>
-                </div>
-              </CardContent>
-            </Card>
+            <AIAssistant />
           </TabsContent>
         </Tabs>
       </div>
