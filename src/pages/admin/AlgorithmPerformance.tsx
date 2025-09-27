@@ -754,9 +754,6 @@ export default function AlgorithmPerformance() {
               </p>
             </div>
             <div className="flex items-center space-x-4">
-              <Badge variant="outline">
-                Last Analysis: {new Date(metrics.date).toLocaleDateString()}
-              </Badge>
               <Button onClick={refreshData} variant="outline" disabled={refreshing}>
                 <RefreshCcw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
                 Refresh
