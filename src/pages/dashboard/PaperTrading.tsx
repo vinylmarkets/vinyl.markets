@@ -225,9 +225,16 @@ export default function PaperTrading() {
       <div className="container mx-auto p-6">
         <div className="max-w-2xl mx-auto text-center">
           <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-              AtomicMarket Paper Trading
-            </h1>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <img 
+                src="/atomicmarket-logo-black.png" 
+                alt="AtomicMarket"
+                className="h-12"
+              />
+              <h1 className="text-4xl font-bold text-foreground">
+                Paper Trading
+              </h1>
+            </div>
             <p className="text-xl text-muted-foreground mb-6">
               Practice trading with real market data and virtual money. Perfect your strategies risk-free.
             </p>
