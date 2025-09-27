@@ -3,8 +3,12 @@ import { supabase } from '@/integrations/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useToast } from '@/hooks/use-toast'
 import {
   BookOpen,
@@ -15,7 +19,10 @@ import {
   Tag,
   Calendar,
   User,
-  Filter
+  Filter,
+  Upload,
+  X,
+  Loader2
 } from 'lucide-react'
 
 interface KnowledgeItem {
@@ -37,6 +44,13 @@ interface ImportStats {
   errors: number
 }
 
+interface UploadFormData {
+  file: File | null
+  category: string
+  instructions: string
+  tags: string
+}
+
 export function KnowledgeBaseManager() {
   const { toast } = useToast()
   const [knowledgeItems, setKnowledgeItems] = useState<KnowledgeItem[]>([])
@@ -46,6 +60,14 @@ export function KnowledgeBaseManager() {
   const [loading, setLoading] = useState(true)
   const [importing, setImporting] = useState(false)
   const [importStats, setImportStats] = useState<ImportStats | null>(null)
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [uploadForm, setUploadForm] = useState<UploadFormData>({
+    file: null,
+    category: 'strategy',
+    instructions: '',
+    tags: ''
+  })
 
   useEffect(() => {
     loadKnowledgeBase()
@@ -130,6 +152,78 @@ export function KnowledgeBaseManager() {
     }
   }
 
+  const handleFileUpload = async () => {
+    if (!uploadForm.file) {
+      toast({
+        title: "Error",
+        description: "Please select a file to upload",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setUploading(true)
+    try {
+      // Upload file to Supabase storage first
+      const fileName = `${Date.now()}-${uploadForm.file.name}`
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('generated-images')
+        .upload(`documents/${fileName}`, uploadForm.file)
+
+      if (uploadError) throw uploadError
+
+      // Get the public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('generated-images')
+        .getPublicUrl(`documents/${fileName}`)
+
+      // Process the document
+      const { data: session } = await supabase.auth.getSession()
+      if (!session.session) throw new Error('Not authenticated')
+
+      const { data, error } = await supabase.functions.invoke('process-document', {
+        body: {
+          fileUrl: publicUrl,
+          fileName: uploadForm.file.name,
+          category: uploadForm.category,
+          instructions: uploadForm.instructions || undefined,
+          tags: uploadForm.tags ? uploadForm.tags.split(',').map(tag => tag.trim()) : undefined
+        },
+        headers: {
+          Authorization: `Bearer ${session.session.access_token}`
+        }
+      })
+
+      if (error) throw error
+
+      if (data.success) {
+        toast({
+          title: "Success",
+          description: `Document uploaded and processed successfully!`,
+        })
+        setUploadDialogOpen(false)
+        setUploadForm({
+          file: null,
+          category: 'strategy',
+          instructions: '',
+          tags: ''
+        })
+        await loadKnowledgeBase()
+      } else {
+        throw new Error(data.error || 'Processing failed')
+      }
+    } catch (error) {
+      console.error('Error uploading document:', error)
+      toast({
+        title: "Error",
+        description: "Failed to upload and process document",
+        variant: "destructive",
+      })
+    } finally {
+      setUploading(false)
+    }
+  }
+
   const categories = [
     { value: 'all', label: 'All Categories', count: knowledgeItems.length },
     { value: 'strategy', label: 'Strategy', count: knowledgeItems.filter(i => i.category === 'strategy').length },
@@ -138,6 +232,17 @@ export function KnowledgeBaseManager() {
     { value: 'financial', label: 'Financial', count: knowledgeItems.filter(i => i.category === 'financial').length },
     { value: 'legal', label: 'Legal', count: knowledgeItems.filter(i => i.category === 'legal').length },
     { value: 'team', label: 'Team', count: knowledgeItems.filter(i => i.category === 'team').length },
+    { value: 'research', label: 'Research', count: knowledgeItems.filter(i => i.category === 'research').length },
+  ]
+
+  const uploadCategories = [
+    { value: 'strategy', label: 'Strategy' },
+    { value: 'product', label: 'Product' },
+    { value: 'marketing', label: 'Marketing' },
+    { value: 'financial', label: 'Financial' },
+    { value: 'legal', label: 'Legal' },
+    { value: 'team', label: 'Team' },
+    { value: 'research', label: 'Research' },
   ]
 
   const getCategoryColor = (category: string) => {
@@ -184,6 +289,110 @@ export function KnowledgeBaseManager() {
                   {importStats.imported} sections imported
                 </Badge>
               )}
+              <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="gap-2">
+                    <Upload className="h-4 w-4" />
+                    Upload Document
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Upload Knowledge Document</DialogTitle>
+                    <DialogDescription>
+                      Upload any document to add to the company knowledge base. Include instructions on how to use this knowledge.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="file">Document</Label>
+                      <Input
+                        id="file"
+                        type="file"
+                        accept=".pdf,.docx,.doc,.txt,.md,.pptx,.xlsx"
+                        onChange={(e) => setUploadForm({
+                          ...uploadForm,
+                          file: e.target.files?.[0] || null
+                        })}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Supports PDF, Word, PowerPoint, Excel, and text files
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="category">Category</Label>
+                      <Select
+                        value={uploadForm.category}
+                        onValueChange={(value) => setUploadForm({
+                          ...uploadForm,
+                          category: value
+                        })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {uploadCategories.map(cat => (
+                            <SelectItem key={cat.value} value={cat.value}>
+                              {cat.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="instructions">Usage Instructions</Label>
+                      <Textarea
+                        id="instructions"
+                        placeholder="e.g., 'Use this research for our Q2 marketing strategy' or 'Apply these principles to our social media campaigns'"
+                        value={uploadForm.instructions}
+                        onChange={(e) => setUploadForm({
+                          ...uploadForm,
+                          instructions: e.target.value
+                        })}
+                        rows={3}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="tags">Tags (comma-separated)</Label>
+                      <Input
+                        id="tags"
+                        placeholder="e.g., strategy, q2-2024, social-media"
+                        value={uploadForm.tags}
+                        onChange={(e) => setUploadForm({
+                          ...uploadForm,
+                          tags: e.target.value
+                        })}
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setUploadDialogOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      onClick={handleFileUpload} 
+                      disabled={uploading || !uploadForm.file}
+                    >
+                      {uploading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-4 w-4 mr-2" />
+                          Upload & Process
+                        </>
+                      )}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
               <Button onClick={importBible} disabled={importing} className="bg-primary hover:bg-primary/90">
                 {importing ? (
                   <>
