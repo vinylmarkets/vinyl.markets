@@ -24,7 +24,8 @@ import {
   Clock,
   Sparkles,
   Images,
-  Rocket
+  Rocket,
+  Network
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -417,6 +418,18 @@ export default function AdminDashboard() {
       metrics: [
         { label: "Progress", value: "Tracking" },
         { label: "Readiness", value: "Monitor" }
+      ]
+    },
+    {
+      title: "Knowledge Graph",
+      description: "AI-powered prediction enhancement using pattern correlation and historical accuracy",
+      icon: Network,
+      href: "/admin/knowledge-graph",
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
+      metrics: [
+        { label: "Graph", value: "Enhanced" },
+        { label: "Accuracy", value: "AI Driven" }
       ]
     }
   ];
