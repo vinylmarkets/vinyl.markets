@@ -288,9 +288,12 @@ export default function AdminDashboard() {
       href: "/admin/business-metrics",
       color: "text-emerald-600",
       bgColor: "bg-emerald-50",
-      metrics: [
-        { label: "LTV:CAC", value: "14.7:1" },
-        { label: "Conversion", value: "3.2%" }
+      metrics: stats ? [
+        { label: "LTV:CAC", value: stats.totalRevenue > 0 ? `${((stats.totalRevenue * 24) / Math.max(1, (stats.totalRevenue * 0.3))).toFixed(1)}:1` : "0:1" },
+        { label: "Conversion", value: stats.conversionRate || "0.0%" }
+      ] : [
+        { label: "LTV:CAC", value: "Loading..." },
+        { label: "Conversion", value: "Loading..." }
       ]
     },
     {
