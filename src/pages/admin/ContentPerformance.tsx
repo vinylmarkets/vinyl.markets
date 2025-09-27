@@ -34,6 +34,8 @@ interface BlogPost {
   view_count: number;
   category: string;
   author_name: string;
+  featured_image_url: string;
+  featured_image_alt: string;
 }
 
 interface PageViewData {
@@ -222,7 +224,7 @@ export default function ContentPerformance() {
     try {
       const { data: posts, error } = await supabase
         .from('blog_posts')
-        .select('id, title, slug, published_at, view_count, category, author_name')
+        .select('id, title, slug, published_at, view_count, category, author_name, featured_image_url, featured_image_alt')
         .eq('published', true)
         .order('view_count', { ascending: false });
 
@@ -927,6 +929,69 @@ export default function ContentPerformance() {
                   {searchTerm && (
                     <div className="text-sm text-muted-foreground">
                       Found {filteredBlogPosts.length} article{filteredBlogPosts.length !== 1 ? 's' : ''} matching "{searchTerm}"
+                    </div>
+                  )}
+
+                  {/* Search Results Display */}
+                  {searchTerm && filteredBlogPosts.length > 0 && (
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">Search Results</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {filteredBlogPosts.slice(0, 9).map((post) => (
+                          <Card 
+                            key={post.id} 
+                            className={`group overflow-hidden hover:shadow-lg transition-all duration-300 bg-card border-border cursor-pointer ${
+                              selectedPost === post.id ? 'ring-2 ring-primary' : ''
+                            }`}
+                            onClick={() => setSelectedPost(post.id)}
+                          >
+                            <div className="aspect-video overflow-hidden bg-muted">
+                              {post.featured_image_url ? (
+                                <img
+                                  src={post.featured_image_url}
+                                  alt={post.featured_image_alt || post.title}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                  loading="lazy"
+                                />
+                              ) : (
+                                <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                                  <FileText className="h-12 w-12 text-primary/40" />
+                                </div>
+                              )}
+                            </div>
+                            
+                            <CardContent className="p-4">
+                              <div className="space-y-2">
+                                <h3 className="text-sm font-medium leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+                                  {post.title}
+                                </h3>
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                  <span>{post.author_name}</span>
+                                  {post.category && (
+                                    <>
+                                      <span>•</span>
+                                      <Badge variant="secondary" className="text-xs px-1 py-0">
+                                        {post.category}
+                                      </Badge>
+                                    </>
+                                  )}
+                                </div>
+                                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                  <span>{post.view_count.toLocaleString()} views</span>
+                                  {post.published_at && (
+                                    <span>{format(new Date(post.published_at), "MMM dd, yyyy")}</span>
+                                  )}
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                      {filteredBlogPosts.length > 9 && (
+                        <div className="text-center text-sm text-muted-foreground">
+                          Showing first 9 results. Use the dropdown above to select from all {filteredBlogPosts.length} matches.
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
