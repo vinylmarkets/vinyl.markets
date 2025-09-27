@@ -24,6 +24,8 @@ export default function BusinessMetrics() {
   const [loading, setLoading] = useState(true);
   const [currentMRR, setCurrentMRR] = useState(0);
   const [growthRate, setGrowthRate] = useState(0);
+  const [dailyMetrics, setDailyMetrics] = useState<any[]>([]);
+  const [apiPerformance, setApiPerformance] = useState<any[]>([]);
 
   useEffect(() => {
     fetchBusinessMetrics();
@@ -44,11 +46,14 @@ export default function BusinessMetrics() {
         .order('date', { ascending: false })
         .limit(30);
 
-      const { data: apiPerformance } = await supabase
+      const { data: apiPerformanceData } = await supabase
         .from('api_performance')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(1000);
+
+      setDailyMetrics(dailyMetrics || []);
+      setApiPerformance(apiPerformanceData || []);
 
       // Process revenue data and projections
       const revenueData = businessSummary?.map(d => ({
@@ -57,38 +62,45 @@ export default function BusinessMetrics() {
         projection: (Number(d.mrr) || 0) * 1.15 // 15% growth projection
       })) || [];
 
-      // Customer acquisition metrics (mock data based on available data)
+      // Calculate real customer metrics from available data
+      const totalUsers = dailyMetrics?.[0]?.total_users || 0;
+      const activeUsers = dailyMetrics?.[0]?.active_users || 0;
+      const paidUsers = dailyMetrics?.filter(d => d.subscription_conversions > 0).length || 0;
+      
+      // Customer metrics based on actual data
       const customerMetrics = {
-        cac: 85, // Customer Acquisition Cost in dollars
-        ltv: 1250, // Lifetime Value in dollars
-        ratio: 14.7 // LTV:CAC ratio
+        cac: paidUsers > 0 ? Math.round((currentMRR * 0.3) / paidUsers) : 0, // Estimated based on 30% of MRR for acquisition
+        ltv: currentMRR > 0 ? Math.round(currentMRR * 24) : 0, // 24 months average lifetime
+        ratio: paidUsers > 0 && currentMRR > 0 ? ((currentMRR * 24) / ((currentMRR * 0.3) / paidUsers)) : 0
       };
 
-      // Subscription conversion funnel
+      // Real conversion funnel based on actual user data
+      const signups = dailyMetrics?.reduce((sum, d) => sum + (d.new_signups || 0), 0) || 0;
+      const conversions = dailyMetrics?.reduce((sum, d) => sum + (d.subscription_conversions || 0), 0) || 0;
+      
       const conversionFunnel = [
-        { stage: 'Visitors', count: 12450, percentage: 100 },
-        { stage: 'Sign-ups', count: 2100, percentage: 16.9 },
-        { stage: 'Trial Users', count: 1890, percentage: 15.2 },
-        { stage: 'Paid Conversion', count: 189, percentage: 1.5 },
-        { stage: 'Long-term (6mo+)', count: 145, percentage: 1.2 }
+        { stage: 'Total Users', count: totalUsers, percentage: 100 },
+        { stage: 'Active Users', count: activeUsers, percentage: totalUsers > 0 ? (activeUsers / totalUsers) * 100 : 0 },
+        { stage: 'Recent Signups (30d)', count: signups, percentage: totalUsers > 0 ? (signups / totalUsers) * 100 : 0 },
+        { stage: 'Paid Conversions (30d)', count: conversions, percentage: totalUsers > 0 ? (conversions / totalUsers) * 100 : 0 },
+        { stage: 'Retention Rate', count: Math.max(0, activeUsers - signups), percentage: totalUsers > 0 ? (Math.max(0, activeUsers - signups) / totalUsers) * 100 : 0 }
       ];
 
-      // Support metrics (mock data)
+      // Support metrics - no real data available, remove entirely
       const supportMetrics = {
-        tickets: 23,
-        avgResolution: 4.2, // hours
-        satisfaction: 4.6 // out of 5
+        tickets: 0,
+        avgResolution: 0,
+        satisfaction: 0
       };
 
       // System performance metrics from API data
-      const avgResponseTime = apiPerformance?.reduce((sum, api) => sum + api.response_time_ms, 0) / (apiPerformance?.length || 1) || 0;
-      const errorRate = apiPerformance?.filter(api => api.status_code >= 400).length / (apiPerformance?.length || 1) * 100 || 0;
+      const avgResponseTime = apiPerformanceData?.reduce((sum, api) => sum + api.response_time_ms, 0) / (apiPerformanceData?.length || 1) || 0;
+      const errorRate = apiPerformanceData?.filter(api => api.status_code >= 400).length / (apiPerformanceData?.length || 1) * 100 || 0;
       
       const systemPerformance = [
         { metric: 'API Response Time', value: avgResponseTime, target: 500, status: avgResponseTime < 500 ? 'good' : 'warning' },
         { metric: 'Error Rate', value: errorRate, target: 1, status: errorRate < 1 ? 'good' : 'critical' },
-        { metric: 'Uptime', value: 99.8, target: 99.5, status: 'good' },
-        { metric: 'Database Performance', value: 95, target: 90, status: 'good' }
+        { metric: 'Success Rate', value: Math.max(0, 100 - errorRate), target: 99, status: (100 - errorRate) >= 99 ? 'good' : 'warning' }
       ];
 
       // Growth metrics over time
@@ -186,13 +198,13 @@ export default function BusinessMetrics() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Support Tickets</CardTitle>
-            <HeadphonesIcon className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{businessData?.supportMetrics.tickets}</div>
+            <div className="text-2xl font-bold">{(dailyMetrics?.[0]?.active_users || 0).toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              Avg resolution: {businessData?.supportMetrics.avgResolution}h
+              {((dailyMetrics?.[0]?.active_users || 0) / (dailyMetrics?.[0]?.total_users || 1) * 100).toFixed(1)}% of total users
             </p>
           </CardContent>
         </Card>
@@ -203,8 +215,8 @@ export default function BusinessMetrics() {
             <Zap className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">99.8%</div>
-            <p className="text-xs text-muted-foreground">Uptime this month</p>
+            <div className="text-2xl font-bold">{(100 - (apiPerformance?.filter(api => api.status_code >= 400).length / (apiPerformance?.length || 1) * 100 || 0)).toFixed(1)}%</div>
+            <p className="text-xs text-muted-foreground">API Success Rate</p>
           </CardContent>
         </Card>
       </div>
@@ -242,8 +254,8 @@ export default function BusinessMetrics() {
         <TabsContent value="funnel">
           <Card>
             <CardHeader>
-              <CardTitle>Subscription Conversion Funnel</CardTitle>
-              <CardDescription>User journey from visitor to paid subscriber</CardDescription>
+              <CardTitle>User Engagement Metrics</CardTitle>
+              <CardDescription>Real user engagement and conversion data</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -263,7 +275,7 @@ export default function BusinessMetrics() {
                         <div className="font-bold">{stage.count.toLocaleString()}</div>
                         <div className="text-xs text-muted-foreground">users</div>
                       </div>
-                      <Progress value={stage.percentage} className="w-24" />
+                      <Progress value={Math.min(100, stage.percentage)} className="w-24" />
                     </div>
                   </div>
                 ))}
@@ -336,19 +348,19 @@ export default function BusinessMetrics() {
                   </div>
                   
                   <div className="space-y-4">
-                    <h3 className="font-semibold">Support Metrics</h3>
+                    <h3 className="font-semibold">API Activity</h3>
                     <div className="grid grid-cols-1 gap-4">
                       <div className="p-4 rounded-lg border text-center">
-                        <div className="text-2xl font-bold">{businessData?.supportMetrics.tickets}</div>
-                        <div className="text-sm text-muted-foreground">Open Tickets</div>
+                        <div className="text-2xl font-bold">{apiPerformance?.length || 0}</div>
+                        <div className="text-sm text-muted-foreground">Total API Calls</div>
                       </div>
                       <div className="p-4 rounded-lg border text-center">
-                        <div className="text-2xl font-bold">{businessData?.supportMetrics.avgResolution}h</div>
-                        <div className="text-sm text-muted-foreground">Avg Resolution Time</div>
+                        <div className="text-2xl font-bold">{apiPerformance?.filter(api => api.status_code >= 400).length || 0}</div>
+                        <div className="text-sm text-muted-foreground">Failed Requests</div>
                       </div>
                       <div className="p-4 rounded-lg border text-center">
-                        <div className="text-2xl font-bold">{businessData?.supportMetrics.satisfaction}/5</div>
-                        <div className="text-sm text-muted-foreground">Customer Satisfaction</div>
+                        <div className="text-2xl font-bold">{(dailyMetrics?.reduce((sum, d) => sum + (d.terminal_queries || 0), 0) || 0).toLocaleString()}</div>
+                        <div className="text-sm text-muted-foreground">Terminal Queries (30d)</div>
                       </div>
                     </div>
                   </div>
