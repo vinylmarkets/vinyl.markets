@@ -373,34 +373,42 @@ export default function ComplianceMonitoring() {
               <CardDescription>Categories and resolution status of user complaints</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <ChartContainer config={chartConfig} className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={complianceData?.complaintTracking}>
-                      <XAxis dataKey="category" angle={-45} textAnchor="end" height={80} />
-                      <YAxis />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <Bar dataKey="count" fill="var(--color-count)" />
-                      <Bar dataKey="resolved" fill="var(--color-resolved)" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {complianceData?.complaintTracking.map((complaint) => (
-                    <div key={complaint.category} className="p-4 rounded-lg border">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="font-medium">{complaint.category}</div>
-                        <Badge variant="outline">{complaint.count} total</Badge>
+              {complianceData?.complaintTracking && complianceData.complaintTracking.length > 0 ? (
+                <div className="space-y-4">
+                  <ChartContainer config={chartConfig} className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={complianceData?.complaintTracking}>
+                        <XAxis dataKey="category" angle={-45} textAnchor="end" height={80} />
+                        <YAxis />
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                        <Bar dataKey="count" fill="var(--color-count)" />
+                        <Bar dataKey="resolved" fill="var(--color-resolved)" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </ChartContainer>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {complianceData?.complaintTracking.map((complaint) => (
+                      <div key={complaint.category} className="p-4 rounded-lg border">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="font-medium">{complaint.category}</div>
+                          <Badge variant="outline">{complaint.count} total</Badge>
+                        </div>
+                        <div className="flex items-center justify-between text-sm text-muted-foreground">
+                          <span>Resolved: {complaint.resolved}</span>
+                          <span>{((complaint.resolved / complaint.count) * 100).toFixed(0)}%</span>
+                        </div>
                       </div>
-                      <div className="flex items-center justify-between text-sm text-muted-foreground">
-                        <span>Resolved: {complaint.resolved}</span>
-                        <span>{((complaint.resolved / complaint.count) * 100).toFixed(0)}%</span>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <FileCheck className="h-12 w-12 mx-auto mb-4 text-green-500" />
+                  <p>No user complaints</p>
+                  <p className="text-sm">Charts will appear when users submit complaints</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
