@@ -2918,6 +2918,39 @@ export type Database = {
         }
         Relationships: []
       }
+      system_notifications: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          metadata: Json | null
+          notification_type: string
+          read_by_admin: boolean | null
+          severity: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          metadata?: Json | null
+          notification_type: string
+          read_by_admin?: boolean | null
+          severity?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          metadata?: Json | null
+          notification_type?: string
+          read_by_admin?: boolean | null
+          severity?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       terminal_queries: {
         Row: {
           ai_model_used: string | null
@@ -3154,6 +3187,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_complaints: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          id: string
+          priority: string | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string | null
+          subject: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          id?: string
+          priority?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string | null
+          subject: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          priority?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string | null
+          subject?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
       }
       user_engagement_summary: {
         Row: {
