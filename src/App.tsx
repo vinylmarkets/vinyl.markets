@@ -61,6 +61,7 @@ import { ImageGenerator } from "./pages/admin/ImageGenerator";
 import { ImageLibrary } from "./pages/admin/ImageLibrary";
 import { ProductDevelopment } from "./pages/admin/ProductDevelopment";
 import LaunchChecklist from "./pages/admin/LaunchChecklist";
+import CronJobsManagement from "./pages/admin/CronJobsManagement";
 import ForumPage from "./pages/forum/ForumPage";
 import Auth from "./pages/Auth";
 
@@ -123,6 +124,7 @@ const App = () => {
               <Route path="/admin/product-development" element={<AdminProtected><ProductDevelopment /></AdminProtected>} />
               <Route path="/admin/launch-checklist" element={<AdminProtected><LaunchChecklist /></AdminProtected>} />
               <Route path="/admin/knowledge-graph" element={<AdminProtected><KnowledgeGraph /></AdminProtected>} />
+              <Route path="/admin/cron-jobs" element={<AdminProtected><CronJobsManagement /></AdminProtected>} />
               <Route path="/admin/blog" element={<AdminProtected><BlogEditor /></AdminProtected>} />
               <Route path="/admin/blog/:id" element={<AdminProtected><BlogEditor /></AdminProtected>} />
               

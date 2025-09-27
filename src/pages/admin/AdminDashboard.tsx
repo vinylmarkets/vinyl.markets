@@ -431,6 +431,18 @@ export default function AdminDashboard() {
         { label: "Graph", value: "Enhanced" },
         { label: "Accuracy", value: "AI Driven" }
       ]
+    },
+    {
+      title: "Cron Jobs Management",
+      description: "Monitor and manage automated tasks, schedules, and background processes",
+      icon: Clock,
+      href: "/admin/cron-jobs",
+      color: "text-amber-600",
+      bgColor: "bg-amber-50",
+      metrics: [
+        { label: "Active", value: "5 Jobs" },
+        { label: "Schedule", value: "Daily" }
+      ]
     }
   ];
 
