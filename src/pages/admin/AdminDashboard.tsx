@@ -4,12 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { 
-  BarChart3, 
-  Users, 
-  Brain, 
-  FileText, 
-  DollarSign, 
+import {
+  BarChart3,
+  Users,
+  Brain,
+  FileText,
+  DollarSign,
   Shield,
   ArrowRight,
   TrendingUp,
@@ -25,7 +25,8 @@ import {
   Sparkles,
   Images,
   Rocket,
-  Network
+  Network,
+  Target
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -430,6 +431,18 @@ export default function AdminDashboard() {
       metrics: [
         { label: "Graph", value: "Enhanced" },
         { label: "Accuracy", value: "AI Driven" }
+      ]
+    },
+    {
+      title: "Atomic Playbook",
+      description: "Company operations intelligence system with AI assistant",
+      icon: Target,
+      href: "/admin/atomic-playbook",
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
+      metrics: [
+        { label: "Phase 1", value: "Active" },
+        { label: "AI", value: "Assistant" }
       ]
     },
     {

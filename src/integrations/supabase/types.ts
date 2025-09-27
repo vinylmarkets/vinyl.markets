@@ -2840,6 +2840,341 @@ export type Database = {
         }
         Relationships: []
       }
+      playbook_access: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          granted_by: string | null
+          id: string
+          permissions: Json | null
+          role: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          granted_by?: string | null
+          id?: string
+          permissions?: Json | null
+          role?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          granted_by?: string | null
+          id?: string
+          permissions?: Json | null
+          role?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      playbook_ai_history: {
+        Row: {
+          context: Json | null
+          created_at: string | null
+          helpful: boolean | null
+          id: string
+          query: string
+          response: string
+          user_id: string | null
+        }
+        Insert: {
+          context?: Json | null
+          created_at?: string | null
+          helpful?: boolean | null
+          id?: string
+          query: string
+          response: string
+          user_id?: string | null
+        }
+        Update: {
+          context?: Json | null
+          created_at?: string | null
+          helpful?: boolean | null
+          id?: string
+          query?: string
+          response?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      playbook_campaigns: {
+        Row: {
+          actual_metrics: Json | null
+          actual_spend: number | null
+          budget: number | null
+          created_at: string | null
+          end_date: string | null
+          id: string
+          name: string
+          notes: string | null
+          playbook_template: string | null
+          start_date: string | null
+          status: string | null
+          target_metrics: Json | null
+          type: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          actual_metrics?: Json | null
+          actual_spend?: number | null
+          budget?: number | null
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          playbook_template?: string | null
+          start_date?: string | null
+          status?: string | null
+          target_metrics?: Json | null
+          type?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          actual_metrics?: Json | null
+          actual_spend?: number | null
+          budget?: number | null
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          playbook_template?: string | null
+          start_date?: string | null
+          status?: string | null
+          target_metrics?: Json | null
+          type?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      playbook_financials: {
+        Row: {
+          amount: number
+          category: string | null
+          created_at: string | null
+          currency: string | null
+          description: string
+          end_date: string | null
+          id: string
+          notes: string | null
+          recurring_interval: string | null
+          start_date: string | null
+          type: string
+          updated_at: string | null
+          vendor: string | null
+        }
+        Insert: {
+          amount: number
+          category?: string | null
+          created_at?: string | null
+          currency?: string | null
+          description: string
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          recurring_interval?: string | null
+          start_date?: string | null
+          type: string
+          updated_at?: string | null
+          vendor?: string | null
+        }
+        Update: {
+          amount?: number
+          category?: string | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          recurring_interval?: string | null
+          start_date?: string | null
+          type?: string
+          updated_at?: string | null
+          vendor?: string | null
+        }
+        Relationships: []
+      }
+      playbook_knowledge: {
+        Row: {
+          category: string
+          content: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          metadata: Json | null
+          source: string | null
+          subcategory: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+          version: number | null
+        }
+        Insert: {
+          category: string
+          content: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          metadata?: Json | null
+          source?: string | null
+          subcategory?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+          version?: number | null
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          metadata?: Json | null
+          source?: string | null
+          subcategory?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+          version?: number | null
+        }
+        Relationships: []
+      }
+      playbook_metrics: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          date: string
+          id: string
+          metric_name: string
+          notes: string | null
+          unit: string | null
+          value: number
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          date: string
+          id?: string
+          metric_name: string
+          notes?: string | null
+          unit?: string | null
+          value: number
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          date?: string
+          id?: string
+          metric_name?: string
+          notes?: string | null
+          unit?: string | null
+          value?: number
+        }
+        Relationships: []
+      }
+      playbook_projects: {
+        Row: {
+          assigned_to: string | null
+          bible_reference: string | null
+          completion_date: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          milestone_id: string | null
+          name: string
+          phase: string | null
+          priority: string | null
+          progress_percentage: number | null
+          status: string | null
+          target_date: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          bible_reference?: string | null
+          completion_date?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          milestone_id?: string | null
+          name: string
+          phase?: string | null
+          priority?: string | null
+          progress_percentage?: number | null
+          status?: string | null
+          target_date?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          bible_reference?: string | null
+          completion_date?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          milestone_id?: string | null
+          name?: string
+          phase?: string | null
+          priority?: string | null
+          progress_percentage?: number | null
+          status?: string | null
+          target_date?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      playbook_tasks: {
+        Row: {
+          assigned_to: string | null
+          completed_at: string | null
+          created_at: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          project_id: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          project_id?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          project_id?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playbook_tasks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "playbook_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       portfolio_holdings: {
         Row: {
           added_at: string | null
