@@ -66,6 +66,7 @@ interface Achievement {
 }
 
 export default function PaperTrading() {
+  console.log('PaperTrading component is rendering');
   const [account, setAccount] = useState<PaperAccount | null>(null);
   const [positions, setPositions] = useState<Position[]>([]);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
