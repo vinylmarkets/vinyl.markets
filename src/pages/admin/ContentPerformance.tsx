@@ -867,36 +867,67 @@ export default function ContentPerformance() {
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <Select value={selectedPost} onValueChange={setSelectedPost}>
-                    <SelectTrigger className="w-[400px]">
-                      <SelectValue placeholder="Select an article to analyze" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {blogPosts.length > 0 ? (
-                        blogPosts.map((post) => (
-                          <SelectItem key={post.id} value={post.id}>
-                            {post.title}
+                {/* Search and Selection Controls */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div className="flex-1 max-w-md">
+                      <Input
+                        placeholder="Search by title, author, category, or keywords..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full"
+                      />
+                    </div>
+                    <Select value={selectedPost} onValueChange={setSelectedPost}>
+                      <SelectTrigger className="w-[400px] bg-primary text-primary-foreground border-primary hover:bg-primary/90">
+                        <SelectValue placeholder="Select an article to analyze" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {filteredBlogPosts.length > 0 ? (
+                          filteredBlogPosts.map((post) => (
+                            <SelectItem key={post.id} value={post.id}>
+                              <div className="flex flex-col gap-1">
+                                <span className="font-medium">{post.title}</span>
+                                <div className="flex gap-2 text-xs text-muted-foreground">
+                                  <span>By {post.author_name}</span>
+                                  {post.category && (
+                                    <>
+                                      <span>•</span>
+                                      <span>{post.category}</span>
+                                    </>
+                                  )}
+                                  <span>•</span>
+                                  <span>{post.view_count.toLocaleString()} views</span>
+                                </div>
+                              </div>
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="no-posts" disabled>
+                            {blogPosts.length === 0 ? "No published articles available" : "No articles match your search"}
                           </SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem value="no-posts" disabled>
-                          No published articles available
-                        </SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
-                  
-                  {selectedPost && (
-                    <Button variant="outline" asChild>
-                      <Link 
-                        to={`/articles/${blogPosts.find(p => p.id === selectedPost)?.slug}`} 
-                        target="_blank"
-                      >
-                        <Eye className="h-4 w-4 mr-2" />
-                        View Article
-                      </Link>
-                    </Button>
+                        )}
+                      </SelectContent>
+                    </Select>
+                    
+                    {selectedPost && (
+                      <Button variant="outline" asChild>
+                        <Link 
+                          to={`/articles/${blogPosts.find(p => p.id === selectedPost)?.slug}`} 
+                          target="_blank"
+                        >
+                          <Eye className="h-4 w-4 mr-2" />
+                          View Article
+                        </Link>
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Search Results Summary */}
+                  {searchTerm && (
+                    <div className="text-sm text-muted-foreground">
+                      Found {filteredBlogPosts.length} article{filteredBlogPosts.length !== 1 ? 's' : ''} matching "{searchTerm}"
+                    </div>
                   )}
                 </div>
 
