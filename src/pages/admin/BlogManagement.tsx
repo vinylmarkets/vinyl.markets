@@ -214,7 +214,7 @@ export default function BlogManagement() {
                   <div className="flex items-center gap-2 ml-4">
                     {post.published && (
                       <Button variant="ghost" size="sm" asChild>
-                        <Link to={`/blog/${post.slug}`} target="_blank">
+                        <Link to={`/articles/${post.slug}`} target="_blank">
                           <Eye className="w-4 h-4" />
                         </Link>
                       </Button>
