@@ -94,32 +94,73 @@ export const WatchlistManager: React.FC<WatchlistManagerProps> = ({ onSymbolSele
 
   const handleAnalyze = async (symbol: string) => {
     try {
+      // Clear previous analysis first
+      setAnalysisData(null);
+      
+      // Set loading state for the new symbol
       setAnalysisData({
         symbol,
         loading: true
       });
       
-      // Simulate analysis for now - this would call actual analysis API
+      // Simulate analysis with symbol-specific data
       setTimeout(() => {
-        setAnalysisData({
-          symbol,
-          loading: false,
-          analysis: {
+        const mockAnalyses: { [key: string]: any } = {
+          'AAPL': {
             sentiment: 'Bullish',
-            riskLevel: 'Medium',
-            technicalScore: 7.5,
-            fundamentalScore: 8.2,
+            riskLevel: 'Low',
+            technicalScore: 8.5,
+            fundamentalScore: 9.0,
             recommendation: 'BUY',
+            targetPrice: '$200.00',
+            supportLevel: '$175.00',
+            resistanceLevel: '$190.00',
+            keyPoints: [
+              'Strong iPhone 15 sales momentum',
+              'Services revenue growth accelerating',
+              'AI integration driving premium pricing',
+              'Strong balance sheet with $162B cash'
+            ]
+          },
+          'GME': {
+            sentiment: 'Neutral',
+            riskLevel: 'High',
+            technicalScore: 5.5,
+            fundamentalScore: 4.2,
+            recommendation: 'HOLD',
             targetPrice: '$32.50',
             supportLevel: '$24.80',
             resistanceLevel: '$29.90',
             keyPoints: [
-              'Strong earnings growth expected',
-              'Technical breakout above resistance',
-              'Positive analyst upgrades',
-              'Sector rotation favorable'
+              'Meme stock volatility remains elevated',
+              'Digital transformation in progress',
+              'Retail sentiment driving price action',
+              'High short interest creates squeeze potential'
             ]
           }
+        };
+
+        const analysis = mockAnalyses[symbol] || {
+          sentiment: 'Neutral',
+          riskLevel: 'Medium',
+          technicalScore: 6.0,
+          fundamentalScore: 6.0,
+          recommendation: 'HOLD',
+          targetPrice: 'TBD',
+          supportLevel: 'TBD',
+          resistanceLevel: 'TBD',
+          keyPoints: [
+            'Analysis pending - limited data available',
+            'Requires further fundamental research',
+            'Monitor technical indicators',
+            'Consider sector trends'
+          ]
+        };
+
+        setAnalysisData({
+          symbol,
+          loading: false,
+          analysis
         });
       }, 2000);
       
