@@ -227,11 +227,26 @@ export const TradingDashboard = () => {
       
       try {
         console.log('Checking for integrations for user:', user.id);
-        const { data, error } = await supabase
+        
+        // First try with RLS
+        let { data, error } = await supabase
           .from('broker_integrations')
           .select('id, broker_name, user_id, is_active')
           .eq('user_id', user.id)
           .eq('is_active', true);
+
+        console.log('RLS query response:', { data, error });
+
+        // If RLS fails, try with service role (for debugging)
+        if (!data || data.length === 0) {
+          console.log('RLS query returned no data, trying direct query...');
+          
+          // Direct query to check if data exists (this will help us debug)
+          const { data: debugData, error: debugError } = await supabase
+            .rpc('get_user_integrations', { target_user_id: user.id });
+            
+          console.log('Debug query response:', { debugData, debugError });
+        }
 
         console.log('Raw Supabase response:', { data, error });
 
