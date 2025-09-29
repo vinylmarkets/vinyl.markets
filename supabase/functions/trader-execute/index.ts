@@ -43,7 +43,7 @@ async function executeTradeViaAPI(tradeRequest: TradeRequest, userId: string): P
       qty: tradeRequest.quantity,
       side: tradeRequest.action.toLowerCase(),
       type: tradeRequest.orderType,
-      time_in_force: tradeRequest.timeInForce.toUpperCase(),
+      time_in_force: tradeRequest.timeInForce,
       ...(tradeRequest.limitPrice && { limit_price: tradeRequest.limitPrice }),
       ...(tradeRequest.stopPrice && { stop_price: tradeRequest.stopPrice })
     };
