@@ -97,6 +97,7 @@ export const TradingDashboard = () => {
   const [isConnected, setIsConnected] = useState(true);
   const [knowledgeMode, setKnowledgeMode] = useState<'simple' | 'academic'>('simple');
   const [viewMode, setViewMode] = useState<'chart' | 'flow'>('chart');
+  const [quickTradeSymbol, setQuickTradeSymbol] = useState('');
   
   const isDevelopment = import.meta.env.DEV;
 
@@ -244,12 +245,49 @@ export const TradingDashboard = () => {
     }
   };
 
-  const handleTradeClick = () => {
-    toast({
-      title: "Demo Mode",
-      description: "This is a demo. Connect your broker to enable real trading.",
-      variant: "default",
-    });
+  const handleTradeClick = async (action: 'BUY' | 'SELL', symbol: string) => {
+    if (!hasIntegrations) {
+      toast({
+        title: "Demo Mode",
+        description: "This is a demo. Connect your broker to enable real trading.",
+        variant: "default",
+      });
+      return;
+    }
+
+    // Execute real trade via Alpaca
+    try {
+      const { data, error } = await supabase.functions.invoke('trader-execute', {
+        body: {
+          action: action.toLowerCase(),
+          symbol: symbol.toUpperCase(),
+          quantity: 1, // Default to 1 share
+          order_type: 'market'
+        }
+      });
+
+      if (error) {
+        toast({
+          title: "Trade Failed",
+          description: error.message || "Failed to execute trade. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Trade Executed",
+        description: `${action} order for ${symbol.toUpperCase()} has been submitted successfully.`,
+        variant: "default",
+      });
+    } catch (error) {
+      console.error('Trade execution error:', error);
+      toast({
+        title: "Trade Error",
+        description: "An error occurred while executing the trade.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -414,25 +452,37 @@ export const TradingDashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Input placeholder="Symbol" className="h-8" />
+                <Input 
+                  placeholder="Symbol" 
+                  className="h-8" 
+                  value={quickTradeSymbol}
+                  onChange={(e) => setQuickTradeSymbol(e.target.value.toUpperCase())}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && quickTradeSymbol.trim()) {
+                      handleTradeClick('BUY', quickTradeSymbol.trim());
+                    }
+                  }}
+                />
                 <div className="flex space-x-2">
                   <Button 
                     size="sm" 
                     className="flex-1 bg-success hover:bg-success/90 text-white font-medium h-8"
-                    onClick={handleTradeClick}
+                    onClick={() => quickTradeSymbol.trim() && handleTradeClick('BUY', quickTradeSymbol.trim())}
+                    disabled={!quickTradeSymbol.trim()}
                   >
                     BUY
                   </Button>
                   <Button 
                     size="sm"
                     className="flex-1 bg-destructive hover:bg-destructive/90 text-white font-medium h-8"
-                    onClick={handleTradeClick}
+                    onClick={() => quickTradeSymbol.trim() && handleTradeClick('SELL', quickTradeSymbol.trim())}
+                    disabled={!quickTradeSymbol.trim()}
                   >
                     SELL
                   </Button>
                 </div>
                 <div className="text-xs text-muted-foreground text-center">
-                  Paper trading enabled
+                  {hasIntegrations ? 'Live trading enabled' : 'Paper trading enabled'}
                 </div>
               </CardContent>
             </Card>
