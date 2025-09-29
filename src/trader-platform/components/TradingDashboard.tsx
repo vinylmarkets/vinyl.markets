@@ -93,6 +93,8 @@ export const TradingDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
+  console.log('TradingDashboard rendering, user:', user?.id || 'no user', 'email:', user?.email || 'no email');
+  
   const [signals, setSignals] = useState<TradingSignal[]>([]);
   const [positions, setPositions] = useState<Position[]>([]);
   const [recentTrades, setRecentTrades] = useState<RecentTrade[]>([]);
@@ -215,7 +217,10 @@ export const TradingDashboard = () => {
 
     // Check for existing broker integrations
     const checkIntegrations = async () => {
+      console.log('checkIntegrations called, user:', user?.id || 'no user');
+      
       if (!user) {
+        console.log('No user found, setting hasIntegrations to false');
         setHasIntegrations(false);
         return;
       }
@@ -224,9 +229,11 @@ export const TradingDashboard = () => {
         console.log('Checking for integrations for user:', user.id);
         const { data, error } = await supabase
           .from('broker_integrations')
-          .select('id, broker_name')
+          .select('id, broker_name, user_id, is_active')
           .eq('user_id', user.id)
           .eq('is_active', true);
+
+        console.log('Raw Supabase response:', { data, error });
 
         if (error) {
           console.error('Error checking integrations:', error);
