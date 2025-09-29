@@ -564,6 +564,33 @@ export type Database = {
         }
         Relationships: []
       }
+      cron_job_logs: {
+        Row: {
+          created_at: string | null
+          executed_at: string | null
+          id: string
+          job_name: string
+          response_id: number | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          executed_at?: string | null
+          id?: string
+          job_name: string
+          response_id?: number | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          executed_at?: string | null
+          id?: string
+          job_name?: string
+          response_id?: number | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       daily_market_analysis: {
         Row: {
           analysis_data: Json | null
