@@ -270,58 +270,25 @@ serve(async (req) => {
         // Combine signals for final decision
         const combinedSignal = combineSignals(individualSignals);
         
-        // Store individual strategy signals if they have confidence > 0
+        // Store only high-confidence individual strategy signals (>= 70%)
         for (const strategySignal of individualSignals) {
-          if (strategySignal.confidence > 0) {
+          if (strategySignal.confidence >= 70) {
             allSignals.push({
               symbol,
-              strategy_type: strategySignal.strategy,
-              signal_type: strategySignal.signal,
-              confidence_score: strategySignal.confidence,
-              current_price: marketData.currentPrice,
-              target_price: strategySignal.signal === 'BUY' ? marketData.currentPrice * 1.02 : marketData.currentPrice * 0.98,
-              stop_loss_price: strategySignal.signal === 'BUY' ? marketData.currentPrice * 0.98 : marketData.currentPrice * 1.02,
-              reasoning: `${strategySignal.strategy} strategy: ${strategySignal.signal} signal with ${strategySignal.confidence}% confidence`,
-              market_data: {
-                volume: marketData.volume,
-                avgVolume: marketData.avgVolume,
-                change: marketData.change,
-                high: marketData.high,
-                low: marketData.low
-              },
-              strategy_params: {
-                rsi: calculateRSI(marketData.closes, 14),
-                volumeRatio: marketData.volume / marketData.avgVolume
-              },
-              expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString() // 4 hours
+              action: strategySignal.signal,
+              confidence: strategySignal.confidence / 100, // Convert to decimal
+              current_price: marketData.currentPrice
             });
           }
         }
 
-        // Store combined signal if strong enough
-        if (combinedSignal.confidence > 60) {
+        // Store combined signal if high confidence (>= 70%)
+        if (combinedSignal.confidence >= 70) {
           allSignals.push({
             symbol,
-            strategy_type: 'combined',
-            signal_type: combinedSignal.action,
-            confidence_score: Math.round(combinedSignal.confidence),
-            current_price: marketData.currentPrice,
-            target_price: combinedSignal.action === 'BUY' ? marketData.currentPrice * 1.025 : marketData.currentPrice * 0.975,
-            stop_loss_price: combinedSignal.action === 'BUY' ? marketData.currentPrice * 0.975 : marketData.currentPrice * 1.025,
-            reasoning: `Combined strategy consensus: ${combinedSignal.action} with ${Math.round(combinedSignal.confidence)}% confidence`,
-            market_data: {
-              volume: marketData.volume,
-              avgVolume: marketData.avgVolume,
-              change: marketData.change,
-              high: marketData.high,
-              low: marketData.low
-            },
-            strategy_params: {
-              momentum: momentumSignal.confidence,
-              meanReversion: meanReversionSignal.confidence,
-              ml: mlSignal.confidence
-            },
-            expires_at: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString() // 6 hours
+            action: combinedSignal.action,
+            confidence: combinedSignal.confidence / 100, // Convert to decimal
+            current_price: marketData.currentPrice
           });
         }
 
@@ -359,12 +326,10 @@ serve(async (req) => {
       timestamp: new Date().toISOString(),
       symbolsAnalyzed: symbols.length,
       totalSignals: allSignals.length,
-      highConfidenceSignals: allSignals.filter(s => s.confidence_score >= 70).length,
+      highConfidenceSignals: allSignals.filter(s => s.confidence >= 0.7).length,
       signalBreakdown: {
-        momentum: allSignals.filter(s => s.strategy_type === 'momentum').length,
-        meanReversion: allSignals.filter(s => s.strategy_type === 'mean_reversion').length,
-        ml: allSignals.filter(s => s.strategy_type === 'ml_prediction').length,
-        combined: allSignals.filter(s => s.strategy_type === 'combined').length
+        totalSignals: allSignals.length,
+        highConfidenceOnly: true
       }
     };
 
