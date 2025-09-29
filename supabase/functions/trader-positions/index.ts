@@ -76,19 +76,93 @@ const DEMO_RECENT_TRADES: RecentTrade[] = [
 
 async function fetchPositionsFromAPI(): Promise<{ positions: Position[], recentTrades: RecentTrade[] }> {
   try {
-    console.log('Attempting to fetch positions from trading API...');
+    console.log('Attempting to fetch positions from Supabase...');
     
-    // Placeholder for future API integration
-    // const [positionsResponse, tradesResponse] = await Promise.all([
-    //   fetch(`${TRADING_API_URL}/positions`),
-    //   fetch(`${TRADING_API_URL}/trades/recent`)
-    // ]);
+    // Import Supabase client
+    const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    // Get the user from the Authorization header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.log('No auth header, using demo data');
+      return { positions: DEMO_POSITIONS, recentTrades: DEMO_RECENT_TRADES };
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     
-    // For now, return demo data
-    console.log('Using demo positions data');
+    if (authError || !user) {
+      console.log('Auth failed, using demo data:', authError);
+      return { positions: DEMO_POSITIONS, recentTrades: DEMO_RECENT_TRADES };
+    }
+
+    console.log('Fetching positions for user:', user.id);
+
+    // First get the user's paper account
+    const { data: paperAccounts, error: accountError } = await supabase
+      .from('paper_accounts')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .limit(1);
+
+    if (accountError || !paperAccounts || paperAccounts.length === 0) {
+      console.log('No active paper account found, using demo data');
+      return { positions: DEMO_POSITIONS, recentTrades: DEMO_RECENT_TRADES };
+    }
+
+    const accountId = paperAccounts[0].id;
+    console.log('Using paper account:', accountId);
+
+    // Fetch paper positions for the account
+    const { data: paperPositions, error: positionsError } = await supabase
+      .from('paper_positions')
+      .select('*')
+      .eq('account_id', accountId);
+
+    if (positionsError) {
+      console.error('Error fetching positions:', positionsError);
+      return { positions: DEMO_POSITIONS, recentTrades: DEMO_RECENT_TRADES };
+    }
+
+    // Convert paper positions to Position format
+    const positions: Position[] = (paperPositions || []).map(pos => ({
+      symbol: pos.symbol,
+      quantity: Number(pos.quantity),
+      averageCost: Number(pos.average_cost || 0),
+      currentPrice: Number(pos.current_price || 0),
+      marketValue: Number(pos.market_value || 0),
+      unrealizedPnL: Number(pos.unrealized_pnl || 0),
+      unrealizedPnLPercent: Number(pos.unrealized_pnl_percentage || 0),
+      side: pos.side || 'long',
+      assetType: pos.asset_type || 'stock'
+    }));
+
+    // Fetch recent trades from paper_transactions if available
+    const { data: paperTrades } = await supabase
+      .from('paper_transactions')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    const recentTrades: RecentTrade[] = (paperTrades || []).map(trade => ({
+      symbol: trade.symbol || 'UNKNOWN',
+      action: trade.transaction_type === 'buy' ? 'BUY' : 'SELL',
+      quantity: Number(trade.quantity || 0),
+      price: Number(trade.price || 0),
+      timestamp: trade.created_at || new Date().toISOString(),
+      timeAgo: getTimeAgo(trade.created_at)
+    }));
+
+    console.log(`Found ${positions.length} positions and ${recentTrades.length} recent trades`);
+    
     return {
-      positions: DEMO_POSITIONS,
-      recentTrades: DEMO_RECENT_TRADES
+      positions: positions.length > 0 ? positions : DEMO_POSITIONS,
+      recentTrades: recentTrades.length > 0 ? recentTrades : DEMO_RECENT_TRADES
     };
     
   } catch (error) {
@@ -100,7 +174,23 @@ async function fetchPositionsFromAPI(): Promise<{ positions: Position[], recentT
   }
 }
 
-Deno.serve(async (req) => {
+function getTimeAgo(timestamp: string): string {
+  const now = new Date();
+  const past = new Date(timestamp);
+  const diffMs = now.getTime() - past.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  
+  if (diffMins < 1) return 'now';
+  if (diffMins < 60) return `${diffMins}m`;
+  if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h`;
+  return `${Math.floor(diffMins / 1440)}d`;
+}
+
+// Need access to req in fetchPositionsFromAPI
+let req: Request;
+
+Deno.serve(async (request) => {
+  req = request;
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
