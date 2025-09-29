@@ -21,7 +21,9 @@ const TraderAuth = () => {
 
   // Check if user is already authenticated as a trader
   React.useEffect(() => {
+    console.log('TraderAuth: useEffect running, user:', user);
     if (user) {
+      console.log('TraderAuth: User found, checking trader access');
       checkTraderAccess();
     }
   }, [user]);
@@ -129,10 +131,14 @@ const TraderAuth = () => {
 
   // If already authenticated and whitelisted, redirect
   if (user) {
+    console.log('TraderAuth: User is authenticated, showing debug info instead of redirecting');
     return <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center">
+      <div className="text-center space-y-4">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-        <p>Checking access...</p>
+        <p>Already logged in as: {user.email}</p>
+        <p>Checking trader access...</p>
+        <Button onClick={() => navigate('/trader')}>Go to Trader Dashboard</Button>
+        <Button variant="outline" onClick={() => supabase.auth.signOut()}>Logout to see login form</Button>
       </div>
     </div>;
   }
