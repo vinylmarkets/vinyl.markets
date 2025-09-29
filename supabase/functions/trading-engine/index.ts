@@ -1,228 +1,234 @@
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { corsHeaders } from '../_shared/cors.ts'
 
-// Initialize Supabase client
-const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-const supabase = createClient(supabaseUrl, supabaseServiceKey)
-
-interface MarketData {
-  symbol: string;
-  price: number;
-  change: number;
-  changePercent: number;
-  volume: number;
-  high: number;
-  low: number;
-  open: number;
-  previousClose: number;
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-interface TradingSignal {
-  symbol: string;
-  strategy_type: 'momentum' | 'mean_reversion' | 'ml_prediction';
-  signal_type: 'BUY' | 'SELL' | 'HOLD';
-  confidence_score: number;
-  current_price: number;
-  target_price?: number;
-  stop_loss_price?: number;
-  reasoning: string;
-  market_data: any;
-  strategy_params: any;
-  expires_at: string;
-}
-
-const TRADING_SYMBOLS = ['AAPL', 'GOOGL', 'MSFT', 'NVDA', 'TSLA', 'AMZN', 'META', 'NFLX', 'CRM', 'ADBE'];
-
-async function fetchYahooFinanceData(symbols: string[]): Promise<MarketData[]> {
-  const results: MarketData[] = [];
+// Technical indicator calculations
+function calculateRSI(closes: number[], period: number = 14): number {
+  if (closes.length < period + 1) return 50; // neutral if not enough data
   
-  for (const symbol of symbols) {
-    try {
-      // Using Yahoo Finance alternative API (free tier)
-      const response = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`, {
+  const gains = [];
+  const losses = [];
+  
+  for (let i = 1; i < closes.length; i++) {
+    const change = closes[i] - closes[i - 1];
+    gains.push(change > 0 ? change : 0);
+    losses.push(change < 0 ? Math.abs(change) : 0);
+  }
+  
+  const avgGain = gains.slice(-period).reduce((a, b) => a + b) / period;
+  const avgLoss = losses.slice(-period).reduce((a, b) => a + b) / period;
+  
+  if (avgLoss === 0) return 100;
+  
+  const rs = avgGain / avgLoss;
+  return 100 - (100 / (1 + rs));
+}
+
+function calculateMACD(closes: number[]): { macd: number, signal: number, histogram: number } {
+  if (closes.length < 26) return { macd: 0, signal: 0, histogram: 0 };
+  
+  const ema12 = calculateEMA(closes, 12);
+  const ema26 = calculateEMA(closes, 26);
+  const macd = ema12 - ema26;
+  
+  // For signal line, we'd need more historical MACD values
+  // Simplified: use a shorter EMA of recent MACD approximation
+  const signal = macd * 0.8; // Simplified signal line
+  const histogram = macd - signal;
+  
+  return { macd, signal, histogram };
+}
+
+function calculateEMA(closes: number[], period: number): number {
+  if (closes.length < period) return closes[closes.length - 1] || 0;
+  
+  const multiplier = 2 / (period + 1);
+  let ema = closes.slice(0, period).reduce((a, b) => a + b) / period;
+  
+  for (let i = period; i < closes.length; i++) {
+    ema = (closes[i] * multiplier) + (ema * (1 - multiplier));
+  }
+  
+  return ema;
+}
+
+function calculateStdDev(values: number[]): number {
+  if (values.length < 2) return 0;
+  
+  const mean = values.reduce((a, b) => a + b) / values.length;
+  const variance = values.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / values.length;
+  return Math.sqrt(variance);
+}
+
+// Momentum Strategy
+function momentumStrategy(marketData: any) {
+  const rsi = calculateRSI(marketData.closes, 14)
+  const macd = calculateMACD(marketData.closes)
+  const volumeRatio = marketData.volume / marketData.avgVolume
+
+  let signal = 'HOLD'
+  let confidence = 0
+
+  if (rsi < 30 && macd.histogram > 0 && volumeRatio > 1.2) {
+    signal = 'BUY'
+    confidence = 80
+  } else if (rsi > 70 && macd.histogram < 0 && volumeRatio > 1.2) {
+    signal = 'SELL'
+    confidence = 80
+  }
+
+  return { signal, confidence, strategy: 'momentum' }
+}
+
+// Mean Reversion Strategy
+function meanReversionStrategy(marketData: any) {
+  const currentPrice = marketData.currentPrice
+  const sma20 = marketData.closes.slice(-20).reduce((a: number, b: number) => a + b) / 20
+  const stdDev = calculateStdDev(marketData.closes.slice(-20))
+  
+  const upperBand = sma20 + (stdDev * 2)
+  const lowerBand = sma20 - (stdDev * 2)
+  const bbPosition = (currentPrice - lowerBand) / (upperBand - lowerBand)
+
+  let signal = 'HOLD'
+  let confidence = 0
+
+  if (bbPosition < 0.2) {
+    signal = 'BUY'
+    confidence = 70
+  } else if (bbPosition > 0.8) {
+    signal = 'SELL'
+    confidence = 70
+  }
+
+  return { signal, confidence, strategy: 'mean_reversion' }
+}
+
+// ML Strategy (simplified for edge function)
+function mlStrategy(marketData: any) {
+  // Simplified ML logic - in production, call a proper ML model
+  const features = {
+    rsi: calculateRSI(marketData.closes, 14),
+    priceChange: marketData.change,
+    volumeRatio: marketData.volume / marketData.avgVolume
+  }
+
+  // Simple decision tree logic as placeholder
+  let signal = 'HOLD'
+  let confidence = 0
+
+  if (features.rsi < 35 && features.volumeRatio > 1.5) {
+    signal = 'BUY'
+    confidence = 65
+  } else if (features.rsi > 65 && features.priceChange < -2) {
+    signal = 'SELL'
+    confidence = 65
+  }
+
+  return { signal, confidence, strategy: 'ml_prediction' }
+}
+
+// Combine all strategies
+function combineSignals(signals: any[]) {
+  const weights: { [key: string]: number } = { momentum: 0.35, mean_reversion: 0.35, ml_prediction: 0.30 }
+  let buyScore = 0
+  let sellScore = 0
+
+  signals.forEach((s: any) => {
+    const weight = weights[s.strategy] || 0
+    if (s.signal === 'BUY') buyScore += s.confidence * weight
+    if (s.signal === 'SELL') sellScore += s.confidence * weight
+  })
+
+  if (buyScore > 50) return { action: 'BUY', confidence: buyScore }
+  if (sellScore > 50) return { action: 'SELL', confidence: sellScore }
+  return { action: 'HOLD', confidence: 0 }
+}
+
+async function fetchHistoricalData(symbol: string): Promise<any> {
+  try {
+    // Fetch 30 days of historical data for technical analysis
+    const response = await fetch(
+      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=30d`,
+      {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        const result = data.chart.result[0];
-        const meta = result.meta;
-        const quote = result.indicators.quote[0];
-        
-        const marketData: MarketData = {
-          symbol,
-          price: meta.regularMarketPrice || quote.close[quote.close.length - 1],
-          change: meta.regularMarketPrice - meta.previousClose,
-          changePercent: ((meta.regularMarketPrice - meta.previousClose) / meta.previousClose) * 100,
-          volume: quote.volume[quote.volume.length - 1] || 0,
-          high: quote.high[quote.high.length - 1] || meta.regularMarketPrice,
-          low: quote.low[quote.low.length - 1] || meta.regularMarketPrice,
-          open: quote.open[quote.open.length - 1] || meta.regularMarketPrice,
-          previousClose: meta.previousClose
-        };
-        
-        results.push(marketData);
       }
-    } catch (error) {
-      console.warn(`Failed to fetch data for ${symbol}:`, error);
-      // Generate mock data as fallback
-      const mockPrice = 100 + Math.random() * 400;
-      results.push({
-        symbol,
-        price: mockPrice,
-        change: (Math.random() - 0.5) * 10,
-        changePercent: (Math.random() - 0.5) * 5,
-        volume: Math.floor(Math.random() * 10000000),
-        high: mockPrice * (1 + Math.random() * 0.03),
-        low: mockPrice * (1 - Math.random() * 0.03),
-        open: mockPrice * (1 + (Math.random() - 0.5) * 0.02),
-        previousClose: mockPrice * (1 + (Math.random() - 0.5) * 0.02)
-      });
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
     }
-  }
-  
-  return results;
-}
 
-function runMomentumStrategy(data: MarketData): TradingSignal | null {
-  const momentum = data.changePercent;
-  const volumeRatio = data.volume / 1000000; // millions
-  
-  if (momentum > 2 && volumeRatio > 0.5) {
-    return {
-      symbol: data.symbol,
-      strategy_type: 'momentum',
-      signal_type: 'BUY',
-      confidence_score: Math.min(95, 60 + Math.abs(momentum) * 5 + volumeRatio * 2),
-      current_price: data.price,
-      target_price: data.price * 1.03,
-      stop_loss_price: data.price * 0.98,
-      reasoning: `Strong upward momentum ${momentum.toFixed(2)}% with high volume`,
-      market_data: data,
-      strategy_params: { momentum, volumeRatio },
-      expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString() // 4 hours
-    };
-  } else if (momentum < -2 && volumeRatio > 0.5) {
-    return {
-      symbol: data.symbol,
-      strategy_type: 'momentum',
-      signal_type: 'SELL',
-      confidence_score: Math.min(95, 60 + Math.abs(momentum) * 5 + volumeRatio * 2),
-      current_price: data.price,
-      target_price: data.price * 0.97,
-      stop_loss_price: data.price * 1.02,
-      reasoning: `Strong downward momentum ${momentum.toFixed(2)}% with high volume`,
-      market_data: data,
-      strategy_params: { momentum, volumeRatio },
-      expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString()
-    };
-  }
-  
-  return null;
-}
-
-function runMeanReversionStrategy(data: MarketData): TradingSignal | null {
-  const priceFromHigh = (data.price - data.high) / data.high;
-  const priceFromLow = (data.price - data.low) / data.low;
-  
-  // Oversold condition
-  if (priceFromLow < 0.02 && data.changePercent < -1) {
-    return {
-      symbol: data.symbol,
-      strategy_type: 'mean_reversion',
-      signal_type: 'BUY',
-      confidence_score: 70 + Math.abs(priceFromLow) * 1000,
-      current_price: data.price,
-      target_price: data.price * 1.025,
-      stop_loss_price: data.price * 0.985,
-      reasoning: `Oversold condition near daily low, expecting bounce`,
-      market_data: data,
-      strategy_params: { priceFromHigh, priceFromLow },
-      expires_at: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString() // 2 hours
-    };
-  }
-  
-  // Overbought condition
-  if (Math.abs(priceFromHigh) < 0.02 && data.changePercent > 1) {
-    return {
-      symbol: data.symbol,
-      strategy_type: 'mean_reversion',
-      signal_type: 'SELL',
-      confidence_score: 70 + Math.abs(priceFromHigh) * 1000,
-      current_price: data.price,
-      target_price: data.price * 0.975,
-      stop_loss_price: data.price * 1.015,
-      reasoning: `Overbought condition near daily high, expecting pullback`,
-      market_data: data,
-      strategy_params: { priceFromHigh, priceFromLow },
-      expires_at: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString()
-    };
-  }
-  
-  return null;
-}
-
-function runMLPredictionStrategy(data: MarketData): TradingSignal | null {
-  // Simplified ML-like logic based on multiple factors
-  const volatility = Math.abs(data.high - data.low) / data.price;
-  const priceAction = data.changePercent;
-  const volumeScore = Math.min(1, data.volume / 5000000); // normalize volume
-  
-  // ML-like score combining multiple factors
-  const mlScore = (priceAction * 0.4) + (volatility * 100 * 0.3) + (volumeScore * 0.3);
-  
-  if (mlScore > 1.5) {
-    return {
-      symbol: data.symbol,
-      strategy_type: 'ml_prediction',
-      signal_type: 'BUY',
-      confidence_score: Math.min(90, 65 + mlScore * 10),
-      current_price: data.price,
-      target_price: data.price * 1.04,
-      stop_loss_price: data.price * 0.97,
-      reasoning: `ML model indicates bullish pattern (score: ${mlScore.toFixed(2)})`,
-      market_data: data,
-      strategy_params: { mlScore, volatility, volumeScore },
-      expires_at: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString() // 6 hours
-    };
-  } else if (mlScore < -1.5) {
-    return {
-      symbol: data.symbol,
-      strategy_type: 'ml_prediction',
-      signal_type: 'SELL',
-      confidence_score: Math.min(90, 65 + Math.abs(mlScore) * 10),
-      current_price: data.price,
-      target_price: data.price * 0.96,
-      stop_loss_price: data.price * 1.03,
-      reasoning: `ML model indicates bearish pattern (score: ${mlScore.toFixed(2)})`,
-      market_data: data,
-      strategy_params: { mlScore, volatility, volumeScore },
-      expires_at: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString()
-    };
-  }
-  
-  return null;
-}
-
-async function storeSignals(signals: TradingSignal[]) {
-  if (signals.length === 0) return;
-  
-  const { error } = await supabase
-    .from('trading.signals')
-    .insert(signals);
+    const data = await response.json();
+    const result = data.chart.result[0];
+    const meta = result.meta;
+    const indicators = result.indicators.quote[0];
     
-  if (error) {
-    console.error('Error storing signals:', error);
-    throw error;
+    // Get the last 30 days of closes for technical analysis
+    const closes = indicators.close.filter((c: number) => c !== null);
+    const volumes = indicators.volume.filter((v: number) => v !== null);
+    
+    // Calculate average volume (20-day)
+    const avgVolume = volumes.slice(-20).reduce((a: number, b: number) => a + b, 0) / Math.min(20, volumes.length);
+    
+    return {
+      symbol,
+      currentPrice: meta.regularMarketPrice,
+      previousClose: meta.previousClose,
+      change: ((meta.regularMarketPrice - meta.previousClose) / meta.previousClose) * 100,
+      volume: meta.regularMarketVolume,
+      avgVolume,
+      closes,
+      high: meta.regularMarketDayHigh,
+      low: meta.regularMarketDayLow
+    };
+
+  } catch (error) {
+    console.warn(`Failed to fetch historical data for ${symbol}:`, error);
+    
+    // Return mock data for testing
+    const mockPrice = 100 + Math.random() * 400;
+    const mockCloses = Array.from({ length: 30 }, (_, i) => 
+      mockPrice + (Math.random() - 0.5) * 20 + Math.sin(i / 5) * 10
+    );
+    
+    return {
+      symbol,
+      currentPrice: mockPrice,
+      previousClose: mockPrice * 0.99,
+      change: (Math.random() - 0.5) * 5,
+      volume: Math.floor(Math.random() * 10000000),
+      avgVolume: Math.floor(Math.random() * 8000000),
+      closes: mockCloses,
+      high: mockPrice * 1.03,
+      low: mockPrice * 0.97
+    };
   }
-  
-  console.log(`Stored ${signals.length} trading signals`);
 }
 
-Deno.serve(async (req) => {
+function isMarketOpen(): boolean {
+  const now = new Date();
+  const utcHour = now.getUTCHours();
+  const utcDay = now.getUTCDay();
+  
+  // Convert to EST (UTC-5)
+  const estHour = utcHour - 5;
+  
+  // Market is open Monday-Friday, 9:30 AM - 4:00 PM EST
+  const isWeekday = utcDay >= 1 && utcDay <= 5;
+  const isMarketHours = estHour >= 9.5 && estHour < 16;
+  
+  return isWeekday && isMarketHours;
+}
+
+serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -230,13 +236,8 @@ Deno.serve(async (req) => {
   try {
     console.log('Trading engine starting...');
     
-    // Check if market is open (basic check - 9:30 AM to 4 PM EST, Monday-Friday)
-    const now = new Date();
-    const estHour = now.getUTCHours() - 5; // EST offset
-    const isWeekday = now.getUTCDay() >= 1 && now.getUTCDay() <= 5;
-    const isMarketHours = estHour >= 9.5 && estHour < 16;
-    
-    if (!isWeekday || !isMarketHours) {
+    // Check if market is open
+    if (!isMarketOpen()) {
       console.log('Market is closed, skipping signal generation');
       return new Response(
         JSON.stringify({ 
@@ -248,50 +249,126 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Fetch market data
-    console.log('Fetching market data for symbols:', TRADING_SYMBOLS);
-    const marketData = await fetchYahooFinanceData(TRADING_SYMBOLS);
-    
-    // Run trading strategies
-    const allSignals: TradingSignal[] = [];
-    
-    for (const data of marketData) {
-      // Run all strategies for each symbol
-      const momentumSignal = runMomentumStrategy(data);
-      const meanReversionSignal = runMeanReversionStrategy(data);
-      const mlSignal = runMLPredictionStrategy(data);
-      
-      if (momentumSignal) allSignals.push(momentumSignal);
-      if (meanReversionSignal) allSignals.push(meanReversionSignal);
-      if (mlSignal) allSignals.push(mlSignal);
+    const symbols = ['AAPL', 'MSFT', 'GOOGL', 'NVDA', 'TSLA', 'META', 'AMZN'];
+    const allSignals = [];
+
+    console.log(`Analyzing ${symbols.length} symbols...`);
+
+    // Process each symbol
+    for (const symbol of symbols) {
+      try {
+        console.log(`Fetching data for ${symbol}...`);
+        const marketData = await fetchHistoricalData(symbol);
+        
+        // Run all three strategies
+        const momentumSignal = momentumStrategy(marketData);
+        const meanReversionSignal = meanReversionStrategy(marketData);
+        const mlSignal = mlStrategy(marketData);
+        
+        const individualSignals = [momentumSignal, meanReversionSignal, mlSignal];
+        
+        // Combine signals for final decision
+        const combinedSignal = combineSignals(individualSignals);
+        
+        // Store individual strategy signals if they have confidence > 0
+        for (const strategySignal of individualSignals) {
+          if (strategySignal.confidence > 0) {
+            allSignals.push({
+              symbol,
+              strategy_type: strategySignal.strategy,
+              signal_type: strategySignal.signal,
+              confidence_score: strategySignal.confidence,
+              current_price: marketData.currentPrice,
+              target_price: strategySignal.signal === 'BUY' ? marketData.currentPrice * 1.02 : marketData.currentPrice * 0.98,
+              stop_loss_price: strategySignal.signal === 'BUY' ? marketData.currentPrice * 0.98 : marketData.currentPrice * 1.02,
+              reasoning: `${strategySignal.strategy} strategy: ${strategySignal.signal} signal with ${strategySignal.confidence}% confidence`,
+              market_data: {
+                volume: marketData.volume,
+                avgVolume: marketData.avgVolume,
+                change: marketData.change,
+                high: marketData.high,
+                low: marketData.low
+              },
+              strategy_params: {
+                rsi: calculateRSI(marketData.closes, 14),
+                volumeRatio: marketData.volume / marketData.avgVolume
+              },
+              expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString() // 4 hours
+            });
+          }
+        }
+
+        // Store combined signal if strong enough
+        if (combinedSignal.confidence > 60) {
+          allSignals.push({
+            symbol,
+            strategy_type: 'combined',
+            signal_type: combinedSignal.action,
+            confidence_score: Math.round(combinedSignal.confidence),
+            current_price: marketData.currentPrice,
+            target_price: combinedSignal.action === 'BUY' ? marketData.currentPrice * 1.025 : marketData.currentPrice * 0.975,
+            stop_loss_price: combinedSignal.action === 'BUY' ? marketData.currentPrice * 0.975 : marketData.currentPrice * 1.025,
+            reasoning: `Combined strategy consensus: ${combinedSignal.action} with ${Math.round(combinedSignal.confidence)}% confidence`,
+            market_data: {
+              volume: marketData.volume,
+              avgVolume: marketData.avgVolume,
+              change: marketData.change,
+              high: marketData.high,
+              low: marketData.low
+            },
+            strategy_params: {
+              momentum: momentumSignal.confidence,
+              meanReversion: meanReversionSignal.confidence,
+              ml: mlSignal.confidence
+            },
+            expires_at: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString() // 6 hours
+          });
+        }
+
+        console.log(`${symbol}: Combined signal = ${combinedSignal.action} (${Math.round(combinedSignal.confidence)}%)`);
+
+      } catch (error) {
+        console.error(`Error processing ${symbol}:`, error);
+      }
     }
-    
-    // Filter for high-confidence signals only
-    const highConfidenceSignals = allSignals.filter(signal => signal.confidence_score >= 75);
-    
+
     // Store signals in database
-    if (highConfidenceSignals.length > 0) {
-      await storeSignals(highConfidenceSignals);
+    if (allSignals.length > 0) {
+      const supabase = createClient(
+        Deno.env.get('SUPABASE_URL')!,
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      );
+
+      console.log(`Storing ${allSignals.length} signals in database...`);
+
+      const { error } = await supabase
+        .from('trading.signals')
+        .insert(allSignals);
+
+      if (error) {
+        console.error('Error storing signals:', error);
+        throw error;
+      }
+
+      console.log('Successfully stored signals in database');
     }
-    
+
     const response = {
       success: true,
       marketStatus: 'open',
       timestamp: new Date().toISOString(),
-      symbolsAnalyzed: marketData.length,
+      symbolsAnalyzed: symbols.length,
       totalSignals: allSignals.length,
-      highConfidenceSignals: highConfidenceSignals.length,
-      signals: highConfidenceSignals.map(s => ({
-        symbol: s.symbol,
-        strategy: s.strategy_type,
-        signal: s.signal_type,
-        confidence: s.confidence_score,
-        price: s.current_price,
-        reasoning: s.reasoning
-      }))
+      highConfidenceSignals: allSignals.filter(s => s.confidence_score >= 70).length,
+      signalBreakdown: {
+        momentum: allSignals.filter(s => s.strategy_type === 'momentum').length,
+        meanReversion: allSignals.filter(s => s.strategy_type === 'mean_reversion').length,
+        ml: allSignals.filter(s => s.strategy_type === 'ml_prediction').length,
+        combined: allSignals.filter(s => s.strategy_type === 'combined').length
+      }
     };
 
-    console.log(`Trading engine completed: ${highConfidenceSignals.length} high-confidence signals generated`);
+    console.log(`Trading engine completed: ${allSignals.length} signals generated`);
 
     return new Response(
       JSON.stringify(response),
@@ -310,4 +387,4 @@ Deno.serve(async (req) => {
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
-});
+})
