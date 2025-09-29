@@ -3644,6 +3644,134 @@ export type Database = {
         }
         Relationships: []
       }
+      trading_positions: {
+        Row: {
+          closed_at: string | null
+          created_at: string
+          current_price: number | null
+          entry_price: number
+          id: string
+          market_value: number | null
+          opened_at: string
+          quantity: number
+          side: string
+          signal_id: string | null
+          status: string
+          stop_loss_price: number | null
+          symbol: string
+          take_profit_price: number | null
+          unrealized_pnl: number | null
+          unrealized_pnl_percent: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          closed_at?: string | null
+          created_at?: string
+          current_price?: number | null
+          entry_price: number
+          id?: string
+          market_value?: number | null
+          opened_at?: string
+          quantity: number
+          side: string
+          signal_id?: string | null
+          status?: string
+          stop_loss_price?: number | null
+          symbol: string
+          take_profit_price?: number | null
+          unrealized_pnl?: number | null
+          unrealized_pnl_percent?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          closed_at?: string | null
+          created_at?: string
+          current_price?: number | null
+          entry_price?: number
+          id?: string
+          market_value?: number | null
+          opened_at?: string
+          quantity?: number
+          side?: string
+          signal_id?: string | null
+          status?: string
+          stop_loss_price?: number | null
+          symbol?: string
+          take_profit_price?: number | null
+          unrealized_pnl?: number | null
+          unrealized_pnl_percent?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trading_positions_signal_id_fkey"
+            columns: ["signal_id"]
+            isOneToOne: false
+            referencedRelation: "trading_signals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trading_signals: {
+        Row: {
+          confidence_score: number
+          created_at: string
+          executed_at: string | null
+          expires_at: string | null
+          id: string
+          quantity: number | null
+          reasoning: string | null
+          signal_data: Json | null
+          signal_type: string
+          status: string
+          stop_loss_price: number | null
+          symbol: string
+          take_profit_price: number | null
+          target_price: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          confidence_score: number
+          created_at?: string
+          executed_at?: string | null
+          expires_at?: string | null
+          id?: string
+          quantity?: number | null
+          reasoning?: string | null
+          signal_data?: Json | null
+          signal_type: string
+          status?: string
+          stop_loss_price?: number | null
+          symbol: string
+          take_profit_price?: number | null
+          target_price?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          confidence_score?: number
+          created_at?: string
+          executed_at?: string | null
+          expires_at?: string | null
+          id?: string
+          quantity?: number | null
+          reasoning?: string | null
+          signal_data?: Json | null
+          signal_type?: string
+          status?: string
+          stop_loss_price?: number | null
+          symbol?: string
+          take_profit_price?: number | null
+          target_price?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       universe_selection: {
         Row: {
           created_at: string
