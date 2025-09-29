@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { LogOut } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useNavigate, Link } from "react-router-dom";
@@ -38,7 +40,9 @@ import {
   Link as LinkIcon,
   TrendingUp as TrendingUpIcon,
   TrendingDown as TrendingDownIcon,
-  X
+  X,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 import { CandlestickChart } from "./CandlestickChart";
 import { TeachingAssistant } from "./TeachingAssistant";
@@ -123,6 +127,7 @@ export const TradingDashboard = () => {
     quantity: number;
   } | null>(null);
   const [priceUpdateInterval, setPriceUpdateInterval] = useState<NodeJS.Timeout | null>(null);
+  const [analysisExpanded, setAnalysisExpanded] = useState(false);
   
   const isDevelopment = import.meta.env.DEV;
 
@@ -888,113 +893,110 @@ export const TradingDashboard = () => {
                 />
               </div>
             )}
-            {/* Active Positions */}
+            
             <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center space-x-2 text-base">
-                  <Target className="h-4 w-4 text-accent" />
-                  <span>Active Positions</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-3">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-border text-xs text-muted-foreground">
-                        <th className="text-left py-1 font-medium">Symbol</th>
-                        <th className="text-right py-1 font-medium">Qty</th>
-                        <th className="text-right py-1 font-medium">Avg Cost</th>
-                        <th className="text-right py-1 font-medium">Current</th>
-                        <th className="text-right py-1 font-medium">P&L</th>
-                        <th className="text-right py-1 font-medium">%</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                      {positions.length > 0 ? (
-                        positions.map((position) => (
-                          <tr key={position.symbol} className="hover:bg-muted/50 transition-colors">
-                            <td className="py-2 font-medium text-foreground">{position.symbol}</td>
-                            <td className="text-right py-2 text-muted-foreground">{position.quantity}</td>
-                            <td className="text-right py-2 text-muted-foreground">${position.averageCost.toFixed(2)}</td>
-                            <td className="text-right py-2 text-foreground">${position.currentPrice.toFixed(2)}</td>
-                            <td className={`text-right py-2 font-medium ${position.unrealizedPnL >= 0 ? 'text-success' : 'text-destructive'}`}>
-                              {position.unrealizedPnL >= 0 ? '+' : ''}${position.unrealizedPnL.toFixed(0)}
-                            </td>
-                            <td className={`text-right py-2 font-medium ${position.unrealizedPnLPercent >= 0 ? 'text-success' : 'text-destructive'}`}>
-                              {position.unrealizedPnLPercent >= 0 ? '+' : ''}{position.unrealizedPnLPercent.toFixed(2)}%
-                            </td>
+              <Tabs defaultValue="positions" className="w-full">
+                <CardHeader className="pb-2">
+                  <TabsList className="grid w-full grid-cols-3 h-8">
+                    <TabsTrigger value="positions" className="text-xs">Positions</TabsTrigger>
+                    <TabsTrigger value="trades" className="text-xs">Trades</TabsTrigger>
+                    <TabsTrigger value="status" className="text-xs">Status</TabsTrigger>
+                  </TabsList>
+                </CardHeader>
+                
+                <CardContent className="p-3">
+                  <TabsContent value="positions" className="mt-0">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-border text-xs text-muted-foreground">
+                            <th className="text-left py-1 font-medium">Symbol</th>
+                            <th className="text-right py-1 font-medium">Qty</th>
+                            <th className="text-right py-1 font-medium">Cost</th>
+                            <th className="text-right py-1 font-medium">Current</th>
+                            <th className="text-right py-1 font-medium">P&L</th>
                           </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border">
+                          {positions.length > 0 ? (
+                            positions.map((position) => (
+                              <tr key={position.symbol} className="hover:bg-muted/50 transition-colors">
+                                <td className="py-2 font-medium text-foreground">{position.symbol}</td>
+                                <td className="text-right py-2 text-muted-foreground text-xs">{position.quantity}</td>
+                                <td className="text-right py-2 text-muted-foreground text-xs">${position.averageCost.toFixed(2)}</td>
+                                <td className="text-right py-2 text-foreground text-xs">${position.currentPrice.toFixed(2)}</td>
+                                <td className={`text-right py-2 font-medium text-xs ${position.unrealizedPnL >= 0 ? 'text-success' : 'text-destructive'}`}>
+                                  {position.unrealizedPnL >= 0 ? '+' : ''}${position.unrealizedPnL.toFixed(0)}
+                                  <div className={`${position.unrealizedPnLPercent >= 0 ? 'text-success' : 'text-destructive'}`}>
+                                    ({position.unrealizedPnLPercent >= 0 ? '+' : ''}{position.unrealizedPnLPercent.toFixed(1)}%)
+                                  </div>
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan={5} className="py-6 text-center text-muted-foreground text-xs">
+                                {hasIntegrations ? 'No positions found' : 'Connect broker for positions'}
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="trades" className="mt-0">
+                    <div className="space-y-2 max-h-32 overflow-y-auto">
+                      {recentTrades.length > 0 ? (
+                        recentTrades.map((trade, index) => (
+                          <div key={index} className="flex items-center justify-between p-2 bg-muted/30 rounded text-xs">
+                            <div className="flex items-center space-x-2">
+                              <Badge className={`text-xs ${
+                                trade.action === 'BUY' 
+                                  ? 'bg-success/10 text-success border-success/20' 
+                                  : 'bg-destructive/10 text-destructive border-destructive/20'
+                              }`}>
+                                {trade.action}
+                              </Badge>
+                              <span className="font-medium">{trade.symbol}</span>
+                              <span className="text-muted-foreground">{trade.quantity}@${trade.price}</span>
+                            </div>
+                            {trade.pnl && (
+                              <span className={`font-medium ${trade.pnl >= 0 ? 'text-success' : 'text-destructive'}`}>
+                                {trade.pnl >= 0 ? '+' : ''}${trade.pnl.toFixed(2)}
+                              </span>
+                            )}
+                          </div>
                         ))
                       ) : (
-                        <tr>
-                          <td colSpan={6} className="py-8 text-center text-muted-foreground">
-                            {hasIntegrations ? 'No positions found in your connected account' : 'Connect a broker to view positions'}
-                          </td>
-                        </tr>
+                        <div className="py-6 text-center text-muted-foreground text-xs">
+                          {hasIntegrations ? 'No recent trades' : 'Connect broker for trade history'}
+                        </div>
                       )}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Recent Trades */}
-            <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center space-x-2 text-base">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span>Recent Trades</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {recentTrades.map((trade, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 bg-muted/30 rounded border border-border">
-                    <div className="flex items-center space-x-2">
-                      <Badge className={`text-xs ${
-                        trade.action === 'BUY' 
-                          ? 'bg-success/10 text-success border-success/20' 
-                          : 'bg-destructive/10 text-destructive border-destructive/20'
-                      }`}>
-                        {trade.action}
-                      </Badge>
-                      <span className="font-medium text-sm">{trade.symbol}</span>
-                      <span className="text-xs text-muted-foreground">{trade.quantity} @ ${trade.price}</span>
                     </div>
-                    {trade.pnl && (
-                      <span className={`text-xs font-medium ${trade.pnl >= 0 ? 'text-success' : 'text-destructive'}`}>
-                        {trade.pnl >= 0 ? '+' : ''}${trade.pnl.toFixed(2)}
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-
-            {/* System Status */}
-            <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center space-x-2 text-base">
-                  <Activity className="h-4 w-4 text-accent" />
-                  <span>System Status</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Cloud Status</span>
-                  <div className="flex items-center space-x-1">
-                    <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                    <span className="text-sm font-medium text-success">Active</span>
-                  </div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Signals Today</span>
-                  <span className="text-sm font-bold text-primary">12</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Last Analysis</span>
-                  <span className="text-sm font-bold text-foreground">2m ago</span>
-                </div>
-              </CardContent>
+                  </TabsContent>
+                  
+                  <TabsContent value="status" className="mt-0">
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Cloud Status</span>
+                        <div className="flex items-center space-x-1">
+                          <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                          <span className="text-sm font-medium text-success">Active</span>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Signals Today</span>
+                        <span className="text-sm font-bold text-primary">12</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Last Analysis</span>
+                        <span className="text-sm font-bold text-foreground">2m ago</span>
+                      </div>
+                    </div>
+                  </TabsContent>
+                </CardContent>
+              </Tabs>
             </Card>
           </div>
 
@@ -1043,25 +1045,67 @@ export const TradingDashboard = () => {
           </div>
         </div>
 
-        {/* Analysis Sections */}
-        <div className="mt-6 space-y-6">
-          {/* AI Writing Studio */}
-          <AIWritingStudio />
-          
-          {/* Market Narrative Dashboard */}
-          <MarketNarrativeDashboard />
-          
-          {/* Sector Map */}
-          <SectorMap />
-          
-          {/* Relationship Network Graph */}
-          <RelationshipNetworkGraph 
-            selectedSymbol={quickTradeSymbol || 'AAPL'}
-            onSymbolSelect={handleSymbolSelect}
-          />
-          
-          {/* Relationship Signals */}
-          <RelationshipSignals />
+        {/* Analysis Sections - Collapsible */}
+        <div className="mt-4">
+          <Collapsible open={analysisExpanded} onOpenChange={setAnalysisExpanded}>
+            <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
+              <CollapsibleTrigger asChild>
+                <CardHeader className="pb-2 cursor-pointer hover:bg-muted/50 transition-colors rounded-t-lg">
+                  <CardTitle className="flex items-center justify-between text-base">
+                    <div className="flex items-center space-x-2">
+                      <BarChart3 className="h-4 w-4 text-primary" />
+                      <span>Advanced Analysis</span>
+                      <Badge variant="secondary" className="text-xs">
+                        5 Tools
+                      </Badge>
+                    </div>
+                    {analysisExpanded ? (
+                      <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </CardTitle>
+                </CardHeader>
+              </CollapsibleTrigger>
+              
+              <CollapsibleContent className="space-y-4 p-4">
+                <Tabs defaultValue="writing" className="w-full">
+                  <TabsList className="grid w-full grid-cols-5 h-8">
+                    <TabsTrigger value="writing" className="text-xs">AI Studio</TabsTrigger>
+                    <TabsTrigger value="narrative" className="text-xs">Narrative</TabsTrigger>
+                    <TabsTrigger value="sector" className="text-xs">Sectors</TabsTrigger>
+                    <TabsTrigger value="network" className="text-xs">Network</TabsTrigger>
+                    <TabsTrigger value="signals" className="text-xs">Signals</TabsTrigger>
+                  </TabsList>
+                  
+                  <div className="mt-4">
+                    <TabsContent value="writing" className="mt-0">
+                      <AIWritingStudio />
+                    </TabsContent>
+                    
+                    <TabsContent value="narrative" className="mt-0">
+                      <MarketNarrativeDashboard />
+                    </TabsContent>
+                    
+                    <TabsContent value="sector" className="mt-0">
+                      <SectorMap />
+                    </TabsContent>
+                    
+                    <TabsContent value="network" className="mt-0">
+                      <RelationshipNetworkGraph 
+                        selectedSymbol={quickTradeSymbol || 'AAPL'}
+                        onSymbolSelect={handleSymbolSelect}
+                      />
+                    </TabsContent>
+                    
+                    <TabsContent value="signals" className="mt-0">
+                      <RelationshipSignals />
+                    </TabsContent>
+                  </div>
+                </Tabs>
+              </CollapsibleContent>
+            </Card>
+          </Collapsible>
         </div>
       </div>
     </div>

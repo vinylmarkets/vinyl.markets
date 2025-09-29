@@ -105,10 +105,10 @@ const TraderSettings = () => {
       // Save to database for backend use (auto-trading, etc.)
       const { error } = await supabase
         .from('user_settings')
-        .upsert({
+        .upsert([{
           user_id: user?.id,
-          settings: settings
-        });
+          settings: settings as any
+        }]);
         
       if (error) {
         console.error('Error saving settings to database:', error);
