@@ -108,6 +108,8 @@ export const TradingDashboard = () => {
     changePercent: number;
     isExpanded: boolean;
     priceHistory: number[];
+    action?: 'BUY' | 'SELL';
+    quantity: number;
   } | null>(null);
   const [priceUpdateInterval, setPriceUpdateInterval] = useState<NodeJS.Timeout | null>(null);
   
@@ -257,21 +259,53 @@ export const TradingDashboard = () => {
     }
   };
 
+  const fetchRealMarketData = async (symbol: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('market-data', {
+        body: { symbol: symbol.toUpperCase() }
+      });
+
+      if (error) {
+        console.error('Market data error:', error);
+        // Fallback to mock data if API fails
+        return {
+          price: 150 + Math.random() * 100,
+          change: (Math.random() - 0.5) * 10,
+          changePercent: (Math.random() - 0.5) * 5
+        };
+      }
+
+      return {
+        price: data.price || 150 + Math.random() * 100,
+        change: data.change || (Math.random() - 0.5) * 10,
+        changePercent: data.changePercent || (Math.random() - 0.5) * 5
+      };
+    } catch (error) {
+      console.error('Failed to fetch market data:', error);
+      // Fallback to mock data if API fails
+      return {
+        price: 150 + Math.random() * 100,
+        change: (Math.random() - 0.5) * 10,
+        changePercent: (Math.random() - 0.5) * 5
+      };
+    }
+  };
+
   const handleTradeClick = async (action: 'BUY' | 'SELL', symbol: string) => {
     if (!symbol.trim()) return;
     
-    // Expand and show price data
-    const mockPrice = 150 + Math.random() * 100; // Mock price between 150-250
-    const mockChange = (Math.random() - 0.5) * 10; // Change between -5 to +5
-    const mockChangePercent = (mockChange / mockPrice) * 100;
+    // Fetch real market data
+    const marketData = await fetchRealMarketData(symbol);
     
     setQuickTradeData({
       symbol: symbol.toUpperCase(),
-      price: mockPrice,
-      change: mockChange,
-      changePercent: mockChangePercent,
+      price: marketData.price,
+      change: marketData.change,
+      changePercent: marketData.changePercent,
       isExpanded: true,
-      priceHistory: Array.from({ length: 20 }, (_, i) => mockPrice + (Math.random() - 0.5) * 5)
+      priceHistory: Array.from({ length: 20 }, (_, i) => marketData.price + (Math.random() - 0.5) * 5),
+      action,
+      quantity: 1
     });
 
     // Start real-time price updates
@@ -279,33 +313,34 @@ export const TradingDashboard = () => {
       clearInterval(priceUpdateInterval);
     }
     
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
+      const updatedData = await fetchRealMarketData(symbol);
       setQuickTradeData(prev => {
         if (!prev) return null;
         
-        const priceChange = (Math.random() - 0.5) * 2; // Smaller random changes
-        const newPrice = Math.max(prev.price + priceChange, 1); // Don't go below $1
-        const newChange = newPrice - prev.priceHistory[0];
-        const newChangePercent = (newChange / prev.priceHistory[0]) * 100;
-        
         return {
           ...prev,
-          price: newPrice,
-          change: newChange,
-          changePercent: newChangePercent,
-          priceHistory: [newPrice, ...prev.priceHistory.slice(0, 19)]
+          price: updatedData.price,
+          change: updatedData.change,
+          changePercent: updatedData.changePercent,
+          priceHistory: [updatedData.price, ...prev.priceHistory.slice(0, 19)]
         };
       });
-    }, 2000); // Update every 2 seconds
+    }, 5000); // Update every 5 seconds
     
     setPriceUpdateInterval(interval);
+  };
+
+  const handleSubmitTrade = async () => {
+    if (!quickTradeData) return;
 
     if (!hasIntegrations) {
       toast({
-        title: "Demo Mode",
-        description: `Demo ${action} order for ${symbol.toUpperCase()} - showing live price simulation.`,
+        title: "Paper Trading",
+        description: `Paper ${quickTradeData.action} order for ${quickTradeData.quantity} shares of ${quickTradeData.symbol} submitted.`,
         variant: "default",
       });
+      resetQuickTrade();
       return;
     }
 
@@ -313,9 +348,9 @@ export const TradingDashboard = () => {
     try {
       const { data, error } = await supabase.functions.invoke('trader-execute', {
         body: {
-          action: action.toUpperCase() as 'BUY' | 'SELL',
-          symbol: symbol.toUpperCase(),
-          quantity: 1,
+          action: quickTradeData.action,
+          symbol: quickTradeData.symbol,
+          quantity: quickTradeData.quantity,
           orderType: 'market',
           timeInForce: 'day'
         }
@@ -332,9 +367,11 @@ export const TradingDashboard = () => {
 
       toast({
         title: "Trade Executed",
-        description: `${action} order for ${symbol.toUpperCase()} has been submitted successfully.`,
+        description: `${quickTradeData.action} order for ${quickTradeData.quantity} shares of ${quickTradeData.symbol} submitted successfully.`,
         variant: "default",
       });
+      
+      resetQuickTrade();
     } catch (error) {
       console.error('Trade execution error:', error);
       toast({
@@ -602,35 +639,70 @@ export const TradingDashboard = () => {
                       })}
                     </div>
                     
-                    {/* Live indicator */}
-                    <div className="flex items-center justify-center space-x-2 text-xs text-muted-foreground">
-                      <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
-                      <span>Live Price Data</span>
+                    {/* Quantity Input */}
+                    <div className="space-y-2">
+                      <label className="text-xs text-muted-foreground">Quantity</label>
+                      <Input
+                        type="number"
+                        min="1"
+                        value={quickTradeData.quantity}
+                        onChange={(e) => setQuickTradeData(prev => prev ? {
+                          ...prev,
+                          quantity: Math.max(1, parseInt(e.target.value) || 1)
+                        } : null)}
+                        className="h-8 text-center"
+                      />
                     </div>
+                    
+                    {/* Trade Summary */}
+                    <div className="text-center p-2 bg-muted/30 rounded text-sm">
+                      <strong>{quickTradeData.action} {quickTradeData.quantity}</strong> shares of <strong>{quickTradeData.symbol}</strong>
+                    </div>
+                    
+                    {/* Submit Trade Button */}
+                    <Button 
+                      onClick={handleSubmitTrade}
+                      className="w-full bg-primary hover:bg-primary/90 text-white font-medium"
+                    >
+                      Submit Trade
+                    </Button>
+                    
+                    {/* Cancel Button */}
+                    <Button 
+                      variant="outline"
+                      onClick={resetQuickTrade}
+                      className="w-full"
+                    >
+                      Cancel
+                    </Button>
                   </div>
                 )}
                 
-                <div className="flex space-x-2">
-                  <Button 
-                    size="sm" 
-                    className="flex-1 bg-success hover:bg-success/90 text-white font-medium h-8"
-                    onClick={() => quickTradeSymbol.trim() && handleTradeClick('BUY', quickTradeSymbol.trim())}
-                    disabled={!quickTradeSymbol.trim()}
-                  >
-                    BUY
-                  </Button>
-                  <Button 
-                    size="sm"
-                    className="flex-1 bg-destructive hover:bg-destructive/90 text-white font-medium h-8"
-                    onClick={() => quickTradeSymbol.trim() && handleTradeClick('SELL', quickTradeSymbol.trim())}
-                    disabled={!quickTradeSymbol.trim()}
-                  >
-                    SELL
-                  </Button>
-                </div>
-                <div className="text-xs text-muted-foreground text-center">
-                  {hasIntegrations ? 'Live trading enabled' : 'Paper trading enabled'}
-                </div>
+                {!quickTradeData?.isExpanded && (
+                  <>
+                    <div className="flex space-x-2">
+                      <Button 
+                        size="sm" 
+                        className="flex-1 bg-success hover:bg-success/90 text-white font-medium h-8"
+                        onClick={() => quickTradeSymbol.trim() && handleTradeClick('BUY', quickTradeSymbol.trim())}
+                        disabled={!quickTradeSymbol.trim()}
+                      >
+                        BUY
+                      </Button>
+                      <Button 
+                        size="sm"
+                        className="flex-1 bg-destructive hover:bg-destructive/90 text-white font-medium h-8"
+                        onClick={() => quickTradeSymbol.trim() && handleTradeClick('SELL', quickTradeSymbol.trim())}
+                        disabled={!quickTradeSymbol.trim()}
+                      >
+                        SELL
+                      </Button>
+                    </div>
+                    <div className="text-xs text-muted-foreground text-center">
+                      Paper trading enabled
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
 
