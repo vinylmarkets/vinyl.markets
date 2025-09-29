@@ -15,7 +15,7 @@ interface TimePerformance {
 }
 
 export function TimeAnalysis() {
-  const [trades, setTrades] = useState<Trade[]>([]);
+  const [tradesData, setTradesData] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,10 +23,10 @@ export function TimeAnalysis() {
       try {
         setLoading(true);
         const tradeHistory = await getTradeHistory();
-        setTrades(tradeHistory.map(t => ({ ...t })));
+        setTradesData(tradeHistory.map(t => ({ ...t })));
       } catch (error) {
         console.error('Error fetching trade data:', error);
-        setTrades([]);
+        setTradesData([]);
       } finally {
         setLoading(false);
       }
@@ -35,7 +35,7 @@ export function TimeAnalysis() {
     fetchData();
   }, []);
 
-  const trades = useMemo(() => trades, [trades]);
+  const trades = useMemo(() => tradesData, [tradesData]);
   
   const { hourlyData, dailyData, sessionData } = useMemo(() => {
     const closedTrades = trades.filter(t => t.status === 'closed');

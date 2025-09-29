@@ -2,8 +2,10 @@ import React, { useMemo, useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { getTradeHistory } from "../../lib/trading-api";
-import { calculatePerformanceMetrics, Trade } from "../../lib/performance-calculations";
+import { calculatePerformanceMetrics, calculateValueAtRisk, calculateRiskRewardRatio, Trade } from "../../lib/performance-calculations";
 import { Shield, AlertTriangle, TrendingDown, Target, BarChart3, Activity } from "lucide-react";
 
 export function RiskMetrics() {
