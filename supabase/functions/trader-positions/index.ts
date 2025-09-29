@@ -76,7 +76,7 @@ const DEMO_RECENT_TRADES: RecentTrade[] = [
 
 async function fetchPositionsFromAPI(): Promise<{ positions: Position[], recentTrades: RecentTrade[] }> {
   try {
-    console.log('Attempting to fetch positions from Supabase...');
+    console.log('Attempting to fetch positions...');
     
     // Import Supabase client
     const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
@@ -102,7 +102,76 @@ async function fetchPositionsFromAPI(): Promise<{ positions: Position[], recentT
 
     console.log('Fetching positions for user:', user.id);
 
-    // First get the user's paper account
+    // Try to fetch from Alpaca API first
+    const alpacaKey = Deno.env.get('ALPACA_API_KEY');
+    const alpacaSecret = Deno.env.get('ALPACA_SECRET_KEY');
+    const alpacaBaseUrl = Deno.env.get('ALPACA_BASE_URL') || 'https://paper-api.alpaca.markets';
+
+    if (alpacaKey && alpacaSecret) {
+      try {
+        console.log('Fetching positions from Alpaca API...');
+        
+        // Fetch positions from Alpaca
+        const positionsResponse = await fetch(`${alpacaBaseUrl}/v2/positions`, {
+          method: 'GET',
+          headers: {
+            'APCA-API-KEY-ID': alpacaKey,
+            'APCA-API-SECRET-KEY': alpacaSecret,
+          },
+        });
+
+        if (positionsResponse.ok) {
+          const alpacaPositions = await positionsResponse.json();
+          console.log('Fetched positions from Alpaca:', alpacaPositions.length);
+
+          const positions: Position[] = alpacaPositions.map((pos: any) => ({
+            symbol: pos.symbol,
+            quantity: Number(pos.qty),
+            averageCost: Number(pos.avg_entry_price),
+            currentPrice: Number(pos.current_price),
+            marketValue: Number(pos.market_value),
+            unrealizedPnL: Number(pos.unrealized_pl),
+            unrealizedPnLPercent: Number(pos.unrealized_plpc) * 100,
+            side: pos.side,
+            assetType: 'stock'
+          }));
+
+          // Fetch recent orders from Alpaca
+          const ordersResponse = await fetch(`${alpacaBaseUrl}/v2/orders?status=all&limit=10`, {
+            method: 'GET',
+            headers: {
+              'APCA-API-KEY-ID': alpacaKey,
+              'APCA-API-SECRET-KEY': alpacaSecret,
+            },
+          });
+
+          let recentTrades: RecentTrade[] = [];
+          if (ordersResponse.ok) {
+            const alpacaOrders = await ordersResponse.json();
+            recentTrades = alpacaOrders
+              .filter((order: any) => order.filled_qty && Number(order.filled_qty) > 0)
+              .map((order: any) => ({
+                symbol: order.symbol,
+                action: order.side.toUpperCase() as 'BUY' | 'SELL',
+                quantity: Number(order.filled_qty),
+                price: Number(order.filled_avg_price || 0),
+                timestamp: order.filled_at || order.created_at,
+                timeAgo: getTimeAgo(order.filled_at || order.created_at)
+              }));
+          }
+
+          console.log(`Found ${positions.length} positions and ${recentTrades.length} recent trades from Alpaca`);
+          return { positions, recentTrades };
+        } else {
+          console.log('Failed to fetch from Alpaca, falling back to database');
+        }
+      } catch (alpacaError) {
+        console.warn('Error fetching from Alpaca:', alpacaError);
+      }
+    }
+
+    // Fallback to database positions
+    console.log('Fetching from database...');
     const { data: paperAccounts, error: accountError } = await supabase
       .from('paper_accounts')
       .select('id')
@@ -118,7 +187,6 @@ async function fetchPositionsFromAPI(): Promise<{ positions: Position[], recentT
     const accountId = paperAccounts[0].id;
     console.log('Using paper account:', accountId);
 
-    // Fetch paper positions for the account
     const { data: paperPositions, error: positionsError } = await supabase
       .from('paper_positions')
       .select('*')
@@ -129,7 +197,6 @@ async function fetchPositionsFromAPI(): Promise<{ positions: Position[], recentT
       return { positions: DEMO_POSITIONS, recentTrades: DEMO_RECENT_TRADES };
     }
 
-    // Convert paper positions to Position format
     const positions: Position[] = (paperPositions || []).map(pos => ({
       symbol: pos.symbol,
       quantity: Number(pos.quantity),
@@ -142,7 +209,6 @@ async function fetchPositionsFromAPI(): Promise<{ positions: Position[], recentT
       assetType: pos.asset_type || 'stock'
     }));
 
-    // Fetch recent trades from paper_transactions if available
     const { data: paperTrades } = await supabase
       .from('paper_transactions')
       .select('*')
@@ -158,12 +224,8 @@ async function fetchPositionsFromAPI(): Promise<{ positions: Position[], recentT
       timeAgo: getTimeAgo(trade.created_at)
     }));
 
-    console.log(`Found ${positions.length} positions and ${recentTrades.length} recent trades`);
-    
-    return {
-      positions,
-      recentTrades
-    };
+    console.log(`Found ${positions.length} positions and ${recentTrades.length} recent trades from database`);
+    return { positions, recentTrades };
     
   } catch (error) {
     console.warn('Failed to fetch positions, using demo data:', error instanceof Error ? error.message : String(error));
