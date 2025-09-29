@@ -50,7 +50,15 @@ interface Position {
   unrealizedPnL: number;
   unrealizedPnLPercent: number;
   side: 'long' | 'short';
-  assetType: 'stock' | 'option' | 'crypto';
+}
+
+interface CloudStatus {
+  isActive: boolean;
+  lastAnalysis: string;
+  nextScheduledRun: string;
+  signalsToday: number;
+  lastMarketData: string | null;
+  systemHealth: 'healthy' | 'warning' | 'error';
 }
 
 interface AccountData {
@@ -71,37 +79,31 @@ interface RecentTrade {
   quantity: number;
   price: number;
   timestamp: string;
-  timeAgo: string;
+  pnl?: number;
 }
-
-interface CloudStatus {
-  isActive: boolean;
-  lastAnalysis: string | null;
-  nextScheduledRun: string;
-  signalsToday: number;
-  lastMarketData: string | null;
-  systemHealth: 'healthy' | 'warning' | 'error';
-}
-
-const isDevelopment = import.meta.env.DEV;
 
 export const TradingDashboard = () => {
-  const [knowledgeMode, setKnowledgeMode] = useState<'simple' | 'academic'>('simple');
-  const [quickTradeSymbol, setQuickTradeSymbol] = useState('');
-  const [isConnected, setIsConnected] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
   const [signals, setSignals] = useState<TradingSignal[]>([]);
   const [positions, setPositions] = useState<Position[]>([]);
   const [recentTrades, setRecentTrades] = useState<RecentTrade[]>([]);
-  const { signOut } = useAuth();
-  const navigate = useNavigate();
+  const [isConnected, setIsConnected] = useState(true);
+  const [knowledgeMode, setKnowledgeMode] = useState<'simple' | 'academic'>('simple');
+  
+  const isDevelopment = import.meta.env.DEV;
+
   const [cloudStatus, setCloudStatus] = useState<CloudStatus>({
     isActive: true,
-    lastAnalysis: null,
+    lastAnalysis: new Date().toISOString(),
     nextScheduledRun: '',
     signalsToday: 0,
     lastMarketData: null,
     systemHealth: 'healthy'
   });
+  
   const [accountData, setAccountData] = useState<AccountData>({
     portfolioValue: 125450,
     dailyPnL: 2340,
@@ -113,177 +115,95 @@ export const TradingDashboard = () => {
     accountStatus: 'active',
     lastUpdated: new Date().toISOString()
   });
-  
-  const { toast } = useToast();
 
-  // Fetch functions
-  const fetchCloudStatus = async () => {
-    try {
-      const today = new Date().toISOString().split('T')[0];
-      
-      // For now, use mock data since we need to check the actual table structure
-      // TODO: Update with real Supabase queries once table access is confirmed
-      
-      // Calculate next scheduled run (next 5-minute interval during market hours)
-      const now = new Date();
-      const estNow = new Date(now.getTime() - (5 * 60 * 60 * 1000)); // EST offset
-      const nextRun = new Date(estNow);
-      nextRun.setMinutes(Math.ceil(nextRun.getMinutes() / 5) * 5, 0, 0);
-      
-      // Check if it's market hours (9:30 AM - 4:00 PM EST, Mon-Fri)
-      const day = estNow.getDay();
-      const hour = estNow.getHours() + (estNow.getMinutes() / 60);
-      const isMarketHours = day >= 1 && day <= 5 && hour >= 9.5 && hour < 16;
-      
-      if (!isMarketHours) {
-        // If after hours, set to next market open
-        const nextMarketDay = new Date(estNow);
-        if (day === 0) nextMarketDay.setDate(nextMarketDay.getDate() + 1); // Sunday -> Monday
-        else if (day === 6) nextMarketDay.setDate(nextMarketDay.getDate() + 2); // Saturday -> Monday
-        else if (hour >= 16) nextMarketDay.setDate(nextMarketDay.getDate() + 1); // After 4 PM
-        
-        nextMarketDay.setHours(9, 30, 0, 0);
-        nextRun.setTime(nextMarketDay.getTime());
-      }
-
-      // Mock data for demonstration - replace with real Supabase queries
-      const mockSignalsToday = Math.floor(Math.random() * 15) + 5; // 5-20 signals
-      const lastAnalysisTime = new Date(Date.now() - Math.random() * 30 * 60 * 1000); // Within last 30 min
-
-      setCloudStatus({
-        isActive: true,
-        lastAnalysis: lastAnalysisTime.toISOString(),
-        nextScheduledRun: nextRun.toLocaleTimeString('en-US', { 
-          timeZone: 'America/New_York',
-          hour: 'numeric',
-          minute: '2-digit',
-          timeZoneName: 'short'
-        }),
-        signalsToday: mockSignalsToday,
-        lastMarketData: new Date(Date.now() - 2 * 60 * 1000).toISOString(), // 2 min ago
-        systemHealth: 'healthy'
-      });
-
-      setIsConnected(true);
-    } catch (error) {
-      console.warn('Error fetching cloud status:', error);
-      setCloudStatus(prev => ({ ...prev, systemHealth: 'error' }));
-    }
-  };
-
-  const fetchAccountData = async () => {
-    try {
-      const response = await fetch('/api/trader/account');
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          setAccountData(result.data);
-          setIsConnected(true);
-        }
-      }
-    } catch (error) {
-      console.warn('Failed to fetch account data:', error);
-      if (isDevelopment) setIsConnected(false);
-    }
-  };
-
-  const fetchSignals = async () => {
-    try {
-      const response = await fetch('/api/trader/signals');
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          setSignals(result.data);
-          setIsConnected(true);
-        }
-      }
-    } catch (error) {
-      console.warn('Failed to fetch signals:', error);
-      if (isDevelopment) setIsConnected(false);
-    }
-  };
-
-  const fetchPositions = async () => {
-    try {
-      const response = await fetch('/api/trader/positions');
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          setPositions(result.data.positions);
-          setRecentTrades(result.data.recentTrades);
-          setIsConnected(true);
-        }
-      }
-    } catch (error) {
-      console.warn('Failed to fetch positions:', error);
-      if (isDevelopment) setIsConnected(false);
-    }
-  };
-
-  // Set up polling intervals
+  // Mock data
   useEffect(() => {
-    // Initial fetch
-    fetchCloudStatus();
-    fetchAccountData();
-    fetchSignals();
-    fetchPositions();
+    // Mock signals
+    setSignals([
+      {
+        symbol: 'AAPL',
+        action: 'BUY',
+        confidence: 87,
+        targetPrice: 185.50,
+        currentPrice: 182.30,
+        reasoning: 'Strong technical breakout above resistance level',
+        timestamp: new Date().toISOString()
+      },
+      {
+        symbol: 'TSLA',
+        action: 'SELL',
+        confidence: 72,
+        targetPrice: 210.00,
+        currentPrice: 218.45,
+        reasoning: 'Overbought conditions detected',
+        timestamp: new Date().toISOString()
+      }
+    ]);
 
-    // Set up intervals
-    const cloudStatusInterval = setInterval(fetchCloudStatus, 30000); // 30 seconds
-    const accountInterval = setInterval(fetchAccountData, 10000); // 10 seconds
-    const signalsInterval = setInterval(fetchSignals, 30000); // 30 seconds
-    const positionsInterval = setInterval(fetchPositions, 10000); // 10 seconds
+    // Mock positions
+    setPositions([
+      {
+        symbol: 'NVDA',
+        quantity: 100,
+        averageCost: 425.30,
+        currentPrice: 438.50,
+        marketValue: 43850,
+        unrealizedPnL: 1320,
+        unrealizedPnLPercent: 3.1,
+        side: 'long'
+      },
+      {
+        symbol: 'MSFT',
+        quantity: 50,
+        averageCost: 340.20,
+        currentPrice: 348.75,
+        marketValue: 17437.50,
+        unrealizedPnL: 427.50,
+        unrealizedPnLPercent: 2.5,
+        side: 'long'
+      }
+    ]);
 
-    return () => {
-      clearInterval(cloudStatusInterval);
-      clearInterval(accountInterval);
-      clearInterval(signalsInterval);
-      clearInterval(positionsInterval);
-    };
+    // Mock recent trades
+    setRecentTrades([
+      {
+        symbol: 'GOOGL',
+        action: 'BUY',
+        quantity: 25,
+        price: 142.50,
+        timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+        pnl: 125.50
+      },
+      {
+        symbol: 'META',
+        action: 'SELL',
+        quantity: 75,
+        price: 338.90,
+        timestamp: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
+        pnl: -45.20
+      }
+    ]);
   }, []);
-
-  const handleTradeClick = () => {
-    toast({
-      title: "Trading Disabled",
-      description: "Trading will be enabled after regulatory approval",
-      variant: "default",
-    });
-  };
 
   const handleLogout = async () => {
     try {
-      await signOut();
+      await supabase.auth.signOut();
+      navigate('/trader-auth');
       toast({
         title: "Logged out",
         description: "You have been successfully logged out.",
       });
-      navigate('/trader-auth');
     } catch (error) {
       console.error('Logout error:', error);
-      toast({
-        title: "Logout Error",
-        description: "An error occurred during logout.",
-        variant: "destructive",
-      });
     }
   };
 
-  const getTooltipContent = (type: string) => {
-    const tooltips = {
-      simple: {
-        vix: "VIX measures market fear - higher means more volatile",
-        sharpe: "Higher Sharpe ratio means better risk-adjusted returns",
-        drawdown: "Largest peak-to-trough decline in portfolio value",
-        momentum: "Strategy that buys rising stocks and sells falling ones"
-      },
-      academic: {
-        vix: "CBOE Volatility Index: implied volatility of S&P 500 index options",
-        sharpe: "Risk-adjusted return metric: (Return - Risk-free rate) / Standard deviation",
-        drawdown: "Maximum observed loss from peak to trough of portfolio value",
-        momentum: "Cross-sectional momentum strategy based on 12-1 month formation period"
-      }
-    };
-    return tooltips[knowledgeMode][type] || "";
+  const handleTradeClick = () => {
+    toast({
+      title: "Demo Mode",
+      description: "This is a demo. Connect your broker to enable real trading.",
+      variant: "default",
+    });
   };
 
   return (
@@ -320,30 +240,22 @@ export const TradingDashboard = () => {
             </div>
             <div className="text-center">
               <p className="text-xs text-muted-foreground">Daily P&L</p>
-              <div className="flex items-center space-x-1">
-                {accountData.dailyPnL >= 0 ? (
-                  <TrendingUp className="h-4 w-4 text-success" />
-                ) : (
-                  <TrendingDown className="h-4 w-4 text-destructive" />
-                )}
-                <p className={`text-lg font-semibold ${accountData.dailyPnL >= 0 ? 'text-success' : 'text-destructive'}`}>
-                  ${Math.abs(accountData.dailyPnL).toLocaleString()} ({accountData.dailyPnLPercent > 0 ? '+' : ''}{accountData.dailyPnLPercent}%)
-                </p>
-              </div>
+              <p className={`text-lg font-semibold ${accountData.dailyPnL >= 0 ? 'text-success' : 'text-destructive'}`}>
+                {accountData.dailyPnL >= 0 ? '+' : ''}${accountData.dailyPnL.toLocaleString()}
+              </p>
             </div>
             <div className="text-center">
               <p className="text-xs text-muted-foreground">Buying Power</p>
-              <p className="text-lg font-semibold text-foreground">${accountData.buyingPower.toLocaleString()}</p>
+              <p className="text-lg font-semibold text-accent">${accountData.buyingPower.toLocaleString()}</p>
             </div>
           </div>
 
-          {/* Right side controls */}
-          <div className="flex items-center space-x-2">
-            {/* Knowledge Mode Toggle - Hide on mobile */}
-            <div className="hidden md:flex items-center space-x-2">
-              <span className="text-xs text-muted-foreground">Knowledge Mode:</span>
+          {/* Right Side Controls */}
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            {/* Knowledge Mode Toggle */}
+            <div className="flex bg-muted rounded-lg p-1">
               <Button
-                variant={knowledgeMode === 'simple' ? 'default' : 'outline'}
+                variant={knowledgeMode === 'simple' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setKnowledgeMode('simple')}
                 className="h-8 px-3 text-xs"
@@ -351,7 +263,7 @@ export const TradingDashboard = () => {
                 Simple
               </Button>
               <Button
-                variant={knowledgeMode === 'academic' ? 'default' : 'outline'}
+                variant={knowledgeMode === 'academic' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setKnowledgeMode('academic')}
                 className="h-8 px-3 text-xs"
@@ -400,184 +312,38 @@ export const TradingDashboard = () => {
         </Card>
       </div>
 
-      {/* Compact Bento Layout */}
-      <div className="p-2 sm:p-4 space-y-4">
-        {/* Cloud Status Section */}
-        <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200 border-l-4 border-l-primary">
-          <CardContent className="p-3 sm:p-4">
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-4">
-              {/* Cloud Status */}
-              <div className="flex items-center space-x-2">
-                <div className="flex items-center space-x-1">
-                  {cloudStatus.isActive ? (
-                    <Cloud className="h-4 w-4 text-success" />
-                  ) : (
-                    <AlertCircle className="h-4 w-4 text-destructive" />
-                  )}
-                  <span className="text-sm font-medium">Cloud Status:</span>
-                </div>
-                <Badge variant={cloudStatus.isActive ? "default" : "destructive"} className="flex items-center space-x-1">
-                  <div className={`w-2 h-2 rounded-full ${cloudStatus.isActive ? 'bg-success animate-pulse' : 'bg-destructive'}`} />
-                  <span>{cloudStatus.isActive ? 'Active' : 'Offline'}</span>
-                </Badge>
-              </div>
-
-              {/* Last Analysis */}
-              <div className="text-center">
-                <p className="text-xs text-muted-foreground">Last Analysis</p>
-                <p className="text-sm font-semibold text-foreground">
-                  {cloudStatus.lastAnalysis 
-                    ? new Date(cloudStatus.lastAnalysis).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-                    : 'Pending'
-                  }
-                </p>
-              </div>
-
-              {/* Next Run */}
-              <div className="text-center">
-                <p className="text-xs text-muted-foreground">Next Run</p>
-                <p className="text-sm font-semibold text-accent">{cloudStatus.nextScheduledRun}</p>
-              </div>
-
-              {/* Signals Today */}
-              <div className="text-center">
-                <p className="text-xs text-muted-foreground">Signals Today</p>
-                <p className="text-sm font-semibold text-primary">{cloudStatus.signalsToday}</p>
-              </div>
-
-              {/* Auto-refresh Indicator */}
-              <div className="flex items-center justify-center space-x-2">
-                <RefreshCw className="h-3 w-3 text-muted-foreground animate-spin" />
-                <span className="text-xs text-muted-foreground">Auto-refresh: 30s</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Top Row - Compact Metrics */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
-            <CardContent className="p-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">Win Rate</p>
-                  <p className="text-lg font-bold text-success">78.4%</p>
-                </div>
-                <Target className="h-5 w-5 text-success" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
-            <CardContent className="p-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">Risk</p>
-                  <p className="text-lg font-bold text-warning">2.1%</p>
-                </div>
-                <Shield className="h-5 w-5 text-warning" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
-            <CardContent className="p-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">VIX</p>
-                  <p className="text-lg font-bold text-accent">18.2</p>
-                </div>
-                <Activity className="h-5 w-5 text-accent" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
-            <CardContent className="p-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">Sharpe</p>
-                  <p className="text-lg font-bold text-primary">1.4</p>
-                </div>
-                <BarChart3 className="h-5 w-5 text-primary" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
-            <CardContent className="p-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">Drawdown</p>
-                  <p className="text-lg font-bold text-destructive">-3.2%</p>
-                </div>
-                <TrendingDown className="h-5 w-5 text-destructive" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
-            <CardContent className="p-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">Session</p>
-                  <p className="text-sm font-bold text-accent">Pre-Market</p>
-                </div>
-                <Clock className="h-5 w-5 text-accent" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Main Content - Responsive Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-          
-          {/* Left - Signals & Quick Trade */}
-          <div className="lg:col-span-3 space-y-4">
-            
-            {/* Compact Strong Signals */}
+      {/* Compact Bento Grid Layout */}
+      <div className="p-2 sm:p-4">
+        <div className="grid grid-cols-12 gap-3">
+          {/* Left Column - Account & Stats */}
+          <div className="col-span-12 lg:col-span-3 space-y-3">
+            {/* Account Summary */}
             <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center space-x-2 text-base">
-                  <Target className="h-4 w-4 text-primary" />
-                  <span>Strong Signals</span>
+                  <DollarSign className="h-4 w-4 text-primary" />
+                  <span>Account</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <div className="grid grid-cols-2 gap-2">
-                  {signals.slice(0, 2).map((signal, index) => (
-                    <div key={signal.symbol} className={`p-2 rounded bg-gradient-to-r ${
-                      signal.action === 'BUY' 
-                        ? 'from-success/10 to-success/5 border border-success/20'
-                        : signal.action === 'SELL'
-                        ? 'from-destructive/10 to-destructive/5 border border-destructive/20'
-                        : 'from-muted/10 to-muted/5 border border-muted/20'
-                    }`}>
-                      <div className="text-center">
-                        <span className="text-sm font-semibold text-foreground">{signal.symbol}</span>
-                        <p className={`text-xs font-medium ${
-                          signal.action === 'BUY' ? 'text-success' :
-                          signal.action === 'SELL' ? 'text-destructive' : 'text-muted-foreground'
-                        }`}>
-                          {signal.action} {signal.confidence}%
-                        </p>
-                        <p className="text-xs text-muted-foreground">${signal.targetPrice}</p>
-                      </div>
-                    </div>
-                  ))}
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Portfolio</span>
+                  <span className="text-sm font-bold">${accountData.portfolioValue.toLocaleString()}</span>
                 </div>
-                
-                <Button 
-                  size="sm"
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium" 
-                  onClick={handleTradeClick}
-                >
-                  Execute Top Signal
-                </Button>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Daily P&L</span>
+                  <span className={`text-sm font-bold ${accountData.dailyPnL >= 0 ? 'text-success' : 'text-destructive'}`}>
+                    {accountData.dailyPnL >= 0 ? '+' : ''}${accountData.dailyPnL.toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Buying Power</span>
+                  <span className="text-sm font-bold text-accent">${accountData.buyingPower.toLocaleString()}</span>
+                </div>
               </CardContent>
             </Card>
 
-            {/* Compact Quick Trade */}
+            {/* Quick Actions */}
             <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center space-x-2 text-base">
@@ -586,28 +352,18 @@ export const TradingDashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="flex space-x-1">
-                  <Input
-                    placeholder="Symbol..."
-                    value={quickTradeSymbol}
-                    onChange={(e) => setQuickTradeSymbol(e.target.value)}
-                    className="flex-1 h-8 text-sm"
-                  />
-                  <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-                    <Search className="h-3 w-3" />
-                  </Button>
-                </div>
-                <div className="grid grid-cols-2 gap-1">
+                <Input placeholder="Symbol" className="h-8" />
+                <div className="flex space-x-2">
                   <Button 
-                    size="sm"
-                    className="bg-success hover:bg-success/90 text-white font-medium h-8"
+                    size="sm" 
+                    className="flex-1 bg-success hover:bg-success/90 text-white font-medium h-8"
                     onClick={handleTradeClick}
                   >
                     BUY
                   </Button>
                   <Button 
                     size="sm"
-                    className="bg-destructive hover:bg-destructive/90 text-white font-medium h-8"
+                    className="flex-1 bg-destructive hover:bg-destructive/90 text-white font-medium h-8"
                     onClick={handleTradeClick}
                   >
                     SELL
@@ -619,7 +375,7 @@ export const TradingDashboard = () => {
               </CardContent>
             </Card>
 
-            {/* Strategy Performance - Compact */}
+            {/* Strategy Performance */}
             <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center space-x-2 text-base">
@@ -644,14 +400,13 @@ export const TradingDashboard = () => {
             </Card>
           </div>
 
-          {/* Center - Positions & Trades */}
-          <div className="col-span-6 space-y-4">
-            
-            {/* Compact Active Positions */}
+          {/* Center Column - Positions & Trades */}
+          <div className="col-span-12 lg:col-span-6 space-y-3">
+            {/* Active Positions */}
             <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center space-x-2 text-base">
-                  <DollarSign className="h-4 w-4 text-accent" />
+                  <Target className="h-4 w-4 text-accent" />
                   <span>Active Positions</span>
                 </CardTitle>
               </CardHeader>
@@ -689,7 +444,7 @@ export const TradingDashboard = () => {
               </CardContent>
             </Card>
 
-            {/* Compact Recent Trades */}
+            {/* Recent Trades */}
             <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center space-x-2 text-base">
@@ -708,87 +463,77 @@ export const TradingDashboard = () => {
                       }`}>
                         {trade.action}
                       </Badge>
-                      <span className="text-sm font-medium text-foreground">{trade.symbol}</span>
-                      <span className="text-xs text-muted-foreground">{trade.quantity} @ ${trade.price.toFixed(2)}</span>
+                      <span className="font-medium text-sm">{trade.symbol}</span>
+                      <span className="text-xs text-muted-foreground">{trade.quantity} @ ${trade.price}</span>
                     </div>
-                    <span className="text-xs text-muted-foreground">{trade.timeAgo}</span>
+                    {trade.pnl && (
+                      <span className={`text-xs font-medium ${trade.pnl >= 0 ? 'text-success' : 'text-destructive'}`}>
+                        {trade.pnl >= 0 ? '+' : ''}${trade.pnl.toFixed(2)}
+                      </span>
+                    )}
                   </div>
                 ))}
               </CardContent>
             </Card>
           </div>
 
-          {/* Right - Market Context & Risk */}
-          <div className="col-span-3 space-y-4">
-            
-            {/* Market Context - Compact */}
+          {/* Right Column - Signals & Analytics */}
+          <div className="col-span-12 lg:col-span-3 space-y-3">
+            {/* AI Signals */}
             <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center space-x-2 text-base">
-                  <Activity className="h-4 w-4 text-warning" />
-                  <span>Market Context</span>
+                  <Zap className="h-4 w-4 text-primary" />
+                  <span>AI Signals</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Sentiment</span>
-                  <span className="font-medium text-success">Bullish</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Volatility</span>
-                  <span className="font-medium text-warning">Moderate</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Trend</span>
-                  <span className="font-medium text-success">Up</span>
-                </div>
+              <CardContent className="space-y-3">
+                {signals.map((signal, index) => (
+                  <div key={index} className="p-3 bg-muted/30 rounded border border-border">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-medium text-sm">{signal.symbol}</span>
+                      <Badge className={`text-xs ${
+                        signal.action === 'BUY' 
+                          ? 'bg-success/10 text-success border-success/20' 
+                          : 'bg-destructive/10 text-destructive border-destructive/20'
+                      }`}>
+                        {signal.action}
+                      </Badge>
+                    </div>
+                    <div className="text-xs text-muted-foreground mb-1">
+                      Confidence: {signal.confidence}%
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      ${signal.currentPrice} → ${signal.targetPrice}
+                    </div>
+                  </div>
+                ))}
               </CardContent>
             </Card>
 
-            {/* Risk Metrics - Compact */}
+            {/* System Status */}
             <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center space-x-2 text-base">
-                  <Shield className="h-4 w-4 text-destructive" />
-                  <span>Risk Metrics</span>
+                  <Activity className="h-4 w-4 text-accent" />
+                  <span>System Status</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Portfolio VAR</span>
-                  <span className="font-medium text-warning">$2,840</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Cloud Status</span>
+                  <div className="flex items-center space-x-1">
+                    <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                    <span className="text-sm font-medium text-success">Active</span>
+                  </div>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Beta</span>
-                  <span className="font-medium text-accent">1.12</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Signals Today</span>
+                  <span className="text-sm font-bold text-primary">12</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Correlation</span>
-                  <span className="font-medium text-primary">0.78</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Additional Metrics */}
-            <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center space-x-2 text-base">
-                  <Info className="h-4 w-4 text-muted-foreground" />
-                  <span>Performance</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">This Week</span>
-                  <span className="font-medium text-success">+2.1%</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">This Month</span>
-                  <span className="font-medium text-success">+8.7%</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">YTD</span>
-                  <span className="font-medium text-success">+31.2%</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Last Analysis</span>
+                  <span className="text-sm font-bold text-foreground">2m ago</span>
                 </div>
               </CardContent>
             </Card>
