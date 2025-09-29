@@ -65,6 +65,7 @@ import CronJobsManagement from "./pages/admin/CronJobsManagement";
 import AtomicPlaybook from "./pages/admin/AtomicPlaybook";
 import ForumPage from "./pages/forum/ForumPage";
 import Auth from "./pages/Auth";
+import TraderPage from "./pages/trader/TraderPage";
 
 const queryClient = new QueryClient();
 
@@ -153,6 +154,9 @@ const App = () => {
               <Route path="/forum" element={<ForumPage />} />
               <Route path="/forum/:categorySlug" element={<ForumCategory />} />
               <Route path="/forum/topic/:topicId" element={<ForumTopic />} />
+              
+              {/* Hidden Trader Platform - Not linked from navigation */}
+              <Route path="/trader" element={<TraderPage />} />
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
