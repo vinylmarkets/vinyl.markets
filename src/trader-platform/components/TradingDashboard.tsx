@@ -15,6 +15,7 @@ import { SectorMap } from "./SectorMap";
 import { RelationshipNetworkGraph } from "./RelationshipNetworkGraph";
 import { RelationshipSignals } from "./RelationshipSignals";
 import { MarketNarrativeDashboard } from "./MarketNarrativeDashboard";
+import { AIWritingStudio } from "./AIWritingStudio";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -1044,6 +1045,9 @@ export const TradingDashboard = () => {
 
         {/* Analysis Sections */}
         <div className="mt-6 space-y-6">
+          {/* AI Writing Studio */}
+          <AIWritingStudio />
+          
           {/* Market Narrative Dashboard */}
           <MarketNarrativeDashboard />
           

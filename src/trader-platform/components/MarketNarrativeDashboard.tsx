@@ -13,7 +13,8 @@ import {
   Clock,
   Users,
   BookOpen,
-  Zap
+  Zap,
+  Brain
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -376,6 +377,19 @@ export const MarketNarrativeDashboard: React.FC = () => {
                                 {article.full_article}
                               </div>
                             </div>
+
+                            {/* AI Narrative Section */}
+                            {(article as any).aiNarrative && (
+                              <div>
+                                <h5 className="text-sm font-medium mb-2 flex items-center gap-2">
+                                  <Brain className="h-4 w-4 text-purple-500" />
+                                  AI-Generated Narrative
+                                </h5>
+                                <div className="text-sm leading-relaxed p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                                  {(article as any).aiNarrative}
+                                </div>
+                              </div>
+                            )}
                             
                             {article.key_themes && article.key_themes.length > 0 && (
                               <div>
