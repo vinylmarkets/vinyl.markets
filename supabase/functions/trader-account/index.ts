@@ -27,14 +27,51 @@ const DEMO_ACCOUNT: AccountData = {
 
 async function fetchAccountFromAPI(userId: string): Promise<AccountData> {
   try {
-    console.log('Attempting to fetch account data from Alpaca API for user:', userId);
+    console.log('Attempting to fetch account data for user:', userId);
     
-    // Import supabase client to get user's integration
+    // Import supabase client
     const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
+    
+    // First, try to get data from paper_accounts table
+    console.log('Checking for paper trading account...');
+    const { data: paperAccount, error: paperError } = await supabase
+      .from('paper_accounts')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (!paperError && paperAccount) {
+      console.log('Using paper trading account data');
+      
+      // Calculate daily P&L as percentage of starting capital
+      const dailyPnLPercent = paperAccount.starting_capital > 0 
+        ? (parseFloat(paperAccount.total_unrealized_pnl || '0') / parseFloat(paperAccount.starting_capital || '100000')) * 100
+        : 0;
+
+      const paperAccountData: AccountData = {
+        portfolioValue: parseFloat(paperAccount.total_equity || '0'),
+        dailyPnL: parseFloat(paperAccount.total_unrealized_pnl || '0'),
+        dailyPnLPercent: dailyPnLPercent,
+        buyingPower: parseFloat(paperAccount.buying_power || '0'),
+        totalEquity: parseFloat(paperAccount.total_equity || '0'),
+        marginUsed: parseFloat(paperAccount.margin_used || '0'),
+        dayTradesUsed: parseInt(paperAccount.day_trades_count || '0'),
+        accountStatus: 'ACTIVE',
+        lastUpdated: paperAccount.updated_at || new Date().toISOString()
+      };
+      
+      console.log('Paper account data:', paperAccountData);
+      return paperAccountData;
+    }
+    
+    console.log('No paper account found, trying Alpaca API...');
     
     // Get user's broker integration with decrypted keys
     const { data: integration, error } = await supabase
@@ -111,7 +148,7 @@ async function fetchAccountFromAPI(userId: string): Promise<AccountData> {
     return transformedData;
     
   } catch (error) {
-    console.warn('Failed to fetch account data from Alpaca, using demo data:', error instanceof Error ? error.message : String(error));
+    console.warn('Failed to fetch account data, using demo data:', error instanceof Error ? error.message : String(error));
     return DEMO_ACCOUNT;
   }
 }
