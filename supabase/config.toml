@@ -50,3 +50,6 @@ verify_jwt = false
 
 [functions.update-positions]
 verify_jwt = false
+
+[functions.sync-beehiiv-subscriber]
+verify_jwt = true
