@@ -161,8 +161,8 @@ async function fetchPositionsFromAPI(): Promise<{ positions: Position[], recentT
     console.log(`Found ${positions.length} positions and ${recentTrades.length} recent trades`);
     
     return {
-      positions: positions.length > 0 ? positions : DEMO_POSITIONS,
-      recentTrades: recentTrades.length > 0 ? recentTrades : DEMO_RECENT_TRADES
+      positions,
+      recentTrades
     };
     
   } catch (error) {
