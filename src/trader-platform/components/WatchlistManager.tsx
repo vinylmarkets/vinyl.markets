@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, Plus, TrendingUp, Clock, Star } from 'lucide-react';
+import { Search, Plus, TrendingUp, Clock, Star, CheckCircle, Loader2 } from 'lucide-react';
 import { useWatchlists } from '../hooks/useWatchlists';
+import { useToast } from '@/hooks/use-toast';
 
 interface WatchlistManagerProps {
   onSymbolSelect?: (symbol: string) => void;
@@ -28,6 +29,8 @@ export const WatchlistManager: React.FC<WatchlistManagerProps> = ({ onSymbolSele
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any>(null);
   const [loadingSymbols, setLoadingSymbols] = useState(false);
+  const [addingToWatchlist, setAddingToWatchlist] = useState(false);
+  const { toast } = useToast();
 
   // Load default watchlist on mount
   useEffect(() => {
@@ -82,13 +85,33 @@ export const WatchlistManager: React.FC<WatchlistManagerProps> = ({ onSymbolSele
   };
 
   const handleAddToWatchlist = async (symbol: string) => {
-    if (!selectedWatchlist) return;
+    if (!selectedWatchlist) {
+      toast({
+        title: "No watchlist selected",
+        description: "Please select a watchlist first",
+        variant: "destructive"
+      });
+      return;
+    }
     
+    setAddingToWatchlist(true);
     try {
       await addToWatchlist(selectedWatchlist, symbol);
       await loadWatchlistSymbols(selectedWatchlist);
+      toast({
+        title: "Symbol added!",
+        description: `${symbol} has been added to your watchlist`,
+        variant: "default"
+      });
     } catch (err) {
       console.error('Failed to add to watchlist:', err);
+      toast({
+        title: "Failed to add symbol",
+        description: "Please try again",
+        variant: "destructive"
+      });
+    } finally {
+      setAddingToWatchlist(false);
     }
   };
 
@@ -163,18 +186,27 @@ export const WatchlistManager: React.FC<WatchlistManagerProps> = ({ onSymbolSele
           <TabsContent value="watchlists" className="space-y-4">
             {/* Watchlist Selector */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Select Watchlist:</label>
+              <label className="text-sm font-medium">Available Watchlists:</label>
               <div className="grid grid-cols-1 gap-2">
                 {watchlists.map((watchlist) => (
-                  <Button
-                    key={watchlist.id}
-                    variant={selectedWatchlist === watchlist.id ? "default" : "outline"}
-                    className="justify-between"
-                    onClick={() => setSelectedWatchlist(watchlist.id)}
-                  >
-                    <span>{watchlist.name}</span>
-                    <Badge variant="secondary">{watchlist.symbol_count}</Badge>
-                  </Button>
+                  <div key={watchlist.id} className="space-y-1">
+                    <Button
+                      variant={selectedWatchlist === watchlist.id ? "default" : "outline"}
+                      className="w-full justify-between"
+                      onClick={() => setSelectedWatchlist(watchlist.id)}
+                    >
+                      <span>{watchlist.name}</span>
+                      <Badge variant="secondary">{watchlist.symbol_count}</Badge>
+                    </Button>
+                    <p className="text-xs text-muted-foreground pl-2">
+                      {watchlist.is_system 
+                        ? watchlist.watchlist_type === 'alpha_testing' 
+                          ? 'Curated selection of liquid stocks for alpha testing. Includes tech megacaps, finance, energy, and high-volatility stocks.'
+                          : 'System-generated watchlist'
+                        : 'Custom user watchlist'
+                      }
+                    </p>
+                  </div>
                 ))}
               </div>
             </div>
@@ -182,7 +214,9 @@ export const WatchlistManager: React.FC<WatchlistManagerProps> = ({ onSymbolSele
             {/* Watchlist Symbols */}
             {selectedWatchlist && (
               <div className="space-y-2">
-                <label className="text-sm font-medium">Symbols:</label>
+                <label className="text-sm font-medium">
+                  Symbols in {watchlists.find(w => w.id === selectedWatchlist)?.name}:
+                </label>
                 {loadingSymbols ? (
                   <div className="text-muted-foreground text-center py-4">Loading symbols...</div>
                 ) : (
@@ -290,7 +324,13 @@ export const WatchlistManager: React.FC<WatchlistManagerProps> = ({ onSymbolSele
                   <div className="mt-3 flex gap-2">
                     <Button
                       size="sm"
-                      onClick={() => onSymbolSelect?.(searchResults.symbol)}
+                      onClick={() => {
+                        onSymbolSelect?.(searchResults.symbol);
+                        toast({
+                          title: "Analyzing symbol",
+                          description: `Loading analysis for ${searchResults.symbol}...`,
+                        });
+                      }}
                     >
                       Analyze
                     </Button>
@@ -298,10 +338,14 @@ export const WatchlistManager: React.FC<WatchlistManagerProps> = ({ onSymbolSele
                       size="sm"
                       variant="outline"
                       onClick={() => handleAddToWatchlist(searchResults.symbol)}
-                      disabled={!selectedWatchlist}
+                      disabled={!selectedWatchlist || addingToWatchlist}
                     >
-                      <Plus className="h-4 w-4 mr-1" />
-                      Add to List
+                      {addingToWatchlist ? (
+                        <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                      ) : (
+                        <Plus className="h-4 w-4 mr-1" />
+                      )}
+                      {addingToWatchlist ? 'Adding...' : 'Add to List'}
                     </Button>
                   </div>
                 </div>

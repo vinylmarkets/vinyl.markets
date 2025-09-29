@@ -149,7 +149,10 @@ export const TradingDashboard = () => {
   });
 
   const handleSymbolSelect = (symbol: string) => {
+    console.log('Symbol selected for analysis:', symbol);
     setQuickTradeSymbol(symbol);
+    // Auto-trigger the buy analysis for quick access
+    handleTradeClick('BUY', symbol);
   };
 
   // Mock data

@@ -17,17 +17,21 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { action, symbol } = await req.json();
+    // Parse request body once
+    const requestBody = await req.json();
+    const { action, symbol } = requestBody;
+
+    console.log('Stock screener action:', action, 'for symbol:', symbol);
 
     switch (action) {
       case 'get_watchlists':
         return await getWatchlists(supabaseClient, req);
       
       case 'get_watchlist_symbols':
-        return await getWatchlistSymbols(supabaseClient, req);
+        return await getWatchlistSymbols(supabaseClient, requestBody);
       
       case 'add_to_watchlist':
-        return await addToWatchlist(supabaseClient, req);
+        return await addToWatchlist(supabaseClient, requestBody);
       
       case 'search_symbol':
         return await searchSymbol(supabaseClient, symbol);
@@ -89,8 +93,8 @@ async function getWatchlists(supabaseClient: any, req: Request) {
   );
 }
 
-async function getWatchlistSymbols(supabaseClient: any, req: Request) {
-  const { watchlist_id, priority_tier } = await req.json();
+async function getWatchlistSymbols(supabaseClient: any, requestBody: any) {
+  const { watchlist_id, priority_tier } = requestBody;
 
   let query = supabaseClient
     .from('watchlist_items')
@@ -117,8 +121,10 @@ async function getWatchlistSymbols(supabaseClient: any, req: Request) {
   );
 }
 
-async function addToWatchlist(supabaseClient: any, req: Request) {
-  const { watchlist_id, symbol, priority_tier = 3 } = await req.json();
+async function addToWatchlist(supabaseClient: any, requestBody: any) {
+  const { watchlist_id, symbol, priority_tier = 3 } = requestBody;
+
+  console.log('Adding to watchlist:', { watchlist_id, symbol, priority_tier });
 
   const { data, error } = await supabaseClient
     .from('watchlist_items')
