@@ -8,6 +8,8 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import vinylLogoDark from "@/assets/vinyl-logo-dark.png";
+import vinylLogoLight from "@/assets/vinyl-logo-light.png";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -478,10 +480,19 @@ export const TradingDashboard = () => {
         <div className="flex items-center justify-between px-4 sm:px-6 h-full">
           {/* Logo */}
           <div className="flex items-center space-x-2 sm:space-x-3">
-            <h1 className="text-lg sm:text-xl font-bold text-foreground tracking-tight">
-              <span className="hidden sm:inline">TubeAmp Trader v5.0</span>
-              <span className="sm:hidden">Trader</span>
-            </h1>
+            <img 
+              src={vinylLogoDark} 
+              alt="Vinyl" 
+              className="h-8 w-auto dark:hidden"
+            />
+            <img 
+              src={vinylLogoLight} 
+              alt="Vinyl" 
+              className="h-8 w-auto hidden dark:block"
+            />
+            <div className="text-lg sm:text-xl font-bold text-foreground tracking-tight">
+              <span className="hidden sm:inline">v5.0</span>
+            </div>
             {/* Connection Status */}
             {isDevelopment && (
               <div className="flex items-center space-x-1">
