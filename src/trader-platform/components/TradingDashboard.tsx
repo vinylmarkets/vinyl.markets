@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -18,7 +19,11 @@ import {
   Clock,
   Info,
   Wifi,
-  WifiOff
+  WifiOff,
+  Cloud,
+  CheckCircle,
+  AlertCircle,
+  RefreshCw
 } from "lucide-react";
 
 interface TradingSignal {
@@ -64,6 +69,15 @@ interface RecentTrade {
   timeAgo: string;
 }
 
+interface CloudStatus {
+  isActive: boolean;
+  lastAnalysis: string | null;
+  nextScheduledRun: string;
+  signalsToday: number;
+  lastMarketData: string | null;
+  systemHealth: 'healthy' | 'warning' | 'error';
+}
+
 const isDevelopment = import.meta.env.DEV;
 
 export const TradingDashboard = () => {
@@ -73,6 +87,14 @@ export const TradingDashboard = () => {
   const [signals, setSignals] = useState<TradingSignal[]>([]);
   const [positions, setPositions] = useState<Position[]>([]);
   const [recentTrades, setRecentTrades] = useState<RecentTrade[]>([]);
+  const [cloudStatus, setCloudStatus] = useState<CloudStatus>({
+    isActive: true,
+    lastAnalysis: null,
+    nextScheduledRun: '',
+    signalsToday: 0,
+    lastMarketData: null,
+    systemHealth: 'healthy'
+  });
   const [accountData, setAccountData] = useState<AccountData>({
     portfolioValue: 125450,
     dailyPnL: 2340,
@@ -88,6 +110,60 @@ export const TradingDashboard = () => {
   const { toast } = useToast();
 
   // Fetch functions
+  const fetchCloudStatus = async () => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      
+      // For now, use mock data since we need to check the actual table structure
+      // TODO: Update with real Supabase queries once table access is confirmed
+      
+      // Calculate next scheduled run (next 5-minute interval during market hours)
+      const now = new Date();
+      const estNow = new Date(now.getTime() - (5 * 60 * 60 * 1000)); // EST offset
+      const nextRun = new Date(estNow);
+      nextRun.setMinutes(Math.ceil(nextRun.getMinutes() / 5) * 5, 0, 0);
+      
+      // Check if it's market hours (9:30 AM - 4:00 PM EST, Mon-Fri)
+      const day = estNow.getDay();
+      const hour = estNow.getHours() + (estNow.getMinutes() / 60);
+      const isMarketHours = day >= 1 && day <= 5 && hour >= 9.5 && hour < 16;
+      
+      if (!isMarketHours) {
+        // If after hours, set to next market open
+        const nextMarketDay = new Date(estNow);
+        if (day === 0) nextMarketDay.setDate(nextMarketDay.getDate() + 1); // Sunday -> Monday
+        else if (day === 6) nextMarketDay.setDate(nextMarketDay.getDate() + 2); // Saturday -> Monday
+        else if (hour >= 16) nextMarketDay.setDate(nextMarketDay.getDate() + 1); // After 4 PM
+        
+        nextMarketDay.setHours(9, 30, 0, 0);
+        nextRun.setTime(nextMarketDay.getTime());
+      }
+
+      // Mock data for demonstration - replace with real Supabase queries
+      const mockSignalsToday = Math.floor(Math.random() * 15) + 5; // 5-20 signals
+      const lastAnalysisTime = new Date(Date.now() - Math.random() * 30 * 60 * 1000); // Within last 30 min
+
+      setCloudStatus({
+        isActive: true,
+        lastAnalysis: lastAnalysisTime.toISOString(),
+        nextScheduledRun: nextRun.toLocaleTimeString('en-US', { 
+          timeZone: 'America/New_York',
+          hour: 'numeric',
+          minute: '2-digit',
+          timeZoneName: 'short'
+        }),
+        signalsToday: mockSignalsToday,
+        lastMarketData: new Date(Date.now() - 2 * 60 * 1000).toISOString(), // 2 min ago
+        systemHealth: 'healthy'
+      });
+
+      setIsConnected(true);
+    } catch (error) {
+      console.warn('Error fetching cloud status:', error);
+      setCloudStatus(prev => ({ ...prev, systemHealth: 'error' }));
+    }
+  };
+
   const fetchAccountData = async () => {
     try {
       const response = await fetch('/api/trader/account');
@@ -139,19 +215,20 @@ export const TradingDashboard = () => {
 
   // Set up polling intervals
   useEffect(() => {
-    if (!isDevelopment) return;
-
     // Initial fetch
+    fetchCloudStatus();
     fetchAccountData();
     fetchSignals();
     fetchPositions();
 
     // Set up intervals
+    const cloudStatusInterval = setInterval(fetchCloudStatus, 30000); // 30 seconds
     const accountInterval = setInterval(fetchAccountData, 10000); // 10 seconds
     const signalsInterval = setInterval(fetchSignals, 30000); // 30 seconds
     const positionsInterval = setInterval(fetchPositions, 10000); // 10 seconds
 
     return () => {
+      clearInterval(cloudStatusInterval);
       clearInterval(accountInterval);
       clearInterval(signalsInterval);
       clearInterval(positionsInterval);
@@ -257,6 +334,58 @@ export const TradingDashboard = () => {
 
       {/* Compact Bento Layout */}
       <div className="p-4 space-y-4">
+        {/* Cloud Status Section */}
+        <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200 border-l-4 border-l-primary">
+          <CardContent className="p-4">
+            <div className="grid grid-cols-5 gap-4">
+              {/* Cloud Status */}
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-1">
+                  {cloudStatus.isActive ? (
+                    <Cloud className="h-4 w-4 text-success" />
+                  ) : (
+                    <AlertCircle className="h-4 w-4 text-destructive" />
+                  )}
+                  <span className="text-sm font-medium">Cloud Status:</span>
+                </div>
+                <Badge variant={cloudStatus.isActive ? "default" : "destructive"} className="flex items-center space-x-1">
+                  <div className={`w-2 h-2 rounded-full ${cloudStatus.isActive ? 'bg-success animate-pulse' : 'bg-destructive'}`} />
+                  <span>{cloudStatus.isActive ? 'Active' : 'Offline'}</span>
+                </Badge>
+              </div>
+
+              {/* Last Analysis */}
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">Last Analysis</p>
+                <p className="text-sm font-semibold text-foreground">
+                  {cloudStatus.lastAnalysis 
+                    ? new Date(cloudStatus.lastAnalysis).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+                    : 'Pending'
+                  }
+                </p>
+              </div>
+
+              {/* Next Run */}
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">Next Run</p>
+                <p className="text-sm font-semibold text-accent">{cloudStatus.nextScheduledRun}</p>
+              </div>
+
+              {/* Signals Today */}
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">Signals Today</p>
+                <p className="text-sm font-semibold text-primary">{cloudStatus.signalsToday}</p>
+              </div>
+
+              {/* Auto-refresh Indicator */}
+              <div className="flex items-center justify-center space-x-2">
+                <RefreshCw className="h-3 w-3 text-muted-foreground animate-spin" />
+                <span className="text-xs text-muted-foreground">Auto-refresh: 30s</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Top Row - Compact Metrics */}
         <div className="grid grid-cols-6 gap-3">
           <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
