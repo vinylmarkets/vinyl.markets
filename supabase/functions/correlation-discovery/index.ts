@@ -49,7 +49,6 @@ function generateMockPriceHistory(symbol: string, days: number = 30): number[] {
 async function getActiveSymbols(supabaseClient: any): Promise<StockData[]> {
   // Get symbols from sector mappings
   const { data: mappings, error } = await supabaseClient
-    .schema('trading')
     .from('sector_mappings')
     .select('symbol, sector, market_cap_category');
     
@@ -87,7 +86,6 @@ async function saveCorrelation(
   timeframe: string = 'daily'
 ) {
   const { error } = await supabaseClient
-    .schema('trading')
     .from('correlation_matrix')
     .upsert({
       symbol_a: symbolA,
@@ -155,7 +153,6 @@ async function updateCorrelations(supabaseClient: any): Promise<{
 async function generateRelationshipSignals(supabaseClient: any): Promise<any[]> {
   // Get recent correlations
   const { data: correlations, error } = await supabaseClient
-    .schema('trading')
     .from('correlation_matrix')
     .select('*')
     .gte('correlation_coefficient', 0.7)
@@ -249,7 +246,6 @@ async function generateRelationshipSignals(supabaseClient: any): Promise<any[]> 
   // Save signals to database
   for (const signal of signals) {
     await supabaseClient
-      .schema('trading')
       .from('relationship_signals')
       .upsert({
         ...signal,
@@ -292,7 +288,6 @@ serve(async (req) => {
     
     for (const update of sectorUpdates) {
       await supabase
-        .schema('trading')
         .from('sector_performance')
         .upsert({
           ...update,
