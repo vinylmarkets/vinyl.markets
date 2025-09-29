@@ -185,12 +185,12 @@ export const RelationshipSignals: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-3">
         <div>
-          <h3 className="text-lg font-semibold">Relationship-Based Signals</h3>
-          <p className="text-sm text-muted-foreground">
+          <h3 className="text-base font-semibold">Relationship-Based Signals</h3>
+          <p className="text-xs text-muted-foreground">
             Last updated: {lastRefresh.toLocaleTimeString()}
           </p>
         </div>
@@ -208,23 +208,23 @@ export const RelationshipSignals: React.FC = () => {
       {/* Confidence Boosts */}
       {confidenceBoosts.length > 0 && (
         <Card className="border-amber-200 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950/50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
-              <Zap className="h-5 w-5" />
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-amber-700 dark:text-amber-300 text-sm">
+              <Zap className="h-4 w-4" />
               Confidence Boosts
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-2 pt-0">
             {confidenceBoosts.map((boost, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-background rounded-lg border">
-                <div className="space-y-1">
+              <div key={index} className="flex items-center justify-between p-2 bg-background rounded-lg border">
+                <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary">{boost.symbol}</Badge>
-                    <span className="text-sm text-muted-foreground">
+                    <Badge variant="secondary" className="text-xs">{boost.symbol}</Badge>
+                    <span className="text-xs text-muted-foreground">
                       {boost.correlatedSignals} correlated signals detected
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
+                  <div className="flex items-center gap-2 text-xs">
                     <span className="text-muted-foreground">
                       {boost.baseConfidence}% → {boost.boostedConfidence}%
                     </span>
@@ -233,7 +233,7 @@ export const RelationshipSignals: React.FC = () => {
                     </Badge>
                   </div>
                 </div>
-                <Progress value={boost.boostedConfidence} className="w-20" />
+                <Progress value={boost.boostedConfidence} className="w-16 h-2" />
               </div>
             ))}
           </CardContent>
@@ -241,7 +241,7 @@ export const RelationshipSignals: React.FC = () => {
       )}
 
       {/* Relationship Signals */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2">
         {signals.map((signal) => (
           <Card 
             key={signal.id} 
@@ -250,21 +250,21 @@ export const RelationshipSignals: React.FC = () => {
               getSignalColor(signal.signal_type).replace('text-', 'border-').split(' ')[0]
             )}
           >
-            <CardContent className="p-3 h-full flex flex-col justify-between">
-              <div className="space-y-2">
+            <CardContent className="p-2 h-full flex flex-col justify-between">
+              <div className="space-y-1.5">
                 {/* Signal Header - Compact */}
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-2">
                     <div className={cn("mt-0.5", getSignalColor(signal.signal_type).split(' ')[0])}>
                       {getSignalIcon(signal.signal_type)}
                     </div>
-                    <div className="space-y-1 flex-1 min-w-0">
+                    <div className="space-y-0.5 flex-1 min-w-0">
                       <div className="flex items-center gap-1">
                         <span className="font-medium text-xs capitalize truncate">
                           {signal.signal_type.replace('_', ' ')}
                         </span>
                       </div>
-                      <p className="text-xs text-muted-foreground line-clamp-2">
+                      <p className="text-xs text-muted-foreground line-clamp-2 leading-tight">
                         {signal.message}
                       </p>
                     </div>
@@ -301,8 +301,8 @@ export const RelationshipSignals: React.FC = () => {
               </div>
 
               {/* Signal Metrics - Bottom */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs">
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-xs leading-none">
                   <div className="flex items-center gap-2">
                     <span className="text-muted-foreground">Str:</span>
                     <span className={getStrengthColor(signal.strength)}>
@@ -318,7 +318,7 @@ export const RelationshipSignals: React.FC = () => {
                     </div>
                   )}
                 </div>
-                <div className="text-xs text-muted-foreground text-center">
+                <div className="text-xs text-muted-foreground text-center leading-none">
                   {new Date(signal.created_at).toLocaleTimeString()}
                 </div>
               </div>
