@@ -262,12 +262,16 @@ export const TradingDashboard = () => {
     };
 
     checkIntegrations();
-    
-    // Fetch real account data when integrations are connected
+  }, [user, hasIntegrations]);
+
+  // Fetch account data when integrations are detected
+  useEffect(() => {
+    console.log('hasIntegrations changed to:', hasIntegrations);
     if (hasIntegrations) {
+      console.log('Calling fetchAccountData because hasIntegrations is true');
       fetchAccountData();
     }
-  }, [user, hasIntegrations]);
+  }, [hasIntegrations]);
 
   const handleLogout = async () => {
     try {
@@ -316,16 +320,24 @@ export const TradingDashboard = () => {
   };
 
   const fetchAccountData = async () => {
-    if (!hasIntegrations) return;
+    if (!hasIntegrations) {
+      console.log('fetchAccountData: No integrations, skipping');
+      return;
+    }
+    
+    console.log('fetchAccountData: Fetching account data...');
     
     try {
       const { data, error } = await supabase.functions.invoke('trader-account');
+      
+      console.log('fetchAccountData response:', { data, error });
       
       if (error || !data?.success) {
         console.error('Account data error:', error);
         return;
       }
       
+      console.log('Setting account data:', data.data);
       setAccountData(data.data);
     } catch (error) {
       console.error('Failed to fetch account data:', error);
