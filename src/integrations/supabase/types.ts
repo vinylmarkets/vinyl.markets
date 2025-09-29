@@ -3503,6 +3503,33 @@ export type Database = {
           },
         ]
       }
+      traders_whitelist: {
+        Row: {
+          access_level: string
+          created_at: string
+          email: string
+          id: string
+          last_login: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_level?: string
+          created_at?: string
+          email: string
+          id?: string
+          last_login?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_level?: string
+          created_at?: string
+          email?: string
+          id?: string
+          last_login?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       unusual_options_activity: {
         Row: {
           aggressor: string | null
@@ -4079,6 +4106,10 @@ export type Database = {
           user_intent_category: string
         }[]
       }
+      get_trader_access_level: {
+        Args: { user_email: string }
+        Returns: string
+      }
       get_user_analytics_dashboard: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -4107,6 +4138,10 @@ export type Database = {
       }
       is_current_user_admin: {
         Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_whitelisted_trader: {
+        Args: { user_email: string }
         Returns: boolean
       }
       log_cron_execution: {
@@ -4138,6 +4173,10 @@ export type Database = {
       }
       update_paper_account_equity: {
         Args: { account_uuid: string }
+        Returns: undefined
+      }
+      update_trader_last_login: {
+        Args: { user_email: string }
         Returns: undefined
       }
       update_user_engagement: {
