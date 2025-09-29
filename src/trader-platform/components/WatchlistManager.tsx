@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, Plus, TrendingUp, Clock, Star, CheckCircle, Loader2 } from 'lucide-react';
+import { Search, Plus, TrendingUp, Clock, Star, CheckCircle, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { useWatchlists } from '../hooks/useWatchlists';
 import { useToast } from '@/hooks/use-toast';
 
@@ -30,14 +30,21 @@ export const WatchlistManager: React.FC<WatchlistManagerProps> = ({ onSymbolSele
   const [searchResults, setSearchResults] = useState<any>(null);
   const [loadingSymbols, setLoadingSymbols] = useState(false);
   const [addingToWatchlist, setAddingToWatchlist] = useState(false);
+  const [analysisData, setAnalysisData] = useState<any>(null);
+  const [expandedWatchlist, setExpandedWatchlist] = useState<string | null>(null);
   const { toast } = useToast();
 
   // Load default watchlist on mount
   useEffect(() => {
     if (watchlists.length > 0 && !selectedWatchlist) {
-      const defaultWatchlist = watchlists.find(w => w.is_system && w.watchlist_type === 'default');
-      if (defaultWatchlist) {
-        setSelectedWatchlist(defaultWatchlist.id);
+      const userWatchlist = watchlists.find(w => w.watchlist_type === 'user_watchlist');
+      if (userWatchlist) {
+        setSelectedWatchlist(userWatchlist.id);
+      } else {
+        const defaultWatchlist = watchlists.find(w => w.is_system && w.watchlist_type === 'alpha_testing');
+        if (defaultWatchlist) {
+          setSelectedWatchlist(defaultWatchlist.id);
+        }
       }
     }
   }, [watchlists, selectedWatchlist]);
@@ -79,8 +86,50 @@ export const WatchlistManager: React.FC<WatchlistManagerProps> = ({ onSymbolSele
     try {
       const result = await searchSymbol(searchQuery);
       setSearchResults(result);
+      setAnalysisData(null); // Clear previous analysis
     } catch (err) {
       console.error('Search failed:', err);
+    }
+  };
+
+  const handleAnalyze = async (symbol: string) => {
+    try {
+      setAnalysisData({
+        symbol,
+        loading: true
+      });
+      
+      // Simulate analysis for now - this would call actual analysis API
+      setTimeout(() => {
+        setAnalysisData({
+          symbol,
+          loading: false,
+          analysis: {
+            sentiment: 'Bullish',
+            riskLevel: 'Medium',
+            technicalScore: 7.5,
+            fundamentalScore: 8.2,
+            recommendation: 'BUY',
+            targetPrice: '$32.50',
+            supportLevel: '$24.80',
+            resistanceLevel: '$29.90',
+            keyPoints: [
+              'Strong earnings growth expected',
+              'Technical breakout above resistance',
+              'Positive analyst upgrades',
+              'Sector rotation favorable'
+            ]
+          }
+        });
+      }, 2000);
+      
+    } catch (err) {
+      console.error('Analysis failed:', err);
+      setAnalysisData({
+        symbol,
+        loading: false,
+        error: 'Analysis failed'
+      });
     }
   };
 
@@ -112,6 +161,17 @@ export const WatchlistManager: React.FC<WatchlistManagerProps> = ({ onSymbolSele
       });
     } finally {
       setAddingToWatchlist(false);
+    }
+  };
+
+  const handleWatchlistToggle = async (watchlistId: string) => {
+    if (expandedWatchlist === watchlistId) {
+      setExpandedWatchlist(null);
+    } else {
+      setExpandedWatchlist(watchlistId);
+      if (watchlistId !== selectedWatchlist) {
+        await loadWatchlistSymbols(watchlistId);
+      }
     }
   };
 
@@ -184,58 +244,116 @@ export const WatchlistManager: React.FC<WatchlistManagerProps> = ({ onSymbolSele
           </TabsList>
 
           <TabsContent value="watchlists" className="space-y-4">
-            {/* Watchlist Selector */}
+            {/* Available Watchlists */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Available Watchlists:</label>
               <div className="grid grid-cols-1 gap-2">
-                {watchlists.map((watchlist) => (
-                  <div key={watchlist.id} className="space-y-1">
-                    <Button
-                      variant={selectedWatchlist === watchlist.id ? "default" : "outline"}
-                      className="w-full justify-between"
-                      onClick={() => setSelectedWatchlist(watchlist.id)}
-                    >
-                      <span>{watchlist.name}</span>
-                      <Badge variant="secondary">{watchlist.symbol_count}</Badge>
-                    </Button>
-                    <p className="text-xs text-muted-foreground pl-2">
-                      {watchlist.is_system 
-                        ? watchlist.watchlist_type === 'alpha_testing' 
-                          ? 'Curated selection of liquid stocks for alpha testing. Includes tech megacaps, finance, energy, and high-volatility stocks.'
-                          : 'System-generated watchlist'
-                        : 'Custom user watchlist'
-                      }
-                    </p>
-                  </div>
-                ))}
+                {watchlists.map((watchlist) => {
+                  const isExpanded = expandedWatchlist === watchlist.id;
+                  const isUserList = watchlist.watchlist_type === 'user_watchlist';
+                  
+                  return (
+                    <div key={watchlist.id} className="space-y-1">
+                      <Button
+                        variant={selectedWatchlist === watchlist.id ? "default" : "outline"}
+                        className="w-full justify-between"
+                        onClick={() => {
+                          setSelectedWatchlist(watchlist.id);
+                          handleWatchlistToggle(watchlist.id);
+                        }}
+                      >
+                        <span>{watchlist.name}</span>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="secondary">{watchlist.symbol_count}</Badge>
+                          {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                        </div>
+                      </Button>
+                      
+                      <p className="text-xs text-muted-foreground pl-2">
+                        {isUserList 
+                          ? 'Personal watchlist - add up to 10 tickers'
+                          : watchlist.watchlist_type === 'alpha_testing' 
+                            ? 'Curated selection of liquid stocks for alpha testing. Includes tech megacaps, finance, energy, and high-volatility stocks.'
+                            : 'System-generated watchlist'
+                        }
+                      </p>
+                      
+                      {/* Expanded ticker list */}
+                      {isExpanded && (
+                        <div className="pl-4 space-y-1">
+                          {loadingSymbols ? (
+                            <div className="text-muted-foreground text-center py-2 text-xs">Loading...</div>
+                          ) : watchlistSymbols.length > 0 ? (
+                            <div className="grid grid-cols-3 gap-1 max-h-32 overflow-y-auto">
+                              {watchlistSymbols.map((item, index) => (
+                                <div
+                                  key={index}
+                                  className="flex items-center justify-between p-1 text-xs border rounded cursor-pointer hover:bg-muted/50"
+                                  onClick={() => handleAnalyze(item.symbol)}
+                                >
+                                  <span className="font-medium">{item.symbol}</span>
+                                  {!isUserList && item.priority_tier && (
+                                    <Badge variant="outline" className="text-xs px-1 py-0">
+                                      T{item.priority_tier}
+                                    </Badge>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="text-muted-foreground text-center py-2 text-xs">No symbols</div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Watchlist Symbols */}
-            {selectedWatchlist && (
+            {/* Analysis Results */}
+            {analysisData && (
               <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Symbols in {watchlists.find(w => w.id === selectedWatchlist)?.name}:
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4" />
+                  Analysis for {analysisData.symbol}
                 </label>
-                {loadingSymbols ? (
-                  <div className="text-muted-foreground text-center py-4">Loading symbols...</div>
+                {analysisData.loading ? (
+                  <div className="p-4 border rounded-lg">
+                    <div className="flex items-center justify-center">
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      <span className="text-sm">Analyzing...</span>
+                    </div>
+                  </div>
+                ) : analysisData.error ? (
+                  <div className="p-4 border rounded-lg border-red-200">
+                    <div className="text-red-600 text-sm">{analysisData.error}</div>
+                  </div>
                 ) : (
-                  <div className="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto">
-                    {watchlistSymbols.map((item, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 cursor-pointer"
-                        onClick={() => onSymbolSelect?.(item.symbol)}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{item.symbol}</span>
-                          <Badge className={getTierColor(item.priority_tier)}>
-                            {getTierLabel(item.priority_tier)}
-                          </Badge>
+                  <div className="p-4 border rounded-lg bg-card">
+                    <div className="grid grid-cols-2 gap-4 mb-3">
+                      <div>
+                        <span className="text-xs text-muted-foreground">Sentiment:</span>
+                        <div className={`text-sm font-medium ${
+                          analysisData.analysis.sentiment === 'Bullish' ? 'text-green-600' : 
+                          analysisData.analysis.sentiment === 'Bearish' ? 'text-red-600' : 'text-yellow-600'
+                        }`}>
+                          {analysisData.analysis.sentiment}
                         </div>
-                        <Clock className="h-4 w-4 text-muted-foreground" />
                       </div>
-                    ))}
+                      <div>
+                        <span className="text-xs text-muted-foreground">Target:</span>
+                        <div className="text-sm font-medium">{analysisData.analysis.targetPrice}</div>
+                      </div>
+                    </div>
+                    <div className="text-xs space-y-1">
+                      {analysisData.analysis.keyPoints.map((point: string, i: number) => (
+                        <div key={i} className="flex items-start gap-1">
+                          <CheckCircle className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
+                          <span>{point}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -324,13 +442,7 @@ export const WatchlistManager: React.FC<WatchlistManagerProps> = ({ onSymbolSele
                   <div className="mt-3 flex gap-2">
                     <Button
                       size="sm"
-                      onClick={() => {
-                        onSymbolSelect?.(searchResults.symbol);
-                        toast({
-                          title: "Analyzing symbol",
-                          description: `Loading analysis for ${searchResults.symbol}...`,
-                        });
-                      }}
+                      onClick={() => handleAnalyze(searchResults.symbol)}
                     >
                       Analyze
                     </Button>

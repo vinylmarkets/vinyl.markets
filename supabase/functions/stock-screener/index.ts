@@ -75,37 +75,78 @@ async function getWatchlists(supabaseClient: any, req: Request) {
     );
   }
 
-  const { data, error } = await supabaseClient.rpc('get_user_watchlists', {
+  // Get system watchlists
+  const { data: systemWatchlists, error: systemError } = await supabaseClient.rpc('get_user_watchlists', {
     target_user_id: user.id
   });
 
-  if (error) {
-    console.error('Error fetching watchlists:', error);
+  if (systemError) {
+    console.error('Error fetching system watchlists:', systemError);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: systemError.message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 
+  // Get user's custom watchlists
+  const { data: userWatchlists, error: userError } = await supabaseClient
+    .from('user_watchlists')
+    .select('id, name, description, created_at')
+    .eq('user_id', user.id);
+
+  if (userError) {
+    console.error('Error fetching user watchlists:', userError);
+    return new Response(
+      JSON.stringify({ error: userError.message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
+  // Format user watchlists to match expected structure
+  const formattedUserWatchlists = userWatchlists?.map((w: any) => ({
+    id: w.id,
+    name: w.name,
+    description: w.description,
+    is_default: false,
+    is_system: false,
+    watchlist_type: 'user_watchlist',
+    symbol_count: 0 // Will be calculated when symbols are fetched
+  })) || [];
+
+  const allWatchlists = [...(systemWatchlists || []), ...formattedUserWatchlists];
+
   return new Response(
-    JSON.stringify({ data }),
+    JSON.stringify({ data: allWatchlists }),
     { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
   );
 }
 
 async function getWatchlistSymbols(supabaseClient: any, requestBody: any) {
-  const { watchlist_id, priority_tier } = requestBody;
+  const { watchlist_id, watchlist_type } = requestBody;
 
-  let query = supabaseClient
-    .from('watchlist_items')
-    .select('symbol, priority_tier, added_at')
-    .eq('watchlist_id', watchlist_id);
+  let data, error;
 
-  if (priority_tier) {
-    query = query.eq('priority_tier', priority_tier);
+  if (watchlist_type === 'user_watchlist') {
+    // Get symbols from user_watchlist_items
+    const result = await supabaseClient
+      .from('user_watchlist_items')
+      .select('symbol, added_at')
+      .eq('watchlist_id', watchlist_id)
+      .order('added_at', { ascending: false });
+
+    data = result.data;
+    error = result.error;
+  } else {
+    // Get symbols from system watchlist_items
+    const result = await supabaseClient
+      .from('watchlist_items')
+      .select('symbol, priority_tier, added_at')
+      .eq('watchlist_id', watchlist_id)
+      .order('added_at', { ascending: false });
+
+    data = result.data;
+    error = result.error;
   }
-
-  const { data, error } = await query.order('priority_tier').order('added_at');
 
   if (error) {
     console.error('Error fetching watchlist symbols:', error);
@@ -122,14 +163,40 @@ async function getWatchlistSymbols(supabaseClient: any, requestBody: any) {
 }
 
 async function addToWatchlist(supabaseClient: any, requestBody: any) {
-  const { watchlist_id, symbol, priority_tier = 3 } = requestBody;
+  const { watchlist_id, symbol, priority_tier = 3, watchlist_type } = requestBody;
 
-  console.log('Adding to watchlist:', { watchlist_id, symbol, priority_tier });
+  console.log('Adding to watchlist:', { watchlist_id, symbol, priority_tier, watchlist_type });
 
-  const { data, error } = await supabaseClient
-    .from('watchlist_items')
-    .insert({ watchlist_id, symbol, priority_tier })
-    .select();
+  let data, error;
+
+  if (watchlist_type === 'user_watchlist') {
+    // Add to user_watchlist_items
+    const result = await supabaseClient
+      .from('user_watchlist_items')
+      .insert({
+        watchlist_id,
+        symbol: symbol.toUpperCase(),
+        added_at: new Date().toISOString()
+      })
+      .select();
+
+    data = result.data;
+    error = result.error;
+  } else {
+    // Add to system watchlist_items
+    const result = await supabaseClient
+      .from('watchlist_items')
+      .insert({
+        watchlist_id,
+        symbol: symbol.toUpperCase(),
+        priority_tier,
+        added_at: new Date().toISOString()
+      })
+      .select();
+
+    data = result.data;
+    error = result.error;
+  }
 
   if (error) {
     console.error('Error adding to watchlist:', error);
