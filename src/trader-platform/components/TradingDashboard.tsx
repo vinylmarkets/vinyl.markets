@@ -848,8 +848,6 @@ export const TradingDashboard = () => {
               </CardContent>
             </Card>
 
-            {/* Watchlist Manager */}
-            <WatchlistManager onSymbolSelect={handleSymbolSelect} />
           </div>
 
           {/* Center Column - Dynamic View */}
@@ -963,10 +961,40 @@ export const TradingDashboard = () => {
                 ))}
               </CardContent>
             </Card>
+
+            {/* System Status */}
+            <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center space-x-2 text-base">
+                  <Activity className="h-4 w-4 text-accent" />
+                  <span>System Status</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Cloud Status</span>
+                  <div className="flex items-center space-x-1">
+                    <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                    <span className="text-sm font-medium text-success">Active</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Signals Today</span>
+                  <span className="text-sm font-bold text-primary">12</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Last Analysis</span>
+                  <span className="text-sm font-bold text-foreground">2m ago</span>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Right Column - Signals & Analytics */}
+          {/* Right Column - Watchlists & AI Signals */}
           <div className="col-span-12 lg:col-span-3 space-y-3">
+            {/* Smart Watchlists */}
+            <WatchlistManager onSymbolSelect={handleSymbolSelect} />
+
             {/* AI Signals */}
             <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
               <CardHeader className="pb-2">
@@ -1002,33 +1030,6 @@ export const TradingDashboard = () => {
                     {hasIntegrations ? 'No AI signals available' : 'Connect a broker to view AI signals'}
                   </div>
                 )}
-              </CardContent>
-            </Card>
-
-            {/* System Status */}
-            <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center space-x-2 text-base">
-                  <Activity className="h-4 w-4 text-accent" />
-                  <span>System Status</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Cloud Status</span>
-                  <div className="flex items-center space-x-1">
-                    <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                    <span className="text-sm font-medium text-success">Active</span>
-                  </div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Signals Today</span>
-                  <span className="text-sm font-bold text-primary">12</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Last Analysis</span>
-                  <span className="text-sm font-bold text-foreground">2m ago</span>
-                </div>
               </CardContent>
             </Card>
           </div>

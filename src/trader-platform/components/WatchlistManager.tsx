@@ -145,11 +145,11 @@ export const WatchlistManager: React.FC<WatchlistManagerProps> = ({ onSymbolSele
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Star className="h-5 w-5" />
-          Smart Watchlists
+    <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center space-x-2 text-base">
+          <Star className="h-4 w-4 text-primary" />
+          <span>Smart Watchlists</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
