@@ -60,29 +60,58 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({ positions })
   const [chartData, setChartData] = useState<CandleDataPoint[]>([]);
   const [timeframe, setTimeframe] = useState('15m');
 
-  // Generate mock data for the selected symbol
-  const generateMockData = (symbol: string) => {
+  // Generate mock data for the selected symbol and timeframe
+  const generateMockData = (symbol: string, timeframe: string) => {
     const symbolData = SYMBOLS.find(s => s.symbol === symbol);
     const basePrice = symbolData?.price || 100;
     
     const data: CandleDataPoint[] = [];
     const now = new Date();
-    const startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000); // 24 hours ago
+    
+    // Determine time parameters based on timeframe
+    let intervals: number, intervalMs: number, startTime: Date;
+    
+    switch(timeframe) {
+      case '1D':
+        intervals = 96; // 15-minute intervals for 1 day
+        intervalMs = 15 * 60 * 1000;
+        startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        break;
+      case '5D':
+        intervals = 120; // 1-hour intervals for 5 days
+        intervalMs = 60 * 60 * 1000;
+        startTime = new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000);
+        break;
+      case '15m':
+        intervals = 96; // 15-minute intervals for 24 hours
+        intervalMs = 15 * 60 * 1000;
+        startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        break;
+      case '1h':
+        intervals = 48; // 1-hour intervals for 48 hours
+        intervalMs = 60 * 60 * 1000;
+        startTime = new Date(now.getTime() - 48 * 60 * 60 * 1000);
+        break;
+      default:
+        intervals = 96;
+        intervalMs = 15 * 60 * 1000;
+        startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    }
     
     let price = basePrice * 0.95; // Start 5% below current
     const prices: number[] = [];
     
-    // Generate 96 candles (15-minute intervals for 24 hours)
-    for (let i = 0; i < 96; i++) {
-      const time = new Date(startTime.getTime() + i * 15 * 60 * 1000);
+    // Generate candles based on timeframe
+    for (let i = 0; i < intervals; i++) {
+      const time = new Date(startTime.getTime() + i * intervalMs);
       
-      // Random price movement
-      const volatility = 0.01;
+      // Random price movement - more volatility for longer timeframes
+      const volatility = timeframe === '5D' ? 0.02 : timeframe === '1D' ? 0.015 : 0.01;
       const change = (Math.random() - 0.5) * volatility * price;
       price += change;
       
       const open = i === 0 ? price : data[i - 1].close;
-      const variation = price * 0.005;
+      const variation = price * (timeframe === '5D' ? 0.01 : 0.005);
       const high = price + Math.random() * variation;
       const low = price - Math.random() * variation;
       const close = price + (Math.random() - 0.5) * variation * 0.5;
@@ -94,8 +123,9 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({ positions })
       
       prices.push(finalClose);
       
-      // Volume data
-      const volume = Math.random() * 1000000 + 100000;
+      // Volume data - higher volume for longer timeframes
+      const baseVolume = timeframe === '5D' ? 5000000 : timeframe === '1D' ? 2000000 : 1000000;
+      const volume = Math.random() * baseVolume + baseVolume * 0.1;
       
       let sma20, sma50;
       
@@ -108,12 +138,25 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({ positions })
         sma50 = prices.slice(i - 49, i + 1).reduce((a, b) => a + b, 0) / 50;
       }
       
-      data.push({
-        time: time.toLocaleTimeString('en-US', { 
+      // Format time based on timeframe
+      let timeString: string;
+      if (timeframe === '5D' || timeframe === '1D') {
+        timeString = time.toLocaleDateString('en-US', { 
+          month: 'short', 
+          day: 'numeric',
+          hour: timeframe === '1D' ? '2-digit' : undefined,
+          minute: timeframe === '1D' ? '2-digit' : undefined
+        });
+      } else {
+        timeString = time.toLocaleTimeString('en-US', { 
           hour: '2-digit', 
           minute: '2-digit',
           hour12: false 
-        }).slice(0, -3), // Remove seconds, keep HH:MM
+        }).slice(0, -3); // Remove seconds, keep HH:MM
+      }
+      
+      data.push({
+        time: timeString,
         timeMs: time.getTime(),
         open: finalOpen,
         high: finalHigh,
@@ -131,14 +174,14 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({ positions })
 
   // Initialize and update chart data
   useEffect(() => {
-    const data = generateMockData(selectedSymbol);
+    const data = generateMockData(selectedSymbol, timeframe);
     setChartData(data);
     
     // Set current price to latest close
     if (data.length > 0) {
       setCurrentPrice(data[data.length - 1].close);
     }
-  }, [selectedSymbol]);
+  }, [selectedSymbol, timeframe]);
 
   // Simulate real-time price updates
   useEffect(() => {
