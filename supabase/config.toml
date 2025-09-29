@@ -39,5 +39,11 @@ verify_jwt = false
 [functions.execute-trade]
 verify_jwt = false
 
+[functions.trading-engine]
+verify_jwt = false
+
+[functions.execute-trades]
+verify_jwt = false
+
 [functions.update-positions]
 verify_jwt = false
