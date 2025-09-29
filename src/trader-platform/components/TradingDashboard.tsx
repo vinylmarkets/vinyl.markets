@@ -99,6 +99,7 @@ export const TradingDashboard = () => {
   const [positions, setPositions] = useState<Position[]>([]);
   const [recentTrades, setRecentTrades] = useState<RecentTrade[]>([]);
   const [hasIntegrations, setHasIntegrations] = useState(false);
+  console.log('Current hasIntegrations state:', hasIntegrations);
   const [isConnected, setIsConnected] = useState(true);
   const [knowledgeMode, setKnowledgeMode] = useState<'simple' | 'academic'>('simple');
   const [viewMode, setViewMode] = useState<'chart' | 'flow'>('chart');
@@ -254,6 +255,7 @@ export const TradingDashboard = () => {
 
         const hasConnections = data && data.length > 0;
         console.log('Integration check result:', { hasConnections, count: data?.length, data });
+        console.log('About to call setHasIntegrations with:', hasConnections);
         setHasIntegrations(hasConnections);
       } catch (error) {
         console.error('Error checking integrations:', error);
@@ -269,7 +271,26 @@ export const TradingDashboard = () => {
     console.log('hasIntegrations changed to:', hasIntegrations);
     if (hasIntegrations) {
       console.log('Calling fetchAccountData because hasIntegrations is true');
-      fetchAccountData();
+      // Call the function directly here to avoid dependency issues
+      (async () => {
+        console.log('fetchAccountData: Fetching account data...');
+        
+        try {
+          const { data, error } = await supabase.functions.invoke('trader-account');
+          
+          console.log('fetchAccountData response:', { data, error });
+          
+          if (error || !data?.success) {
+            console.error('Account data error:', error);
+            return;
+          }
+          
+          console.log('Setting account data:', data.data);
+          setAccountData(data.data);
+        } catch (error) {
+          console.error('Failed to fetch account data:', error);
+        }
+      })();
     }
   }, [hasIntegrations]);
 
@@ -319,12 +340,8 @@ export const TradingDashboard = () => {
     }
   };
 
-  const fetchAccountData = async () => {
-    if (!hasIntegrations) {
-      console.log('fetchAccountData: No integrations, skipping');
-      return;
-    }
-    
+  // Define fetchAccountData before useEffect
+  const fetchAccountData = React.useCallback(async () => {
     console.log('fetchAccountData: Fetching account data...');
     
     try {
@@ -342,7 +359,7 @@ export const TradingDashboard = () => {
     } catch (error) {
       console.error('Failed to fetch account data:', error);
     }
-  };
+  }, []);
 
   const handleTradeClick = async (action: 'BUY' | 'SELL', symbol: string) => {
     if (!symbol.trim()) return;
