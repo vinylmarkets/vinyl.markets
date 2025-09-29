@@ -214,28 +214,35 @@ export const RelationshipSignals: React.FC = () => {
               Confidence Boosts
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2 pt-0">
-            {confidenceBoosts.map((boost, index) => (
-              <div key={index} className="flex items-center justify-between p-2 bg-background rounded-lg border">
-                <div className="space-y-0.5">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className="text-xs">{boost.symbol}</Badge>
-                    <span className="text-xs text-muted-foreground">
-                      {boost.correlatedSignals} correlated signals detected
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs">
-                    <span className="text-muted-foreground">
-                      {boost.baseConfidence}% → {boost.boostedConfidence}%
-                    </span>
-                    <Badge variant="outline" className="text-amber-600">
-                      +{boost.boost}%
-                    </Badge>
-                  </div>
-                </div>
-                <Progress value={boost.boostedConfidence} className="w-16 h-2" />
-              </div>
-            ))}
+          <CardContent className="pt-0">
+            <div className="grid grid-cols-4 gap-2">
+              {confidenceBoosts.map((boost, index) => (
+                <Card key={index} className="h-24 border-amber-200 bg-background">
+                  <CardContent className="p-1.5 h-full flex flex-col justify-between">
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <Badge variant="secondary" className="text-xs px-1 py-0">{boost.symbol}</Badge>
+                        <Badge variant="outline" className="text-xs px-1 py-0 text-amber-600">
+                          +{boost.boost}%
+                        </Badge>
+                      </div>
+                      <div className="text-xs text-muted-foreground leading-tight">
+                        {boost.correlatedSignals} corr. signals
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">
+                          {boost.baseConfidence}% → {boost.boostedConfidence}%
+                        </span>
+                      </div>
+                      <Progress value={boost.boostedConfidence} className="w-full h-1" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </CardContent>
         </Card>
       )}
