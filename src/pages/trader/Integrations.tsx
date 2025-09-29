@@ -173,9 +173,16 @@ const Integrations = () => {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center gap-3 mb-6">
-        <Link className="h-8 w-8 text-primary" />
-        <h1 className="text-3xl font-bold">Broker Integrations</h1>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <Link className="h-8 w-8 text-primary" />
+          <h1 className="text-3xl font-bold">Broker Integrations</h1>
+        </div>
+        <Button asChild variant="outline">
+          <Link to="/trader">
+            Back to Dashboard
+          </Link>
+        </Button>
       </div>
 
       {/* Existing Integrations */}
