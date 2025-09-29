@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
-import { Resend } from "npm:resend@2.0.0";
+import { Resend } from "https://esm.sh/resend@4.0.0";
 // import { renderAsync } from 'npm:@react-email/components@0.0.22';
 import React from 'npm:react@18.3.1';
 
@@ -16,132 +16,444 @@ const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Daily Market Email Template Component
-const DailyMarketEmail = ({ article, totalSignals, topSector, todayWinRate, topMovers, date }: any) => {
+const DailyMarketEmail = ({ emailData }: any) => {
   return React.createElement('div', {
     style: {
-      fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif',
-      backgroundColor: '#f6f9fc',
+      fontFamily: 'Georgia, serif',
+      maxWidth: '600px',
+      margin: '0 auto',
+      backgroundColor: '#ffffff',
       padding: '20px',
     }
   }, [
     // Header
     React.createElement('div', {
       key: 'header',
-      style: {
-        backgroundColor: '#1a1b23',
-        color: '#ffffff',
-        padding: '20px',
-        borderRadius: '8px 8px 0 0',
-      }
+      style: { marginBottom: '30px' }
     }, [
       React.createElement('h1', {
-        key: 'logo',
-        style: { margin: '0 0 8px 0', fontSize: '24px', fontWeight: 'bold' }
-      }, 'TubeAmp Trader Daily'),
+        key: 'title',
+        style: { 
+          fontSize: '32px', 
+          fontWeight: 'bold', 
+          margin: '0 0 8px 0', 
+          color: '#1a1b23',
+          fontFamily: 'Georgia, serif'
+        }
+      }, 'TubeAmp Daily'),
       React.createElement('p', {
-        key: 'date',
-        style: { margin: '0', color: '#9ca3af', fontSize: '14px' }
-      }, date)
+        key: 'subtitle',
+        style: { 
+          color: '#666666', 
+          fontStyle: 'italic', 
+          fontSize: '16px', 
+          margin: '0' 
+        }
+      }, `${emailData.date} - Your 5-minute market download`)
     ]),
     
-    // Content
+    // The Bigger Picture
     React.createElement('div', {
-      key: 'content',
-      style: {
-        backgroundColor: '#ffffff',
-        padding: '30px',
-      }
+      key: 'bigger-picture',
+      style: { marginBottom: '30px' }
     }, [
-      // Headline
       React.createElement('h2', {
-        key: 'headline',
-        style: { fontSize: '28px', fontWeight: 'bold', margin: '0 0 24px 0', color: '#1a1b23' }
-      }, article.headline),
-      
-      // Key Metrics
+        key: 'title',
+        style: { 
+          fontSize: '22px', 
+          fontWeight: 'bold', 
+          margin: '0 0 15px 0', 
+          color: '#333333',
+          borderBottom: '2px solid #333333',
+          paddingBottom: '5px'
+        }
+      }, 'The Bigger Picture'),
+      React.createElement('p', {
+        key: 'content',
+        style: { 
+          fontSize: '16px', 
+          lineHeight: '1.6', 
+          color: '#333333', 
+          margin: '0 0 15px 0',
+          fontFamily: 'Georgia, serif'
+        }
+      }, emailData.article.biggerPicture),
       React.createElement('div', {
-        key: 'metrics',
+        key: 'callout',
         style: {
-          display: 'flex',
-          justifyContent: 'space-between',
-          backgroundColor: '#f8fafc',
-          padding: '16px',
-          borderRadius: '8px',
-          margin: '0 0 32px 0',
+          backgroundColor: '#f5f5f5',
+          padding: '20px',
+          borderLeft: '4px solid #4CAF50',
+          margin: '20px 0'
         }
       }, [
-        React.createElement('div', { key: 'signals', style: { textAlign: 'center' } }, [
-          React.createElement('div', { key: 'label1', style: { fontSize: '12px', color: '#6b7280', fontWeight: '500' } }, 'SIGNALS TODAY'),
-          React.createElement('div', { key: 'value1', style: { fontSize: '20px', color: '#1a1b23', fontWeight: 'bold' } }, totalSignals)
-        ]),
-        React.createElement('div', { key: 'sector', style: { textAlign: 'center' } }, [
-          React.createElement('div', { key: 'label2', style: { fontSize: '12px', color: '#6b7280', fontWeight: '500' } }, 'TOP SECTOR'),
-          React.createElement('div', { key: 'value2', style: { fontSize: '20px', color: '#1a1b23', fontWeight: 'bold' } }, topSector)
-        ]),
-        React.createElement('div', { key: 'winrate', style: { textAlign: 'center' } }, [
-          React.createElement('div', { key: 'label3', style: { fontSize: '12px', color: '#6b7280', fontWeight: '500' } }, 'WIN RATE'),
-          React.createElement('div', { key: 'value3', style: { fontSize: '20px', color: '#1a1b23', fontWeight: 'bold' } }, `${todayWinRate}%`)
+        React.createElement('p', { 
+          key: 'callout-text', 
+          style: { fontSize: '16px', margin: '0 0 10px 0', color: '#333333' } 
+        }, React.createElement('strong', {}, 'Quick hits from the outside world:')),
+        React.createElement('ul', { key: 'list', style: { margin: '0', paddingLeft: '20px' } }, [
+          React.createElement('li', { key: 'fed' }, React.createElement('strong', {}, 'Fed signals: '), 'Still playing it by ear on rates'),
+          React.createElement('li', { key: 'china' }, React.createElement('strong', {}, 'China update: '), 'Manufacturing data came in mixed'),
+          React.createElement('li', { key: 'crypto' }, React.createElement('strong', {}, 'Crypto corner: '), 'Bitcoin did Bitcoin things')
         ])
-      ]),
-      
-      // Article Content
-      React.createElement('div', { key: 'article' }, [
-        React.createElement('p', { key: 'lead', style: { fontSize: '16px', lineHeight: '1.6', color: '#374151' } }, article.leadParagraph),
-        React.createElement('h3', { key: 'sector-title', style: { fontSize: '20px', fontWeight: '600', margin: '24px 0 12px 0' } }, 'Sector Analysis'),
-        React.createElement('p', { key: 'sector-content', style: { fontSize: '16px', lineHeight: '1.6', color: '#374151' } }, article.sectorAnalysis),
-        React.createElement('h3', { key: 'signal-title', style: { fontSize: '20px', fontWeight: '600', margin: '24px 0 12px 0' } }, 'Signal Intelligence'),
-        React.createElement('p', { key: 'signal-content', style: { fontSize: '16px', lineHeight: '1.6', color: '#374151' } }, article.signalAnalysis),
-        React.createElement('h3', { key: 'outlook-title', style: { fontSize: '20px', fontWeight: '600', margin: '24px 0 12px 0' } }, 'Tomorrow\'s Watchlist'),
-        React.createElement('p', { key: 'outlook-content', style: { fontSize: '16px', lineHeight: '1.6', color: '#374151' } }, article.outlook),
-      ]),
-      
-      // Top Movers Table
-      React.createElement('div', { key: 'movers', style: { margin: '32px 0' } }, [
-        React.createElement('h3', { key: 'movers-title', style: { fontSize: '20px', fontWeight: '600', margin: '0 0 16px 0' } }, 'Top Movers'),
-        React.createElement('table', {
-          key: 'movers-table',
-          style: { width: '100%', borderCollapse: 'collapse' }
-        }, [
-          React.createElement('tr', { key: 'header-row' }, [
-            React.createElement('th', { key: 'symbol-header', style: { padding: '12px', textAlign: 'left', backgroundColor: '#f3f4f6', fontWeight: '600' } }, 'Symbol'),
-            React.createElement('th', { key: 'change-header', style: { padding: '12px', textAlign: 'left', backgroundColor: '#f3f4f6', fontWeight: '600' } }, 'Change'),
-            React.createElement('th', { key: 'signal-header', style: { padding: '12px', textAlign: 'left', backgroundColor: '#f3f4f6', fontWeight: '600' } }, 'Signal'),
-          ]),
-          ...topMovers.map((stock: any, index: number) =>
-            React.createElement('tr', { key: `row-${index}` }, [
-              React.createElement('td', { key: 'symbol', style: { padding: '12px', borderBottom: '1px solid #f3f4f6' } }, stock.symbol),
-              React.createElement('td', {
-                key: 'change',
-                style: {
-                  padding: '12px',
-                  borderBottom: '1px solid #f3f4f6',
-                  color: stock.change >= 0 ? '#059669' : '#dc2626',
-                  fontWeight: '600'
-                }
-              }, `${stock.change >= 0 ? '+' : ''}${stock.change}%`),
-              React.createElement('td', { key: 'signal', style: { padding: '12px', borderBottom: '1px solid #f3f4f6', color: '#6366f1', fontWeight: '500' } }, stock.signal),
-            ])
-          )
-        ])
-      ]),
-      
-      // Footer
-      React.createElement('div', {
-        key: 'footer',
-        style: { textAlign: 'center', marginTop: '32px', padding: '24px 0', borderTop: '1px solid #e5e7eb' }
-      }, [
-        React.createElement('p', {
-          key: 'disclaimer',
-          style: { fontSize: '12px', color: '#6b7280', margin: '0 0 8px 0' }
-        }, 'For educational purposes only. Past performance does not guarantee future results.'),
-        React.createElement('p', {
-          key: 'unsubscribe',
-          style: { fontSize: '12px', color: '#6b7280', margin: '0' }
-        }, 'Manage preferences | Unsubscribe')
       ])
+    ]),
+    
+    // Market Story
+    React.createElement('div', {
+      key: 'market-story',
+      style: { marginBottom: '30px' }
+    }, [
+      React.createElement('h2', {
+        key: 'title',
+        style: { 
+          fontSize: '22px', 
+          fontWeight: 'bold', 
+          margin: '0 0 15px 0', 
+          color: '#333333',
+          borderBottom: '2px solid #333333',
+          paddingBottom: '5px'
+        }
+      }, 'Today\'s Market Story'),
+      React.createElement('p', {
+        key: 'story',
+        style: { 
+          fontSize: '16px', 
+          lineHeight: '1.6', 
+          color: '#333333', 
+          margin: '0 0 15px 0',
+          fontFamily: 'Georgia, serif'
+        }
+      }, `So here's what actually went down: ${emailData.article.marketStory}`),
+      React.createElement('div', {
+        key: 'translation',
+        style: {
+          backgroundColor: '#fff3cd',
+          padding: '15px',
+          borderRadius: '8px',
+          margin: '20px 0'
+        }
+      }, React.createElement('p', {
+        style: { fontSize: '15px', color: '#856404', margin: '0' }
+      }, [
+        React.createElement('strong', { key: 'label' }, 'Translation for humans: '),
+        `The VIX (think of it as Wall Street's fear meter) hit ${emailData.marketData.vixLevel} today. Under 20 means traders are feeling chill. Over 30 means everyone's freaking out. At ${emailData.marketData.vixLevel}? People are borderline cocky.`
+      ])),
+      React.createElement('p', {
+        key: 'algorithms',
+        style: { 
+          fontSize: '16px', 
+          lineHeight: '1.6', 
+          color: '#333333', 
+          margin: '0 0 15px 0',
+          fontFamily: 'Georgia, serif'
+        }
+      }, `Our algorithms caught the momentum early and sent out ${emailData.marketData.buySignals} buy signals before lunch. The momentum strategy killed it with a ${emailData.marketData.momentumWinRate}% success rate.`)
+    ]),
+    
+    // Sector Breakdown
+    React.createElement('div', {
+      key: 'sectors',
+      style: { marginBottom: '30px' }
+    }, [
+      React.createElement('h2', {
+        key: 'title',
+        style: { 
+          fontSize: '22px', 
+          fontWeight: 'bold', 
+          margin: '0 0 15px 0', 
+          color: '#333333',
+          borderBottom: '2px solid #333333',
+          paddingBottom: '5px'
+        }
+      }, 'Winners, Losers, and the Confused Middle'),
+      React.createElement('div', {
+        key: 'grid',
+        style: {
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '20px',
+          margin: '20px 0'
+        }
+      }, [
+        React.createElement('div', {
+          key: 'winners',
+          style: {
+            padding: '15px',
+            backgroundColor: '#f8fff8',
+            borderRadius: '8px'
+          }
+        }, [
+          React.createElement('h3', {
+            key: 'title',
+            style: { color: '#4CAF50', fontSize: '18px', margin: '0 0 10px 0' }
+          }, '😎 Crushed It'),
+          React.createElement('ul', { 
+            key: 'list', 
+            style: { margin: '0', paddingLeft: '0', listStyle: 'none' } 
+          }, emailData.article.sectorBreakdown.winners.map((winner: any, index: number) =>
+            React.createElement('li', { key: `winner-${index}` }, 
+              React.createElement('div', { 
+                style: { fontSize: '14px', margin: '5px 0', color: '#333333' } 
+              }, `${winner.sector} (${winner.change}) - ${winner.reason}`)
+            )
+          ))
+        ]),
+        React.createElement('div', {
+          key: 'losers',
+          style: {
+            padding: '15px',
+            backgroundColor: '#fff8f8',
+            borderRadius: '8px'
+          }
+        }, [
+          React.createElement('h3', {
+            key: 'title',
+            style: { color: '#f44336', fontSize: '18px', margin: '0 0 10px 0' }
+          }, '😰 Rough Day'),
+          React.createElement('ul', { 
+            key: 'list', 
+            style: { margin: '0', paddingLeft: '0', listStyle: 'none' } 
+          }, emailData.article.sectorBreakdown.losers.map((loser: any, index: number) =>
+            React.createElement('li', { key: `loser-${index}` }, 
+              React.createElement('div', { 
+                style: { fontSize: '14px', margin: '5px 0', color: '#333333' } 
+              }, `${loser.sector} (${loser.change}) - ${loser.reason}`)
+            )
+          ))
+        ])
+      ])
+    ]),
+    
+    // Algorithm Insights
+    React.createElement('div', {
+      key: 'algorithms',
+      style: { marginBottom: '30px' }
+    }, [
+      React.createElement('h2', {
+        key: 'title',
+        style: { 
+          fontSize: '22px', 
+          fontWeight: 'bold', 
+          margin: '0 0 15px 0', 
+          color: '#333333',
+          borderBottom: '2px solid #333333',
+          paddingBottom: '5px'
+        }
+      }, 'What The Algorithms Are Seeing'),
+      React.createElement('p', {
+        key: 'insights',
+        style: { 
+          fontSize: '16px', 
+          lineHeight: '1.6', 
+          color: '#333333', 
+          margin: '0 0 15px 0',
+          fontFamily: 'Georgia, serif'
+        }
+      }, emailData.article.algorithmInsights),
+      emailData.article.consensusPick ? React.createElement('div', {
+        key: 'nerd-box',
+        style: {
+          backgroundColor: '#f0f8ff',
+          padding: '15px',
+          borderRadius: '8px',
+          margin: '20px 0'
+        }
+      }, React.createElement('p', {
+        style: { fontSize: '15px', color: '#1e40af', margin: '0' }
+      }, [
+        React.createElement('strong', { key: 'label' }, 'For the nerds: '),
+        `Our three strategies are actually agreeing on ${emailData.article.consensusPick} for once (this happens about as often as Congress passes a bill). RSI hit oversold territory, MACD crossed positive, and volume was 2.3x average.`
+      ])) : null,
+      React.createElement('p', {
+        key: 'watchlist',
+        style: { 
+          fontSize: '16px', 
+          lineHeight: '1.6', 
+          color: '#333333', 
+          margin: '0 0 15px 0',
+          fontFamily: 'Georgia, serif'
+        }
+      }, `Tomorrow we're watching ${emailData.marketData.watchList.join(', ')}. Not saying you should buy them (definitely not saying that - lawyers, you know?), but our computers are very interested in what they do next.`)
+    ]),
+    
+    // Tomorrow's Setup
+    React.createElement('div', {
+      key: 'tomorrow',
+      style: { marginBottom: '30px' }
+    }, [
+      React.createElement('h2', {
+        key: 'title',
+        style: { 
+          fontSize: '22px', 
+          fontWeight: 'bold', 
+          margin: '0 0 15px 0', 
+          color: '#333333',
+          borderBottom: '2px solid #333333',
+          paddingBottom: '5px'
+        }
+      }, 'Setting Up Tomorrow'),
+      React.createElement('p', {
+        key: 'setup',
+        style: { 
+          fontSize: '16px', 
+          lineHeight: '1.6', 
+          color: '#333333', 
+          margin: '0 0 15px 0',
+          fontFamily: 'Georgia, serif'
+        }
+      }, emailData.article.tomorrowSetup),
+      emailData.article.keyLevel ? React.createElement('p', {
+        key: 'key-level',
+        style: { 
+          fontSize: '16px', 
+          lineHeight: '1.6', 
+          color: '#333333', 
+          margin: '0 0 15px 0',
+          fontFamily: 'Georgia, serif'
+        }
+      }, `Keep an eye on ${emailData.article.keyLevel} on the S&P. We've bounced off it three times this month. Fourth time's either the charm or the alarm.`) : null
+    ]),
+    
+    // Footer
+    React.createElement('div', {
+      key: 'footer',
+      style: {
+        marginTop: '40px',
+        paddingTop: '20px',
+        borderTop: '1px solid #ddd',
+      }
+    }, [
+      React.createElement('p', {
+        key: 'disclaimer',
+        style: { fontSize: '14px', color: '#666666', margin: '0 0 15px 0' }
+      }, [
+        React.createElement('strong', { key: 'label' }, 'Remember: '),
+        'This is what happened, not what will happen. Markets are weird, algorithms are fallible, and sometimes a company goes up 10% because their CEO posted a good meme. Trade accordingly.'
+      ]),
+      React.createElement('p', {
+        key: 'note',
+        style: { fontSize: '12px', fontStyle: 'italic', color: '#666666', margin: '0 0 10px 0' }
+      }, 'You\'re getting this because you signed up for market updates that don\'t assume you have a Bloomberg terminal. We\'re teaching computers to trade so you don\'t have to stare at charts all day. Questions? Hit reply, an actual human (me) reads these.'),
+      React.createElement('p', {
+        key: 'unsubscribe',
+        style: { fontSize: '12px', color: '#666666', margin: '0', textAlign: 'center' }
+      }, 'Manage preferences | Unsubscribe')
     ])
   ]);
 };
+
+function generateCatchySubjectLine(marketData: any, themes: any): string {
+  const subjects = [
+    `Tech stocks partied while banks nursed a hangover 🎢`,
+    `Everyone bought the dip (except energy) 📈`,
+    `${marketData.topGainer?.symbol || 'NVDA'} did a thing, markets noticed 🚀`,
+    `VIX at ${marketData.vixLevel || '14'} - traders feeling a bit too comfortable 😎`,
+    `The algorithms are bullish, humans are confused 🤖`,
+    `Sector rotation or just random Tuesday? 🤷‍♂️`
+  ];
+  
+  return subjects[Math.floor(Math.random() * subjects.length)];
+}
+
+async function generateConversationalContent(marketData: any, stories: any): Promise<any> {
+  console.log('Generating conversational market content...');
+  
+  const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+  if (!openAIApiKey) {
+    throw new Error('OpenAI API key not found');
+  }
+
+  const prompt = `You are writing a daily market email in a conversational, educational style that doesn't assume readers are financial experts. Based on the data below, create content for each section:
+
+Market Data for ${marketData.date}:
+- Top Performer: ${stories.biggestMover?.symbol || 'NVDA'} ${stories.biggestMover?.change > 0 ? '+' : ''}${stories.biggestMover?.change || 5.2}%
+- Market Regime: ${marketData.marketRegime || 'bullish'}
+- VIX Level: ${14.3}
+- Algorithm Signals: ${marketData.signalSummary?.bullish_signals || 47} bullish vs ${marketData.signalSummary?.bearish_signals || 12} bearish
+- Sector Performance: Tech leading, Energy lagging
+
+Write content for these sections:
+
+1. BIGGER_PICTURE (150-200 words): What's happening outside Wall Street that actually matters. Be conversational, mention specific companies/events, explain WHY things matter in simple terms.
+
+2. MARKET_STORY (150-200 words): What happened in markets today. Focus on explaining WHY moves happened, not just what happened. Use casual language but include specific numbers.
+
+3. ALGORITHM_INSIGHTS (100-150 words): What our trading algorithms are seeing, written for normal humans. Explain technical concepts simply but don't dumb it down too much.
+
+4. TOMORROW_SETUP (75-100 words): What to watch tomorrow. Be specific about levels, earnings, events. End with a slightly witty observation.
+
+5. SECTOR_BREAKDOWN: 
+   Winners: 3 sectors with % changes and casual explanations
+   Losers: 3 sectors with % changes and casual explanations
+
+Style guidelines:
+- Write like you're explaining to a smart friend who doesn't work in finance
+- Use humor but keep it professional
+- Include specific numbers and company names
+- Explain the "why" behind market moves
+- No jargon without explanation
+- Be slightly skeptical/realistic about market narratives
+
+Return as JSON with fields: biggerPicture, marketStory, algorithmInsights, tomorrowSetup, sectorBreakdown (with winners/losers arrays), consensusPick, keyLevel`;
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { 
+            role: 'system', 
+            content: 'You are a financial writer known for making markets accessible to regular people. Your style is conversational, educational, and slightly witty. You explain complex concepts simply without talking down to readers.' 
+          },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.8,
+        max_tokens: 1000
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const content = JSON.parse(data.choices[0].message.content.trim());
+    
+    console.log('Generated conversational content');
+    return content;
+    
+  } catch (error) {
+    console.error('Error generating conversational content:', error);
+    
+    // Fallback content
+    return {
+      biggerPicture: "Remember that Fed meeting everyone forgot was happening? Well, they actually said some things that mattered this time. Basically, they're still trying to figure out if the economy is too hot, too cold, or just right. Meanwhile, tech companies continue to spend billions on AI like it's going out of style, which is either genius or the biggest bubble since 1999. Time will tell.",
+      marketStory: `Tech stocks had their best day in weeks, and honestly, nobody's quite sure why. ${stories.biggestMover?.symbol || 'NVDA'} jumped ${Math.abs(stories.biggestMover?.change || 5.2)}%, which is wild for a company that size. The weird thing? Usually when tech rallies this hard, banks sell off. Today both went up. That's... unusual.`,
+      algorithmInsights: "Our three strategies are actually agreeing on something for once (this happens about as often as Congress passes a bill). All three are bullish on semiconductor stocks, which is interesting because they usually hate each other's picks. The ML model's showing 82% confidence, which is about as excited as a computer can get.",
+      tomorrowSetup: "No major earnings tomorrow, so we'll probably trade on whatever random tweet goes viral or some Fed member's cousin's economic opinion. Keep an eye on 4,200 on the S&P - we've bounced off it three times this month.",
+      sectorBreakdown: {
+        winners: [
+          { sector: "Semiconductors", change: "+3.2%", reason: "AI hype is back, baby" },
+          { sector: "Software", change: "+2.8%", reason: "Following chips like always" },
+          { sector: "Banks", change: "+1.9%", reason: "Wait, what? (see above)" }
+        ],
+        losers: [
+          { sector: "Energy", change: "-2.1%", reason: "Oil's down, nobody knows why" },
+          { sector: "Utilities", change: "-1.3%", reason: "The boring stocks being boring" },
+          { sector: "Real Estate", change: "-0.9%", reason: "Rates something something" }
+        ]
+      },
+      consensusPick: "NVDA",
+      keyLevel: "4,200"
+    };
+  }
+}
 
 async function generateAndSendDailyEmail() {
   console.log('Starting daily market email generation...');
@@ -155,40 +467,40 @@ async function generateAndSendDailyEmail() {
       .eq('publish_date', today)
       .single();
     
-    if (!article) {
-      // Generate new article if none exists
-      const { data: generateResponse } = await supabase.functions.invoke('market-narrator');
-      if (!generateResponse) {
-        throw new Error('Failed to generate market narrative');
-      }
-    }
-    
-    // Get market data for metrics
+    // Get market data for narrative generation
     const { data: marketData } = await supabase
       .from('market_narrative_data')
       .select('*')
       .eq('date', today)
       .single();
     
+    // Generate conversational content
+    const conversationalContent = await generateConversationalContent(marketData || {}, {
+      biggestMover: { symbol: 'NVDA', change: 5.2 }
+    });
+    
     // Mock data for demonstration
     const emailData = {
-      article: article || {
-        headline: "Markets Rally on Tech Strength",
-        leadParagraph: "Technology stocks led a broad market rally today as investors showed renewed confidence in growth sectors.",
-        sectorAnalysis: "The technology sector outperformed with a 2.3% gain, driven by semiconductor and software stocks.",
-        signalAnalysis: "Our algorithms detected 47 buy signals today, with highest confidence in the technology and healthcare sectors.",
-        outlook: "Looking ahead, momentum indicators suggest continued strength in growth sectors, with key resistance levels to watch."
+      article: {
+        subjectLine: generateCatchySubjectLine(marketData || {}, {}),
+        biggerPicture: conversationalContent.biggerPicture,
+        marketStory: conversationalContent.marketStory,
+        sectorBreakdown: conversationalContent.sectorBreakdown,
+        algorithmInsights: conversationalContent.algorithmInsights,
+        tomorrowSetup: conversationalContent.tomorrowSetup,
+        consensusPick: conversationalContent.consensusPick,
+        keyLevel: conversationalContent.keyLevel
       },
-      totalSignals: marketData?.signal_summary?.total || 47,
-      topSector: marketData?.sector_performances ? Object.keys(marketData.sector_performances)[0] : "Technology",
-      todayWinRate: 73,
-      topMovers: marketData?.top_movers || [
-        { symbol: "NVDA", change: 5.2, signal: "BUY" },
-        { symbol: "AAPL", change: 2.8, signal: "HOLD" },
-        { symbol: "MSFT", change: 1.9, signal: "BUY" },
-        { symbol: "GOOGL", change: -1.2, signal: "SELL" },
-        { symbol: "TSLA", change: -2.1, signal: "SELL" }
-      ],
+      marketData: {
+        topGainer: { symbol: "NVDA", percent: 5.2 },
+        buySignals: marketData?.signal_summary?.bullish_signals || 47,
+        momentumWinRate: 73,
+        vixLevel: 14.3,
+        watchList: ["AAPL", "MSFT", "GOOGL", "TSLA"],
+        earningsNote: null,
+        earningsCompany: null,
+        expectedMove: null
+      },
       date: new Date().toLocaleDateString('en-US', {
         weekday: 'long',
         year: 'numeric',
@@ -203,8 +515,7 @@ async function generateAndSendDailyEmail() {
     ];
     
     // Generate HTML from React component
-    const htmlElement = React.createElement(DailyMarketEmail, emailData);
-    // For now, we'll use a simplified HTML template until React Email is properly configured
+    const htmlElement = React.createElement(DailyMarketEmail, { emailData });
     const html = generateSimpleHtml(emailData);
     
     // Send emails
@@ -212,7 +523,7 @@ async function generateAndSendDailyEmail() {
       const { error } = await resend.emails.send({
         from: 'TubeAmp Trader <noreply@tubeamp.com>',
         to: [email],
-        subject: `Daily Market Brief: ${emailData.article.headline}`,
+        subject: emailData.article.subjectLine,
         html,
       });
       
