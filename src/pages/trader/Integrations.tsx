@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { Shield, CheckCircle, AlertCircle, Eye, EyeOff, Link, Loader2 } from "lucide-react";
+import { Shield, CheckCircle, AlertCircle, Eye, EyeOff, Link as LinkIcon, Loader2 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface Integration {
   id: string;
@@ -175,7 +176,7 @@ const Integrations = () => {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <Link className="h-8 w-8 text-primary" />
+          <LinkIcon className="h-8 w-8 text-primary" />
           <h1 className="text-3xl font-bold">Broker Integrations</h1>
         </div>
         <Button asChild variant="outline">
