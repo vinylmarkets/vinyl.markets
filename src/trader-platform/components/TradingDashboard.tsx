@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -14,18 +15,46 @@ import {
   Search,
   Activity,
   Shield,
-  Clock
+  Clock,
+  Info
 } from "lucide-react";
 
 export const TradingDashboard = () => {
   const [knowledgeMode, setKnowledgeMode] = useState<'simple' | 'academic'>('simple');
   const [quickTradeSymbol, setQuickTradeSymbol] = useState('');
+  const { toast } = useToast();
 
-  // Mock data
-  const portfolioValue = 125847.32;
-  const dailyPnL = 1342.18;
-  const dailyPnLPercent = 1.07;
-  const buyingPower = 52340.75;
+  // Updated demo data
+  const portfolioValue = 125450;
+  const dailyPnL = 2340;
+  const dailyPnLPercent = 1.87;
+  const buyingPower = 45230;
+
+  const handleTradeClick = () => {
+    toast({
+      title: "Trading Disabled",
+      description: "Trading will be enabled after regulatory approval",
+      variant: "default",
+    });
+  };
+
+  const getTooltipContent = (type: string) => {
+    const tooltips = {
+      simple: {
+        vix: "VIX measures market fear - higher means more volatile",
+        sharpe: "Higher Sharpe ratio means better risk-adjusted returns",
+        drawdown: "Largest peak-to-trough decline in portfolio value",
+        momentum: "Strategy that buys rising stocks and sells falling ones"
+      },
+      academic: {
+        vix: "CBOE Volatility Index: implied volatility of S&P 500 index options",
+        sharpe: "Risk-adjusted return metric: (Return - Risk-free rate) / Standard deviation",
+        drawdown: "Maximum observed loss from peak to trough of portfolio value",
+        momentum: "Cross-sectional momentum strategy based on 12-1 month formation period"
+      }
+    };
+    return tooltips[knowledgeMode][type] || "";
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -102,36 +131,32 @@ export const TradingDashboard = () => {
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
                 <div>
-                  <span className="font-semibold text-green-800">AAPL</span>
+                  <span className="font-semibold text-green-800">NVDA</span>
                   <p className="text-xs text-green-600">Strong Buy</p>
                 </div>
                 <div className="text-right">
-                  <span className="text-lg font-bold text-green-800">87%</span>
-                  <p className="text-xs text-green-600">Confidence</p>
+                  <span className="text-lg font-bold text-green-800">82%</span>
+                  <p className="text-xs text-green-600">$485.25</p>
                 </div>
               </div>
               
-              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <div>
-                  <span className="font-semibold text-blue-800">MSFT</span>
-                  <p className="text-xs text-blue-600">Moderate Buy</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-lg font-bold text-blue-800">79%</span>
-                  <p className="text-xs text-blue-600">Confidence</p>
-                </div>
-              </div>
-
               <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200">
                 <div>
                   <span className="font-semibold text-red-800">TSLA</span>
                   <p className="text-xs text-red-600">Strong Sell</p>
                 </div>
                 <div className="text-right">
-                  <span className="text-lg font-bold text-red-800">82%</span>
-                  <p className="text-xs text-red-600">Confidence</p>
+                  <span className="text-lg font-bold text-red-800">75%</span>
+                  <p className="text-xs text-red-600">$275.50</p>
                 </div>
               </div>
+              <Button 
+                className="bg-green-600 hover:bg-green-700 text-white w-full" 
+                size="sm" 
+                onClick={handleTradeClick}
+              >
+                Execute Top Signal
+              </Button>
             </CardContent>
           </Card>
 
@@ -156,10 +181,16 @@ export const TradingDashboard = () => {
                 </Button>
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <Button className="bg-green-600 hover:bg-green-700 text-white">
+                <Button 
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                  onClick={handleTradeClick}
+                >
                   BUY
                 </Button>
-                <Button className="bg-red-600 hover:bg-red-700 text-white">
+                <Button 
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                  onClick={handleTradeClick}
+                >
                   SELL
                 </Button>
               </div>
@@ -194,32 +225,18 @@ export const TradingDashboard = () => {
                   </thead>
                   <tbody className="divide-y">
                     <tr>
-                      <td className="py-3 font-medium">SPY</td>
-                      <td className="text-right py-3">100</td>
-                      <td className="text-right py-3">$412.30</td>
-                      <td className="text-right py-3">$413.58</td>
-                      <td className="text-right py-3 text-green-600 font-medium">+$128</td>
-                    </tr>
-                    <tr>
-                      <td className="py-3 font-medium">QQQ</td>
-                      <td className="text-right py-3">50</td>
-                      <td className="text-right py-3">$365.80</td>
-                      <td className="text-right py-3">$364.90</td>
-                      <td className="text-right py-3 text-red-600 font-medium">-$45</td>
-                    </tr>
-                    <tr>
                       <td className="py-3 font-medium">AAPL</td>
-                      <td className="text-right py-3">25</td>
-                      <td className="text-right py-3">$189.45</td>
-                      <td className="text-right py-3">$192.10</td>
-                      <td className="text-right py-3 text-green-600 font-medium">+$66</td>
+                      <td className="text-right py-3">100</td>
+                      <td className="text-right py-3">$180.50</td>
+                      <td className="text-right py-3">$182.45</td>
+                      <td className="text-right py-3 text-green-600 font-medium">+$195</td>
                     </tr>
                     <tr>
-                      <td className="py-3 font-medium">MSFT Call</td>
-                      <td className="text-right py-3">2</td>
-                      <td className="text-right py-3">$4.50</td>
-                      <td className="text-right py-3">$4.95</td>
-                      <td className="text-right py-3 text-green-600 font-medium">+$90</td>
+                      <td className="py-3 font-medium">GOOGL</td>
+                      <td className="text-right py-3">50</td>
+                      <td className="text-right py-3">$141.25</td>
+                      <td className="text-right py-3">$142.80</td>
+                      <td className="text-right py-3 text-green-600 font-medium">+$77.50</td>
                     </tr>
                   </tbody>
                 </table>
