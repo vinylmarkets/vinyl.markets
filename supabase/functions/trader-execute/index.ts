@@ -253,11 +253,12 @@ async function storePaperTrade(
   await supabase.from('paper_transactions').insert({
     account_id: accountId,
     symbol: tradeRequest.symbol,
+    asset_type: 'stock',
     transaction_type: tradeRequest.action.toLowerCase(),
     quantity: tradeRequest.quantity,
     price: fillPrice,
     total_amount: totalCost,
-    order_type: tradeRequest.orderType
+    executed_at: new Date().toISOString()
   });
 
   console.log('Paper trade stored successfully');
