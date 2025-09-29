@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -9,67 +10,77 @@ import {
   BarChart3, 
   Target,
   BookOpen,
-  Zap
+  Zap,
+  Search,
+  Activity,
+  Shield,
+  Clock
 } from "lucide-react";
 
 export const TradingDashboard = () => {
   const [knowledgeMode, setKnowledgeMode] = useState<'simple' | 'academic'>('simple');
+  const [quickTradeSymbol, setQuickTradeSymbol] = useState('');
 
   // Mock data
-  const portfolioValue = 25847.32;
-  const dailyPnL = 342.18;
-  const dailyPnLPercent = 1.34;
+  const portfolioValue = 125847.32;
+  const dailyPnL = 1342.18;
+  const dailyPnLPercent = 1.07;
+  const buyingPower = 52340.75;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Top Bar */}
-      <header className="border-b bg-card px-6 py-4">
+    <div className="min-h-screen bg-gray-50">
+      {/* Top Bar - Dark Gray */}
+      <header className="bg-gray-800 text-white px-6 py-4 border-b">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-6">
-            <h1 className="text-2xl font-bold text-foreground">Trader Platform</h1>
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
-                <p className="text-sm text-muted-foreground">Portfolio Value</p>
-                <p className="text-xl font-bold text-foreground">
-                  ${portfolioValue.toLocaleString()}
+          {/* Logo */}
+          <div className="flex items-center space-x-2">
+            <span className="text-2xl">🚀</span>
+            <h1 className="text-xl font-bold">TubeAmp Trader v5.0</h1>
+          </div>
+
+          {/* Account Stats */}
+          <div className="flex items-center space-x-8">
+            <div className="text-center">
+              <p className="text-xs text-gray-300">Portfolio Value</p>
+              <p className="text-lg font-bold">${portfolioValue.toLocaleString()}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-gray-300">Daily P&L</p>
+              <div className="flex items-center space-x-1">
+                {dailyPnL >= 0 ? (
+                  <TrendingUp className="h-4 w-4 text-green-400" />
+                ) : (
+                  <TrendingDown className="h-4 w-4 text-red-400" />
+                )}
+                <p className={`text-lg font-bold ${dailyPnL >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  ${Math.abs(dailyPnL).toLocaleString()} ({dailyPnLPercent > 0 ? '+' : ''}{dailyPnLPercent}%)
                 </p>
               </div>
-              <div className="text-right">
-                <p className="text-sm text-muted-foreground">Daily P&L</p>
-                <div className="flex items-center space-x-2">
-                  {dailyPnL >= 0 ? (
-                    <TrendingUp className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <TrendingDown className="h-4 w-4 text-red-500" />
-                  )}
-                  <p className={`text-xl font-bold ${dailyPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    ${Math.abs(dailyPnL).toLocaleString()} ({dailyPnLPercent > 0 ? '+' : ''}{dailyPnLPercent}%)
-                  </p>
-                </div>
-              </div>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-gray-300">Buying Power</p>
+              <p className="text-lg font-bold">${buyingPower.toLocaleString()}</p>
             </div>
           </div>
 
           {/* Knowledge Mode Toggle */}
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-muted-foreground">Knowledge Mode:</span>
+            <span className="text-xs text-gray-300">Knowledge Mode:</span>
             <Button
               variant={knowledgeMode === 'simple' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setKnowledgeMode('simple')}
-              className="flex items-center space-x-1"
+              className="h-8 px-3 text-xs"
             >
-              <Zap className="h-4 w-4" />
-              <span>Simple</span>
+              Simple
             </Button>
             <Button
               variant={knowledgeMode === 'academic' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setKnowledgeMode('academic')}
-              className="flex items-center space-x-1"
+              className="h-8 px-3 text-xs"
             >
-              <BookOpen className="h-4 w-4" />
-              <span>Academic</span>
+              Academic
             </Button>
           </div>
         </div>
@@ -78,185 +89,296 @@ export const TradingDashboard = () => {
       {/* Main Content - Three Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
         
-        {/* Signals Column */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Target className="h-5 w-5" />
-              <span>Trading Signals</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="border rounded-lg p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-medium">AAPL</span>
-                <Badge variant="default" className="bg-green-100 text-green-800">
+        {/* Left Column */}
+        <div className="space-y-6">
+          {/* Strong Signals Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Target className="h-5 w-5 text-green-600" />
+                <span>Strong Signals</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                <div>
+                  <span className="font-semibold text-green-800">AAPL</span>
+                  <p className="text-xs text-green-600">Strong Buy</p>
+                </div>
+                <div className="text-right">
+                  <span className="text-lg font-bold text-green-800">87%</span>
+                  <p className="text-xs text-green-600">Confidence</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <div>
+                  <span className="font-semibold text-blue-800">MSFT</span>
+                  <p className="text-xs text-blue-600">Moderate Buy</p>
+                </div>
+                <div className="text-right">
+                  <span className="text-lg font-bold text-blue-800">79%</span>
+                  <p className="text-xs text-blue-600">Confidence</p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200">
+                <div>
+                  <span className="font-semibold text-red-800">TSLA</span>
+                  <p className="text-xs text-red-600">Strong Sell</p>
+                </div>
+                <div className="text-right">
+                  <span className="text-lg font-bold text-red-800">82%</span>
+                  <p className="text-xs text-red-600">Confidence</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quick Trade Panel */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Zap className="h-5 w-5 text-blue-600" />
+                <span>Quick Trade</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex space-x-2">
+                <Input
+                  placeholder="Enter symbol..."
+                  value={quickTradeSymbol}
+                  onChange={(e) => setQuickTradeSymbol(e.target.value)}
+                  className="flex-1"
+                />
+                <Button size="sm" variant="outline">
+                  <Search className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <Button className="bg-green-600 hover:bg-green-700 text-white">
                   BUY
-                </Badge>
-              </div>
-              <p className="text-sm text-muted-foreground mb-2">
-                {knowledgeMode === 'simple' 
-                  ? "Strong upward momentum detected"
-                  : "RSI oversold condition with bullish divergence on MACD histogram"
-                }
-              </p>
-              <div className="flex justify-between text-xs">
-                <span>Confidence: 87%</span>
-                <span>Target: $195.50</span>
-              </div>
-            </div>
-
-            <div className="border rounded-lg p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-medium">TSLA</span>
-                <Badge variant="secondary" className="bg-red-100 text-red-800">
+                </Button>
+                <Button className="bg-red-600 hover:bg-red-700 text-white">
                   SELL
-                </Badge>
+                </Button>
               </div>
-              <p className="text-sm text-muted-foreground mb-2">
-                {knowledgeMode === 'simple' 
-                  ? "Showing signs of weakness"
-                  : "Bearish crossover on 20/50 EMA with declining volume profile"
-                }
-              </p>
-              <div className="flex justify-between text-xs">
-                <span>Confidence: 74%</span>
-                <span>Target: $245.00</span>
+              <div className="text-xs text-gray-500 text-center">
+                Paper trading mode enabled
               </div>
-            </div>
+            </CardContent>
+          </Card>
+        </div>
 
-            <div className="border rounded-lg p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-medium">NVDA</span>
-                <Badge variant="outline">
-                  HOLD
-                </Badge>
+        {/* Middle Column */}
+        <div className="space-y-6">
+          {/* Active Positions Table */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <DollarSign className="h-5 w-5 text-blue-600" />
+                <span>Active Positions</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b text-xs text-gray-500 uppercase">
+                      <th className="text-left py-2">Symbol</th>
+                      <th className="text-right py-2">Qty</th>
+                      <th className="text-right py-2">Avg Cost</th>
+                      <th className="text-right py-2">Current</th>
+                      <th className="text-right py-2">P&L</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    <tr>
+                      <td className="py-3 font-medium">SPY</td>
+                      <td className="text-right py-3">100</td>
+                      <td className="text-right py-3">$412.30</td>
+                      <td className="text-right py-3">$413.58</td>
+                      <td className="text-right py-3 text-green-600 font-medium">+$128</td>
+                    </tr>
+                    <tr>
+                      <td className="py-3 font-medium">QQQ</td>
+                      <td className="text-right py-3">50</td>
+                      <td className="text-right py-3">$365.80</td>
+                      <td className="text-right py-3">$364.90</td>
+                      <td className="text-right py-3 text-red-600 font-medium">-$45</td>
+                    </tr>
+                    <tr>
+                      <td className="py-3 font-medium">AAPL</td>
+                      <td className="text-right py-3">25</td>
+                      <td className="text-right py-3">$189.45</td>
+                      <td className="text-right py-3">$192.10</td>
+                      <td className="text-right py-3 text-green-600 font-medium">+$66</td>
+                    </tr>
+                    <tr>
+                      <td className="py-3 font-medium">MSFT Call</td>
+                      <td className="text-right py-3">2</td>
+                      <td className="text-right py-3">$4.50</td>
+                      <td className="text-right py-3">$4.95</td>
+                      <td className="text-right py-3 text-green-600 font-medium">+$90</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-              <p className="text-sm text-muted-foreground mb-2">
-                {knowledgeMode === 'simple' 
-                  ? "Consolidating in range"
-                  : "Trading within established support/resistance channel with neutral momentum"
-                }
-              </p>
-              <div className="flex justify-between text-xs">
-                <span>Confidence: 62%</span>
-                <span>Range: $520-540</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Positions Column */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <DollarSign className="h-5 w-5" />
-              <span>Open Positions</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="border rounded-lg p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-medium">SPY</span>
-                <span className="text-green-500 font-medium">+$127.45</span>
-              </div>
-              <div className="flex justify-between text-sm text-muted-foreground">
-                <span>100 shares @ $412.30</span>
-                <span>+0.31%</span>
-              </div>
-            </div>
+          {/* Recent Trades */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Clock className="h-5 w-5 text-gray-600" />
+                <span>Recent Trades</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-2 bg-gray-50 rounded border">
+                  <div className="flex items-center space-x-3">
+                    <Badge className="bg-green-100 text-green-800">BUY</Badge>
+                    <span className="font-medium">AAPL</span>
+                    <span className="text-sm text-gray-500">25 @ $189.45</span>
+                  </div>
+                  <span className="text-xs text-gray-500">2 min ago</span>
+                </div>
+                
+                <div className="flex items-center justify-between p-2 bg-gray-50 rounded border">
+                  <div className="flex items-center space-x-3">
+                    <Badge className="bg-red-100 text-red-800">SELL</Badge>
+                    <span className="font-medium">NVDA</span>
+                    <span className="text-sm text-gray-500">10 @ $535.20</span>
+                  </div>
+                  <span className="text-xs text-gray-500">15 min ago</span>
+                </div>
 
-            <div className="border rounded-lg p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-medium">QQQ</span>
-                <span className="text-red-500 font-medium">-$45.20</span>
+                <div className="flex items-center justify-between p-2 bg-gray-50 rounded border">
+                  <div className="flex items-center space-x-3">
+                    <Badge className="bg-blue-100 text-blue-800">BUY</Badge>
+                    <span className="font-medium">QQQ</span>
+                    <span className="text-sm text-gray-500">50 @ $365.80</span>
+                  </div>
+                  <span className="text-xs text-gray-500">1 hr ago</span>
+                </div>
               </div>
-              <div className="flex justify-between text-sm text-muted-foreground">
-                <span>50 shares @ $365.80</span>
-                <span>-0.25%</span>
-              </div>
-            </div>
+            </CardContent>
+          </Card>
+        </div>
 
-            <div className="border rounded-lg p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-medium">MSFT Call</span>
-                <span className="text-green-500 font-medium">+$89.00</span>
-              </div>
-              <div className="flex justify-between text-sm text-muted-foreground">
-                <span>2 contracts @ $4.50</span>
-                <span>+9.8%</span>
-              </div>
-            </div>
+        {/* Right Column */}
+        <div className="space-y-6">
+          {/* Strategy Performance */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <BarChart3 className="h-5 w-5 text-purple-600" />
+                <span>Strategy Performance</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border">
+                  <div>
+                    <span className="font-medium text-purple-800">Momentum</span>
+                    <p className="text-xs text-purple-600">7-day return</p>
+                  </div>
+                  <span className="text-lg font-bold text-purple-800">+8.2%</span>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border">
+                  <div>
+                    <span className="font-medium text-blue-800">Mean Reversion</span>
+                    <p className="text-xs text-blue-600">30-day return</p>
+                  </div>
+                  <span className="text-lg font-bold text-blue-800">+12.5%</span>
+                </div>
 
-            <div className="pt-4 border-t">
-              <div className="flex justify-between items-center">
-                <span className="font-medium">Total P&L</span>
-                <span className="text-green-500 font-bold">+$171.25</span>
+                <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border">
+                  <div>
+                    <span className="font-medium text-green-800">ML Predictions</span>
+                    <p className="text-xs text-green-600">Overall accuracy</p>
+                  </div>
+                  <span className="text-lg font-bold text-green-800">87.3%</span>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Performance Column */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <BarChart3 className="h-5 w-5" />
-              <span>Performance</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-3 border rounded-lg">
-                <p className="text-2xl font-bold text-green-500">78.4%</p>
-                <p className="text-xs text-muted-foreground">Win Rate</p>
+          {/* Market Context */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Activity className="h-5 w-5 text-orange-600" />
+                <span>Market Context</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="text-center p-3 bg-orange-50 rounded-lg border">
+                  <p className="text-xl font-bold text-orange-800">18.2</p>
+                  <p className="text-xs text-orange-600">VIX Level</p>
+                </div>
+                <div className="text-center p-3 bg-blue-50 rounded-lg border">
+                  <p className="text-xl font-bold text-blue-800">Pre-Market</p>
+                  <p className="text-xs text-blue-600">Session</p>
+                </div>
               </div>
-              <div className="text-center p-3 border rounded-lg">
-                <p className="text-2xl font-bold text-primary">2.3</p>
-                <p className="text-xs text-muted-foreground">Profit Factor</p>
-              </div>
-              <div className="text-center p-3 border rounded-lg">
-                <p className="text-2xl font-bold text-foreground">47</p>
-                <p className="text-xs text-muted-foreground">Total Trades</p>
-              </div>
-              <div className="text-center p-3 border rounded-lg">
-                <p className="text-2xl font-bold text-primary">1.47</p>
-                <p className="text-xs text-muted-foreground">Sharpe Ratio</p>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <h4 className="font-medium">Recent Performance</h4>
               <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">This Week</span>
-                  <span className="text-green-500 font-medium">+2.1%</span>
+                <div className="flex justify-between text-sm">
+                  <span>Market Sentiment</span>
+                  <span className="font-medium text-green-600">Bullish</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">This Month</span>
-                  <span className="text-green-500 font-medium">+8.7%</span>
+                <div className="flex justify-between text-sm">
+                  <span>Volatility Regime</span>
+                  <span className="font-medium text-orange-600">Moderate</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">3 Months</span>
-                  <span className="text-green-500 font-medium">+24.3%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">YTD</span>
-                  <span className="text-green-500 font-medium">+31.2%</span>
+                <div className="flex justify-between text-sm">
+                  <span>Trend Direction</span>
+                  <span className="font-medium text-green-600">Up</span>
                 </div>
               </div>
-            </div>
+            </CardContent>
+          </Card>
 
-            <div className="pt-4 border-t">
-              <p className="text-xs text-muted-foreground text-center">
-                {knowledgeMode === 'simple' 
-                  ? "Performance based on algorithmic signals"
-                  : "Risk-adjusted returns calculated using modified Sharpe ratio with volatility weighting"
-                }
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+          {/* Risk Management */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Shield className="h-5 w-5 text-red-600" />
+                <span>Risk Management</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="text-center p-3 bg-red-50 rounded-lg border">
+                  <p className="text-lg font-bold text-red-800">2.1%</p>
+                  <p className="text-xs text-red-600">Portfolio Risk</p>
+                </div>
+                <div className="text-center p-3 bg-yellow-50 rounded-lg border">
+                  <p className="text-lg font-bold text-yellow-800">1.4</p>
+                  <p className="text-xs text-yellow-600">Sharpe Ratio</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Max Drawdown</span>
+                  <span className="font-medium text-red-600">-3.2%</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Win Rate</span>
+                  <span className="font-medium text-green-600">78.4%</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Risk Score</span>
+                  <span className="font-medium text-yellow-600">Medium</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
