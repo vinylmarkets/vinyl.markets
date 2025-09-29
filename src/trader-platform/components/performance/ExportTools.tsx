@@ -1,13 +1,33 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { generateMockTrades, calculatePerformanceMetrics } from "../../lib/performance-calculations";
+import { getTradeHistory } from "../../lib/trading-api";
+import { calculatePerformanceMetrics } from "../../lib/performance-calculations";
 import { Download, FileText, FileSpreadsheet, Database } from "lucide-react";
 import { format } from "date-fns";
 
 export function ExportTools() {
-  const exportToCsv = () => {
-    const trades = generateMockTrades(100);
+  const [trades, setTrades] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchTradeData = async () => {
+    try {
+      setLoading(true);
+      const tradeHistory = await getTradeHistory();
+      setTrades(tradeHistory);
+    } catch (error) {
+      console.error('Error fetching trade data:', error);
+      setTrades([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const exportToCsv = async () => {
+    if (trades.length === 0) {
+      await fetchTradeData();
+    }
+    
     const headers = [
       'Date', 'Time', 'Symbol', 'Direction', 'Quantity', 'Entry Price', 
       'Exit Price', 'P&L ($)', 'P&L (%)', 'Strategy', 'Hold Time (Hours)', 'Status'
@@ -42,8 +62,11 @@ export function ExportTools() {
     downloadFile(csvData, `trading-history-${format(new Date(), 'yyyy-MM-dd')}.csv`, 'text/csv');
   };
 
-  const exportToJson = () => {
-    const trades = generateMockTrades(100);
+  const exportToJson = async () => {
+    if (trades.length === 0) {
+      await fetchTradeData();
+    }
+    
     const metrics = calculatePerformanceMetrics(trades, 100000);
     
     const exportData = {
@@ -67,9 +90,12 @@ export function ExportTools() {
   };
 
   const exportToPdf = async () => {
+    if (trades.length === 0) {
+      await fetchTradeData();
+    }
+    
     // For a real implementation, you would use a library like jsPDF or puppeteer
     // For now, we'll create a simplified HTML report
-    const trades = generateMockTrades(100);
     const metrics = calculatePerformanceMetrics(trades, 100000);
     
     const htmlReport = `
@@ -194,17 +220,17 @@ export function ExportTools() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem onClick={exportToCsv} className="gap-2">
+        <DropdownMenuItem onClick={exportToCsv} className="gap-2" disabled={loading}>
           <FileSpreadsheet className="h-4 w-4" />
-          Export to CSV
+          {loading ? 'Loading...' : 'Export to CSV'}
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={exportToJson} className="gap-2">
+        <DropdownMenuItem onClick={exportToJson} className="gap-2" disabled={loading}>
           <Database className="h-4 w-4" />
-          Export to JSON
+          {loading ? 'Loading...' : 'Export to JSON'}
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={exportToPdf} className="gap-2">
+        <DropdownMenuItem onClick={exportToPdf} className="gap-2" disabled={loading}>
           <FileText className="h-4 w-4" />
-          Export Report (HTML)
+          {loading ? 'Loading...' : 'Export Report (HTML)'}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

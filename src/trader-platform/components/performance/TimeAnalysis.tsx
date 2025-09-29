@@ -1,7 +1,9 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { generateMockTrades } from "../../lib/performance-calculations";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getTradeHistory } from "../../lib/trading-api";
+import { Trade } from "../../lib/performance-calculations";
 import { Clock, Calendar, TrendingUp, TrendingDown } from "lucide-react";
 
 interface TimePerformance {
@@ -13,7 +15,27 @@ interface TimePerformance {
 }
 
 export function TimeAnalysis() {
-  const trades = useMemo(() => generateMockTrades(100), []);
+  const [trades, setTrades] = useState<Trade[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const tradeHistory = await getTradeHistory();
+        setTrades(tradeHistory.map(t => ({ ...t })));
+      } catch (error) {
+        console.error('Error fetching trade data:', error);
+        setTrades([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const trades = useMemo(() => trades, [trades]);
   
   const { hourlyData, dailyData, sessionData } = useMemo(() => {
     const closedTrades = trades.filter(t => t.status === 'closed');

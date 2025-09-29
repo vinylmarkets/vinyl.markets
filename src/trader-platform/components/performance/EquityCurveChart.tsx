@@ -1,10 +1,12 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Area, AreaChart } from "recharts";
-import { generateMockTrades } from "../../lib/performance-calculations";
-import { DollarSign, Percent, TrendingUp, TrendingDown } from "lucide-react";
+import { getTradeHistory } from "../../lib/trading-api";
+import { Trade } from "../../lib/performance-calculations";
+import { DollarSign, Percent, TrendingUp, TrendingDown, BarChart3 } from "lucide-react";
 
 interface EquityPoint {
   date: string;
@@ -24,10 +26,62 @@ export function EquityCurveChart() {
   const [viewMode, setViewMode] = useState<'dollar' | 'percent'>('dollar');
   const [showBenchmark, setShowBenchmark] = useState(true);
   const [showTrades, setShowTrades] = useState(true);
+  const [trades, setTrades] = useState<Trade[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const tradeHistory = await getTradeHistory();
+        
+        // Convert to Trade format
+        const convertedTrades: Trade[] = tradeHistory.map(trade => ({
+          id: trade.id,
+          symbol: trade.symbol,
+          direction: trade.direction,
+          quantity: trade.quantity,
+          entryPrice: trade.entryPrice,
+          exitPrice: trade.exitPrice,
+          entryTime: trade.entryTime,
+          exitTime: trade.exitTime,
+          pnl: trade.pnl,
+          pnlPercent: trade.pnlPercent,
+          strategy: trade.strategy,
+          status: trade.status
+        }));
+        
+        setTrades(convertedTrades);
+      } catch (error) {
+        console.error('Error fetching trade data:', error);
+        setTrades([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const { equityData, totalReturn, benchmarkReturn, maxDrawdown } = useMemo(() => {
-    const trades = generateMockTrades(100);
     const initialBalance = 100000;
+    
+    if (trades.length === 0) {
+      return {
+        equityData: [{
+          date: new Date().toISOString().split('T')[0],
+          equity: initialBalance,
+          equityPercent: 0,
+          benchmark: initialBalance,
+          benchmarkPercent: 0,
+          isDrawdown: false
+        }],
+        totalReturn: 0,
+        benchmarkReturn: 0,
+        maxDrawdown: 0
+      };
+    }
+
     let runningEquity = initialBalance;
     let peak = initialBalance;
     
@@ -83,7 +137,7 @@ export function EquityCurveChart() {
       benchmarkReturn: ((finalBenchmark - initialBalance) / initialBalance) * 100,
       maxDrawdown: Math.max(...data.map(d => d.isDrawdown ? 1 : 0)) * 15 // Mock max drawdown
     };
-  }, []);
+  }, [trades]);
 
   const formatValue = (value: number) => {
     if (viewMode === 'dollar') {
@@ -102,6 +156,43 @@ export function EquityCurveChart() {
   const getDataKey = (key: 'equity' | 'benchmark') => {
     return viewMode === 'dollar' ? key : `${key}Percent`;
   };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Equity Curve</CardTitle>
+          <CardDescription>Loading chart data...</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-96">
+            <Skeleton className="w-full h-full" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (trades.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Equity Curve</CardTitle>
+          <CardDescription>No trading data available</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-96 flex items-center justify-center">
+            <div className="text-center">
+              <BarChart3 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">
+                Start trading to see your equity curve here
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -259,18 +350,6 @@ export function EquityCurveChart() {
                   name="S&P 500"
                 />
               )}
-
-              {/* Trade markers */}
-              {showTrades && equityData.filter(d => d.trade).map((point, index) => (
-                <circle
-                  key={`trade-${index}`}
-                  cx={`${((new Date(point.date).getTime() - new Date(equityData[0].date).getTime()) / (new Date(equityData[equityData.length - 1].date).getTime() - new Date(equityData[0].date).getTime())) * 100}%`}
-                  cy={`${100 - ((point[getDataKey('equity')] - Math.min(...equityData.map(d => d[getDataKey('equity')]))) / (Math.max(...equityData.map(d => d[getDataKey('equity')])) - Math.min(...equityData.map(d => d[getDataKey('equity')])))) * 100}%`}
-                  r="3"
-                  fill={point.trade?.isWin ? "hsl(var(--success))" : "hsl(var(--destructive))"}
-                  className="opacity-70 hover:opacity-100 transition-opacity"
-                />
-              ))}
             </AreaChart>
           </ResponsiveContainer>
         </div>

@@ -1,26 +1,46 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { generateMockTrades, Trade } from "../../lib/performance-calculations";
+import { getTradeHistory } from "../../lib/trading-api";
+import { Trade } from "../../lib/performance-calculations";
 import { CalendarIcon, Download, Filter, Search, TrendingUp, TrendingDown } from "lucide-react";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
 
 export function TradeHistoryTable() {
-  const trades = useMemo(() => generateMockTrades(100), []);
-  const [filteredTrades, setFilteredTrades] = useState<Trade[]>(trades);
+  const [trades, setTrades] = useState<Trade[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filteredTrades, setFilteredTrades] = useState<Trade[]>([]);
   const [searchSymbol, setSearchSymbol] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [strategyFilter, setStrategyFilter] = useState("all");
   const [sortField, setSortField] = useState<keyof Trade>("entryTime");
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const tradeHistory = await getTradeHistory();
+        setTrades(tradeHistory);
+      } catch (error) {
+        console.error('Error fetching trade history:', error);
+        setTrades([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // Apply filters
   React.useEffect(() => {
@@ -75,6 +95,47 @@ export function TradeHistoryTable() {
 
     setFilteredTrades(filtered);
   }, [trades, searchSymbol, filterType, strategyFilter, dateRange, sortField, sortDirection]);
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Trade History</CardTitle>
+          <CardDescription>Loading trade data...</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex gap-4">
+              <Skeleton className="h-10 flex-1" />
+              <Skeleton className="h-10 w-32" />
+              <Skeleton className="h-10 w-40" />
+            </div>
+            <div className="space-y-2">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <Skeleton key={i} className="h-12 w-full" />
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (trades.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Trade History</CardTitle>
+          <CardDescription>No trades found</CardDescription>
+        </CardHeader>
+        <CardContent className="text-center py-8">
+          <p className="text-muted-foreground">
+            Your trade history will appear here once you start trading.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const handleSort = (field: keyof Trade) => {
     if (sortField === field) {

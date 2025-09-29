@@ -1,12 +1,49 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import { generateMockTrades, getStrategyPerformance } from "../../lib/performance-calculations";
+import { getTradeHistory } from "../../lib/trading-api";
+import { getStrategyPerformance, Trade } from "../../lib/performance-calculations";
 import { TrendingUp, TrendingDown, Brain, Zap, Target } from "lucide-react";
 
 export function StrategyBreakdown() {
-  const trades = useMemo(() => generateMockTrades(100), []);
+  const [trades, setTrades] = useState<Trade[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const tradeHistory = await getTradeHistory();
+        
+        const convertedTrades: Trade[] = tradeHistory.map(trade => ({
+          id: trade.id,
+          symbol: trade.symbol,
+          direction: trade.direction,
+          quantity: trade.quantity,
+          entryPrice: trade.entryPrice,
+          exitPrice: trade.exitPrice,
+          entryTime: trade.entryTime,
+          exitTime: trade.exitTime,
+          pnl: trade.pnl,
+          pnlPercent: trade.pnlPercent,
+          strategy: trade.strategy,
+          status: trade.status
+        }));
+        
+        setTrades(convertedTrades);
+      } catch (error) {
+        console.error('Error fetching trade data:', error);
+        setTrades([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const strategyData = useMemo(() => getStrategyPerformance(trades), [trades]);
 
   const chartData = strategyData.map(strategy => ({
@@ -38,6 +75,47 @@ export function StrategyBreakdown() {
   const getTrendColor = (value: number) => {
     return value > 0 ? "text-success" : value < 0 ? "text-destructive" : "text-muted-foreground";
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-6 w-32" />
+                <Skeleton className="h-4 w-full" />
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <Skeleton className="h-8 w-20" />
+                  <Skeleton className="h-16 w-full" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (trades.length === 0) {
+    return (
+      <Card>
+        <CardHeader className="text-center">
+          <CardTitle className="flex items-center justify-center gap-2">
+            <Brain className="h-5 w-5" />
+            No Strategy Data
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="text-center py-8">
+          <p className="text-muted-foreground">
+            Strategy performance analysis will appear here once you have trading history.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">

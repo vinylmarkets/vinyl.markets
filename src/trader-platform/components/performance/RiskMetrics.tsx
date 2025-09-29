@@ -1,13 +1,41 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { generateMockTrades, calculatePerformanceMetrics, calculateValueAtRisk, calculateRiskRewardRatio } from "../../lib/performance-calculations";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getTradeHistory } from "../../lib/trading-api";
+import { calculatePerformanceMetrics, Trade } from "../../lib/performance-calculations";
 import { Shield, AlertTriangle, TrendingDown, Target, BarChart3, Activity } from "lucide-react";
 
 export function RiskMetrics() {
-  const trades = useMemo(() => generateMockTrades(100), []);
+  const [trades, setTrades] = useState<Trade[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const tradeHistory = await getTradeHistory();
+        setTrades(tradeHistory.map(t => ({ ...t })));
+      } catch (error) {
+        setTrades([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loading || trades.length === 0) {
+    return (
+      <Card>
+        <CardHeader><CardTitle>Risk Metrics</CardTitle></CardHeader>
+        <CardContent className="text-center py-8">
+          <p className="text-muted-foreground">
+            {loading ? "Loading risk analysis..." : "No trade data for risk analysis"}
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
   const metrics = useMemo(() => calculatePerformanceMetrics(trades, 100000), [trades]);
   
   const riskAnalysis = useMemo(() => {
