@@ -14,7 +14,17 @@ interface DiagnosticResult {
   timestamp?: string;
 }
 
-export const DiagnosticPanel = () => {
+interface DiagnosticPanelProps {
+  currentPositions?: any[];
+  currentTrades?: any[];
+  currentAccount?: any;
+}
+
+export const DiagnosticPanel = ({ 
+  currentPositions = [], 
+  currentTrades = [],
+  currentAccount 
+}: DiagnosticPanelProps) => {
   const [diagnostics, setDiagnostics] = useState<DiagnosticResult[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const { toast } = useToast();
@@ -24,6 +34,48 @@ export const DiagnosticPanel = () => {
     const results: DiagnosticResult[] = [];
 
     try {
+      // 0. Check frontend component state FIRST
+      results.push({
+        category: "Frontend State - Positions",
+        status: currentPositions.length > 0 ? "warning" : "success",
+        message: currentPositions.length > 0
+          ? `⚠️ Component is displaying ${currentPositions.length} position(s) - verify these are not mock/demo data`
+          : "No positions being displayed (correct for fresh account)",
+        data: { 
+          displayedPositions: currentPositions,
+          symbols: currentPositions.map(p => p.symbol),
+          note: "These are the ACTUAL positions being shown in the UI right now"
+        },
+        timestamp: new Date().toISOString()
+      });
+
+      results.push({
+        category: "Frontend State - Recent Trades",
+        status: currentTrades.length > 0 ? "warning" : "success",
+        message: currentTrades.length > 0
+          ? `⚠️ Component is displaying ${currentTrades.length} recent trade(s) - verify these are not mock/demo data`
+          : "No recent trades being displayed",
+        data: { 
+          displayedTrades: currentTrades,
+          symbols: currentTrades.map(t => t.symbol),
+          note: "These are the ACTUAL trades being shown in the UI right now"
+        },
+        timestamp: new Date().toISOString()
+      });
+
+      results.push({
+        category: "Frontend State - Account Data",
+        status: currentAccount ? "success" : "warning",
+        message: currentAccount
+          ? `Account showing $${currentAccount.portfolioValue?.toLocaleString()} value`
+          : "No account data in component state",
+        data: {
+          displayedAccount: currentAccount,
+          note: "This is the ACTUAL account data being shown in the UI right now"
+        },
+        timestamp: new Date().toISOString()
+      });
+
       // 1. Check current user
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       results.push({

@@ -1038,7 +1038,11 @@ export const TradingDashboard = () => {
                   </TabsContent>
                   
                   <TabsContent value="diagnostics" className="mt-0">
-                    <DiagnosticPanel />
+                    <DiagnosticPanel 
+                      currentPositions={positions}
+                      currentTrades={recentTrades}
+                      currentAccount={accountData}
+                    />
                   </TabsContent>
                 </CardContent>
               </Tabs>
