@@ -4037,44 +4037,6 @@ export type Database = {
       }
     }
     Views: {
-      admin_executive_summary: {
-        Row: {
-          briefings_today: number | null
-          monthly_revenue: number | null
-          paid_users: number | null
-          queries_today: number | null
-          total_users: number | null
-          users_last_7_days: number | null
-        }
-        Relationships: []
-      }
-      admin_feature_usage: {
-        Row: {
-          feature: string | null
-          total_usage: number | null
-          unique_users: number | null
-          usage_date: string | null
-        }
-        Relationships: []
-      }
-      admin_revenue_analytics: {
-        Row: {
-          avg_customer_age_days: number | null
-          monthly_revenue: number | null
-          subscriber_count: number | null
-          subscription_tier: string | null
-        }
-        Relationships: []
-      }
-      admin_user_growth: {
-        Row: {
-          cumulative_users: number | null
-          new_signups: number | null
-          paid_signups: number | null
-          signup_date: string | null
-        }
-        Relationships: []
-      }
       business_metrics_summary: {
         Row: {
           active_users: number | null
@@ -4155,6 +4117,44 @@ export type Database = {
       generate_daily_metrics: {
         Args: { target_date?: string }
         Returns: undefined
+      }
+      get_admin_executive_summary: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          briefings_today: number
+          monthly_revenue: number
+          paid_users: number
+          queries_today: number
+          total_users: number
+          users_last_7_days: number
+        }[]
+      }
+      get_admin_feature_usage: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          feature: string
+          total_usage: number
+          unique_users: number
+          usage_date: string
+        }[]
+      }
+      get_admin_revenue_analytics: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          avg_customer_age_days: number
+          monthly_revenue: number
+          subscriber_count: number
+          subscription_tier: string
+        }[]
+      }
+      get_admin_user_growth: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          cumulative_users: number
+          new_signups: number
+          paid_signups: number
+          signup_date: string
+        }[]
       }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
