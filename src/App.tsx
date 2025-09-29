@@ -158,7 +158,12 @@ const App = () => {
               <Route path="/forum/topic/:topicId" element={<ForumTopic />} />
               
               {/* Hidden Trader Platform - Not linked from navigation */}
-              <Route path="/trader-auth" element={<TraderAuth />} />
+              <Route path="/trader-auth" element={
+                <div>
+                  <h1>Testing TraderAuth Route</h1>
+                  <TraderAuth />
+                </div>
+              } />
               <Route path="/trader" element={<TraderPage />} />
               <Route path="/trader/integrations" element={<Integrations />} />
               
