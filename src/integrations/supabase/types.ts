@@ -4109,6 +4109,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      log_cron_execution: {
+        Args: { job_name: string; response_data: Json; status: string }
+        Returns: undefined
+      }
       screen_content_compliance: {
         Args: { content_text: string }
         Returns: boolean
