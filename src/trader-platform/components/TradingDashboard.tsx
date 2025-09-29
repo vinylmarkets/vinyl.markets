@@ -3,6 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { LogOut } from "lucide-react";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { 
@@ -87,6 +90,8 @@ export const TradingDashboard = () => {
   const [signals, setSignals] = useState<TradingSignal[]>([]);
   const [positions, setPositions] = useState<Position[]>([]);
   const [recentTrades, setRecentTrades] = useState<RecentTrade[]>([]);
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
   const [cloudStatus, setCloudStatus] = useState<CloudStatus>({
     isActive: true,
     lastAnalysis: null,
@@ -243,6 +248,24 @@ export const TradingDashboard = () => {
     });
   };
 
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Logged out",
+        description: "You have been successfully logged out.",
+      });
+      navigate('/trader-auth');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast({
+        title: "Logout Error",
+        description: "An error occurred during logout.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getTooltipContent = (type: string) => {
     const tooltips = {
       simple: {
@@ -265,10 +288,13 @@ export const TradingDashboard = () => {
     <div className="min-h-screen bg-background">
       {/* Top Header Bar */}
       <header className="h-16 border-b border-border bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/50">
-        <div className="flex items-center justify-between px-6 h-full">
+        <div className="flex items-center justify-between px-4 sm:px-6 h-full">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
-            <h1 className="text-xl font-bold text-foreground tracking-tight">TubeAmp Trader v5.0</h1>
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <h1 className="text-lg sm:text-xl font-bold text-foreground tracking-tight">
+              <span className="hidden sm:inline">TubeAmp Trader v5.0</span>
+              <span className="sm:hidden">Trader</span>
+            </h1>
             {/* Connection Status */}
             {isDevelopment && (
               <div className="flex items-center space-x-1">
@@ -284,8 +310,8 @@ export const TradingDashboard = () => {
             )}
           </div>
 
-          {/* Account Stats */}
-          <div className="flex items-center space-x-6">
+          {/* Account Stats - Hide on small screens */}
+          <div className="hidden lg:flex items-center space-x-6">
             <div className="text-center">
               <p className="text-xs text-muted-foreground">Portfolio Value</p>
               <p className="text-lg font-semibold text-foreground">${accountData.portfolioValue.toLocaleString()}</p>
@@ -309,35 +335,49 @@ export const TradingDashboard = () => {
             </div>
           </div>
 
-          {/* Knowledge Mode Toggle */}
+          {/* Right side controls */}
           <div className="flex items-center space-x-2">
-            <span className="text-xs text-muted-foreground">Knowledge Mode:</span>
-            <Button
-              variant={knowledgeMode === 'simple' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setKnowledgeMode('simple')}
-              className="h-8 px-3 text-xs"
+            {/* Knowledge Mode Toggle - Hide on mobile */}
+            <div className="hidden md:flex items-center space-x-2">
+              <span className="text-xs text-muted-foreground">Knowledge Mode:</span>
+              <Button
+                variant={knowledgeMode === 'simple' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setKnowledgeMode('simple')}
+                className="h-8 px-3 text-xs"
+              >
+                Simple
+              </Button>
+              <Button
+                variant={knowledgeMode === 'academic' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setKnowledgeMode('academic')}
+                className="h-8 px-3 text-xs"
+              >
+                Academic
+              </Button>
+            </div>
+            
+            {/* Logout Button */}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleLogout}
+              className="flex items-center space-x-2"
             >
-              Simple
-            </Button>
-            <Button
-              variant={knowledgeMode === 'academic' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setKnowledgeMode('academic')}
-              className="h-8 px-3 text-xs"
-            >
-              Academic
+              <LogOut className="h-4 w-4" />
+              <span className="hidden sm:inline">Logout</span>
             </Button>
           </div>
         </div>
       </header>
 
       {/* Compact Bento Layout */}
-      <div className="p-4 space-y-4">
+      <div className="p-2 sm:p-4 space-y-4">
         {/* Cloud Status Section */}
         <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200 border-l-4 border-l-primary">
-          <CardContent className="p-4">
-            <div className="grid grid-cols-5 gap-4">
+          <CardContent className="p-3 sm:p-4">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-4">
               {/* Cloud Status */}
               <div className="flex items-center space-x-2">
                 <div className="flex items-center space-x-1">
@@ -387,7 +427,7 @@ export const TradingDashboard = () => {
         </Card>
 
         {/* Top Row - Compact Metrics */}
-        <div className="grid grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
             <CardContent className="p-3">
               <div className="flex items-center justify-between">
@@ -461,11 +501,11 @@ export const TradingDashboard = () => {
           </Card>
         </div>
 
-        {/* Main Content - Tighter Grid */}
-        <div className="grid grid-cols-12 gap-4">
+        {/* Main Content - Responsive Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           
           {/* Left - Signals & Quick Trade */}
-          <div className="col-span-3 space-y-4">
+          <div className="lg:col-span-3 space-y-4">
             
             {/* Compact Strong Signals */}
             <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">

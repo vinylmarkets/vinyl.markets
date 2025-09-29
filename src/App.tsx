@@ -66,6 +66,7 @@ import AtomicPlaybook from "./pages/admin/AtomicPlaybook";
 import ForumPage from "./pages/forum/ForumPage";
 import Auth from "./pages/Auth";
 import TraderPage from "./pages/trader/TraderPage";
+import TraderAuth from "./pages/trader/TraderAuth";
 
 const queryClient = new QueryClient();
 
@@ -156,6 +157,7 @@ const App = () => {
               <Route path="/forum/topic/:topicId" element={<ForumTopic />} />
               
               {/* Hidden Trader Platform - Not linked from navigation */}
+              <Route path="/trader-auth" element={<TraderAuth />} />
               <Route path="/trader" element={<TraderPage />} />
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
