@@ -27,19 +27,50 @@ const DEMO_ACCOUNT: AccountData = {
 
 async function fetchAccountFromAPI(): Promise<AccountData> {
   try {
-    console.log('Attempting to fetch account data from trading API...');
+    console.log('Attempting to fetch account data from Alpaca API...');
     
-    // Placeholder for future API integration
-    // const response = await fetch(`${TRADING_API_URL}/account`, {
-    //   headers: { 'Authorization': `Bearer ${API_TOKEN}` }
-    // });
+    const alpacaApiKey = Deno.env.get('ALPACA_API_KEY');
+    const alpacaSecret = Deno.env.get('ALPACA_SECRET_KEY');
+    const alpacaBaseUrl = Deno.env.get('ALPACA_BASE_URL') || 'https://paper-api.alpaca.markets';
     
-    // For now, return demo data
-    console.log('Using demo account data');
-    return DEMO_ACCOUNT;
+    if (!alpacaApiKey || !alpacaSecret) {
+      console.warn('Alpaca API credentials not found, using demo data');
+      return DEMO_ACCOUNT;
+    }
+    
+    const response = await fetch(`${alpacaBaseUrl}/v2/account`, {
+      headers: {
+        'APCA-API-KEY-ID': alpacaApiKey,
+        'APCA-API-SECRET-KEY': alpacaSecret,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      console.warn(`Alpaca API error: ${response.status} ${response.statusText}, using demo data`);
+      return DEMO_ACCOUNT;
+    }
+    
+    const alpacaData = await response.json();
+    console.log('Successfully fetched real account data from Alpaca');
+    
+    // Transform Alpaca data to our format
+    const transformedData: AccountData = {
+      portfolioValue: parseFloat(alpacaData.portfolio_value || '0'),
+      dailyPnL: parseFloat(alpacaData.todays_pnl || '0'),
+      dailyPnLPercent: parseFloat(alpacaData.todays_pnl_pct || '0') * 100,
+      buyingPower: parseFloat(alpacaData.buying_power || '0'),
+      totalEquity: parseFloat(alpacaData.equity || '0'),
+      marginUsed: parseFloat(alpacaData.initial_margin || '0'),
+      dayTradesUsed: parseInt(alpacaData.daytrade_count || '0'),
+      accountStatus: alpacaData.status || 'unknown',
+      lastUpdated: new Date().toISOString()
+    };
+    
+    return transformedData;
     
   } catch (error) {
-    console.warn('Failed to fetch account data, using demo data:', error instanceof Error ? error.message : String(error));
+    console.warn('Failed to fetch account data from Alpaca, using demo data:', error instanceof Error ? error.message : String(error));
     return DEMO_ACCOUNT;
   }
 }
