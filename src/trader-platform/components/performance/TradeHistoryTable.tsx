@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { generateMockTrades, Trade } from "../../lib/performance-calculations";
 import { CalendarIcon, Download, Filter, Search, TrendingUp, TrendingDown } from "lucide-react";
 import { format } from "date-fns";
+import { DateRange } from "react-day-picker";
 
 export function TradeHistoryTable() {
   const trades = useMemo(() => generateMockTrades(100), []);
@@ -19,7 +20,7 @@ export function TradeHistoryTable() {
   const [strategyFilter, setStrategyFilter] = useState("all");
   const [sortField, setSortField] = useState<keyof Trade>("entryTime");
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-  const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date }>({});
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
   // Apply filters
   React.useEffect(() => {
@@ -45,11 +46,11 @@ export function TradeHistoryTable() {
     }
 
     // Date range filter
-    if (dateRange.from || dateRange.to) {
+    if (dateRange?.from || dateRange?.to) {
       filtered = filtered.filter(trade => {
         const tradeDate = new Date(trade.entryTime);
-        const afterStart = !dateRange.from || tradeDate >= dateRange.from;
-        const beforeEnd = !dateRange.to || tradeDate <= dateRange.to;
+        const afterStart = !dateRange?.from || tradeDate >= dateRange.from;
+        const beforeEnd = !dateRange?.to || tradeDate <= dateRange.to;
         return afterStart && beforeEnd;
       });
     }
@@ -190,8 +191,8 @@ export function TradeHistoryTable() {
             <PopoverTrigger asChild>
               <Button variant="outline" className="justify-start text-left font-normal">
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {dateRange.from ? (
-                  dateRange.to ? (
+                {dateRange?.from ? (
+                  dateRange?.to ? (
                     `${format(dateRange.from, "MMM dd")} - ${format(dateRange.to, "MMM dd")}`
                   ) : (
                     format(dateRange.from, "MMM dd")
@@ -205,7 +206,7 @@ export function TradeHistoryTable() {
               <Calendar
                 mode="range"
                 selected={dateRange}
-                onSelect={(range) => setDateRange(range || {})}
+                onSelect={(range) => setDateRange(range)}
                 initialFocus
                 className="pointer-events-auto"
               />
@@ -269,7 +270,7 @@ export function TradeHistoryTable() {
                   </TableCell>
                   <TableCell className="font-medium">{trade.symbol}</TableCell>
                   <TableCell>
-                    <Badge variant={trade.direction === 'BUY' ? 'success' : 'destructive'}>
+                    <Badge variant={trade.direction === 'BUY' ? 'default' : 'destructive'} className={trade.direction === 'BUY' ? 'bg-success text-success-foreground hover:bg-success/80' : ''}>
                       {trade.direction}
                     </Badge>
                   </TableCell>

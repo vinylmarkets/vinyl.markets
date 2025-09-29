@@ -205,8 +205,8 @@ export function MonthlyHeatmap() {
                 </CardTitle>
                 <div className="flex gap-2">
                   <Badge 
-                    variant={monthData.totalPnl > 0 ? "success" : "destructive"}
-                    className="flex items-center gap-1"
+                    variant={monthData.totalPnl > 0 ? "default" : "destructive"}
+                    className={`flex items-center gap-1 ${monthData.totalPnl > 0 ? 'bg-success text-success-foreground hover:bg-success/80' : ''}`}
                   >
                     {monthData.totalPnl > 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
                     {monthData.totalPnl > 0 ? '+' : ''}${monthData.totalPnl.toFixed(0)}

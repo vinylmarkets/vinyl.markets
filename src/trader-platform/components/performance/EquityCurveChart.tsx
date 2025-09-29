@@ -135,7 +135,7 @@ export function EquityCurveChart() {
 
         <div className="flex flex-wrap gap-4 mt-4">
           <div className="flex items-center gap-2">
-            <Badge variant={totalReturn > 0 ? "success" : "destructive"} className="flex items-center gap-1">
+            <Badge variant={totalReturn > 0 ? "default" : "destructive"} className={`flex items-center gap-1 ${totalReturn > 0 ? 'bg-success text-success-foreground hover:bg-success/80' : ''}`}>
               {totalReturn > 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
               {totalReturn.toFixed(2)}%
             </Badge>

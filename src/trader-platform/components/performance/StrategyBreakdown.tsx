@@ -54,8 +54,8 @@ export function StrategyBreakdown() {
                     <CardTitle className="text-lg">{strategy.displayName}</CardTitle>
                   </div>
                   <Badge 
-                    variant={strategy.totalPnl > 0 ? "success" : "destructive"}
-                    className="px-2 py-1"
+                    variant={strategy.totalPnl > 0 ? "default" : "destructive"}
+                    className={`px-2 py-1 ${strategy.totalPnl > 0 ? 'bg-success text-success-foreground hover:bg-success/80' : ''}`}
                   >
                     {strategy.totalPnl > 0 ? '+' : ''}${strategy.totalPnl.toFixed(0)}
                   </Badge>

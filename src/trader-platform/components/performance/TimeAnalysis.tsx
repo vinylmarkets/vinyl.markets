@@ -159,10 +159,11 @@ export function TimeAnalysis() {
                     <h4 className="font-medium text-sm">{session.period}</h4>
                     <Badge 
                       variant={
-                        badgeType === "excellent" ? "success" : 
+                        badgeType === "excellent" ? "default" : 
                         badgeType === "good" ? "secondary" :
                         badgeType === "average" ? "outline" : "destructive"
                       }
+                      className={badgeType === "excellent" ? "bg-success text-success-foreground hover:bg-success/80" : ""}
                     >
                       {badgeType}
                     </Badge>

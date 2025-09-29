@@ -69,7 +69,7 @@ export function PerformanceOverview() {
 
   const getTrendBadgeVariant = (trend: string) => {
     switch (trend) {
-      case "positive": return "success" as const;
+      case "positive": return "default" as const;
       case "negative": return "destructive" as const;
       default: return "secondary" as const;
     }
@@ -91,7 +91,7 @@ export function PerformanceOverview() {
                   <div className={`text-2xl font-bold ${getTrendColor(card.trend)}`}>
                     {card.value}
                   </div>
-                  <Badge variant={getTrendBadgeVariant(card.trend)} className="text-xs">
+                  <Badge variant={getTrendBadgeVariant(card.trend)} className={`text-xs ${card.trend === 'positive' ? 'bg-success text-success-foreground hover:bg-success/80' : ''}`}>
                     {card.subtitle}
                   </Badge>
                 </div>
