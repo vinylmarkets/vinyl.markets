@@ -9,18 +9,18 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
 interface TradingSignal {
   id: string;
   symbol: string;
-  strategy_type: string;
   signal_type: 'BUY' | 'SELL' | 'HOLD';
   confidence_score: number;
-  current_price: number;
   target_price?: number;
   stop_loss_price?: number;
+  take_profit_price?: number;
+  quantity?: number;
   reasoning: string;
-  market_data: any;
-  strategy_params: any;
-  generated_at: string;
+  signal_data: any;
+  status: string;
+  created_at: string;
   expires_at: string;
-  executed: boolean;
+  executed_at?: string;
 }
 
 interface RiskSettings {
@@ -83,9 +83,9 @@ async function getRiskSettings(): Promise<RiskSettings> {
 
 async function getExecutableSignals(minConfidence: number): Promise<TradingSignal[]> {
   const { data, error } = await supabase
-    .from('trading.signals')
+    .from('trading_signals')
     .select('*')
-    .eq('executed', false)
+    .eq('status', 'active')
     .gte('confidence_score', minConfidence)
     .gt('expires_at', new Date().toISOString())
     .order('confidence_score', { ascending: false })
@@ -101,7 +101,7 @@ async function getExecutableSignals(minConfidence: number): Promise<TradingSigna
 
 async function getCurrentPositions() {
   const { data, error } = await supabase
-    .from('trading.positions')
+    .from('trading_positions')
     .select('*')
     .eq('status', 'open');
     
@@ -139,12 +139,15 @@ function calculatePositionSize(
     accountBalance * riskSettings.max_portfolio_risk
   );
   
+  // Get current price from target_price if available, otherwise use a default
+  const currentPrice = signal.target_price || 100; // Fallback price
+  
   const stopLossDistance = signal.stop_loss_price 
-    ? Math.abs(signal.current_price - signal.stop_loss_price) 
-    : signal.current_price * riskSettings.stop_loss_percent;
+    ? Math.abs(currentPrice - signal.stop_loss_price) 
+    : currentPrice * riskSettings.stop_loss_percent;
     
   const shares = Math.floor(maxRiskAmount / stopLossDistance);
-  const maxShares = Math.floor(riskSettings.max_position_size / signal.current_price);
+  const maxShares = Math.floor(riskSettings.max_position_size / currentPrice);
   
   return Math.min(shares, maxShares);
 }
@@ -197,25 +200,26 @@ async function executeAlpacaOrder(
 
 async function createPosition(signal: TradingSignal, order: AlpacaOrder, quantity: number) {
   const side = signal.signal_type === 'BUY' ? 'long' : 'short';
+  const entryPrice = signal.target_price || 100; // Use target_price as entry price
   
   const position = {
+    user_id: null, // Will be set by RLS policies
     symbol: signal.symbol,
     side,
     quantity,
-    entry_price: signal.current_price,
-    current_price: signal.current_price,
-    market_value: quantity * signal.current_price,
+    entry_price: entryPrice,
+    current_price: entryPrice,
+    market_value: quantity * entryPrice,
     unrealized_pnl: 0,
     unrealized_pnl_percent: 0,
     stop_loss_price: signal.stop_loss_price,
-    take_profit_price: signal.target_price,
+    take_profit_price: signal.take_profit_price,
     signal_id: signal.id,
-    alpaca_order_id: order.id,
     status: 'open'
   };
   
   const { error } = await supabase
-    .from('trading.positions')
+    .from('trading_positions')
     .insert(position);
     
   if (error) {
@@ -225,8 +229,8 @@ async function createPosition(signal: TradingSignal, order: AlpacaOrder, quantit
   
   // Mark signal as executed
   await supabase
-    .from('trading.signals')
-    .update({ executed: true })
+    .from('trading_signals')
+    .update({ status: 'executed', executed_at: new Date().toISOString() })
     .eq('id', signal.id);
 }
 
@@ -309,7 +313,7 @@ Deno.serve(async (req) => {
         if (signal.signal_type === 'HOLD') continue;
         
         // Calculate position size
-        const quantity = calculatePositionSize(signal, riskSettings);
+        const quantity = signal.quantity || calculatePositionSize(signal, riskSettings);
         if (quantity <= 0) {
           console.log(`Skipping ${signal.symbol}: position size too small`);
           continue;
@@ -326,13 +330,12 @@ Deno.serve(async (req) => {
           symbol: signal.symbol,
           side: signal.signal_type,
           quantity,
-          price: signal.current_price,
+          price: signal.target_price || 100,
           confidence: signal.confidence_score,
-          strategy: signal.strategy_type,
           orderId: order.id
         });
         
-        console.log(`Executed ${signal.signal_type} ${quantity} ${signal.symbol} @ ${signal.current_price}`);
+        console.log(`Executed ${signal.signal_type} ${quantity} ${signal.symbol} @ ${signal.target_price || 'market'}`);
         
       } catch (error) {
         console.error(`Failed to execute trade for ${signal.symbol}:`, error);
