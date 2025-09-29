@@ -340,26 +340,6 @@ export const TradingDashboard = () => {
     }
   };
 
-  // Define fetchAccountData before useEffect
-  const fetchAccountData = React.useCallback(async () => {
-    console.log('fetchAccountData: Fetching account data...');
-    
-    try {
-      const { data, error } = await supabase.functions.invoke('trader-account');
-      
-      console.log('fetchAccountData response:', { data, error });
-      
-      if (error || !data?.success) {
-        console.error('Account data error:', error);
-        return;
-      }
-      
-      console.log('Setting account data:', data.data);
-      setAccountData(data.data);
-    } catch (error) {
-      console.error('Failed to fetch account data:', error);
-    }
-  }, []);
 
   const handleTradeClick = async (action: 'BUY' | 'SELL', symbol: string) => {
     if (!symbol.trim()) return;
