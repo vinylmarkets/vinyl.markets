@@ -22,6 +22,39 @@ interface TradeResponse {
   message: string;
 }
 
+async function checkAssetTradeable(symbol: string, alpacaApiKey: string, alpacaSecret: string, alpacaBaseUrl: string): Promise<{ tradeable: boolean; reason?: string }> {
+  try {
+    const response = await fetch(`${alpacaBaseUrl}/v2/assets/${symbol}`, {
+      headers: {
+        'APCA-API-KEY-ID': alpacaApiKey,
+        'APCA-API-SECRET-KEY': alpacaSecret
+      }
+    });
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        return { tradeable: false, reason: 'Symbol not found or delisted' };
+      }
+      return { tradeable: false, reason: 'Unable to verify symbol' };
+    }
+    
+    const asset = await response.json();
+    
+    if (asset.status !== 'active') {
+      return { tradeable: false, reason: `Asset status: ${asset.status}` };
+    }
+    
+    if (!asset.tradable) {
+      return { tradeable: false, reason: 'Asset is not tradeable' };
+    }
+    
+    return { tradeable: true };
+  } catch (error) {
+    console.error('Error checking asset tradeability:', error);
+    return { tradeable: false, reason: 'Error verifying symbol' };
+  }
+}
+
 async function executeTradeViaAPI(tradeRequest: TradeRequest): Promise<TradeResponse> {
   try {
     console.log('Attempting to execute trade via Alpaca API:', tradeRequest);
@@ -33,6 +66,12 @@ async function executeTradeViaAPI(tradeRequest: TradeRequest): Promise<TradeResp
     
     if (!alpacaApiKey || !alpacaSecret) {
       throw new Error('Alpaca API credentials not configured');
+    }
+    
+    // Check if asset is tradeable first
+    const tradeabilityCheck = await checkAssetTradeable(tradeRequest.symbol, alpacaApiKey, alpacaSecret, alpacaBaseUrl);
+    if (!tradeabilityCheck.tradeable) {
+      throw new Error(`Cannot trade ${tradeRequest.symbol}: ${tradeabilityCheck.reason}`);
     }
     
     // Convert our trade request to Alpaca format
@@ -61,8 +100,17 @@ async function executeTradeViaAPI(tradeRequest: TradeRequest): Promise<TradeResp
     
     if (!response.ok) {
       const errorData = await response.text();
-      console.error('Alpaca API error:', errorData);
-      throw new Error(`Alpaca API error: ${response.status} - ${errorData}`);
+      console.error('Alpaca API error response:', errorData);
+      
+      let errorMessage = errorData;
+      try {
+        const errorJson = JSON.parse(errorData);
+        errorMessage = errorJson.message || errorData;
+      } catch (e) {
+        // Error is not JSON, use as-is
+      }
+      
+      throw new Error(`Order rejected: ${errorMessage}`);
     }
     
     const alpacaOrderResult = await response.json();
