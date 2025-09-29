@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LogOut } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { 
@@ -26,7 +26,9 @@ import {
   Cloud,
   CheckCircle,
   AlertCircle,
-  RefreshCw
+  RefreshCw,
+  Link as LinkIcon,
+  Settings
 } from "lucide-react";
 
 interface TradingSignal {
@@ -371,6 +373,32 @@ export const TradingDashboard = () => {
           </div>
         </div>
       </header>
+
+      {/* Broker Integration Status */}
+      <div className="p-2 sm:p-4">
+        <Card className="border-yellow-200 bg-yellow-50 border-l-4 border-l-yellow-500">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <AlertCircle className="h-5 w-5 text-yellow-600" />
+                <div>
+                  <p className="font-medium text-yellow-800">Broker Connection Required</p>
+                  <p className="text-sm text-yellow-700">
+                    Connect your Alpaca account to enable live trading and access your real account data
+                  </p>
+                </div>
+              </div>
+              <Link to="/trader/integrations">
+                <Button size="sm" className="bg-yellow-600 hover:bg-yellow-700 text-white">
+                  <LinkIcon className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Connect Broker</span>
+                  <span className="sm:hidden">Connect</span>
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Compact Bento Layout */}
       <div className="p-2 sm:p-4 space-y-4">

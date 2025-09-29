@@ -67,6 +67,7 @@ import ForumPage from "./pages/forum/ForumPage";
 import Auth from "./pages/Auth";
 import TraderPage from "./pages/trader/TraderPage";
 import TraderAuth from "./pages/trader/TraderAuth";
+import Integrations from "./pages/trader/Integrations";
 
 const queryClient = new QueryClient();
 
@@ -159,6 +160,7 @@ const App = () => {
               {/* Hidden Trader Platform - Not linked from navigation */}
               <Route path="/trader-auth" element={<TraderAuth />} />
               <Route path="/trader" element={<TraderPage />} />
+              <Route path="/trader/integrations" element={<Integrations />} />
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
