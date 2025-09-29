@@ -25,13 +25,38 @@ const DEMO_ACCOUNT: AccountData = {
   lastUpdated: new Date().toISOString()
 };
 
-async function fetchAccountFromAPI(): Promise<AccountData> {
+async function fetchAccountFromAPI(userId: string): Promise<AccountData> {
   try {
-    console.log('Attempting to fetch account data from Alpaca API...');
+    console.log('Attempting to fetch account data from Alpaca API for user:', userId);
     
+    // Import supabase client to get user's integration
+    const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+    
+    // Get user's broker integration with decrypted keys
+    const { data: integration, error } = await supabase
+      .from('broker_integrations')
+      .select('api_key_encrypted, secret_key_encrypted, environment')
+      .eq('user_id', userId)
+      .eq('broker_name', 'alpaca')
+      .eq('is_active', true)
+      .single();
+    
+    if (error || !integration) {
+      console.warn('No active Alpaca integration found for user, using demo data');
+      return DEMO_ACCOUNT;
+    }
+    
+    // For now, use global secrets since decryption is complex
+    // TODO: Implement proper decryption of user's stored keys
     const alpacaApiKey = Deno.env.get('ALPACA_API_KEY');
     const alpacaSecret = Deno.env.get('ALPACA_SECRET_KEY');
-    const alpacaBaseUrl = Deno.env.get('ALPACA_BASE_URL') || 'https://paper-api.alpaca.markets';
+    const alpacaBaseUrl = integration.environment === 'live' 
+      ? 'https://api.alpaca.markets' 
+      : 'https://paper-api.alpaca.markets';
     
     if (!alpacaApiKey || !alpacaSecret) {
       console.warn('Alpaca API credentials not found, using demo data');
@@ -94,7 +119,39 @@ Deno.serve(async (req) => {
 
     console.log('Fetching account data...');
 
-    const accountData = await fetchAccountFromAPI();
+    // Get user ID from auth
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Authorization required' }),
+        { 
+          status: 401, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Extract user ID from the JWT token
+    const token = authHeader.replace('Bearer ', '');
+    const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    );
+    
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid authentication' }),
+        { 
+          status: 401, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    const accountData = await fetchAccountFromAPI(user.id);
 
     const response = {
       success: true,
