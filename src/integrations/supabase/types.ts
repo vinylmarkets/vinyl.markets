@@ -173,13 +173,6 @@ export type Database = {
             foreignKeyName: "analytics_events_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "user_analytics_dashboard"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "analytics_events_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
@@ -214,13 +207,6 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "api_performance_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_analytics_dashboard"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "api_performance_user_id_fkey"
             columns: ["user_id"]
@@ -527,13 +513,6 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "compliance_logs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_analytics_dashboard"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "compliance_logs_user_id_fkey"
             columns: ["user_id"]
@@ -946,13 +925,6 @@ export type Database = {
             foreignKeyName: "forum_likes_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "user_analytics_dashboard"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "forum_likes_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
@@ -992,13 +964,6 @@ export type Database = {
             columns: ["topic_id"]
             isOneToOne: false
             referencedRelation: "forum_topics"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "forum_posts_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_analytics_dashboard"
             referencedColumns: ["id"]
           },
           {
@@ -1062,13 +1027,6 @@ export type Database = {
             foreignKeyName: "forum_topics_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "user_analytics_dashboard"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "forum_topics_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
@@ -1097,13 +1055,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "forum_user_stats_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "user_analytics_dashboard"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "forum_user_stats_user_id_fkey"
             columns: ["user_id"]
@@ -2038,13 +1989,6 @@ export type Database = {
             columns: ["opportunity_id"]
             isOneToOne: false
             referencedRelation: "options_opportunities"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "options_user_interactions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_analytics_dashboard"
             referencedColumns: ["id"]
           },
           {
@@ -3527,13 +3471,6 @@ export type Database = {
             foreignKeyName: "terminal_queries_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "user_analytics_dashboard"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "terminal_queries_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
@@ -3630,13 +3567,6 @@ export type Database = {
             foreignKeyName: "user_achievements_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "user_analytics_dashboard"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_achievements_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
@@ -3698,13 +3628,6 @@ export type Database = {
             columns: ["portfolio_id"]
             isOneToOne: false
             referencedRelation: "user_portfolios"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_briefings_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_analytics_dashboard"
             referencedColumns: ["id"]
           },
           {
@@ -3800,13 +3723,6 @@ export type Database = {
             foreignKeyName: "user_engagement_summary_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "user_analytics_dashboard"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_engagement_summary_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
@@ -3861,13 +3777,6 @@ export type Database = {
             foreignKeyName: "user_learning_progress_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "user_analytics_dashboard"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_learning_progress_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
@@ -3902,13 +3811,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "user_portfolios_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_analytics_dashboard"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "user_portfolios_user_id_fkey"
             columns: ["user_id"]
@@ -3953,13 +3855,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "user_preferences_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_analytics_dashboard"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "user_preferences_user_id_fkey"
             columns: ["user_id"]
@@ -4037,49 +3932,7 @@ export type Database = {
       }
     }
     Views: {
-      business_metrics_summary: {
-        Row: {
-          active_users: number | null
-          churn_rate: number | null
-          date: string | null
-          engagement_rate: number | null
-          mrr: number | null
-          mrr_growth_rate: number | null
-          new_signups: number | null
-          previous_mrr: number | null
-          total_users: number | null
-        }
-        Relationships: []
-      }
-      query_intelligence_summary: {
-        Row: {
-          avg_satisfaction: number | null
-          frequency_count: number | null
-          implemented: boolean | null
-          pattern_text: string | null
-          priority_score: number | null
-          suggested_feature: string | null
-          unique_users_asking: number | null
-          user_intent_category: string | null
-        }
-        Relationships: []
-      }
-      user_analytics_dashboard: {
-        Row: {
-          achievements_earned: number | null
-          avg_briefing_rating: number | null
-          email: string | null
-          full_name: string | null
-          id: string | null
-          last_active: string | null
-          signup_date: string | null
-          subscription_tier: string | null
-          total_briefings: number | null
-          total_queries: number | null
-          total_time_spent: number | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       analyze_query_pattern: {
@@ -4156,6 +4009,20 @@ export type Database = {
           signup_date: string
         }[]
       }
+      get_business_metrics_summary: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          active_users: number
+          churn_rate: number
+          date: string
+          engagement_rate: number
+          mrr: number
+          mrr_growth_rate: number
+          new_signups: number
+          previous_mrr: number
+          total_users: number
+        }[]
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -4163,6 +4030,43 @@ export type Database = {
       get_current_user_subscription_tier: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_public_app_status: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          active_features: string[]
+          last_updated: string
+          status: string
+        }[]
+      }
+      get_query_intelligence_summary: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          avg_satisfaction: number
+          frequency_count: number
+          implemented: boolean
+          pattern_text: string
+          priority_score: number
+          suggested_feature: string
+          unique_users_asking: number
+          user_intent_category: string
+        }[]
+      }
+      get_user_analytics_dashboard: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          achievements_earned: number
+          avg_briefing_rating: number
+          email: string
+          full_name: string
+          id: string
+          last_active: string
+          signup_date: string
+          subscription_tier: string
+          total_briefings: number
+          total_queries: number
+          total_time_spent: number
+        }[]
       }
       get_user_latest_briefing: {
         Args: { p_user_id: string }
