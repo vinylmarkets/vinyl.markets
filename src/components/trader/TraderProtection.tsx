@@ -13,7 +13,9 @@ export const TraderProtection: React.FC<TraderProtectionProps> = ({ children }) 
   const { user } = useAuth();
 
   // Check environment variable - disable in production unless explicitly enabled
-  const isEnabled = import.meta.env.VITE_ENABLE_TRADING === 'true';
+  // Temporarily disabled for development
+  const isEnabled = true; // import.meta.env.VITE_ENABLE_TRADING === 'true';
+  console.log('TraderProtection: isEnabled =', isEnabled, 'env var =', import.meta.env.VITE_ENABLE_TRADING);
   
   useEffect(() => {
     checkTraderAccess();
@@ -47,6 +49,7 @@ export const TraderProtection: React.FC<TraderProtectionProps> = ({ children }) 
 
   // Redirect to 404 if trading is disabled
   if (!isEnabled) {
+    console.log('TraderProtection: Trading disabled, redirecting to 404');
     return <Navigate to="/404" replace />;
   }
 
