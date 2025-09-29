@@ -19,6 +19,7 @@ import { RelationshipSignals } from "./RelationshipSignals";
 import { MarketNarrativeDashboard } from "./MarketNarrativeDashboard";
 import { AIWritingStudio } from "./AIWritingStudio";
 import { AlpacaDiagnostic } from "./AlpacaDiagnostic";
+import { DiagnosticPanel } from "./DiagnosticPanel";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -936,10 +937,11 @@ export const TradingDashboard = () => {
             <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
               <Tabs defaultValue="positions" className="w-full">
                 <CardHeader className="pb-2">
-                  <TabsList className="grid w-full grid-cols-3 h-8">
+                  <TabsList className="grid w-full grid-cols-4 h-8">
                     <TabsTrigger value="positions" className="text-xs">Positions</TabsTrigger>
                     <TabsTrigger value="trades" className="text-xs">Trades</TabsTrigger>
                     <TabsTrigger value="status" className="text-xs">Status</TabsTrigger>
+                    <TabsTrigger value="diagnostics" className="text-xs">Diagnostics</TabsTrigger>
                   </TabsList>
                 </CardHeader>
                 
@@ -1033,6 +1035,10 @@ export const TradingDashboard = () => {
                         <span className="text-sm font-bold text-foreground">2m ago</span>
                       </div>
                     </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="diagnostics" className="mt-0">
+                    <DiagnosticPanel />
                   </TabsContent>
                 </CardContent>
               </Tabs>
