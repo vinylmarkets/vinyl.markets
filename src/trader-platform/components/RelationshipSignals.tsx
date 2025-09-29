@@ -241,149 +241,86 @@ export const RelationshipSignals: React.FC = () => {
       )}
 
       {/* Relationship Signals */}
-      <div className="grid gap-4">
+      <div className="grid grid-cols-2 gap-3">
         {signals.map((signal) => (
           <Card 
             key={signal.id} 
             className={cn(
-              "border-l-4 transition-all duration-200",
+              "aspect-square border-l-4 transition-all duration-200 hover:shadow-md",
               getSignalColor(signal.signal_type).replace('text-', 'border-').split(' ')[0]
             )}
           >
-            <CardContent className="p-4">
-              <div className="space-y-3">
-                {/* Signal Header */}
+            <CardContent className="p-3 h-full flex flex-col justify-between">
+              <div className="space-y-2">
+                {/* Signal Header - Compact */}
                 <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3">
-                    <div className={cn("mt-1", getSignalColor(signal.signal_type).split(' ')[0])}>
+                  <div className="flex items-start gap-2">
+                    <div className={cn("mt-0.5", getSignalColor(signal.signal_type).split(' ')[0])}>
                       {getSignalIcon(signal.signal_type)}
                     </div>
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium capitalize">
+                    <div className="space-y-1 flex-1 min-w-0">
+                      <div className="flex items-center gap-1">
+                        <span className="font-medium text-xs capitalize truncate">
                           {signal.signal_type.replace('_', ' ')}
                         </span>
-                        <Badge variant="outline" className="text-xs">
-                          {(signal.confidence * 100).toFixed(0)}% confidence
-                        </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-xs text-muted-foreground line-clamp-2">
                         {signal.message}
                       </p>
                     </div>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setExpandedSignal(
-                      expandedSignal === signal.id ? null : signal.id
-                    )}
-                  >
-                    {expandedSignal === signal.id ? (
-                      <ChevronUp className="h-4 w-4" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4" />
-                    )}
-                  </Button>
+                  <Badge variant="outline" className="text-xs shrink-0">
+                    {(signal.confidence * 100).toFixed(0)}%
+                  </Badge>
                 </div>
 
-                {/* Signal Symbols/Sectors */}
-                <div className="flex items-center gap-2">
+                {/* Signal Symbols/Sectors - Compact */}
+                <div className="flex items-center gap-1 flex-wrap">
                   {signal.symbol_a && (
-                    <Badge variant="secondary">{signal.symbol_a}</Badge>
+                    <Badge variant="secondary" className="text-xs">{signal.symbol_a}</Badge>
                   )}
                   {signal.symbol_b && (
                     <>
-                      <ArrowRight className="h-3 w-3 text-muted-foreground" />
-                      <Badge variant="secondary">{signal.symbol_b}</Badge>
+                      <ArrowRight className="h-2 w-2 text-muted-foreground" />
+                      <Badge variant="secondary" className="text-xs">{signal.symbol_b}</Badge>
                     </>
                   )}
                   {signal.from_sector && signal.to_sector && (
                     <>
-                      <Badge variant="outline" className="text-red-500">
-                        {signal.from_sector}
+                      <Badge variant="outline" className="text-xs text-red-500">
+                        {signal.from_sector.substring(0, 4)}
                       </Badge>
-                      <ArrowRight className="h-3 w-3 text-muted-foreground" />
-                      <Badge variant="outline" className="text-green-500">
-                        {signal.to_sector}
+                      <ArrowRight className="h-2 w-2 text-muted-foreground" />
+                      <Badge variant="outline" className="text-xs text-green-500">
+                        {signal.to_sector.substring(0, 4)}
                       </Badge>
                     </>
                   )}
                 </div>
 
-                {/* Signal Metrics */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">Strength: </span>
-                      <span className={getStrengthColor(signal.strength)}>
-                        {signal.strength > 0 ? '+' : ''}{signal.strength.toFixed(1)}%
+              </div>
+
+              {/* Signal Metrics - Bottom */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">Str:</span>
+                    <span className={getStrengthColor(signal.strength)}>
+                      {signal.strength > 0 ? '+' : ''}{signal.strength.toFixed(1)}%
+                    </span>
+                  </div>
+                  {signal.correlation_coefficient && (
+                    <div className="flex items-center gap-1">
+                      <span className="text-muted-foreground">Corr:</span>
+                      <span className="font-medium">
+                        {(signal.correlation_coefficient * 100).toFixed(0)}%
                       </span>
                     </div>
-                    {signal.correlation_coefficient && (
-                      <div>
-                        <span className="text-muted-foreground">Correlation: </span>
-                        <span className="font-medium">
-                          {(signal.correlation_coefficient * 100).toFixed(0)}%
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {new Date(signal.created_at).toLocaleTimeString()}
-                  </div>
+                  )}
                 </div>
-
-                {/* Expanded Details */}
-                {expandedSignal === signal.id && (
-                  <div className="pt-3 border-t border-border space-y-2">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">Signal Type:</span>
-                        <p className="font-medium capitalize">
-                          {signal.signal_type.replace('_', ' ')}
-                        </p>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Expires:</span>
-                        <p className="font-medium">
-                          {new Date(signal.expires_at).toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    {/* Action Suggestions */}
-                    <div className="p-3 bg-muted/50 rounded-lg">
-                      <h4 className="font-medium text-sm mb-2">Suggested Actions:</h4>
-                      <ul className="text-sm text-muted-foreground space-y-1">
-                        {signal.signal_type === 'sympathy' && (
-                          <>
-                            <li>• Monitor {signal.symbol_b} for follow-through movement</li>
-                            <li>• Consider position sizing based on correlation strength</li>
-                          </>
-                        )}
-                        {signal.signal_type === 'sector_rotation' && (
-                          <>
-                            <li>• Reduce exposure to {signal.from_sector} stocks</li>
-                            <li>• Increase allocation to {signal.to_sector} opportunities</li>
-                          </>
-                        )}
-                        {signal.signal_type === 'pair_trade' && (
-                          <>
-                            <li>• Long {signal.symbol_a}, short {signal.symbol_b}</li>
-                            <li>• Set stop loss at 3-sigma spread level</li>
-                          </>
-                        )}
-                        {signal.signal_type === 'index_arbitrage' && (
-                          <>
-                            <li>• Look for lagging components to catch up</li>
-                            <li>• Consider ETF vs individual stock plays</li>
-                          </>
-                        )}
-                      </ul>
-                    </div>
-                  </div>
-                )}
+                <div className="text-xs text-muted-foreground text-center">
+                  {new Date(signal.created_at).toLocaleTimeString()}
+                </div>
               </div>
             </CardContent>
           </Card>
