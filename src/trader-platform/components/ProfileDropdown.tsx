@@ -20,7 +20,8 @@ import {
   Bell,
   Key,
   HelpCircle,
-  LogOut
+  LogOut,
+  AlertCircle
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
@@ -179,6 +180,13 @@ export const ProfileDropdown = () => {
         </DropdownMenuItem>
         
         <DropdownMenuSeparator className="bg-border/50" />
+        
+        <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors">
+          <Link to="/trader/troubleshooting" className="flex items-center w-full">
+            <AlertCircle className="mr-3 h-4 w-4" />
+            <span>Troubleshooting</span>
+          </Link>
+        </DropdownMenuItem>
         
         <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors">
           <Link to="/trader/help" className="flex items-center w-full">

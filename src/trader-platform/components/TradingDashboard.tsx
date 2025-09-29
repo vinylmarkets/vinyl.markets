@@ -18,8 +18,6 @@ import { RelationshipNetworkGraph } from "./RelationshipNetworkGraph";
 import { RelationshipSignals } from "./RelationshipSignals";
 import { MarketNarrativeDashboard } from "./MarketNarrativeDashboard";
 import { AIWritingStudio } from "./AIWritingStudio";
-import { AlpacaDiagnostic } from "./AlpacaDiagnostic";
-import { DiagnosticPanel } from "./DiagnosticPanel";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -655,13 +653,6 @@ export const TradingDashboard = () => {
         </div>
       )}
 
-      {/* Alpaca Connection Diagnostic - Show if integrations are enabled */}
-      {hasIntegrations && (
-        <div className="p-2 sm:p-4">
-          <AlpacaDiagnostic />
-        </div>
-      )}
-
       {/* Compact Bento Grid Layout */}
       <div className="p-2 sm:p-4">
         <div className="grid grid-cols-12 gap-3">
@@ -937,11 +928,10 @@ export const TradingDashboard = () => {
             <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
               <Tabs defaultValue="positions" className="w-full">
                 <CardHeader className="pb-2">
-                  <TabsList className="grid w-full grid-cols-4 h-8">
+                  <TabsList className="grid w-full grid-cols-3 h-8">
                     <TabsTrigger value="positions" className="text-xs">Positions</TabsTrigger>
                     <TabsTrigger value="trades" className="text-xs">Trades</TabsTrigger>
                     <TabsTrigger value="status" className="text-xs">Status</TabsTrigger>
-                    <TabsTrigger value="diagnostics" className="text-xs">Diagnostics</TabsTrigger>
                   </TabsList>
                 </CardHeader>
                 
@@ -1035,14 +1025,6 @@ export const TradingDashboard = () => {
                         <span className="text-sm font-bold text-foreground">2m ago</span>
                       </div>
                     </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="diagnostics" className="mt-0">
-                    <DiagnosticPanel 
-                      currentPositions={positions}
-                      currentTrades={recentTrades}
-                      currentAccount={accountData}
-                    />
                   </TabsContent>
                 </CardContent>
               </Tabs>
