@@ -113,7 +113,7 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({ positions })
           hour: '2-digit', 
           minute: '2-digit',
           hour12: false 
-        }),
+        }).slice(0, -3), // Remove seconds, keep HH:MM
         timeMs: time.getTime(),
         open: finalOpen,
         high: finalHigh,
@@ -307,23 +307,27 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({ positions })
         {/* Chart Container */}
         <div className="flex-1 min-h-[400px] rounded-lg border bg-card p-4">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+            <ComposedChart data={chartData} margin={{ top: 20, right: 60, left: 60, bottom: 40 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis 
                 dataKey="time" 
-                tick={{ fontSize: 10 }}
-                interval="preserveStartEnd"
+                tick={{ fontSize: 11 }}
+                interval={Math.floor(chartData.length / 8)} // Show ~8 time labels
+                tickFormatter={(value) => value.slice(0, 5)} // Show HH:MM only
               />
               <YAxis 
                 domain={['dataMin - 5', 'dataMax + 5']}
-                tick={{ fontSize: 10 }}
+                tick={{ fontSize: 11 }}
                 yAxisId="price"
+                label={{ value: 'Price ($)', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }}
+                tickFormatter={(value) => `$${value.toFixed(0)}`}
               />
               <YAxis 
                 yAxisId="volume"
                 orientation="right"
                 domain={[0, 'dataMax']}
-                tick={{ fontSize: 8 }}
+                tick={{ fontSize: 10 }}
+                label={{ value: 'Volume', angle: 90, position: 'insideRight', style: { textAnchor: 'middle' } }}
                 tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`}
               />
               <Tooltip content={<CustomTooltip />} />
