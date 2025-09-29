@@ -58,6 +58,15 @@ async function fetchAccountFromAPI(userId: string): Promise<AccountData> {
       ? 'https://api.alpaca.markets' 
       : 'https://paper-api.alpaca.markets';
     
+    console.log('Alpaca API details:', {
+      hasApiKey: !!alpacaApiKey,
+      hasSecret: !!alpacaSecret,
+      apiKeyLength: alpacaApiKey?.length || 0,
+      secretLength: alpacaSecret?.length || 0,
+      baseUrl: alpacaBaseUrl,
+      environment: integration.environment
+    });
+    
     if (!alpacaApiKey || !alpacaSecret) {
       console.warn('Alpaca API credentials not found, using demo data');
       return DEMO_ACCOUNT;
@@ -71,8 +80,15 @@ async function fetchAccountFromAPI(userId: string): Promise<AccountData> {
       }
     });
     
+    console.log('Alpaca API response:', {
+      status: response.status,
+      statusText: response.statusText,
+      url: response.url
+    });
+    
     if (!response.ok) {
-      console.warn(`Alpaca API error: ${response.status} ${response.statusText}, using demo data`);
+      const errorText = await response.text();
+      console.warn(`Alpaca API error: ${response.status} ${response.statusText}`, errorText);
       return DEMO_ACCOUNT;
     }
     
