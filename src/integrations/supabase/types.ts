@@ -4258,6 +4258,30 @@ export type Database = {
         }
         Relationships: []
       }
+      world_news_context: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          news_stories: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          news_stories?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          news_stories?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
