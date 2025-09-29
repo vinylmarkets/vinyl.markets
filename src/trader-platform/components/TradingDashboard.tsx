@@ -119,7 +119,16 @@ export const TradingDashboard = () => {
 
   // Mock data
   useEffect(() => {
-    // Mock signals
+    // Only show mock data if no real integrations exist
+    if (hasIntegrations) {
+      // Clear mock data when real integrations are connected
+      setSignals([]);
+      setPositions([]);
+      setRecentTrades([]);
+      return;
+    }
+
+    // Mock signals - only shown when no real broker connected
     setSignals([
       {
         symbol: 'AAPL',
@@ -141,7 +150,7 @@ export const TradingDashboard = () => {
       }
     ]);
 
-    // Mock positions
+    // Mock positions - only shown when no real broker connected
     setPositions([
       {
         symbol: 'NVDA',
@@ -165,7 +174,7 @@ export const TradingDashboard = () => {
       }
     ]);
 
-    // Mock recent trades
+    // Mock recent trades - only shown when no real broker connected
     setRecentTrades([
       {
         symbol: 'GOOGL',
@@ -216,7 +225,7 @@ export const TradingDashboard = () => {
     };
 
     checkIntegrations();
-  }, [user]);
+  }, [user, hasIntegrations]);
 
   const handleLogout = async () => {
     try {
@@ -459,20 +468,28 @@ export const TradingDashboard = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
-                      {positions.map((position) => (
-                        <tr key={position.symbol} className="hover:bg-muted/50 transition-colors">
-                          <td className="py-2 font-medium text-foreground">{position.symbol}</td>
-                          <td className="text-right py-2 text-muted-foreground">{position.quantity}</td>
-                          <td className="text-right py-2 text-muted-foreground">${position.averageCost.toFixed(2)}</td>
-                          <td className="text-right py-2 text-foreground">${position.currentPrice.toFixed(2)}</td>
-                          <td className={`text-right py-2 font-medium ${position.unrealizedPnL >= 0 ? 'text-success' : 'text-destructive'}`}>
-                            {position.unrealizedPnL >= 0 ? '+' : ''}${position.unrealizedPnL.toFixed(0)}
-                          </td>
-                          <td className={`text-right py-2 font-medium ${position.unrealizedPnLPercent >= 0 ? 'text-success' : 'text-destructive'}`}>
-                            {position.unrealizedPnLPercent >= 0 ? '+' : ''}{position.unrealizedPnLPercent.toFixed(2)}%
+                      {positions.length > 0 ? (
+                        positions.map((position) => (
+                          <tr key={position.symbol} className="hover:bg-muted/50 transition-colors">
+                            <td className="py-2 font-medium text-foreground">{position.symbol}</td>
+                            <td className="text-right py-2 text-muted-foreground">{position.quantity}</td>
+                            <td className="text-right py-2 text-muted-foreground">${position.averageCost.toFixed(2)}</td>
+                            <td className="text-right py-2 text-foreground">${position.currentPrice.toFixed(2)}</td>
+                            <td className={`text-right py-2 font-medium ${position.unrealizedPnL >= 0 ? 'text-success' : 'text-destructive'}`}>
+                              {position.unrealizedPnL >= 0 ? '+' : ''}${position.unrealizedPnL.toFixed(0)}
+                            </td>
+                            <td className={`text-right py-2 font-medium ${position.unrealizedPnLPercent >= 0 ? 'text-success' : 'text-destructive'}`}>
+                              {position.unrealizedPnLPercent >= 0 ? '+' : ''}{position.unrealizedPnLPercent.toFixed(2)}%
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={6} className="py-8 text-center text-muted-foreground">
+                            {hasIntegrations ? 'No positions found in your connected account' : 'Connect a broker to view positions'}
                           </td>
                         </tr>
-                      ))}
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -523,26 +540,32 @@ export const TradingDashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {signals.map((signal, index) => (
-                  <div key={index} className="p-3 bg-muted/30 rounded border border-border">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium text-sm">{signal.symbol}</span>
-                      <Badge className={`text-xs ${
-                        signal.action === 'BUY' 
-                          ? 'bg-success/10 text-success border-success/20' 
-                          : 'bg-destructive/10 text-destructive border-destructive/20'
-                      }`}>
-                        {signal.action}
-                      </Badge>
+                {signals.length > 0 ? (
+                  signals.map((signal, index) => (
+                    <div key={index} className="p-3 bg-muted/30 rounded border border-border">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-medium text-sm">{signal.symbol}</span>
+                        <Badge className={`text-xs ${
+                          signal.action === 'BUY' 
+                            ? 'bg-success/10 text-success border-success/20' 
+                            : 'bg-destructive/10 text-destructive border-destructive/20'
+                        }`}>
+                          {signal.action}
+                        </Badge>
+                      </div>
+                      <div className="text-xs text-muted-foreground mb-1">
+                        Confidence: {signal.confidence}%
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        ${signal.currentPrice} → ${signal.targetPrice}
+                      </div>
                     </div>
-                    <div className="text-xs text-muted-foreground mb-1">
-                      Confidence: {signal.confidence}%
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      ${signal.currentPrice} → ${signal.targetPrice}
-                    </div>
+                  ))
+                ) : (
+                  <div className="py-8 text-center text-muted-foreground">
+                    {hasIntegrations ? 'No AI signals available' : 'Connect a broker to view AI signals'}
                   </div>
-                ))}
+                )}
               </CardContent>
             </Card>
 
