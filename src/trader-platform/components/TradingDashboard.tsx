@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import vinylLogoDark from "@/assets/vinyl-logo-dark.png";
 import vinylLogoLight from "@/assets/vinyl-logo-light.png";
 import { WatchlistManager } from "./WatchlistManager";
+import { SectorMap } from "./SectorMap";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -1036,6 +1037,11 @@ export const TradingDashboard = () => {
               </CardContent>
             </Card>
           </div>
+        </div>
+
+        {/* Sector Map Section */}
+        <div className="mt-6">
+          <SectorMap />
         </div>
       </div>
     </div>
