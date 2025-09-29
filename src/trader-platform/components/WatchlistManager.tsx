@@ -483,12 +483,7 @@ export const WatchlistManager: React.FC<WatchlistManagerProps> = ({ onSymbolSele
                   <div className="mt-3 flex gap-2">
                     <Button
                       size="sm"
-                      onClick={() => {
-                        handleAnalyze(searchResults.symbol);
-                        if (onSymbolSelect) {
-                          onSymbolSelect(searchResults.symbol);
-                        }
-                      }}
+                      onClick={() => handleAnalyze(searchResults.symbol)}
                     >
                       Analyze
                     </Button>
