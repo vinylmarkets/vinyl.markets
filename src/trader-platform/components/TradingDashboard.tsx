@@ -313,10 +313,11 @@ export const TradingDashboard = () => {
     try {
       const { data, error } = await supabase.functions.invoke('trader-execute', {
         body: {
-          action: action.toLowerCase(),
+          action: action.toUpperCase() as 'BUY' | 'SELL',
           symbol: symbol.toUpperCase(),
-          quantity: 1, // Default to 1 share
-          order_type: 'market'
+          quantity: 1,
+          orderType: 'market',
+          timeInForce: 'day'
         }
       });
 
