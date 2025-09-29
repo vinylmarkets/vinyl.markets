@@ -307,7 +307,7 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({ positions })
         {/* Chart Container */}
         <div className="flex-1 min-h-[350px] rounded-lg border bg-card p-2">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={chartData} margin={{ top: 10, right: 40, left: 40, bottom: 20 }}>
+            <ComposedChart data={chartData} margin={{ top: 10, right: 20, left: 20, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis 
                 dataKey="time" 
