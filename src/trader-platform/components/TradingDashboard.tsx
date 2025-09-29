@@ -18,6 +18,7 @@ import { RelationshipNetworkGraph } from "./RelationshipNetworkGraph";
 import { RelationshipSignals } from "./RelationshipSignals";
 import { MarketNarrativeDashboard } from "./MarketNarrativeDashboard";
 import { AIWritingStudio } from "./AIWritingStudio";
+import { AlpacaDiagnostic } from "./AlpacaDiagnostic";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -650,6 +651,13 @@ export const TradingDashboard = () => {
               </div>
             </CardContent>
           </Card>
+        </div>
+      )}
+
+      {/* Alpaca Connection Diagnostic - Show if integrations are enabled */}
+      {hasIntegrations && (
+        <div className="p-2 sm:p-4">
+          <AlpacaDiagnostic />
         </div>
       )}
 
