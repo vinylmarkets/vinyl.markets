@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import vinylLogoDark from "@/assets/vinyl-logo-dark.png";
 import vinylLogoLight from "@/assets/vinyl-logo-light.png";
+import { WatchlistManager } from "./WatchlistManager";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -146,6 +147,10 @@ export const TradingDashboard = () => {
     meanReversion: hasIntegrations ? 0 : 12.5,
     mlPrediction: hasIntegrations ? 0 : 87.3
   });
+
+  const handleSymbolSelect = (symbol: string) => {
+    setQuickTradeSymbol(symbol);
+  };
 
   // Mock data
   useEffect(() => {
@@ -842,6 +847,9 @@ export const TradingDashboard = () => {
                 )}
               </CardContent>
             </Card>
+
+            {/* Watchlist Manager */}
+            <WatchlistManager onSymbolSelect={handleSymbolSelect} />
           </div>
 
           {/* Center Column - Dynamic View */}

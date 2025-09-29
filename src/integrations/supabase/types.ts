@@ -3459,6 +3459,78 @@ export type Database = {
         }
         Relationships: []
       }
+      stock_analysis_cache: {
+        Row: {
+          analysis_data: Json
+          analysis_type: string
+          created_at: string
+          expires_at: string
+          id: string
+          symbol: string
+        }
+        Insert: {
+          analysis_data: Json
+          analysis_type?: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          symbol: string
+        }
+        Update: {
+          analysis_data?: Json
+          analysis_type?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          symbol?: string
+        }
+        Relationships: []
+      }
+      stock_universe: {
+        Row: {
+          average_true_range: number | null
+          company_name: string
+          created_at: string
+          id: string
+          is_active: boolean
+          last_screened: string
+          market_cap: number | null
+          price: number | null
+          sector: string | null
+          symbol: string
+          updated_at: string
+          volume: number | null
+        }
+        Insert: {
+          average_true_range?: number | null
+          company_name: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_screened?: string
+          market_cap?: number | null
+          price?: number | null
+          sector?: string | null
+          symbol: string
+          updated_at?: string
+          volume?: number | null
+        }
+        Update: {
+          average_true_range?: number | null
+          company_name?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_screened?: string
+          market_cap?: number | null
+          price?: number | null
+          sector?: string | null
+          symbol?: string
+          updated_at?: string
+          volume?: number | null
+        }
+        Relationships: []
+      }
       system_notifications: {
         Row: {
           created_at: string
@@ -3569,6 +3641,39 @@ export type Database = {
           id?: string
           last_login?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      universe_selection: {
+        Row: {
+          created_at: string
+          id: string
+          metadata: Json | null
+          rank: number
+          score: number
+          selection_date: string
+          selection_reason: string
+          symbol: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          rank: number
+          score: number
+          selection_date?: string
+          selection_reason: string
+          symbol: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          rank?: number
+          score?: number
+          selection_date?: string
+          selection_reason?: string
+          symbol?: string
         }
         Relationships: []
       }
@@ -4026,6 +4131,74 @@ export type Database = {
         }
         Relationships: []
       }
+      watchlist_items: {
+        Row: {
+          added_at: string
+          id: string
+          priority_tier: number
+          symbol: string
+          watchlist_id: string | null
+        }
+        Insert: {
+          added_at?: string
+          id?: string
+          priority_tier?: number
+          symbol: string
+          watchlist_id?: string | null
+        }
+        Update: {
+          added_at?: string
+          id?: string
+          priority_tier?: number
+          symbol?: string
+          watchlist_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "watchlist_items_watchlist_id_fkey"
+            columns: ["watchlist_id"]
+            isOneToOne: false
+            referencedRelation: "watchlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      watchlists: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_default: boolean
+          is_system: boolean
+          name: string
+          updated_at: string
+          user_id: string | null
+          watchlist_type: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_default?: boolean
+          is_system?: boolean
+          name: string
+          updated_at?: string
+          user_id?: string | null
+          watchlist_type?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_default?: boolean
+          is_system?: boolean
+          name?: string
+          updated_at?: string
+          user_id?: string | null
+          watchlist_type?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -4046,6 +4219,10 @@ export type Database = {
       check_terminal_query_limits: {
         Args: { user_uuid: string }
         Returns: boolean
+      }
+      clean_expired_analysis_cache: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       clean_expired_insights_cache: {
         Args: Record<PropertyKey, never>
@@ -4185,6 +4362,18 @@ export type Database = {
           content_plain_speak: string
           delivered_at: string
           user_rating: number
+        }[]
+      }
+      get_user_watchlists: {
+        Args: { target_user_id?: string }
+        Returns: {
+          description: string
+          id: string
+          is_default: boolean
+          is_system: boolean
+          name: string
+          symbol_count: number
+          watchlist_type: string
         }[]
       }
       is_current_user_admin: {
