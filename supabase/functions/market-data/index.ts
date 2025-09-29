@@ -13,7 +13,11 @@ serve(async (req) => {
   }
 
   try {
-    const symbols = ['AAPL', 'MSFT', 'GOOGL', 'NVDA', 'TSLA', 'META', 'AMZN']
+    const body = await req.json();
+    const requestedSymbol = body?.symbol;
+    
+    // If specific symbol requested, fetch just that one
+    const symbols = requestedSymbol ? [requestedSymbol.toUpperCase()] : ['AAPL', 'MSFT', 'GOOGL', 'NVDA', 'TSLA', 'META', 'AMZN'];
     const marketData = []
 
     console.log('Fetching market data for symbols:', symbols);
@@ -46,14 +50,20 @@ serve(async (req) => {
         const indicators = data.chart.result[0].indicators.quote[0]
         
         const changePercent = ((quote.regularMarketPrice - quote.previousClose) / quote.previousClose) * 100;
+        const change = quote.regularMarketPrice - quote.previousClose;
         
-        marketData.push({
+        const stockData = {
           symbol,
+          price: quote.regularMarketPrice,
+          change: change,
+          changePercent: changePercent,
           current_price: quote.regularMarketPrice,
           volume: quote.regularMarketVolume,
           previous_close: quote.previousClose,
           change_percent: changePercent
-        })
+        };
+        
+        marketData.push(stockData)
 
         console.log(`Successfully fetched data for ${symbol}: $${quote.regularMarketPrice}`);
         
@@ -67,7 +77,24 @@ serve(async (req) => {
       throw new Error('No market data could be fetched');
     }
 
-    // Store in Supabase
+    // If single symbol requested, return just that data
+    if (requestedSymbol && marketData.length > 0) {
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          data: marketData[0],
+          timestamp: new Date().toISOString()
+        }), 
+        {
+          headers: { 
+            ...corsHeaders,
+            'Content-Type': 'application/json' 
+          }
+        }
+      );
+    }
+
+    // Store in Supabase for batch requests
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
@@ -76,12 +103,18 @@ serve(async (req) => {
     console.log(`Storing ${marketData.length} market data records in database`);
 
     const { error: insertError } = await supabase
-      .from('trading.market_data')
-      .insert(marketData)
+      .from('market_data')
+      .insert(marketData.map(item => ({
+        symbol: item.symbol,
+        close_price: item.current_price,
+        volume: item.volume,
+        timestamp: new Date().toISOString(),
+        data_source: 'yahoo_finance'
+      })))
 
     if (insertError) {
       console.error('Database insert error:', insertError);
-      throw new Error(`Failed to store market data: ${insertError.message}`);
+      // Don't throw error for storage issues, still return the data
     }
 
     console.log('Successfully stored market data in database');

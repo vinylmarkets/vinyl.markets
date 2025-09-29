@@ -244,6 +244,11 @@ export const TradingDashboard = () => {
     };
 
     checkIntegrations();
+    
+    // Fetch real account data when integrations are connected
+    if (hasIntegrations) {
+      fetchAccountData();
+    }
   }, [user, hasIntegrations]);
 
   const handleLogout = async () => {
@@ -265,7 +270,7 @@ export const TradingDashboard = () => {
         body: { symbol: symbol.toUpperCase() }
       });
 
-      if (error) {
+      if (error || !data?.success) {
         console.error('Market data error:', error);
         // Fallback to mock data if API fails
         return {
@@ -275,10 +280,11 @@ export const TradingDashboard = () => {
         };
       }
 
+      const stockData = data.data;
       return {
-        price: data.price || 150 + Math.random() * 100,
-        change: data.change || (Math.random() - 0.5) * 10,
-        changePercent: data.changePercent || (Math.random() - 0.5) * 5
+        price: stockData.price || stockData.current_price || 150 + Math.random() * 100,
+        change: stockData.change || (Math.random() - 0.5) * 10,
+        changePercent: stockData.changePercent || stockData.change_percent || (Math.random() - 0.5) * 5
       };
     } catch (error) {
       console.error('Failed to fetch market data:', error);
@@ -288,6 +294,23 @@ export const TradingDashboard = () => {
         change: (Math.random() - 0.5) * 10,
         changePercent: (Math.random() - 0.5) * 5
       };
+    }
+  };
+
+  const fetchAccountData = async () => {
+    if (!hasIntegrations) return;
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('trader-account');
+      
+      if (error || !data?.success) {
+        console.error('Account data error:', error);
+        return;
+      }
+      
+      setAccountData(data.data);
+    } catch (error) {
+      console.error('Failed to fetch account data:', error);
     }
   };
 
