@@ -51,6 +51,11 @@ serve(async (req) => {
       throw new Error('OpenAI API key not found');
     }
 
+    // First gather world context from news
+    console.log('Gathering world news context...');
+    const newsAggregatorResponse = await supabase.functions.invoke('news-aggregator');
+    const worldContext = newsAggregatorResponse.data?.context || [];
+
     // Collect and analyze market data
     const marketData = await collectMarketData(supabase);
     
@@ -58,8 +63,8 @@ serve(async (req) => {
     const themes = identifyThemes(marketData);
     const stories = await findMarketStories(marketData, supabase);
     
-    // Generate the narrative using AI
-    const article = await constructArticle(themes, stories, openAIApiKey);
+    // Generate the narrative using AI with world context
+    const article = await constructArticle(themes, stories, worldContext, openAIApiKey);
     
     // Save the article to database
     const { data: savedArticle, error: saveError } = await supabase
@@ -425,14 +430,19 @@ Write one compelling paragraph that tells the story of today's market action:`;
   }
 }
 
-async function constructArticle(themes: ArticleThemes, stories: MarketStories, openAIApiKey: string): Promise<any> {
+async function constructArticle(themes: ArticleThemes, stories: MarketStories, worldContext: any[], openAIApiKey: string): Promise<any> {
   console.log('Generating article with enhanced AI...');
 
   // First generate the human-readable narrative
   const marketData = await getMarketDataForNarrative(stories);
   const aiNarrative = await generateHumanReadableText(marketData, stories);
 
-  const prompt = `You are a professional financial journalist. Based on the market analysis and AI-generated narrative below, create a comprehensive daily market report.
+  // Include world context in the prompt
+  const worldNewsContext = worldContext.length > 0 ? 
+    `\n\nWorld News Context:\n${worldContext.map(news => `- ${news.humanSummary || news.title}: ${news.marketImpact || news.summary}`).join('\n')}` : 
+    '';
+
+  const prompt = `You are a professional financial journalist. Based on the market analysis, world news context, and AI-generated narrative below, create a comprehensive daily market report.
 
 AI-Generated Market Narrative:
 "${aiNarrative}"
@@ -440,7 +450,7 @@ AI-Generated Market Narrative:
 Market Context:
 - Primary Theme: ${themes.primary}
 - Market Sentiment: ${themes.sentiment}
-- Secondary Themes: ${themes.secondary.join(', ')}
+- Secondary Themes: ${themes.secondary.join(', ')}${worldNewsContext}
 
 Key Stories:
 - Biggest Mover: ${stories.biggestMover ? `${stories.biggestMover.symbol} ${stories.biggestMover.change > 0 ? 'gained' : 'lost'} ${Math.abs(stories.biggestMover.change)}% on ${stories.biggestMover.reason}` : 'No significant movers'}
