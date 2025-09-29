@@ -276,12 +276,21 @@ export const TradingDashboard = () => {
         console.log('fetchAccountData: Fetching account data...');
         
         try {
-          const { data, error } = await supabase.functions.invoke('trader-account');
+          // Use fetch with GET method instead of supabase.functions.invoke (which defaults to POST)
+          const response = await fetch(`https://jhxjvpbwkdzjufjyqanq.supabase.co/functions/v1/trader-account`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+              'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoeGp2cGJ3a2R6anVmanlxYW5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5MDQ3MzYsImV4cCI6MjA3MzQ4MDczNn0.K7bcrLAr8Kxvln7owSNW452GhijuxWduv3u4173DPsc',
+              'Content-Type': 'application/json'
+            }
+          });
           
-          console.log('fetchAccountData response:', { data, error });
+          const data = await response.json();
+          console.log('fetchAccountData response:', { data, status: response.status });
           
-          if (error || !data?.success) {
-            console.error('Account data error:', error);
+          if (!response.ok || !data?.success) {
+            console.error('Account data error:', data);
             return;
           }
           
