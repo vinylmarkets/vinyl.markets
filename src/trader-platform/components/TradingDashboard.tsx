@@ -14,6 +14,7 @@ import { WatchlistManager } from "./WatchlistManager";
 import { SectorMap } from "./SectorMap";
 import { RelationshipNetworkGraph } from "./RelationshipNetworkGraph";
 import { RelationshipSignals } from "./RelationshipSignals";
+import { MarketNarrativeDashboard } from "./MarketNarrativeDashboard";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -1041,8 +1042,11 @@ export const TradingDashboard = () => {
           </div>
         </div>
 
-        {/* Relationship Analysis Section */}
+        {/* Analysis Sections */}
         <div className="mt-6 space-y-6">
+          {/* Market Narrative Dashboard */}
+          <MarketNarrativeDashboard />
+          
           {/* Sector Map */}
           <SectorMap />
           
