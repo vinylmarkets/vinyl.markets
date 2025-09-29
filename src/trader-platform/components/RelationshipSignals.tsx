@@ -241,58 +241,51 @@ export const RelationshipSignals: React.FC = () => {
       )}
 
       {/* Relationship Signals */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-4 gap-2">
         {signals.map((signal) => (
           <Card 
             key={signal.id} 
             className={cn(
-              "aspect-square border-l-4 transition-all duration-200 hover:shadow-md",
+              "border-l-4 transition-all duration-200 hover:shadow-md h-24",
               getSignalColor(signal.signal_type).replace('text-', 'border-').split(' ')[0]
             )}
           >
-            <CardContent className="p-2 h-full flex flex-col justify-between">
-              <div className="space-y-1.5">
-                {/* Signal Header - Compact */}
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-2">
-                    <div className={cn("mt-0.5", getSignalColor(signal.signal_type).split(' ')[0])}>
+            <CardContent className="p-1.5 h-full flex flex-col justify-between">
+              <div className="space-y-1">
+                {/* Signal Header - Ultra Compact */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1 flex-1 min-w-0">
+                    <div className={cn("", getSignalColor(signal.signal_type).split(' ')[0])}>
                       {getSignalIcon(signal.signal_type)}
                     </div>
-                    <div className="space-y-0.5 flex-1 min-w-0">
-                      <div className="flex items-center gap-1">
-                        <span className="font-medium text-xs capitalize truncate">
-                          {signal.signal_type.replace('_', ' ')}
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted-foreground line-clamp-2 leading-tight">
-                        {signal.message}
-                      </p>
-                    </div>
+                    <span className="font-medium text-xs capitalize truncate">
+                      {signal.signal_type.replace('_', ' ')}
+                    </span>
                   </div>
-                  <Badge variant="outline" className="text-xs shrink-0">
+                  <Badge variant="outline" className="text-xs shrink-0 px-1">
                     {(signal.confidence * 100).toFixed(0)}%
                   </Badge>
                 </div>
 
-                {/* Signal Symbols/Sectors - Compact */}
-                <div className="flex items-center gap-1 flex-wrap">
+                {/* Signal Symbols/Sectors - Ultra Compact */}
+                <div className="flex items-center gap-0.5 flex-wrap text-xs">
                   {signal.symbol_a && (
-                    <Badge variant="secondary" className="text-xs">{signal.symbol_a}</Badge>
+                    <Badge variant="secondary" className="text-xs px-1 py-0">{signal.symbol_a}</Badge>
                   )}
                   {signal.symbol_b && (
                     <>
                       <ArrowRight className="h-2 w-2 text-muted-foreground" />
-                      <Badge variant="secondary" className="text-xs">{signal.symbol_b}</Badge>
+                      <Badge variant="secondary" className="text-xs px-1 py-0">{signal.symbol_b}</Badge>
                     </>
                   )}
                   {signal.from_sector && signal.to_sector && (
                     <>
-                      <Badge variant="outline" className="text-xs text-red-500">
-                        {signal.from_sector.substring(0, 4)}
+                      <Badge variant="outline" className="text-xs px-1 py-0 text-red-500">
+                        {signal.from_sector.substring(0, 3)}
                       </Badge>
                       <ArrowRight className="h-2 w-2 text-muted-foreground" />
-                      <Badge variant="outline" className="text-xs text-green-500">
-                        {signal.to_sector.substring(0, 4)}
+                      <Badge variant="outline" className="text-xs px-1 py-0 text-green-500">
+                        {signal.to_sector.substring(0, 3)}
                       </Badge>
                     </>
                   )}
@@ -301,26 +294,21 @@ export const RelationshipSignals: React.FC = () => {
               </div>
 
               {/* Signal Metrics - Bottom */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-xs leading-none">
-                  <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground">Str:</span>
-                    <span className={getStrengthColor(signal.strength)}>
-                      {signal.strength > 0 ? '+' : ''}{signal.strength.toFixed(1)}%
+              <div className="flex items-center justify-between text-xs leading-none">
+                <div className="flex items-center gap-1">
+                  <span className="text-muted-foreground">Str:</span>
+                  <span className={getStrengthColor(signal.strength)}>
+                    {signal.strength > 0 ? '+' : ''}{signal.strength.toFixed(1)}%
+                  </span>
+                </div>
+                {signal.correlation_coefficient && (
+                  <div className="flex items-center gap-1">
+                    <span className="text-muted-foreground">Corr:</span>
+                    <span className="font-medium">
+                      {(signal.correlation_coefficient * 100).toFixed(0)}%
                     </span>
                   </div>
-                  {signal.correlation_coefficient && (
-                    <div className="flex items-center gap-1">
-                      <span className="text-muted-foreground">Corr:</span>
-                      <span className="font-medium">
-                        {(signal.correlation_coefficient * 100).toFixed(0)}%
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <div className="text-xs text-muted-foreground text-center leading-none">
-                  {new Date(signal.created_at).toLocaleTimeString()}
-                </div>
+                )}
               </div>
             </CardContent>
           </Card>
