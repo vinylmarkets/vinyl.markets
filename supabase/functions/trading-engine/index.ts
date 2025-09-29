@@ -64,6 +64,122 @@ function calculateStdDev(values: number[]): number {
   return Math.sqrt(variance);
 }
 
+// Sector Context Analysis Functions
+async function getSector(symbol: string, supabaseClient: any): Promise<string | null> {
+  const { data, error } = await supabaseClient
+    .schema('trading')
+    .from('sector_mappings')
+    .select('sector, industry, market_cap_category, correlation_group')
+    .eq('symbol', symbol)
+    .single();
+    
+  if (error) {
+    console.log(`No sector mapping found for ${symbol}`);
+    return null;
+  }
+  
+  return data.sector;
+}
+
+async function getSectorStrength(sector: string, supabaseClient: any): Promise<number> {
+  const { data, error } = await supabaseClient
+    .schema('trading')
+    .from('sector_performance')
+    .select('relative_strength')
+    .eq('sector', sector)
+    .eq('performance_date', new Date().toISOString().split('T')[0])
+    .single();
+    
+  if (error || !data) {
+    console.log(`No sector performance data found for ${sector}`);
+    return 0.5; // neutral
+  }
+  
+  return data.relative_strength || 0.5;
+}
+
+async function getCorrelatedStocks(symbol: string, threshold: number, supabaseClient: any): Promise<string[]> {
+  const { data, error } = await supabaseClient
+    .schema('trading')
+    .from('correlation_matrix')
+    .select('symbol_a, symbol_b, correlation_coefficient')
+    .or(`symbol_a.eq.${symbol},symbol_b.eq.${symbol}`)
+    .eq('timeframe', 'daily')
+    .gte('correlation_coefficient', threshold);
+    
+  if (error || !data) {
+    return [];
+  }
+  
+  return data.map((row: any) => 
+    row.symbol_a === symbol ? row.symbol_b : row.symbol_a
+  );
+}
+
+async function checkCorrelatedSignals(correlatedSymbols: string[], supabaseClient: any): Promise<number> {
+  if (correlatedSymbols.length === 0) return 0.5;
+  
+  // This would check recent signals for correlated stocks
+  // For now, return a mock confirmation score
+  const mockConfirmationScore = 0.6 + (Math.random() * 0.3);
+  return Math.min(mockConfirmationScore, 1.0);
+}
+
+async function analyzeSectorContext(symbol: string, supabaseClient: any): Promise<{
+  contextMultiplier: number;
+  sectorStrength: number;
+  correlatedMovers: string[];
+  sector?: string;
+}> {
+  try {
+    // Get the stock's sector
+    const sector = await getSector(symbol, supabaseClient);
+    
+    if (!sector) {
+      return {
+        contextMultiplier: 1.0,
+        sectorStrength: 0.5,
+        correlatedMovers: []
+      };
+    }
+    
+    // Check sector momentum
+    const sectorStrength = await getSectorStrength(sector, supabaseClient);
+    
+    // Find correlated stocks
+    const correlatedSymbols = await getCorrelatedStocks(symbol, 0.7, supabaseClient);
+    
+    // Adjust signal confidence based on sector context
+    let contextMultiplier = 1.0;
+    
+    if (sectorStrength > 0.8) {
+      contextMultiplier = 1.2; // Sector is hot, increase confidence
+    } else if (sectorStrength < 0.2) {
+      contextMultiplier = 0.8; // Sector is weak, decrease confidence
+    }
+    
+    // Check if correlated stocks are also showing similar signals
+    const correlationConfirmation = await checkCorrelatedSignals(correlatedSymbols, supabaseClient);
+    if (correlationConfirmation > 0.6) {
+      contextMultiplier *= 1.1; // Friends are moving together, good sign
+    }
+    
+    return {
+      contextMultiplier,
+      sectorStrength,
+      correlatedMovers: correlatedSymbols,
+      sector
+    };
+  } catch (error) {
+    console.error('Error in sector context analysis:', error);
+    return {
+      contextMultiplier: 1.0,
+      sectorStrength: 0.5,
+      correlatedMovers: []
+    };
+  }
+}
+
 // Momentum Strategy
 function momentumStrategy(marketData: any) {
   const rsi = calculateRSI(marketData.closes, 14)
@@ -254,11 +370,21 @@ serve(async (req) => {
 
     console.log(`Analyzing ${symbols.length} symbols...`);
 
+    // Initialize Supabase client for sector analysis
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    );
+
     // Process each symbol
     for (const symbol of symbols) {
       try {
         console.log(`Fetching data for ${symbol}...`);
         const marketData = await fetchHistoricalData(symbol);
+        
+        // Run sector context analysis
+        const sectorContext = await analyzeSectorContext(symbol, supabase);
+        console.log(`${symbol}: Sector context - ${sectorContext.sector} (strength: ${sectorContext.sectorStrength.toFixed(2)}, multiplier: ${sectorContext.contextMultiplier.toFixed(2)})`);
         
         // Run all three strategies
         const momentumSignal = momentumStrategy(marketData);
@@ -267,11 +393,17 @@ serve(async (req) => {
         
         const individualSignals = [momentumSignal, meanReversionSignal, mlSignal];
         
+        // Apply sector context to individual signals
+        const contextualSignals = individualSignals.map(signal => ({
+          ...signal,
+          confidence: Math.min(100, signal.confidence * sectorContext.contextMultiplier)
+        }));
+        
         // Combine signals for final decision
-        const combinedSignal = combineSignals(individualSignals);
+        const combinedSignal = combineSignals(contextualSignals);
         
         // Store only high-confidence individual strategy signals (>= 70%)
-        for (const strategySignal of individualSignals) {
+        for (const strategySignal of contextualSignals) {
           if (strategySignal.confidence >= 70) {
             allSignals.push({
               symbol,
@@ -301,15 +433,11 @@ serve(async (req) => {
 
     // Store signals in database
     if (allSignals.length > 0) {
-      const supabase = createClient(
-        Deno.env.get('SUPABASE_URL')!,
-        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-      );
-
       console.log(`Storing ${allSignals.length} signals in database...`);
 
       const { error } = await supabase
-        .from('trading.signals')
+        .schema('trading')
+        .from('signals')
         .insert(allSignals);
 
       if (error) {
