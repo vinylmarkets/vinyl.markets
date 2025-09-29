@@ -184,6 +184,38 @@ export const TradingDashboard = () => {
         pnl: -45.20
       }
     ]);
+
+    // Check for existing broker integrations
+    const checkIntegrations = async () => {
+      if (!user) {
+        setHasIntegrations(false);
+        return;
+      }
+      
+      try {
+        console.log('Checking for integrations for user:', user.id);
+        const { data, error } = await supabase
+          .from('broker_integrations')
+          .select('id, broker_name')
+          .eq('user_id', user.id)
+          .eq('is_active', true);
+
+        if (error) {
+          console.error('Error checking integrations:', error);
+          setHasIntegrations(false);
+          return;
+        }
+
+        const hasConnections = data && data.length > 0;
+        console.log('Integration check result:', { hasConnections, count: data?.length, data });
+        setHasIntegrations(hasConnections);
+      } catch (error) {
+        console.error('Error checking integrations:', error);
+        setHasIntegrations(false);
+      }
+    };
+
+    checkIntegrations();
   }, [user]);
 
   const handleLogout = async () => {
