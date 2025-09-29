@@ -25,6 +25,8 @@ interface Position {
 
 interface CandlestickChartProps {
   positions: Position[];
+  knowledgeMode?: 'simple' | 'academic';
+  showEducation?: boolean;
 }
 
 interface CandleDataPoint {

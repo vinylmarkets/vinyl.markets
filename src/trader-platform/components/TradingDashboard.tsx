@@ -31,6 +31,8 @@ import {
   Settings
 } from "lucide-react";
 import { CandlestickChart } from "./CandlestickChart";
+import { TeachingAssistant } from "./TeachingAssistant";
+import { SignalFlowView } from "./SignalFlowView";
 
 interface TradingSignal {
   symbol: string;
@@ -94,6 +96,7 @@ export const TradingDashboard = () => {
   const [hasIntegrations, setHasIntegrations] = useState(false);
   const [isConnected, setIsConnected] = useState(true);
   const [knowledgeMode, setKnowledgeMode] = useState<'simple' | 'academic'>('simple');
+  const [viewMode, setViewMode] = useState<'chart' | 'flow'>('chart');
   
   const isDevelopment = import.meta.env.DEV;
 
@@ -295,6 +298,28 @@ export const TradingDashboard = () => {
 
           {/* Right Side Controls */}
           <div className="flex items-center space-x-2 sm:space-x-4">
+            {/* View Mode Toggle */}
+            <div className="flex bg-muted rounded-lg p-1">
+              <Button
+                variant={viewMode === 'chart' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('chart')}
+                className="h-8 px-3 text-xs flex items-center space-x-1"
+              >
+                <BarChart3 className="h-3 w-3" />
+                <span className="hidden sm:inline">Chart View</span>
+              </Button>
+              <Button
+                variant={viewMode === 'flow' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('flow')}
+                className="h-8 px-3 text-xs flex items-center space-x-1"
+              >
+                <Activity className="h-3 w-3" />
+                <span className="hidden sm:inline">Signal Flow</span>
+              </Button>
+            </div>
+            
             {/* Knowledge Mode Toggle */}
             <div className="flex bg-muted rounded-lg p-1">
               <Button
@@ -445,12 +470,36 @@ export const TradingDashboard = () => {
             </Card>
           </div>
 
-          {/* Center Column - Chart & Main Trading Area */}
+          {/* Center Column - Dynamic View */}
           <div className="col-span-12 lg:col-span-6 space-y-3">
-            {/* Real-time Candlestick Chart */}
-            <div className="h-[500px]">
-              <CandlestickChart positions={positions} />
-            </div>
+            {viewMode === 'chart' ? (
+              /* Chart View with Educational Overlays */
+              <div className="h-[500px] relative">
+                <CandlestickChart 
+                  positions={positions} 
+                  knowledgeMode={knowledgeMode}
+                  showEducation={knowledgeMode === 'simple'}
+                />
+                <TeachingAssistant knowledgeMode={knowledgeMode} />
+              </div>
+            ) : (
+              /* Signal Flow View */
+              <div className="h-[500px]">
+                <SignalFlowView 
+                  signals={signals}
+                  knowledgeMode={knowledgeMode}
+                  onSignalAction={(signal, action) => {
+                    toast({
+                      title: action === 'execute' ? 'Trade Executed!' : 'Signal Passed',
+                      description: action === 'execute' 
+                        ? `Buying ${signal.symbol} at $${signal.currentPrice}`
+                        : `Passed on ${signal.symbol} signal`,
+                      variant: action === 'execute' ? 'default' : undefined
+                    });
+                  }}
+                />
+              </div>
+            )}
             {/* Active Positions */}
             <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
               <CardHeader className="pb-2">
