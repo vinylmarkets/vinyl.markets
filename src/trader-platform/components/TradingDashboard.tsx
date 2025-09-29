@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,19 +16,147 @@ import {
   Activity,
   Shield,
   Clock,
-  Info
+  Info,
+  Wifi,
+  WifiOff
 } from "lucide-react";
+
+interface TradingSignal {
+  symbol: string;
+  action: 'BUY' | 'SELL' | 'HOLD';
+  confidence: number;
+  targetPrice: number;
+  currentPrice: number;
+  reasoning: string;
+  timestamp: string;
+}
+
+interface Position {
+  symbol: string;
+  quantity: number;
+  averageCost: number;
+  currentPrice: number;
+  marketValue: number;
+  unrealizedPnL: number;
+  unrealizedPnLPercent: number;
+  side: 'long' | 'short';
+  assetType: 'stock' | 'option' | 'crypto';
+}
+
+interface AccountData {
+  portfolioValue: number;
+  dailyPnL: number;
+  dailyPnLPercent: number;
+  buyingPower: number;
+  totalEquity: number;
+  marginUsed: number;
+  dayTradesUsed: number;
+  accountStatus: string;
+  lastUpdated: string;
+}
+
+interface RecentTrade {
+  symbol: string;
+  action: 'BUY' | 'SELL';
+  quantity: number;
+  price: number;
+  timestamp: string;
+  timeAgo: string;
+}
+
+const isDevelopment = import.meta.env.DEV;
 
 export const TradingDashboard = () => {
   const [knowledgeMode, setKnowledgeMode] = useState<'simple' | 'academic'>('simple');
   const [quickTradeSymbol, setQuickTradeSymbol] = useState('');
+  const [isConnected, setIsConnected] = useState(false);
+  const [signals, setSignals] = useState<TradingSignal[]>([]);
+  const [positions, setPositions] = useState<Position[]>([]);
+  const [recentTrades, setRecentTrades] = useState<RecentTrade[]>([]);
+  const [accountData, setAccountData] = useState<AccountData>({
+    portfolioValue: 125450,
+    dailyPnL: 2340,
+    dailyPnLPercent: 1.87,
+    buyingPower: 45230,
+    totalEquity: 125450,
+    marginUsed: 0,
+    dayTradesUsed: 0,
+    accountStatus: 'active',
+    lastUpdated: new Date().toISOString()
+  });
+  
   const { toast } = useToast();
 
-  // Updated demo data
-  const portfolioValue = 125450;
-  const dailyPnL = 2340;
-  const dailyPnLPercent = 1.87;
-  const buyingPower = 45230;
+  // Fetch functions
+  const fetchAccountData = async () => {
+    try {
+      const response = await fetch('/api/trader/account');
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setAccountData(result.data);
+          setIsConnected(true);
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to fetch account data:', error);
+      if (isDevelopment) setIsConnected(false);
+    }
+  };
+
+  const fetchSignals = async () => {
+    try {
+      const response = await fetch('/api/trader/signals');
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setSignals(result.data);
+          setIsConnected(true);
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to fetch signals:', error);
+      if (isDevelopment) setIsConnected(false);
+    }
+  };
+
+  const fetchPositions = async () => {
+    try {
+      const response = await fetch('/api/trader/positions');
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setPositions(result.data.positions);
+          setRecentTrades(result.data.recentTrades);
+          setIsConnected(true);
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to fetch positions:', error);
+      if (isDevelopment) setIsConnected(false);
+    }
+  };
+
+  // Set up polling intervals
+  useEffect(() => {
+    if (!isDevelopment) return;
+
+    // Initial fetch
+    fetchAccountData();
+    fetchSignals();
+    fetchPositions();
+
+    // Set up intervals
+    const accountInterval = setInterval(fetchAccountData, 10000); // 10 seconds
+    const signalsInterval = setInterval(fetchSignals, 30000); // 30 seconds
+    const positionsInterval = setInterval(fetchPositions, 10000); // 10 seconds
+
+    return () => {
+      clearInterval(accountInterval);
+      clearInterval(signalsInterval);
+      clearInterval(positionsInterval);
+    };
+  }, []);
 
   const handleTradeClick = () => {
     toast({
@@ -64,30 +192,43 @@ export const TradingDashboard = () => {
           {/* Logo */}
           <div className="flex items-center space-x-3">
             <h1 className="text-xl font-bold text-foreground tracking-tight">TubeAmp Trader v5.0</h1>
+            {/* Connection Status */}
+            {isDevelopment && (
+              <div className="flex items-center space-x-1">
+                {isConnected ? (
+                  <Wifi className="h-4 w-4 text-success" />
+                ) : (
+                  <WifiOff className="h-4 w-4 text-destructive" />
+                )}
+                <span className={`text-xs ${isConnected ? 'text-success' : 'text-destructive'}`}>
+                  {isConnected ? 'Connected' : 'Disconnected'}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Account Stats */}
           <div className="flex items-center space-x-6">
             <div className="text-center">
               <p className="text-xs text-muted-foreground">Portfolio Value</p>
-              <p className="text-lg font-semibold text-foreground">${portfolioValue.toLocaleString()}</p>
+              <p className="text-lg font-semibold text-foreground">${accountData.portfolioValue.toLocaleString()}</p>
             </div>
             <div className="text-center">
               <p className="text-xs text-muted-foreground">Daily P&L</p>
               <div className="flex items-center space-x-1">
-                {dailyPnL >= 0 ? (
+                {accountData.dailyPnL >= 0 ? (
                   <TrendingUp className="h-4 w-4 text-success" />
                 ) : (
                   <TrendingDown className="h-4 w-4 text-destructive" />
                 )}
-                <p className={`text-lg font-semibold ${dailyPnL >= 0 ? 'text-success' : 'text-destructive'}`}>
-                  ${Math.abs(dailyPnL).toLocaleString()} ({dailyPnLPercent > 0 ? '+' : ''}{dailyPnLPercent}%)
+                <p className={`text-lg font-semibold ${accountData.dailyPnL >= 0 ? 'text-success' : 'text-destructive'}`}>
+                  ${Math.abs(accountData.dailyPnL).toLocaleString()} ({accountData.dailyPnLPercent > 0 ? '+' : ''}{accountData.dailyPnLPercent}%)
                 </p>
               </div>
             </div>
             <div className="text-center">
               <p className="text-xs text-muted-foreground">Buying Power</p>
-              <p className="text-lg font-semibold text-foreground">${buyingPower.toLocaleString()}</p>
+              <p className="text-lg font-semibold text-foreground">${accountData.buyingPower.toLocaleString()}</p>
             </div>
           </div>
 
@@ -207,21 +348,26 @@ export const TradingDashboard = () => {
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
-                  <div className="p-2 rounded bg-gradient-to-r from-success/10 to-success/5 border border-success/20">
-                    <div className="text-center">
-                      <span className="text-sm font-semibold text-foreground">NVDA</span>
-                      <p className="text-xs text-success font-medium">BUY 82%</p>
-                      <p className="text-xs text-muted-foreground">$485.25</p>
+                  {signals.slice(0, 2).map((signal, index) => (
+                    <div key={signal.symbol} className={`p-2 rounded bg-gradient-to-r ${
+                      signal.action === 'BUY' 
+                        ? 'from-success/10 to-success/5 border border-success/20'
+                        : signal.action === 'SELL'
+                        ? 'from-destructive/10 to-destructive/5 border border-destructive/20'
+                        : 'from-muted/10 to-muted/5 border border-muted/20'
+                    }`}>
+                      <div className="text-center">
+                        <span className="text-sm font-semibold text-foreground">{signal.symbol}</span>
+                        <p className={`text-xs font-medium ${
+                          signal.action === 'BUY' ? 'text-success' :
+                          signal.action === 'SELL' ? 'text-destructive' : 'text-muted-foreground'
+                        }`}>
+                          {signal.action} {signal.confidence}%
+                        </p>
+                        <p className="text-xs text-muted-foreground">${signal.targetPrice}</p>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="p-2 rounded bg-gradient-to-r from-destructive/10 to-destructive/5 border border-destructive/20">
-                    <div className="text-center">
-                      <span className="text-sm font-semibold text-foreground">TSLA</span>
-                      <p className="text-xs text-destructive font-medium">SELL 75%</p>
-                      <p className="text-xs text-muted-foreground">$275.50</p>
-                    </div>
-                  </div>
+                  ))}
                 </div>
                 
                 <Button 
@@ -326,22 +472,20 @@ export const TradingDashboard = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
-                      <tr className="hover:bg-muted/50 transition-colors">
-                        <td className="py-2 font-medium text-foreground">AAPL</td>
-                        <td className="text-right py-2 text-muted-foreground">100</td>
-                        <td className="text-right py-2 text-muted-foreground">$180.50</td>
-                        <td className="text-right py-2 text-foreground">$182.45</td>
-                        <td className="text-right py-2 text-success font-medium">+$195</td>
-                        <td className="text-right py-2 text-success font-medium">+1.08%</td>
-                      </tr>
-                      <tr className="hover:bg-muted/50 transition-colors">
-                        <td className="py-2 font-medium text-foreground">GOOGL</td>
-                        <td className="text-right py-2 text-muted-foreground">50</td>
-                        <td className="text-right py-2 text-muted-foreground">$141.25</td>
-                        <td className="text-right py-2 text-foreground">$142.80</td>
-                        <td className="text-right py-2 text-success font-medium">+$77.50</td>
-                        <td className="text-right py-2 text-success font-medium">+1.10%</td>
-                      </tr>
+                      {positions.map((position) => (
+                        <tr key={position.symbol} className="hover:bg-muted/50 transition-colors">
+                          <td className="py-2 font-medium text-foreground">{position.symbol}</td>
+                          <td className="text-right py-2 text-muted-foreground">{position.quantity}</td>
+                          <td className="text-right py-2 text-muted-foreground">${position.averageCost.toFixed(2)}</td>
+                          <td className="text-right py-2 text-foreground">${position.currentPrice.toFixed(2)}</td>
+                          <td className={`text-right py-2 font-medium ${position.unrealizedPnL >= 0 ? 'text-success' : 'text-destructive'}`}>
+                            {position.unrealizedPnL >= 0 ? '+' : ''}${position.unrealizedPnL.toFixed(0)}
+                          </td>
+                          <td className={`text-right py-2 font-medium ${position.unrealizedPnLPercent >= 0 ? 'text-success' : 'text-destructive'}`}>
+                            {position.unrealizedPnLPercent >= 0 ? '+' : ''}{position.unrealizedPnLPercent.toFixed(2)}%
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
@@ -357,32 +501,22 @@ export const TradingDashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <div className="flex items-center justify-between p-2 bg-muted/30 rounded border border-border">
-                  <div className="flex items-center space-x-2">
-                    <Badge className="bg-success/10 text-success border-success/20 text-xs">BUY</Badge>
-                    <span className="text-sm font-medium text-foreground">AAPL</span>
-                    <span className="text-xs text-muted-foreground">100 @ $180.50</span>
+                {recentTrades.map((trade, index) => (
+                  <div key={index} className="flex items-center justify-between p-2 bg-muted/30 rounded border border-border">
+                    <div className="flex items-center space-x-2">
+                      <Badge className={`text-xs ${
+                        trade.action === 'BUY' 
+                          ? 'bg-success/10 text-success border-success/20' 
+                          : 'bg-destructive/10 text-destructive border-destructive/20'
+                      }`}>
+                        {trade.action}
+                      </Badge>
+                      <span className="text-sm font-medium text-foreground">{trade.symbol}</span>
+                      <span className="text-xs text-muted-foreground">{trade.quantity} @ ${trade.price.toFixed(2)}</span>
+                    </div>
+                    <span className="text-xs text-muted-foreground">{trade.timeAgo}</span>
                   </div>
-                  <span className="text-xs text-muted-foreground">2m</span>
-                </div>
-                
-                <div className="flex items-center justify-between p-2 bg-muted/30 rounded border border-border">
-                  <div className="flex items-center space-x-2">
-                    <Badge className="bg-destructive/10 text-destructive border-destructive/20 text-xs">SELL</Badge>
-                    <span className="text-sm font-medium text-foreground">NVDA</span>
-                    <span className="text-xs text-muted-foreground">10 @ $535.20</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">15m</span>
-                </div>
-
-                <div className="flex items-center justify-between p-2 bg-muted/30 rounded border border-border">
-                  <div className="flex items-center space-x-2">
-                    <Badge className="bg-accent/10 text-accent border-accent/20 text-xs">BUY</Badge>
-                    <span className="text-sm font-medium text-foreground">GOOGL</span>
-                    <span className="text-xs text-muted-foreground">50 @ $141.25</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">1h</span>
-                </div>
+                ))}
               </CardContent>
             </Card>
           </div>
