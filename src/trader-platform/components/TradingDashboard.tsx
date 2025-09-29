@@ -302,9 +302,10 @@ export const TradingDashboard = () => {
   useEffect(() => {
     console.log('hasIntegrations changed to:', hasIntegrations);
     if (hasIntegrations) {
-      console.log('Calling fetchAccountData because hasIntegrations is true');
-      // Call the function directly here to avoid dependency issues
+      console.log('Calling fetchAccountData and fetchPositionsData because hasIntegrations is true');
+      // Call both account and positions functions
       (async () => {
+        // Fetch account data
         console.log('fetchAccountData: Fetching account data...');
         
         try {
@@ -323,13 +324,43 @@ export const TradingDashboard = () => {
           
           if (!response.ok || !data?.success) {
             console.error('Account data error:', data);
-            return;
+          } else {
+            console.log('Setting account data:', data.data);
+            setAccountData(data.data);
           }
-          
-          console.log('Setting account data:', data.data);
-          setAccountData(data.data);
         } catch (error) {
           console.error('Failed to fetch account data:', error);
+        }
+
+        // Fetch positions data
+        console.log('fetchPositionsData: Fetching positions data...');
+        
+        try {
+          const response = await fetch(`https://jhxjvpbwkdzjufjyqanq.supabase.co/functions/v1/trader-positions`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+              'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoeGp2cGJ3a2R6anVmanlxYW5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5MDQ3MzYsImV4cCI6MjA3MzQ4MDczNn0.K7bcrLAr8Kxvln7owSNW452GhijuxWduv3u4173DPsc',
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          const data = await response.json();
+          console.log('fetchPositionsData response:', { data, status: response.status });
+          
+          if (!response.ok || !data?.success) {
+            console.error('Positions data error:', data);
+          } else {
+            console.log('Setting positions data:', data.data);
+            if (data.data.positions) {
+              setPositions(data.data.positions);
+            }
+            if (data.data.recentTrades) {
+              setRecentTrades(data.data.recentTrades);
+            }
+          }
+        } catch (error) {
+          console.error('Failed to fetch positions data:', error);
         }
       })();
     }
