@@ -88,10 +88,16 @@ async function getWatchlists(supabaseClient: any, req: Request) {
     );
   }
 
-  // Get user's custom watchlists
+  // Get user's custom watchlists with symbol counts
   const { data: userWatchlists, error: userError } = await supabaseClient
     .from('user_watchlists')
-    .select('id, name, description, created_at')
+    .select(`
+      id, 
+      name, 
+      description, 
+      created_at,
+      user_watchlist_items!user_watchlist_items_watchlist_id_fkey(symbol)
+    `)
     .eq('user_id', user.id);
 
   if (userError) {
@@ -110,7 +116,7 @@ async function getWatchlists(supabaseClient: any, req: Request) {
     is_default: false,
     is_system: false,
     watchlist_type: 'user_watchlist',
-    symbol_count: 0 // Will be calculated when symbols are fetched
+    symbol_count: w.user_watchlist_items?.length || 0
   })) || [];
 
   const allWatchlists = [...(systemWatchlists || []), ...formattedUserWatchlists];
