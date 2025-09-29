@@ -27,12 +27,12 @@ import {
   CheckCircle,
   AlertCircle,
   RefreshCw,
-  Link as LinkIcon,
-  Settings
+  Link as LinkIcon
 } from "lucide-react";
 import { CandlestickChart } from "./CandlestickChart";
 import { TeachingAssistant } from "./TeachingAssistant";
 import { SignalFlowView } from "./SignalFlowView";
+import { ProfileDropdown } from "./ProfileDropdown";
 
 interface TradingSignal {
   symbol: string;
@@ -296,7 +296,7 @@ export const TradingDashboard = () => {
             </div>
           </div>
 
-          {/* Right Side Controls */}
+            {/* Right Side Controls */}
           <div className="flex items-center space-x-2 sm:space-x-4">
             {/* View Mode Toggle */}
             <div className="flex bg-muted rounded-lg p-1">
@@ -340,16 +340,8 @@ export const TradingDashboard = () => {
               </Button>
             </div>
             
-            {/* Logout Button */}
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleLogout}
-              className="flex items-center space-x-2"
-            >
-              <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline">Logout</span>
-            </Button>
+            {/* Profile Dropdown */}
+            <ProfileDropdown />
           </div>
         </div>
       </header>

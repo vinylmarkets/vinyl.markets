@@ -68,6 +68,7 @@ import Auth from "./pages/Auth";
 import TraderPage from "./pages/trader/TraderPage";
 import TraderAuth from "./pages/trader/TraderAuth";
 import Integrations from "./pages/trader/Integrations";
+import TraderSettings from "./pages/trader/TraderSettings";
 
 const queryClient = new QueryClient();
 
@@ -161,6 +162,7 @@ const App = () => {
               <Route path="/trader-auth" element={<TraderAuth />} />
               <Route path="/trader" element={<TraderPage />} />
               <Route path="/trader/integrations" element={<Integrations />} />
+              <Route path="/trader/settings" element={<TraderSettings />} />
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
