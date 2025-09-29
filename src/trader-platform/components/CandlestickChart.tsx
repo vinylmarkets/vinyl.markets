@@ -4,7 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, Activity, BarChart3 } from "lucide-react";
-import { ComposedChart, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Bar, Line } from 'recharts';
+import { 
+  ComposedChart, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer, 
+  Bar, 
+  Line,
+  Cell
+} from 'recharts';
 
 interface Position {
   symbol: string;
@@ -27,6 +37,7 @@ interface CandleDataPoint {
   volume: number;
   sma20?: number;
   sma50?: number;
+  isGreen: boolean;
 }
 
 const SYMBOLS = [
@@ -37,56 +48,8 @@ const SYMBOLS = [
   { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 142.50, change: -0.85, changePercent: -0.59 }
 ];
 
-// Custom Candlestick component for Recharts
-const Candlestick = (props: any) => {
-  const { payload, x, y, width, height } = props;
-  if (!payload) return null;
-
-  const { open, high, low, close } = payload;
-  const isGreen = close > open;
-  const color = isGreen ? '#22c55e' : '#ef4444';
-  
-  const bodyHeight = Math.abs(close - open);
-  const bodyY = Math.min(open, close);
-  const wickWidth = 1;
-  
-  // Convert price to pixel coordinates
-  const priceToY = (price: number) => {
-    const range = payload.high - payload.low;
-    const ratio = (payload.high - price) / range;
-    return y + ratio * height;
-  };
-
-  const openY = priceToY(open);
-  const closeY = priceToY(close);
-  const highY = priceToY(high);
-  const lowY = priceToY(low);
-  const bodyYPos = Math.min(openY, closeY);
-  const bodyHeightPx = Math.abs(openY - closeY);
-
-  return (
-    <g>
-      {/* Wick lines */}
-      <line
-        x1={x + width / 2}
-        y1={highY}
-        x2={x + width / 2}
-        y2={lowY}
-        stroke={color}
-        strokeWidth={wickWidth}
-      />
-      {/* Body rectangle */}
-      <rect
-        x={x + width * 0.2}
-        y={bodyYPos}
-        width={width * 0.6}
-        height={Math.max(bodyHeightPx, 1)}
-        fill={color}
-        stroke={color}
-      />
-    </g>
-  );
-};
+// We'll use simple bar charts to represent price data
+// This is a simplified approach that works with Recharts
 
 export const CandlestickChart: React.FC<CandlestickChartProps> = ({ positions }) => {
   const [selectedSymbol, setSelectedSymbol] = useState('AAPL');
@@ -156,7 +119,8 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({ positions })
         close: finalClose,
         volume: volume,
         sma20,
-        sma50
+        sma50,
+        isGreen: finalClose > finalOpen
       });
     }
     
@@ -193,7 +157,8 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({ positions })
           ...lastCandle,
           close: newPrice,
           high: Math.max(lastCandle.high, newPrice),
-          low: Math.min(lastCandle.low, newPrice)
+          low: Math.min(lastCandle.low, newPrice),
+          isGreen: newPrice > lastCandle.open
         };
         
         return updatedData;
@@ -340,7 +305,7 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({ positions })
         {/* Chart Container */}
         <div className="flex-1 min-h-[400px] rounded-lg border bg-card p-4">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
               <XAxis 
                 dataKey="time" 
@@ -350,8 +315,26 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({ positions })
               <YAxis 
                 domain={['dataMin - 5', 'dataMax + 5']}
                 tick={{ fontSize: 10 }}
+                yAxisId="price"
+              />
+              <YAxis 
+                yAxisId="volume"
+                orientation="right"
+                domain={[0, 'dataMax']}
+                tick={{ fontSize: 8 }}
+                tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`}
               />
               <Tooltip content={<CustomTooltip />} />
+              
+              {/* Price bars representing candlesticks */}
+              <Bar 
+                dataKey="close" 
+                yAxisId="price"
+              >
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.isGreen ? '#22c55e' : '#ef4444'} />
+                ))}
+              </Bar>
               
               {/* Volume bars */}
               <Bar 
@@ -369,6 +352,7 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({ positions })
                 strokeWidth={2}
                 dot={false}
                 connectNulls={false}
+                yAxisId="price"
               />
               <Line 
                 type="monotone" 
@@ -377,31 +361,20 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({ positions })
                 strokeWidth={2}
                 dot={false}
                 connectNulls={false}
+                yAxisId="price"
               />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Position markers overlay */}
+        {/* Position markers info */}
         {positions.filter(p => p.symbol === selectedSymbol).length > 0 && (
-          <div className="absolute inset-0 pointer-events-none">
+          <div className="mt-2 p-2 bg-muted/50 rounded text-xs">
+            <strong>Active Positions:</strong>
             {positions.filter(p => p.symbol === selectedSymbol).map(position => (
-              <div 
-                key={position.symbol}
-                className={`absolute left-0 right-0 h-0.5 ${
-                  position.side === 'long' ? 'bg-success' : 'bg-destructive'
-                } opacity-80`}
-                style={{ 
-                  top: '50%', // This would need calculation based on price position
-                  borderStyle: 'dashed'
-                }}
-              >
-                <span className={`absolute right-2 -top-2 text-xs px-1 rounded ${
-                  position.side === 'long' ? 'bg-success text-white' : 'bg-destructive text-white'
-                }`}>
-                  {position.side.toUpperCase()} @ ${position.averageCost.toFixed(2)}
-                </span>
-              </div>
+              <span key={position.symbol} className="ml-2">
+                {position.side.toUpperCase()} @ ${position.averageCost.toFixed(2)}
+              </span>
             ))}
           </div>
         )}
@@ -410,7 +383,7 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({ positions })
         <div className="flex items-center justify-center space-x-6 mt-3 text-xs">
           <div className="flex items-center space-x-1">
             <BarChart3 className="h-3 w-3 text-green-500" />
-            <span className="text-muted-foreground">Candlesticks</span>
+            <span className="text-muted-foreground">Price Bars</span>
           </div>
           <div className="flex items-center space-x-1">
             <div className="w-3 h-0.5 bg-amber-500"></div>
@@ -424,14 +397,6 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({ positions })
             <div className="w-3 h-0.5 bg-blue-400 opacity-60"></div>
             <span className="text-muted-foreground">Volume</span>
           </div>
-          {positions.filter(p => p.symbol === selectedSymbol).map(position => (
-            <div key={position.symbol} className="flex items-center space-x-1">
-              <div className={`w-3 h-0.5 ${position.side === 'long' ? 'bg-success' : 'bg-destructive'}`}></div>
-              <span className="text-muted-foreground">
-                {position.side.toUpperCase()} Position
-              </span>
-            </div>
-          ))}
         </div>
       </CardContent>
     </Card>
