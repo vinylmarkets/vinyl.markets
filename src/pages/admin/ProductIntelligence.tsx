@@ -37,12 +37,9 @@ export default function ProductIntelligence() {
         .order('date', { ascending: false })
         .limit(30);
 
-      // Fetch query patterns
+      // Fetch query patterns from secure function (admin-only access)
       const { data: queryPatterns } = await supabase
-        .from('query_intelligence_summary')
-        .select('*')
-        .order('frequency_count', { ascending: false })
-        .limit(10);
+        .rpc('get_query_intelligence_summary');
 
       // Fetch achievement data
       const { data: achievementsData } = await supabase

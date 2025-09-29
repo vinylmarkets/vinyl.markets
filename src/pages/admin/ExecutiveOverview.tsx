@@ -31,12 +31,9 @@ export default function ExecutiveOverview() {
 
   const fetchExecutiveMetrics = async () => {
     try {
+      // Fetch executive summary from secure admin-only function
       const { data: summary } = await supabase
-        .from('daily_metrics')
-        .select('*')
-        .order('date', { ascending: false })
-        .limit(1)
-        .single();
+        .rpc('get_admin_executive_summary');
 
       const { data: features } = await supabase
         .from('feature_usage')
@@ -44,14 +41,15 @@ export default function ExecutiveOverview() {
         .order('usage_count', { ascending: false })
         .limit(5);
 
-      if (summary) {
+      if (summary && summary.length > 0) {
+        const executiveSummary = summary[0];
         setMetrics({
-          totalUsers: Number(summary.total_users) || 0,
-          activeUsers7Days: Number(summary.active_users) || 0,
-          activeUsers30Days: Number(summary.active_users) * 4 || 0,
-          mrr: Number(summary.mrr) || 0,
-          growthRate: 12.5,
-          churnRate: 2.1,
+          totalUsers: Number(executiveSummary.total_users) || 0,
+          activeUsers7Days: Number(executiveSummary.users_last_7_days) || 0,
+          activeUsers30Days: Number(executiveSummary.users_last_7_days) * 4 || 0, // Estimate
+          mrr: Number(executiveSummary.monthly_revenue) || 0,
+          growthRate: 12.5, // Could be calculated from historical data
+          churnRate: 2.1, // Could be calculated from user data
           topFeatures: features?.map(f => ({ feature: f.feature_name || '', usage: Number(f.usage_count) || 0 })) || []
         });
       }
@@ -65,10 +63,7 @@ export default function ExecutiveOverview() {
   const fetchRevenueData = async () => {
     try {
       const { data } = await supabase
-        .from('business_metrics_summary')
-        .select('*')
-        .order('date', { ascending: true })
-        .limit(30);
+        .rpc('get_business_metrics_summary');
 
       if (data) {
         setRevenueData(data.map(d => ({

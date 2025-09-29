@@ -33,12 +33,9 @@ export default function BusinessMetrics() {
 
   const fetchBusinessMetrics = async () => {
     try {
-      // Fetch business metrics from multiple sources
+      // Fetch business metrics from secure function (admin-only access)
       const { data: businessSummary } = await supabase
-        .from('business_metrics_summary')
-        .select('*')
-        .order('date', { ascending: true })
-        .limit(12);
+        .rpc('get_business_metrics_summary');
 
       const { data: dailyMetrics } = await supabase
         .from('daily_metrics')
