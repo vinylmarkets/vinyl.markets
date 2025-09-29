@@ -45,5 +45,8 @@ verify_jwt = false
 [functions.execute-trades]
 verify_jwt = false
 
+[functions.market-data]
+verify_jwt = false
+
 [functions.update-positions]
 verify_jwt = false
