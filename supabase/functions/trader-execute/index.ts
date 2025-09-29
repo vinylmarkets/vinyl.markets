@@ -24,31 +24,65 @@ interface TradeResponse {
 
 async function executeTradeViaAPI(tradeRequest: TradeRequest): Promise<TradeResponse> {
   try {
-    console.log('Attempting to execute trade via API:', tradeRequest);
+    console.log('Attempting to execute trade via Alpaca API:', tradeRequest);
     
-    // Placeholder for future API integration
-    // const response = await fetch(`${TRADING_API_URL}/orders`, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'Authorization': `Bearer ${API_TOKEN}`
-    //   },
-    //   body: JSON.stringify(tradeRequest)
-    // });
+    // Get Alpaca credentials from environment
+    const alpacaApiKey = Deno.env.get('ALPACA_API_KEY');
+    const alpacaSecret = Deno.env.get('ALPACA_SECRET_KEY');
+    const alpacaBaseUrl = Deno.env.get('ALPACA_BASE_URL') || 'https://paper-api.alpaca.markets';
     
-    // For now, simulate trade execution with demo response
-    const simulatedResponse: TradeResponse = {
-      orderId: `ORD_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      status: 'pending', // Simulate pending status for regulatory compliance
+    if (!alpacaApiKey || !alpacaSecret) {
+      throw new Error('Alpaca API credentials not configured');
+    }
+    
+    // Convert our trade request to Alpaca format
+    const alpacaOrder = {
       symbol: tradeRequest.symbol,
-      action: tradeRequest.action,
-      quantity: tradeRequest.quantity,
-      timestamp: new Date().toISOString(),
-      message: 'Trading will be enabled after regulatory approval'
+      qty: tradeRequest.quantity,
+      side: tradeRequest.action.toLowerCase(), // 'buy' or 'sell'
+      type: tradeRequest.orderType,
+      time_in_force: tradeRequest.timeInForce.toUpperCase(),
+      ...(tradeRequest.limitPrice && { limit_price: tradeRequest.limitPrice }),
+      ...(tradeRequest.stopPrice && { stop_price: tradeRequest.stopPrice })
     };
     
-    console.log('Simulated trade execution:', simulatedResponse);
-    return simulatedResponse;
+    console.log('Alpaca order payload:', alpacaOrder);
+    
+    // Execute trade via Alpaca API
+    const response = await fetch(`${alpacaBaseUrl}/v2/orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'APCA-API-KEY-ID': alpacaApiKey,
+        'APCA-API-SECRET-KEY': alpacaSecret
+      },
+      body: JSON.stringify(alpacaOrder)
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('Alpaca API error:', errorData);
+      throw new Error(`Alpaca API error: ${response.status} - ${errorData}`);
+    }
+    
+    const alpacaOrderResult = await response.json();
+    console.log('Alpaca order result:', alpacaOrderResult);
+    
+    // Convert Alpaca response to our format
+    const tradeResponse: TradeResponse = {
+      orderId: alpacaOrderResult.id,
+      status: alpacaOrderResult.status === 'filled' ? 'filled' : 'pending',
+      symbol: alpacaOrderResult.symbol,
+      action: alpacaOrderResult.side.toUpperCase() as 'BUY' | 'SELL',
+      quantity: parseInt(alpacaOrderResult.qty),
+      fillPrice: alpacaOrderResult.filled_avg_price ? parseFloat(alpacaOrderResult.filled_avg_price) : undefined,
+      fillQuantity: alpacaOrderResult.filled_qty ? parseInt(alpacaOrderResult.filled_qty) : undefined,
+      timestamp: alpacaOrderResult.created_at || new Date().toISOString(),
+      message: `Order ${alpacaOrderResult.status} via Alpaca`
+    };
+    
+    console.log('Trade executed successfully:', tradeResponse);
+    return tradeResponse;
     
   } catch (error) {
     console.error('Failed to execute trade:', error instanceof Error ? error.message : String(error));
