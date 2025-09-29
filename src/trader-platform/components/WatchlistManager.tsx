@@ -351,55 +351,55 @@ export const WatchlistManager: React.FC<WatchlistManagerProps> = ({ onSymbolSele
                 })}
               </div>
             </div>
-
-            {/* Analysis Results */}
-            {analysisData && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4" />
-                  Analysis for {analysisData.symbol}
-                </label>
-                {analysisData.loading ? (
-                  <div className="p-4 border rounded-lg">
-                    <div className="flex items-center justify-center">
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      <span className="text-sm">Analyzing...</span>
-                    </div>
-                  </div>
-                ) : analysisData.error ? (
-                  <div className="p-4 border rounded-lg border-red-200">
-                    <div className="text-red-600 text-sm">{analysisData.error}</div>
-                  </div>
-                ) : (
-                  <div className="p-4 border rounded-lg bg-card">
-                    <div className="grid grid-cols-2 gap-4 mb-3">
-                      <div>
-                        <span className="text-xs text-muted-foreground">Sentiment:</span>
-                        <div className={`text-sm font-medium ${
-                          analysisData.analysis.sentiment === 'Bullish' ? 'text-green-600' : 
-                          analysisData.analysis.sentiment === 'Bearish' ? 'text-red-600' : 'text-yellow-600'
-                        }`}>
-                          {analysisData.analysis.sentiment}
-                        </div>
-                      </div>
-                      <div>
-                        <span className="text-xs text-muted-foreground">Target:</span>
-                        <div className="text-sm font-medium">{analysisData.analysis.targetPrice}</div>
-                      </div>
-                    </div>
-                    <div className="text-xs space-y-1">
-                      {analysisData.analysis.keyPoints.map((point: string, i: number) => (
-                        <div key={i} className="flex items-start gap-1">
-                          <CheckCircle className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span>{point}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
           </TabsContent>
+
+          {/* Analysis Results - Move outside of tabs so it shows on all tabs */}
+          {analysisData && (
+            <div className="space-y-2 mt-4">
+              <label className="text-sm font-medium flex items-center gap-2">
+                <TrendingUp className="h-4 w-4" />
+                Analysis for {analysisData.symbol}
+              </label>
+              {analysisData.loading ? (
+                <div className="p-4 border rounded-lg">
+                  <div className="flex items-center justify-center">
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    <span className="text-sm">Analyzing...</span>
+                  </div>
+                </div>
+              ) : analysisData.error ? (
+                <div className="p-4 border rounded-lg border-red-200">
+                  <div className="text-red-600 text-sm">{analysisData.error}</div>
+                </div>
+              ) : (
+                <div className="p-4 border rounded-lg bg-card">
+                  <div className="grid grid-cols-2 gap-4 mb-3">
+                    <div>
+                      <span className="text-xs text-muted-foreground">Sentiment:</span>
+                      <div className={`text-sm font-medium ${
+                        analysisData.analysis.sentiment === 'Bullish' ? 'text-green-600' : 
+                        analysisData.analysis.sentiment === 'Bearish' ? 'text-red-600' : 'text-yellow-600'
+                      }`}>
+                        {analysisData.analysis.sentiment}
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-xs text-muted-foreground">Target:</span>
+                      <div className="text-sm font-medium">{analysisData.analysis.targetPrice}</div>
+                    </div>
+                  </div>
+                  <div className="text-xs space-y-1">
+                    {analysisData.analysis.keyPoints.map((point: string, i: number) => (
+                      <div key={i} className="flex items-start gap-1">
+                        <CheckCircle className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
+                        <span>{point}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           <TabsContent value="universe" className="space-y-4">
             <div className="space-y-2">
