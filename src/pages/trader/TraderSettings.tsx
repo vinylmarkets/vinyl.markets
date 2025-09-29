@@ -9,6 +9,8 @@ import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   Palette, 
   DollarSign, 
@@ -38,6 +40,7 @@ interface TradingSettings {
 
 const TraderSettings = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [settings, setSettings] = useState<TradingSettings>({
     defaultPositionSize: 1000,
     riskTolerance: 3,
@@ -94,12 +97,41 @@ const TraderSettings = () => {
     }
   };
 
-  const handleSave = () => {
-    localStorage.setItem('trader-settings', JSON.stringify(settings));
-    toast({
-      title: "Settings Saved",
-      description: "Your preferences have been saved successfully.",
-    });
+  const handleSave = async () => {
+    try {
+      // Save to localStorage for immediate UI updates
+      localStorage.setItem('trader-settings', JSON.stringify(settings));
+      
+      // Save to database for backend use (auto-trading, etc.)
+      const { error } = await supabase
+        .from('user_settings')
+        .upsert({
+          user_id: user?.id,
+          settings: settings
+        });
+        
+      if (error) {
+        console.error('Error saving settings to database:', error);
+        toast({
+          title: "Settings Saved Locally",
+          description: "Settings saved to browser but not synced to server. Auto-trading may not work.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      toast({
+        title: "Settings Saved",
+        description: "Your preferences have been saved successfully. Auto-trading is now configured.",
+      });
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save settings. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const accentColors = [

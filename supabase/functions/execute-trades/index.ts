@@ -48,14 +48,14 @@ interface AlpacaOrder {
 }
 
 async function getRiskSettings(): Promise<RiskSettings> {
-  const { data, error } = await supabase
-    .from('trading.risk_settings')
-    .select('*')
-    .limit(1)
+  // Get user's trading settings from user_settings table
+  const { data: userSettings, error: userError } = await supabase
+    .from('user_settings')
+    .select('settings')
     .single();
     
-  if (error) {
-    console.warn('Failed to fetch risk settings, using defaults:', error);
+  if (userError || !userSettings?.settings) {
+    console.warn('No user settings found, using defaults. Auto-trading disabled.');
     return {
       max_position_size: 1000,
       max_portfolio_risk: 0.02,
@@ -64,11 +64,21 @@ async function getRiskSettings(): Promise<RiskSettings> {
       stop_loss_percent: 0.02,
       take_profit_percent: 0.04,
       min_confidence_score: 75,
-      trading_enabled: true
+      trading_enabled: false // Disabled by default if no user settings
     };
   }
   
-  return data;
+  const settings = userSettings.settings;
+  return {
+    max_position_size: settings.defaultPositionSize || 1000,
+    max_portfolio_risk: (settings.riskTolerance || 3) * 0.01, // Convert risk level to percentage
+    daily_loss_limit: (settings.riskTolerance || 3) * 250, // Higher risk = higher loss limit
+    max_open_positions: Math.min(10, Math.max(3, settings.riskTolerance * 2)), // 3-10 positions based on risk
+    stop_loss_percent: 0.02,
+    take_profit_percent: 0.04,
+    min_confidence_score: settings.signalThreshold || 75,
+    trading_enabled: settings.autoTradeEnabled || false
+  };
 }
 
 async function getExecutableSignals(minConfidence: number): Promise<TradingSignal[]> {
