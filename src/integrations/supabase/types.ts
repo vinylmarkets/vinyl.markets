@@ -4168,6 +4168,15 @@ export type Database = {
           total_time_spent: number
         }[]
       }
+      get_user_integrations: {
+        Args: { target_user_id: string }
+        Returns: {
+          broker_name: string
+          id: string
+          is_active: boolean
+          user_id: string
+        }[]
+      }
       get_user_latest_briefing: {
         Args: { p_user_id: string }
         Returns: {
