@@ -12,6 +12,8 @@ import vinylLogoDark from "@/assets/vinyl-logo-dark.png";
 import vinylLogoLight from "@/assets/vinyl-logo-light.png";
 import { WatchlistManager } from "./WatchlistManager";
 import { SectorMap } from "./SectorMap";
+import { RelationshipNetworkGraph } from "./RelationshipNetworkGraph";
+import { RelationshipSignals } from "./RelationshipSignals";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -1039,9 +1041,19 @@ export const TradingDashboard = () => {
           </div>
         </div>
 
-        {/* Sector Map Section */}
-        <div className="mt-6">
+        {/* Relationship Analysis Section */}
+        <div className="mt-6 space-y-6">
+          {/* Sector Map */}
           <SectorMap />
+          
+          {/* Relationship Network Graph */}
+          <RelationshipNetworkGraph 
+            selectedSymbol={quickTradeSymbol || 'AAPL'}
+            onSymbolSelect={handleSymbolSelect}
+          />
+          
+          {/* Relationship Signals */}
+          <RelationshipSignals />
         </div>
       </div>
     </div>
