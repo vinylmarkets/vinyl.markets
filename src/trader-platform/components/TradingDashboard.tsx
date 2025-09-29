@@ -27,7 +27,10 @@ import {
   CheckCircle,
   AlertCircle,
   RefreshCw,
-  Link as LinkIcon
+  Link as LinkIcon,
+  TrendingUp as TrendingUpIcon,
+  TrendingDown as TrendingDownIcon,
+  X
 } from "lucide-react";
 import { CandlestickChart } from "./CandlestickChart";
 import { TeachingAssistant } from "./TeachingAssistant";
@@ -98,6 +101,15 @@ export const TradingDashboard = () => {
   const [knowledgeMode, setKnowledgeMode] = useState<'simple' | 'academic'>('simple');
   const [viewMode, setViewMode] = useState<'chart' | 'flow'>('chart');
   const [quickTradeSymbol, setQuickTradeSymbol] = useState('');
+  const [quickTradeData, setQuickTradeData] = useState<{
+    symbol: string;
+    price: number;
+    change: number;
+    changePercent: number;
+    isExpanded: boolean;
+    priceHistory: number[];
+  } | null>(null);
+  const [priceUpdateInterval, setPriceUpdateInterval] = useState<NodeJS.Timeout | null>(null);
   
   const isDevelopment = import.meta.env.DEV;
 
@@ -246,10 +258,52 @@ export const TradingDashboard = () => {
   };
 
   const handleTradeClick = async (action: 'BUY' | 'SELL', symbol: string) => {
+    if (!symbol.trim()) return;
+    
+    // Expand and show price data
+    const mockPrice = 150 + Math.random() * 100; // Mock price between 150-250
+    const mockChange = (Math.random() - 0.5) * 10; // Change between -5 to +5
+    const mockChangePercent = (mockChange / mockPrice) * 100;
+    
+    setQuickTradeData({
+      symbol: symbol.toUpperCase(),
+      price: mockPrice,
+      change: mockChange,
+      changePercent: mockChangePercent,
+      isExpanded: true,
+      priceHistory: Array.from({ length: 20 }, (_, i) => mockPrice + (Math.random() - 0.5) * 5)
+    });
+
+    // Start real-time price updates
+    if (priceUpdateInterval) {
+      clearInterval(priceUpdateInterval);
+    }
+    
+    const interval = setInterval(() => {
+      setQuickTradeData(prev => {
+        if (!prev) return null;
+        
+        const priceChange = (Math.random() - 0.5) * 2; // Smaller random changes
+        const newPrice = Math.max(prev.price + priceChange, 1); // Don't go below $1
+        const newChange = newPrice - prev.priceHistory[0];
+        const newChangePercent = (newChange / prev.priceHistory[0]) * 100;
+        
+        return {
+          ...prev,
+          price: newPrice,
+          change: newChange,
+          changePercent: newChangePercent,
+          priceHistory: [newPrice, ...prev.priceHistory.slice(0, 19)]
+        };
+      });
+    }, 2000); // Update every 2 seconds
+    
+    setPriceUpdateInterval(interval);
+
     if (!hasIntegrations) {
       toast({
         title: "Demo Mode",
-        description: "This is a demo. Connect your broker to enable real trading.",
+        description: `Demo ${action} order for ${symbol.toUpperCase()} - showing live price simulation.`,
         variant: "default",
       });
       return;
@@ -289,6 +343,24 @@ export const TradingDashboard = () => {
       });
     }
   };
+
+  const resetQuickTrade = () => {
+    setQuickTradeData(null);
+    setQuickTradeSymbol('');
+    if (priceUpdateInterval) {
+      clearInterval(priceUpdateInterval);
+      setPriceUpdateInterval(null);
+    }
+  };
+
+  // Cleanup interval on unmount
+  useEffect(() => {
+    return () => {
+      if (priceUpdateInterval) {
+        clearInterval(priceUpdateInterval);
+      }
+    };
+  }, [priceUpdateInterval]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -444,11 +516,18 @@ export const TradingDashboard = () => {
             </Card>
 
             {/* Quick Actions */}
-            <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
+            <Card className={`shadow-card hover:shadow-card-hover transition-all duration-300 ${quickTradeData?.isExpanded ? 'ring-2 ring-primary/20' : ''}`}>
               <CardHeader className="pb-2">
-                <CardTitle className="flex items-center space-x-2 text-base">
-                  <Zap className="h-4 w-4 text-accent" />
-                  <span>Quick Trade</span>
+                <CardTitle className="flex items-center justify-between text-base">
+                  <div className="flex items-center space-x-2">
+                    <Zap className="h-4 w-4 text-accent" />
+                    <span>Quick Trade</span>
+                  </div>
+                  {quickTradeData?.isExpanded && (
+                    <Button variant="ghost" size="sm" onClick={resetQuickTrade}>
+                      <X className="h-3 w-3" />
+                    </Button>
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -463,6 +542,73 @@ export const TradingDashboard = () => {
                     }
                   }}
                 />
+                
+                {/* Expanded Price Information */}
+                {quickTradeData?.isExpanded && (
+                  <div className="space-y-3 border-t pt-3 animate-fade-in">
+                    {/* Current Price Display */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <span className="font-bold text-lg">{quickTradeData.symbol}</span>
+                        <div className={`flex items-center space-x-1 text-sm ${
+                          quickTradeData.change >= 0 ? 'text-success' : 'text-destructive'
+                        }`}>
+                          {quickTradeData.change >= 0 ? (
+                            <TrendingUpIcon className="h-3 w-3" />
+                          ) : (
+                            <TrendingDownIcon className="h-3 w-3" />
+                          )}
+                          <span>
+                            {quickTradeData.change >= 0 ? '+' : ''}
+                            {quickTradeData.change.toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-xl font-bold">
+                          ${quickTradeData.price.toFixed(2)}
+                        </div>
+                        <div className={`text-xs ${
+                          quickTradeData.changePercent >= 0 ? 'text-success' : 'text-destructive'
+                        }`}>
+                          {quickTradeData.changePercent >= 0 ? '+' : ''}
+                          {quickTradeData.changePercent.toFixed(2)}%
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Mini Sparkline */}
+                    <div className="h-8 bg-muted/30 rounded flex items-end space-x-px overflow-hidden">
+                      {quickTradeData.priceHistory.slice(0, 15).reverse().map((price, index) => {
+                        const max = Math.max(...quickTradeData.priceHistory);
+                        const min = Math.min(...quickTradeData.priceHistory);
+                        const height = ((price - min) / (max - min)) * 100;
+                        const isLastBar = index === 14;
+                        
+                        return (
+                          <div
+                            key={index}
+                            className={`flex-1 transition-all duration-500 ${
+                              isLastBar
+                                ? quickTradeData.change >= 0
+                                  ? 'bg-success'
+                                  : 'bg-destructive'
+                                : 'bg-primary/60'
+                            }`}
+                            style={{ height: `${Math.max(height, 10)}%` }}
+                          />
+                        );
+                      })}
+                    </div>
+                    
+                    {/* Live indicator */}
+                    <div className="flex items-center justify-center space-x-2 text-xs text-muted-foreground">
+                      <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+                      <span>Live Price Data</span>
+                    </div>
+                  </div>
+                )}
+                
                 <div className="flex space-x-2">
                   <Button 
                     size="sm" 
