@@ -90,6 +90,7 @@ export const TradingDashboard = () => {
   const [signals, setSignals] = useState<TradingSignal[]>([]);
   const [positions, setPositions] = useState<Position[]>([]);
   const [recentTrades, setRecentTrades] = useState<RecentTrade[]>([]);
+  const [hasIntegrations, setHasIntegrations] = useState(false);
   const [isConnected, setIsConnected] = useState(true);
   const [knowledgeMode, setKnowledgeMode] = useState<'simple' | 'academic'>('simple');
   
@@ -183,7 +184,7 @@ export const TradingDashboard = () => {
         pnl: -45.20
       }
     ]);
-  }, []);
+  }, [user]);
 
   const handleLogout = async () => {
     try {
@@ -286,31 +287,33 @@ export const TradingDashboard = () => {
         </div>
       </header>
 
-      {/* Broker Integration Status */}
-      <div className="p-2 sm:p-4">
-        <Card className="border-yellow-200 bg-yellow-50 border-l-4 border-l-yellow-500">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <AlertCircle className="h-5 w-5 text-yellow-600" />
-                <div>
-                  <p className="font-medium text-yellow-800">Broker Connection Required</p>
-                  <p className="text-sm text-yellow-700">
-                    Connect your Alpaca account to enable live trading and access your real account data
-                  </p>
+      {/* Broker Integration Status - Only show if no integrations */}
+      {!hasIntegrations && (
+        <div className="p-2 sm:p-4">
+          <Card className="border-yellow-200 bg-yellow-50 border-l-4 border-l-yellow-500">
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <AlertCircle className="h-5 w-5 text-yellow-600" />
+                  <div>
+                    <p className="font-medium text-yellow-800">Broker Connection Required</p>
+                    <p className="text-sm text-yellow-700">
+                      Connect your Alpaca account to enable live trading and access your real account data
+                    </p>
+                  </div>
                 </div>
+                <Link to="/trader/integrations">
+                  <Button size="sm" className="bg-yellow-600 hover:bg-yellow-700 text-white">
+                    <LinkIcon className="w-4 h-4 mr-2" />
+                    <span className="hidden sm:inline">Connect Broker</span>
+                    <span className="sm:hidden">Connect</span>
+                  </Button>
+                </Link>
               </div>
-              <Link to="/trader/integrations">
-                <Button size="sm" className="bg-yellow-600 hover:bg-yellow-700 text-white">
-                  <LinkIcon className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Connect Broker</span>
-                  <span className="sm:hidden">Connect</span>
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Compact Bento Grid Layout */}
       <div className="p-2 sm:p-4">

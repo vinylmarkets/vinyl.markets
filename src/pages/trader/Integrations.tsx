@@ -44,8 +44,26 @@ const Integrations = () => {
 
   const fetchIntegrations = async () => {
     try {
-      // For now, return empty array until schema is properly configured
-      setIntegrations([]);
+      if (!user) return;
+      
+      const { data, error } = await supabase
+        .from('broker_integrations')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('is_active', true);
+
+      if (error) throw error;
+      
+      const mappedIntegrations: Integration[] = (data || []).map(item => ({
+        id: item.id,
+        broker_name: item.broker_name,
+        environment: item.environment,
+        is_active: item.is_active,
+        last_connected: item.last_connected,
+        account_status: item.account_status
+      }));
+      
+      setIntegrations(mappedIntegrations);
     } catch (error) {
       console.error('Error fetching integrations:', error);
       toast({
@@ -91,7 +109,7 @@ const Integrations = () => {
   };
 
   const saveIntegration = async () => {
-    if (!formData.apiKey || !formData.secretKey) {
+    if (!formData.apiKey || !formData.secretKey || !user) {
       toast({
         title: "Missing Information",
         description: "Please enter both API key and secret key.",
@@ -102,8 +120,30 @@ const Integrations = () => {
 
     setSaving(true);
     try {
-      // Simulate saving integration for demo
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Simple encryption for demo - in production use proper encryption
+      const encryptedApiKey = btoa(formData.apiKey);
+      const encryptedSecretKey = btoa(formData.secretKey);
+
+      const { data, error } = await supabase
+        .from('broker_integrations')
+        .insert({
+          user_id: user.id,
+          broker_name: 'alpaca',
+          api_key_encrypted: encryptedApiKey,
+          secret_key_encrypted: encryptedSecretKey,
+          environment: formData.environment,
+          last_connected: new Date().toISOString(),
+          account_status: {
+            account_id: "demo-account",
+            status: "active",
+            buying_power: "25000.00",
+            equity: "25000.00"
+          }
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
 
       toast({
         title: "Integration Saved",
@@ -113,23 +153,7 @@ const Integrations = () => {
 
       // Reset form and refresh integrations
       setFormData({ apiKey: "", secretKey: "", environment: "paper" });
-      
-      // Add a mock integration to the list
-      const mockIntegration: Integration = {
-        id: "mock-integration-" + Date.now(),
-        broker_name: "alpaca",
-        environment: formData.environment,
-        is_active: true,
-        last_connected: new Date().toISOString(),
-        account_status: {
-          account_id: "demo-account",
-          status: "active",
-          buying_power: "25000.00",
-          equity: "25000.00"
-        }
-      };
-      
-      setIntegrations([mockIntegration, ...integrations]);
+      fetchIntegrations();
     } catch (error) {
       console.error('Save integration failed:', error);
       toast({
@@ -144,7 +168,14 @@ const Integrations = () => {
 
   const deleteIntegration = async (integrationId: string) => {
     try {
-      // For now, just refresh the integrations list
+      const { error } = await supabase
+        .from('broker_integrations')
+        .delete()
+        .eq('id', integrationId)
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+
       toast({
         title: "Integration Deleted",
         description: "Integration removed successfully.",
@@ -234,7 +265,12 @@ const Integrations = () => {
             {/* Alpaca Integration Card */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Alpaca Trading</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <div className="w-8 h-8 bg-yellow-500 rounded flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">A</span>
+                  </div>
+                  Alpaca Trading
+                </CardTitle>
                 <p className="text-sm text-muted-foreground">
                   Commission-free stock trading with API access
                 </p>
@@ -342,7 +378,12 @@ const Integrations = () => {
             {/* Coming Soon Cards */}
             <Card className="opacity-50">
               <CardHeader>
-                <CardTitle className="text-lg">TD Ameritrade</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <div className="w-8 h-8 bg-red-600 rounded flex items-center justify-center">
+                    <span className="text-white font-bold text-xs">TD</span>
+                  </div>
+                  TD Ameritrade
+                </CardTitle>
                 <p className="text-sm text-muted-foreground">Coming Soon</p>
               </CardHeader>
               <CardContent>

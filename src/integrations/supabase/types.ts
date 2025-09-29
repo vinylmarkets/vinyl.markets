@@ -478,6 +478,48 @@ export type Database = {
         }
         Relationships: []
       }
+      broker_integrations: {
+        Row: {
+          account_status: Json | null
+          api_key_encrypted: string
+          broker_name: string
+          created_at: string
+          environment: string
+          id: string
+          is_active: boolean
+          last_connected: string | null
+          secret_key_encrypted: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_status?: Json | null
+          api_key_encrypted: string
+          broker_name: string
+          created_at?: string
+          environment?: string
+          id?: string
+          is_active?: boolean
+          last_connected?: string | null
+          secret_key_encrypted: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_status?: Json | null
+          api_key_encrypted?: string
+          broker_name?: string
+          created_at?: string
+          environment?: string
+          id?: string
+          is_active?: boolean
+          last_connected?: string | null
+          secret_key_encrypted?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       compliance_logs: {
         Row: {
           action_taken: string | null
