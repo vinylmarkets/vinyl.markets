@@ -30,6 +30,7 @@ import {
   Link as LinkIcon,
   Settings
 } from "lucide-react";
+import { CandlestickChart } from "./CandlestickChart";
 
 interface TradingSignal {
   symbol: string;
@@ -444,8 +445,12 @@ export const TradingDashboard = () => {
             </Card>
           </div>
 
-          {/* Center Column - Positions & Trades */}
+          {/* Center Column - Chart & Main Trading Area */}
           <div className="col-span-12 lg:col-span-6 space-y-3">
+            {/* Real-time Candlestick Chart */}
+            <div className="h-[500px]">
+              <CandlestickChart positions={positions} />
+            </div>
             {/* Active Positions */}
             <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
               <CardHeader className="pb-2">
