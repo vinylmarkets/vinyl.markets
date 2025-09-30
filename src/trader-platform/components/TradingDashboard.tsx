@@ -539,33 +539,30 @@ export const TradingDashboard = () => {
         className="h-16 border-b relative overflow-hidden"
         style={woodHeaderEnabled ? {
           background: `
-            linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 50%, rgba(0,0,0,0.2) 100%),
-            repeating-linear-gradient(
-              3deg,
-              transparent,
-              transparent 10px,
-              rgba(101,67,33,0.15) 10px,
-              rgba(101,67,33,0.15) 20px
-            ),
             linear-gradient(90deg, 
-              #654321 0%,
-              #704214 8%,
-              #8b4513 15%,
-              #a0522d 22%,
-              #cd853f 30%,
-              #daa520 38%,
-              #d2b48c 45%,
-              #daa520 52%,
-              #cd853f 60%,
-              #a0522d 70%,
-              #8b4513 80%,
-              #704214 88%,
-              #654321 100%
+              #5a3a1a 0%,
+              #6b4423 15%,
+              #7d5a3f 30%,
+              #8b6f47 45%,
+              #a5825a 48%,
+              #b89968 50%,
+              #a5825a 52%,
+              #8b6f47 55%,
+              #7d5a3f 70%,
+              #6b4423 85%,
+              #5a3a1a 100%
+            ),
+            repeating-linear-gradient(
+              90deg,
+              transparent,
+              transparent 3px,
+              rgba(101,67,33,0.12) 3px,
+              rgba(101,67,33,0.12) 6px
             )
           `,
           borderColor: '#5a3a1a',
           boxShadow: `
-            inset 0 2px 4px rgba(255,255,255,0.3),
+            inset 0 2px 4px rgba(255,255,255,0.25),
             inset 0 -2px 4px rgba(0,0,0,0.5),
             0 2px 8px rgba(0,0,0,0.3)
           `
@@ -575,26 +572,26 @@ export const TradingDashboard = () => {
           borderColor: 'hsl(var(--border))'
         }}
       >
-        {/* Wood grain overlay */}
+        {/* Wood grain and shine overlay */}
         {woodHeaderEnabled && (
           <div 
             className="absolute inset-0 pointer-events-none"
             style={{
               background: `
-                repeating-linear-gradient(
-                  90deg,
-                  transparent,
-                  transparent 120px,
-                  rgba(0,0,0,0.05) 120px,
-                  rgba(0,0,0,0.05) 122px
-                ),
                 linear-gradient(
                   90deg,
                   transparent 0%,
-                  transparent 30%,
-                  rgba(255,255,255,0.1) 50%,
-                  transparent 70%,
+                  transparent 42%,
+                  rgba(255,255,255,0.18) 50%,
+                  transparent 58%,
                   transparent 100%
+                ),
+                repeating-linear-gradient(
+                  90deg,
+                  transparent,
+                  transparent 12px,
+                  rgba(0,0,0,0.04) 12px,
+                  rgba(0,0,0,0.04) 15px
                 )
               `,
               mixBlendMode: 'overlay'
