@@ -623,18 +623,22 @@ export const TradingDashboard = () => {
           {/* Account Stats - Hide on small screens */}
           <div className="hidden lg:flex items-center space-x-6">
             <div className="text-center">
-              <p className={`text-xs ${woodHeaderEnabled ? 'dark:text-background' : 'text-muted-foreground'}`}>Portfolio Value</p>
-              <p className="text-lg font-semibold text-foreground">${accountData.portfolioValue.toLocaleString()}</p>
+              <p className={`text-xs ${woodHeaderEnabled ? 'text-white/80 dark:text-background' : 'text-muted-foreground'}`}>Portfolio Value</p>
+              <p className={`text-lg font-semibold ${woodHeaderEnabled ? 'text-white dark:text-foreground' : 'text-foreground'}`}>${accountData.portfolioValue.toLocaleString()}</p>
             </div>
             <div className="text-center">
-              <p className={`text-xs ${woodHeaderEnabled ? 'dark:text-background' : 'text-muted-foreground'}`}>Daily P&L</p>
-              <p className={`text-lg font-semibold ${accountData.dailyPnL >= 0 ? 'text-success' : 'text-destructive'}`}>
+              <p className={`text-xs ${woodHeaderEnabled ? 'text-white/80 dark:text-background' : 'text-muted-foreground'}`}>Daily P&L</p>
+              <p className={`text-lg font-semibold ${
+                woodHeaderEnabled 
+                  ? 'text-white' 
+                  : accountData.dailyPnL >= 0 ? 'text-success' : 'text-destructive'
+              }`}>
                 {accountData.dailyPnL >= 0 ? '+' : ''}${accountData.dailyPnL.toLocaleString()}
               </p>
             </div>
             <div className="text-center">
-              <p className={`text-xs ${woodHeaderEnabled ? 'dark:text-background' : 'text-muted-foreground'}`}>Buying Power</p>
-              <p className={`text-lg font-semibold ${woodHeaderEnabled ? 'dark:text-card' : 'text-accent'}`}>${accountData.buyingPower.toLocaleString()}</p>
+              <p className={`text-xs ${woodHeaderEnabled ? 'text-white/80 dark:text-background' : 'text-muted-foreground'}`}>Buying Power</p>
+              <p className={`text-lg font-semibold ${woodHeaderEnabled ? 'text-white dark:text-card' : 'text-accent'}`}>${accountData.buyingPower.toLocaleString()}</p>
             </div>
           </div>
 
