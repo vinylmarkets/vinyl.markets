@@ -116,14 +116,9 @@ export const AlpacaDiagnostic = () => {
           <Button 
             onClick={runDiagnostic} 
             disabled={isRunning}
-            size="sm"
-            variant="outline"
+            className="bg-purple-600 hover:bg-purple-700 text-white"
           >
-            {isRunning ? (
-              <RefreshCw className="h-3 w-3 animate-spin" />
-            ) : (
-              <Wifi className="h-3 w-3" />
-            )}
+            {isRunning ? "Running..." : "Run Diagnostic"}
           </Button>
         </CardTitle>
         <CardDescription className="text-xs">

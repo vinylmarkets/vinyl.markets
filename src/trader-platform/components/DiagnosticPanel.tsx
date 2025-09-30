@@ -259,10 +259,9 @@ export const DiagnosticPanel = ({
           <Button 
             onClick={runDiagnostics} 
             disabled={isRunning}
-            size="sm"
-            variant="outline"
+            className="bg-purple-600 hover:bg-purple-700 text-white"
           >
-            <RefreshCw className={`h-3 w-3 ${isRunning ? 'animate-spin' : ''}`} />
+            {isRunning ? "Running..." : "Run Diagnostic"}
           </Button>
         </CardTitle>
         <CardDescription className="text-xs">
