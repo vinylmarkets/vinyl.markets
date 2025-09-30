@@ -4342,6 +4342,95 @@ export type Database = {
         }
         Relationships: []
       }
+      vinyl_newsletter_analytics: {
+        Row: {
+          beehiiv_clicked_count: number | null
+          beehiiv_opened_count: number | null
+          beehiiv_sent_count: number | null
+          created_at: string
+          id: string
+          last_synced_at: string | null
+          newsletter_id: string
+          views: number | null
+        }
+        Insert: {
+          beehiiv_clicked_count?: number | null
+          beehiiv_opened_count?: number | null
+          beehiiv_sent_count?: number | null
+          created_at?: string
+          id?: string
+          last_synced_at?: string | null
+          newsletter_id: string
+          views?: number | null
+        }
+        Update: {
+          beehiiv_clicked_count?: number | null
+          beehiiv_opened_count?: number | null
+          beehiiv_sent_count?: number | null
+          created_at?: string
+          id?: string
+          last_synced_at?: string | null
+          newsletter_id?: string
+          views?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vinyl_newsletter_analytics_newsletter_id_fkey"
+            columns: ["newsletter_id"]
+            isOneToOne: false
+            referencedRelation: "vinyl_newsletters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vinyl_newsletters: {
+        Row: {
+          beehiiv_post_id: string | null
+          beehiiv_pushed_at: string | null
+          category: string | null
+          content: string
+          created_at: string
+          created_by: string | null
+          id: string
+          metadata: Json | null
+          published: boolean | null
+          published_at: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          beehiiv_post_id?: string | null
+          beehiiv_pushed_at?: string | null
+          category?: string | null
+          content: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          metadata?: Json | null
+          published?: boolean | null
+          published_at?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          beehiiv_post_id?: string | null
+          beehiiv_pushed_at?: string | null
+          category?: string | null
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          metadata?: Json | null
+          published?: boolean | null
+          published_at?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       watchlist_items: {
         Row: {
           added_at: string

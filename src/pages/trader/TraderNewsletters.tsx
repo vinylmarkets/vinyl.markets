@@ -69,7 +69,7 @@ const TraderNewsletters = () => {
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = async (publishToBeehiiv: boolean = false) => {
     if (!title.trim() || !content.trim()) {
       toast({
         title: "Missing Content",
@@ -81,22 +81,51 @@ const TraderNewsletters = () => {
 
     setIsSaving(true);
     try {
-      const { error } = await supabase.from("briefings").insert({
-        title,
-        academic_content: content,
-        plain_speak_content: content,
-        executive_summary: content.substring(0, 200) + "...",
-        category: "manual",
-        publication_date: new Date().toISOString(),
-        published: false,
-      });
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error("You must be logged in to save newsletters");
+      }
+
+      const { data: newsletter, error } = await supabase
+        .from("vinyl_newsletters")
+        .insert({
+          title,
+          content,
+          category: "manual",
+          created_by: user.id,
+          published: publishToBeehiiv,
+          published_at: publishToBeehiiv ? new Date().toISOString() : null,
+        })
+        .select()
+        .single();
 
       if (error) throw error;
 
-      toast({
-        title: "Newsletter Saved",
-        description: "Your newsletter has been saved as a draft",
-      });
+      // If publishing to BEEHIIV, call the push function
+      if (publishToBeehiiv && newsletter) {
+        const { error: pushError } = await supabase.functions.invoke("push-newsletter-to-beehiiv", {
+          body: { newsletter_id: newsletter.id },
+        });
+
+        if (pushError) {
+          toast({
+            title: "Saved but BEEHIIV Push Failed",
+            description: "Newsletter saved but couldn't push to BEEHIIV. You can retry later.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Published to BEEHIIV",
+            description: "Your newsletter has been saved and pushed to BEEHIIV",
+          });
+        }
+      } else {
+        toast({
+          title: "Newsletter Saved",
+          description: "Your newsletter has been saved as a draft",
+        });
+      }
       
       // Clear form
       setTitle("");
@@ -263,7 +292,7 @@ const TraderNewsletters = () => {
                   </div>
 
                   <div className="flex gap-2">
-                    <Button onClick={handleSave} disabled={isSaving || !title || !content}>
+                    <Button onClick={() => handleSave(false)} disabled={isSaving || !title || !content}>
                       {isSaving ? (
                         <>
                           <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -273,6 +302,23 @@ const TraderNewsletters = () => {
                         <>
                           <Save className="h-4 w-4 mr-2" />
                           Save Draft
+                        </>
+                      )}
+                    </Button>
+                    <Button 
+                      onClick={() => handleSave(true)} 
+                      disabled={isSaving || !title || !content}
+                      variant="default"
+                    >
+                      {isSaving ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Publishing...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="h-4 w-4 mr-2" />
+                          Publish to BEEHIIV
                         </>
                       )}
                     </Button>
@@ -349,7 +395,7 @@ const TraderNewsletters = () => {
                           </div>
 
                           <div className="flex gap-2">
-                            <Button onClick={handleSave} disabled={isSaving}>
+                            <Button onClick={() => handleSave(false)} disabled={isSaving}>
                               {isSaving ? (
                                 <>
                                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -359,6 +405,23 @@ const TraderNewsletters = () => {
                                 <>
                                   <Save className="h-4 w-4 mr-2" />
                                   Save Draft
+                                </>
+                              )}
+                            </Button>
+                            <Button 
+                              onClick={() => handleSave(true)} 
+                              disabled={isSaving}
+                              variant="default"
+                            >
+                              {isSaving ? (
+                                <>
+                                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                  Publishing...
+                                </>
+                              ) : (
+                                <>
+                                  <Send className="h-4 w-4 mr-2" />
+                                  Publish to BEEHIIV
                                 </>
                               )}
                             </Button>

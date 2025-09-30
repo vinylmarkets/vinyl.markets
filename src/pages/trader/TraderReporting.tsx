@@ -77,50 +77,39 @@ const TraderReporting = () => {
   const loadNewsletterData = async () => {
     setLoading(true);
     try {
-      // Fetch briefings with view counts
-      const { data: briefingsData, error: briefingsError } = await supabase
-        .from("briefings")
+      // Fetch vinyl newsletters (completely separate from atomic briefings)
+      const { data: newslettersData, error: newslettersError } = await supabase
+        .from("vinyl_newsletters")
         .select(`
           id,
           title,
-          publication_date,
-          stocks_mentioned,
+          created_at,
+          tags,
           category
         `)
         .eq("published", true)
-        .order("publication_date", { ascending: false })
+        .order("created_at", { ascending: false })
         .limit(100);
 
-      if (briefingsError) throw briefingsError;
+      if (newslettersError) throw newslettersError;
 
-      // Fetch view counts and ratings for each briefing
+      // Fetch analytics for each newsletter
       const newslettersWithStats = await Promise.all(
-        (briefingsData || []).map(async (briefing) => {
-          const { data: views } = await supabase
-            .from("briefing_views")
-            .select("id")
-            .eq("briefing_id", briefing.id);
-
-          const { data: userBriefings } = await supabase
-            .from("user_briefings")
-            .select("rating")
-            .eq("briefing_id", briefing.id);
-
-          const viewCount = views?.length || 0;
-          const sentCount = userBriefings?.length || 0;
-          const ratings = userBriefings?.filter((ub) => ub.rating).map((ub) => ub.rating) || [];
-          const avgRating = ratings.length > 0
-            ? ratings.reduce((a, b) => a + b, 0) / ratings.length
-            : 0;
+        (newslettersData || []).map(async (newsletter) => {
+          const { data: analytics } = await supabase
+            .from("vinyl_newsletter_analytics")
+            .select("*")
+            .eq("newsletter_id", newsletter.id)
+            .single();
 
           return {
-            id: briefing.id,
-            title: briefing.title,
-            publication_date: briefing.publication_date,
-            stocks_mentioned: briefing.stocks_mentioned || [],
-            views: viewCount,
-            sent_count: sentCount,
-            avg_rating: avgRating,
+            id: newsletter.id,
+            title: newsletter.title,
+            publication_date: newsletter.created_at,
+            stocks_mentioned: newsletter.tags || [],
+            views: analytics?.views || 0,
+            sent_count: analytics?.beehiiv_sent_count || 0,
+            avg_rating: 0, // No rating system for VINYL
           };
         })
       );
@@ -130,18 +119,12 @@ const TraderReporting = () => {
       // Calculate overall stats
       const totalSent = newslettersWithStats.reduce((sum, n) => sum + n.sent_count, 0);
       const totalViews = newslettersWithStats.reduce((sum, n) => sum + n.views, 0);
-      const allRatings = newslettersWithStats
-        .filter((n) => n.avg_rating > 0)
-        .map((n) => n.avg_rating);
-      const avgRating = allRatings.length > 0
-        ? allRatings.reduce((a, b) => a + b, 0) / allRatings.length
-        : 0;
 
       setStats({
         totalSent,
         totalViews,
-        avgRating,
-        subscriberCount: 0, // Would need a subscribers table
+        avgRating: 0, // No ratings for VINYL
+        subscriberCount: 0, // Would come from BEEHIIV
       });
     } catch (error: any) {
       toast({
@@ -156,39 +139,39 @@ const TraderReporting = () => {
 
   const loadAnalytics = async () => {
     try {
-      // Analyze stock mentions
-      const { data: briefingsData } = await supabase
-        .from("briefings")
-        .select("stocks_mentioned, category")
+      // Analyze vinyl newsletters (separate from atomic)
+      const { data: newslettersData } = await supabase
+        .from("vinyl_newsletters")
+        .select("tags, category")
         .eq("published", true)
         .limit(100);
 
-      if (briefingsData) {
-        // Count stock mentions
-        const stockCounts: { [key: string]: number } = {};
-        briefingsData.forEach((b) => {
-          (b.stocks_mentioned || []).forEach((stock: string) => {
-            stockCounts[stock] = (stockCounts[stock] || 0) + 1;
+      if (newslettersData) {
+        // Count tag mentions
+        const tagCounts: { [key: string]: number } = {};
+        newslettersData.forEach((n) => {
+          (n.tags || []).forEach((tag: string) => {
+            tagCounts[tag] = (tagCounts[tag] || 0) + 1;
           });
         });
 
-        const totalStocks = Object.values(stockCounts).reduce((a, b) => a + b, 0);
-        const topStocksData = Object.entries(stockCounts)
+        const totalTags = Object.values(tagCounts).reduce((a, b) => a + b, 0);
+        const topStocksData = Object.entries(tagCounts)
           .sort(([, a], [, b]) => b - a)
           .slice(0, 10)
           .map(([topic, count]) => ({
             topic,
             count,
-            percentage: (count / totalStocks) * 100,
+            percentage: totalTags > 0 ? (count / totalTags) * 100 : 0,
           }));
 
         setTopStocks(topStocksData);
 
         // Count categories
         const categoryCounts: { [key: string]: number } = {};
-        briefingsData.forEach((b) => {
-          if (b.category) {
-            categoryCounts[b.category] = (categoryCounts[b.category] || 0) + 1;
+        newslettersData.forEach((n) => {
+          if (n.category) {
+            categoryCounts[n.category] = (categoryCounts[n.category] || 0) + 1;
           }
         });
 
@@ -198,7 +181,7 @@ const TraderReporting = () => {
           .map(([topic, count]) => ({
             topic,
             count,
-            percentage: (count / totalCategories) * 100,
+            percentage: totalCategories > 0 ? (count / totalCategories) * 100 : 0,
           }));
 
         setTopCategories(topCategoriesData);
@@ -461,7 +444,7 @@ const TraderReporting = () => {
                               variant="ghost"
                               className="h-7 px-2 text-xs"
                             >
-                              <Link to={`/dashboard/briefings/${newsletter.id}`}>
+                              <Link to={`/trader/newsletters/${newsletter.id}`}>
                                 <Eye className="h-3 w-3 mr-1" />
                                 View
                               </Link>
