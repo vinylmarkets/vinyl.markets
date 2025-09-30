@@ -21,7 +21,8 @@ import {
   Key,
   HelpCircle,
   LogOut,
-  AlertCircle
+  AlertCircle,
+  FileText
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
@@ -180,6 +181,13 @@ export const ProfileDropdown = () => {
         </DropdownMenuItem>
         
         <DropdownMenuSeparator className="bg-border/50" />
+        
+        <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors">
+          <Link to="/trader/reporting" className="flex items-center w-full">
+            <FileText className="mr-3 h-4 w-4" />
+            <span>Reporting</span>
+          </Link>
+        </DropdownMenuItem>
         
         <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors">
           <Link to="/trader/troubleshooting" className="flex items-center w-full">
