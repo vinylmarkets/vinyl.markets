@@ -722,7 +722,7 @@ export const TradingDashboard = () => {
           {/* Left Column - Account & Stats */}
           <div className="col-span-12 lg:col-span-3 space-y-3">
             {/* Account Summary */}
-            <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
+            <Card className="!shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)] transition-shadow duration-200">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center space-x-2 text-base">
                   <DollarSign className="h-4 w-4 text-primary" />
@@ -748,7 +748,7 @@ export const TradingDashboard = () => {
             </Card>
 
             {/* Quick Actions */}
-            <Card className={`shadow-card hover:shadow-card-hover transition-all duration-300 ${quickTradeData?.isExpanded ? 'ring-2 ring-primary/20' : ''}`}>
+            <Card className={`!shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)] transition-all duration-300 ${quickTradeData?.isExpanded ? 'ring-2 ring-primary/20' : ''}`}>
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center justify-between text-base">
                   <div className="flex items-center space-x-2">
@@ -901,7 +901,7 @@ export const TradingDashboard = () => {
             </Card>
 
             {/* Strategy Performance */}
-            <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
+            <Card className="!shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)] transition-shadow duration-200">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center space-x-2 text-base">
                   <BarChart3 className="h-4 w-4 text-primary" />
@@ -988,7 +988,7 @@ export const TradingDashboard = () => {
               </div>
             )}
             
-            <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
+            <Card className="!shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)] transition-shadow duration-200">
               <Tabs defaultValue="positions" className="w-full">
                 <CardHeader className="pb-2">
                   <TabsList className="grid w-full grid-cols-2 h-8">
@@ -1089,7 +1089,7 @@ export const TradingDashboard = () => {
             <WatchlistManager onSymbolSelect={handleSymbolSelect} />
 
             {/* AI Signals */}
-            <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
+            <Card className="!shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)] transition-shadow duration-200">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center space-x-2 text-base">
                   <Zap className="h-4 w-4 text-primary" />
@@ -1151,7 +1151,7 @@ export const TradingDashboard = () => {
         {/* Analysis Sections - Collapsible */}
         <div className="mt-4">
           <Collapsible open={analysisExpanded} onOpenChange={setAnalysisExpanded}>
-            <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
+            <Card className="!shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)] transition-shadow duration-200">
               <CollapsibleTrigger asChild>
                 <CardHeader className="pb-2 cursor-pointer hover:bg-muted/50 transition-colors rounded-t-lg">
                   <CardTitle className="flex items-center justify-between text-base">
