@@ -572,28 +572,22 @@ export const TradingDashboard = () => {
           borderColor: 'hsl(var(--border))'
         }}
       >
-        {/* Wood grain and shine overlay */}
+        {/* Horizontal shine overlay */}
         {woodHeaderEnabled && (
           <div 
             className="absolute inset-0 pointer-events-none"
             style={{
               background: `
                 linear-gradient(
-                  90deg,
+                  180deg,
                   transparent 0%,
-                  transparent 42%,
-                  rgba(255,255,255,0.18) 50%,
-                  transparent 58%,
+                  transparent 35%,
+                  rgba(255,255,255,0.2) 50%,
+                  transparent 65%,
                   transparent 100%
-                ),
-                repeating-linear-gradient(
-                  90deg,
-                  transparent,
-                  transparent 12px,
-                  rgba(0,0,0,0.04) 12px,
-                  rgba(0,0,0,0.04) 15px
                 )
               `,
+              filter: 'blur(8px)',
               mixBlendMode: 'overlay'
             }}
           />
