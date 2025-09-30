@@ -90,8 +90,6 @@ serve(async (req) => {
           content: htmlContent,
           description: newsletter.executive_summary || newsletter.title,
           public: true,
-          published: false, // Save as draft first until email is verified
-          email_address: "jonathan@brandline.co", // This email needs to be verified in Kit.com
         }),
       }
     );
