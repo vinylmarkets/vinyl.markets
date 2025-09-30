@@ -69,6 +69,7 @@ interface Position {
   unrealizedPnL: number;
   unrealizedPnLPercent: number;
   side: 'long' | 'short';
+  broker?: string;
 }
 
 interface CloudStatus {
@@ -225,7 +226,8 @@ export const TradingDashboard = () => {
         marketValue: 43850,
         unrealizedPnL: 1320,
         unrealizedPnLPercent: 3.1,
-        side: 'long'
+        side: 'long',
+        broker: 'alpaca'
       },
       {
         symbol: 'MSFT',
@@ -235,7 +237,8 @@ export const TradingDashboard = () => {
         marketValue: 17437.50,
         unrealizedPnL: 427.50,
         unrealizedPnLPercent: 2.5,
-        side: 'long'
+        side: 'long',
+        broker: 'td-ameritrade'
       }
     ]);
 
@@ -1019,6 +1022,7 @@ export const TradingDashboard = () => {
                         <thead>
                           <tr className="border-b border-border text-xs text-muted-foreground">
                             <th className="text-left py-1 font-medium">Symbol</th>
+                            <th className="text-left py-1 font-medium">Broker</th>
                             <th className="text-right py-1 font-medium">Qty</th>
                             <th className="text-right py-1 font-medium">Cost</th>
                             <th className="text-right py-1 font-medium">Current</th>
@@ -1030,6 +1034,11 @@ export const TradingDashboard = () => {
                             positions.map((position) => (
                               <tr key={position.symbol} className="hover:bg-muted/50 transition-colors">
                                 <td className="py-2 font-medium text-foreground">{position.symbol}</td>
+                                <td className="py-2">
+                                  <Badge variant="outline" className="text-xs capitalize">
+                                    {position.broker || 'alpaca'}
+                                  </Badge>
+                                </td>
                                 <td className="text-right py-2 text-muted-foreground text-xs">{position.quantity}</td>
                                 <td className="text-right py-2 text-muted-foreground text-xs">${position.averageCost.toFixed(2)}</td>
                                 <td className="text-right py-2 text-foreground text-xs">${position.currentPrice.toFixed(2)}</td>
@@ -1043,7 +1052,7 @@ export const TradingDashboard = () => {
                             ))
                           ) : (
                             <tr>
-                              <td colSpan={5} className="py-6 text-center text-muted-foreground text-xs">
+                              <td colSpan={6} className="py-6 text-center text-muted-foreground text-xs">
                                 {hasIntegrations ? 'No positions found' : 'Connect broker for positions'}
                               </td>
                             </tr>

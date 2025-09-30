@@ -10,6 +10,7 @@ interface Position {
   unrealizedPnLPercent: number;
   side: 'long' | 'short';
   assetType: 'stock' | 'option' | 'crypto';
+  broker?: string;
 }
 
 interface RecentTrade {
@@ -32,7 +33,8 @@ const DEMO_POSITIONS: Position[] = [
     unrealizedPnL: 195,
     unrealizedPnLPercent: 1.08,
     side: 'long',
-    assetType: 'stock'
+    assetType: 'stock',
+    broker: 'alpaca'
   },
   {
     symbol: 'GOOGL',
@@ -43,7 +45,8 @@ const DEMO_POSITIONS: Position[] = [
     unrealizedPnL: 77.50,
     unrealizedPnLPercent: 1.10,
     side: 'long',
-    assetType: 'stock'
+    assetType: 'stock',
+    broker: 'alpaca'
   }
 ];
 
@@ -102,6 +105,18 @@ async function fetchPositionsFromAPI(): Promise<{ positions: Position[], recentT
 
     console.log('Fetching positions for user:', user.id);
 
+    // Get the user's broker integrations to determine which broker to query
+    const { data: integrations, error: intError } = await supabase
+      .from('broker_integrations')
+      .select('broker_name, environment')
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .limit(1)
+      .single();
+
+    const brokerName = integrations?.broker_name || 'alpaca';
+    console.log('Using broker:', brokerName);
+
     // Try to fetch from Alpaca API first
     const alpacaKey = Deno.env.get('ALPACA_API_KEY');
     const alpacaSecret = Deno.env.get('ALPACA_SECRET_KEY');
@@ -133,7 +148,8 @@ async function fetchPositionsFromAPI(): Promise<{ positions: Position[], recentT
             unrealizedPnL: Number(pos.unrealized_pl),
             unrealizedPnLPercent: Number(pos.unrealized_plpc) * 100,
             side: pos.side,
-            assetType: 'stock'
+            assetType: 'stock',
+            broker: brokerName
           }));
 
           // Fetch recent orders from Alpaca
@@ -206,7 +222,8 @@ async function fetchPositionsFromAPI(): Promise<{ positions: Position[], recentT
       unrealizedPnL: Number(pos.unrealized_pnl || 0),
       unrealizedPnLPercent: Number(pos.unrealized_pnl_percentage || 0),
       side: pos.side || 'long',
-      assetType: pos.asset_type || 'stock'
+      assetType: pos.asset_type || 'stock',
+      broker: 'paper'
     }));
 
     const { data: paperTrades } = await supabase
