@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, XCircle, AlertTriangle, Loader2, Send } from "lucide-react";
+import { CheckCircle, XCircle, AlertTriangle, Loader2, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface DiagnosticResult {
@@ -14,7 +14,7 @@ interface DiagnosticResult {
   timestamp: Date;
 }
 
-export const BeehiivDiagnostic = () => {
+export const KitDiagnostic = () => {
   const [diagnostics, setDiagnostics] = useState<DiagnosticResult[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const { toast } = useToast();
@@ -24,15 +24,15 @@ export const BeehiivDiagnostic = () => {
     const results: DiagnosticResult[] = [];
 
     try {
-      // Check Beehiiv API credentials
+      // Check Kit API credentials
       try {
-        const { data: credentialsTest, error } = await supabase.functions.invoke("push-newsletter-to-beehiiv", {
+        const { data: credentialsTest, error } = await supabase.functions.invoke("push-newsletter-to-kit", {
           body: { test_credentials_only: true }
         });
         
         if (error || credentialsTest?.error) {
           results.push({
-            category: "Beehiiv API Credentials",
+            category: "Kit API Credentials",
             status: "error",
             message: error?.message || credentialsTest?.error || "Failed to verify credentials",
             data: error || credentialsTest,
@@ -40,15 +40,15 @@ export const BeehiivDiagnostic = () => {
           });
         } else {
           results.push({
-            category: "Beehiiv API Credentials",
+            category: "Kit API Credentials",
             status: "success",
-            message: "Beehiiv API credentials configured properly",
+            message: "Kit.com API credentials configured properly",
             timestamp: new Date()
           });
         }
       } catch (error: any) {
         results.push({
-          category: "Beehiiv API Credentials",
+          category: "Kit API Credentials",
           status: "error",
           message: `Credentials check failed: ${error.message}`,
           data: error,
@@ -60,7 +60,7 @@ export const BeehiivDiagnostic = () => {
       try {
         const { data: newsletters, error } = await supabase
           .from("vinyl_newsletters")
-          .select("id, title, published, beehiiv_post_id, created_at")
+          .select("id, title, published, created_at")
           .order("created_at", { ascending: false })
           .limit(5);
 
@@ -73,7 +73,7 @@ export const BeehiivDiagnostic = () => {
             timestamp: new Date()
           });
         } else {
-          const unpublishedCount = newsletters?.filter(n => !n.beehiiv_post_id).length || 0;
+          const unpublishedCount = newsletters?.filter(n => !n.published).length || 0;
           results.push({
             category: "Newsletter Database",
             status: unpublishedCount > 3 ? "warning" : "success",
@@ -92,15 +92,15 @@ export const BeehiivDiagnostic = () => {
         });
       }
 
-      // Check Beehiiv function availability  
+      // Check Kit function availability  
       try {
-        const { data: functionTest, error } = await supabase.functions.invoke("push-newsletter-to-beehiiv", {
+        const { data: functionTest, error } = await supabase.functions.invoke("push-newsletter-to-kit", {
           body: { test_function_only: true }
         });
         
         if (error) {
           results.push({
-            category: "Beehiiv Function",
+            category: "Kit Publishing Function",
             status: "error",
             message: `Function error: ${error.message}`,
             data: error,
@@ -108,16 +108,16 @@ export const BeehiivDiagnostic = () => {
           });
         } else {
           results.push({
-            category: "Beehiiv Function",
+            category: "Kit Publishing Function",
             status: "success",
-            message: "push-newsletter-to-beehiiv function is accessible",
+            message: "push-newsletter-to-kit function is accessible",
             data: functionTest,
             timestamp: new Date()
           });
         }
       } catch (error: any) {
         results.push({
-          category: "Beehiiv Function",
+          category: "Kit Publishing Function",
           status: "error",
           message: `Function access failed: ${error.message}`,
           data: error,
@@ -125,9 +125,9 @@ export const BeehiivDiagnostic = () => {
         });
       }
 
-      // Check sync subscriber function
+      // Check subscriber sync function
       try {
-        const { data: syncTest, error } = await supabase.functions.invoke("sync-beehiiv-subscriber", {
+        const { data: syncTest, error } = await supabase.functions.invoke("sync-kit-subscriber", {
           body: { test_function_only: true }
         });
         
@@ -143,7 +143,7 @@ export const BeehiivDiagnostic = () => {
           results.push({
             category: "Subscriber Sync",
             status: "success",
-            message: "sync-beehiiv-subscriber function is accessible",
+            message: "sync-kit-subscriber function is accessible",
             timestamp: new Date()
           });
         }
@@ -164,7 +164,7 @@ export const BeehiivDiagnostic = () => {
       const warningCount = results.filter(r => r.status === "warning").length;
 
       toast({
-        title: "Beehiiv Diagnostic Complete",
+        title: "Kit.com Diagnostic Complete",
         description: `✅ ${successCount} passed, ⚠️ ${warningCount} warnings, ❌ ${errorCount} errors`,
       });
 
@@ -172,7 +172,7 @@ export const BeehiivDiagnostic = () => {
       console.error("Diagnostic error:", error);
       toast({
         title: "Diagnostic Failed",
-        description: "Unable to complete Beehiiv diagnostics",
+        description: "Unable to complete Kit.com diagnostics",
         variant: "destructive",
       });
     } finally {
@@ -203,8 +203,8 @@ export const BeehiivDiagnostic = () => {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Send className="h-5 w-5 text-primary" />
-            <CardTitle className="text-lg">Beehiiv Publishing</CardTitle>
+            <Mail className="h-5 w-5 text-primary" />
+            <CardTitle className="text-lg">Kit.com Publishing</CardTitle>
           </div>
           <Button
             onClick={runDiagnostics}
@@ -223,13 +223,13 @@ export const BeehiivDiagnostic = () => {
           </Button>
         </div>
         <p className="text-xs text-muted-foreground">
-          Test Beehiiv API connection and publishing pipeline
+          Test Kit.com API connection and newsletter publishing pipeline
         </p>
       </CardHeader>
       <CardContent className="space-y-3">
         {diagnostics.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-4">
-            Click "Run Diagnostic" to check Beehiiv publishing status
+            Click "Run Diagnostic" to check Kit.com publishing status
           </p>
         ) : (
           <div className="space-y-2">

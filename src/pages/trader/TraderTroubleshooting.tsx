@@ -5,7 +5,7 @@ import { TradingAutomationDiagnostic } from "@/trader-platform/components/Tradin
 import { AlpacaDiagnostic } from "@/trader-platform/components/AlpacaDiagnostic";
 import { DiagnosticPanel } from "@/trader-platform/components/DiagnosticPanel";
 import { NewsletterDiagnostic } from "@/trader-platform/components/NewsletterDiagnostic";
-import { BeehiivDiagnostic } from "@/trader-platform/components/BeehiivDiagnostic";
+import { KitDiagnostic } from "@/trader-platform/components/KitDiagnostic";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, ArrowLeft } from "lucide-react";
@@ -57,9 +57,9 @@ const TraderTroubleshooting = () => {
               <NewsletterDiagnostic />
             </div>
 
-            {/* Beehiiv Publishing Diagnostic */}
+            {/* Kit.com Publishing Diagnostic */}
             <div>
-              <BeehiivDiagnostic />
+              <KitDiagnostic />
             </div>
           </div>
         </div>
