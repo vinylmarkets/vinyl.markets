@@ -587,7 +587,7 @@ export const TradingDashboard = () => {
                   transparent 100%
                 )
               `,
-              filter: 'blur(8px)',
+              filter: 'blur(12px)',
               mixBlendMode: 'overlay'
             }}
           />
