@@ -4,6 +4,7 @@ import { TraderProtection } from "@/components/trader/TraderProtection";
 import { TradingAutomationDiagnostic } from "@/trader-platform/components/TradingAutomationDiagnostic";
 import { AlpacaDiagnostic } from "@/trader-platform/components/AlpacaDiagnostic";
 import { DiagnosticPanel } from "@/trader-platform/components/DiagnosticPanel";
+import { NewsletterDiagnostic } from "@/trader-platform/components/NewsletterDiagnostic";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, ArrowLeft } from "lucide-react";
@@ -34,20 +35,25 @@ const TraderTroubleshooting = () => {
           </p>
 
           {/* Bento Grid Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Trading Automation Diagnostic */}
-            <div className="lg:col-span-1">
+            <div>
               <TradingAutomationDiagnostic />
             </div>
 
             {/* Alpaca Connection Diagnostic */}
-            <div className="lg:col-span-1">
+            <div>
               <AlpacaDiagnostic />
             </div>
 
             {/* System Diagnostic Panel */}
-            <div className="lg:col-span-1">
+            <div>
               <DiagnosticPanel />
+            </div>
+
+            {/* Newsletter Diagnostic */}
+            <div>
+              <NewsletterDiagnostic />
             </div>
           </div>
         </div>
