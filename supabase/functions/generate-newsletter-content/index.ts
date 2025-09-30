@@ -17,9 +17,9 @@ serve(async (req) => {
       throw new Error('Prompt is required');
     }
 
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-    if (!OPENAI_API_KEY) {
-      throw new Error('OpenAI API key not configured');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('Lovable API key not configured');
     }
 
     console.log('Generating newsletter with prompt:', prompt);
@@ -61,19 +61,19 @@ WRITING RULES:
 
 CRITICAL: Generate a concise, professional title (8-12 words max) that captures the market theme without hype.`;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-5-mini-2025-08-07',
+        model: 'google/gemini-2.5-flash',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: prompt }
         ],
-        max_completion_tokens: 2000,
+        max_tokens: 2000,
         tools: [
           {
             type: "function",
@@ -104,12 +104,12 @@ CRITICAL: Generate a concise, professional title (8-12 words max) that captures 
 
     if (!response.ok) {
       const errorData = await response.text();
-      console.error('OpenAI API error:', response.status, errorData);
-      throw new Error(`OpenAI API error: ${response.status}`);
+      console.error('Lovable AI Gateway error:', response.status, errorData);
+      throw new Error(`AI Gateway error: ${response.status} - ${errorData}`);
     }
 
     const data = await response.json();
-    console.log('OpenAI response:', JSON.stringify(data, null, 2));
+    console.log('AI Gateway response:', JSON.stringify(data, null, 2));
     
     const toolCall = data.choices[0].message.tool_calls?.[0];
     
