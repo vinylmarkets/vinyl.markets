@@ -24,24 +24,42 @@ serve(async (req) => {
 
     console.log('Generating newsletter with prompt:', prompt);
 
-    // System prompt that defines AtomicMarket's voice and newsletter style
-    const systemPrompt = `You are a financial newsletter writer for AtomicMarket, a sophisticated trading intelligence platform. Your writing style is:
+    // Enhanced system prompt matching AtomicMarket's professional trading newsletter style
+    const systemPrompt = `You are the lead market analyst at VINYL Trading Intelligence, writing for institutional traders and serious retail investors. Your analysis is:
 
-- Professional yet accessible - you write for serious traders who want actionable insights
-- Data-driven and analytical - always back up claims with evidence
-- Direct and concise - no fluff, get to the point quickly
-- Educational - explain complex concepts clearly without dumbing them down
-- Market-focused - tie everything back to trading opportunities and risk management
-- Compliant - never give direct buy/sell recommendations, focus on analysis and education
+VOICE & TONE:
+- Sharp, analytical, and institutional-grade — no retail fluff
+- Confident but never promotional — you analyze, you don't sell
+- Direct and efficient — traders value precision over prose
+- Data-anchored — reference specific price action, volume, technical levels
+- Risk-aware — always acknowledge uncertainty and market conditions
 
-Newsletter structure:
-1. Catchy, descriptive title
-2. Executive summary (2-3 sentences)
-3. Main analysis (3-4 paragraphs)
-4. Key takeaways (bullet points)
-5. Trading implications (what traders should watch)
+STRUCTURE (MANDATORY):
+## Executive summary
+[2-3 sentences: what happened, why it matters, what changed]
 
-Use markdown formatting for emphasis and structure. Keep the total length between 500-800 words.`;
+## Main analysis
+[3-4 focused paragraphs: price action, volume, sector rotation, macro context, order flow signals]
+
+## Key takeaways
+- [Bullet point 1: specific, actionable insight]
+- [Bullet point 2: market condition or shift]
+- [Bullet point 3: risk factor or consideration]
+- [Add 2-3 more bullets as needed]
+
+## Trading implications — what to watch
+- [Specific level/signal 1]: what it means and how to respond
+- [Specific level/signal 2]: actionable observation
+- [Risk management note]: position sizing, stops, or hedge considerations
+
+WRITING RULES:
+1. Use technical precision: "10-year yield pushed 8bps higher" not "rates went up"
+2. Reference real signals: "call skew elevated" "breadth weakened" "VIX term structure inverted"
+3. Write for execution: "watch the 50-day MA as support" not "stocks might go down"
+4. Maintain regulatory compliance: NO "buy this" or "sell that" — only analysis and context
+5. Length: 600-900 words
+
+CRITICAL: Generate a concise, professional title (8-12 words max) that captures the market theme without hype.`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -53,16 +71,34 @@ Use markdown formatting for emphasis and structure. Keep the total length betwee
         model: 'gpt-5-mini-2025-08-07',
         messages: [
           { role: 'system', content: systemPrompt },
-          { 
-            role: 'user', 
-            content: `Write a newsletter article based on this prompt: ${prompt}
-
-Please format your response as JSON with two fields:
-- "title": The newsletter title
-- "content": The full newsletter content in markdown format` 
-          }
+          { role: 'user', content: prompt }
         ],
         max_completion_tokens: 2000,
+        tools: [
+          {
+            type: "function",
+            function: {
+              name: "create_newsletter",
+              description: "Generate a professional trading newsletter with title and content",
+              parameters: {
+                type: "object",
+                properties: {
+                  title: { 
+                    type: "string",
+                    description: "Concise newsletter title (8-12 words)"
+                  },
+                  content: { 
+                    type: "string",
+                    description: "Full newsletter content in markdown format"
+                  }
+                },
+                required: ["title", "content"],
+                additionalProperties: false
+              }
+            }
+          }
+        ],
+        tool_choice: { type: "function", function: { name: "create_newsletter" } }
       }),
     });
 
@@ -73,19 +109,13 @@ Please format your response as JSON with two fields:
     }
 
     const data = await response.json();
-    const generatedText = data.choices[0].message.content;
-
-    // Try to parse as JSON first
-    let result;
-    try {
-      result = JSON.parse(generatedText);
-    } catch (e) {
-      // If not JSON, extract title and content manually
-      const lines = generatedText.split('\n');
-      const title = lines[0].replace(/^#\s*/, '').trim();
-      const content = lines.slice(1).join('\n').trim();
-      result = { title, content };
+    const toolCall = data.choices[0].message.tool_calls?.[0];
+    
+    if (!toolCall) {
+      throw new Error('No tool call returned from AI');
     }
+
+    const result = JSON.parse(toolCall.function.arguments);
 
     console.log('Newsletter generated successfully');
 
