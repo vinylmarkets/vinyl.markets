@@ -109,15 +109,39 @@ CRITICAL: Generate a concise, professional title (8-12 words max) that captures 
     }
 
     const data = await response.json();
+    console.log('OpenAI response:', JSON.stringify(data, null, 2));
+    
     const toolCall = data.choices[0].message.tool_calls?.[0];
     
     if (!toolCall) {
-      throw new Error('No tool call returned from AI');
+      // Fallback: try to extract from regular message content
+      const messageContent = data.choices[0].message.content;
+      console.log('No tool call, attempting to parse message content:', messageContent);
+      
+      if (messageContent) {
+        try {
+          // Try to parse JSON from the content
+          const parsed = JSON.parse(messageContent);
+          if (parsed.title && parsed.content) {
+            console.log('Successfully parsed from message content');
+            return new Response(
+              JSON.stringify(parsed),
+              {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+              }
+            );
+          }
+        } catch (e) {
+          console.error('Failed to parse message content as JSON:', e);
+        }
+      }
+      
+      throw new Error('No tool call returned from AI and could not parse message content');
     }
 
     const result = JSON.parse(toolCall.function.arguments);
 
-    console.log('Newsletter generated successfully');
+    console.log('Newsletter generated successfully via tool call');
 
     return new Response(
       JSON.stringify(result),

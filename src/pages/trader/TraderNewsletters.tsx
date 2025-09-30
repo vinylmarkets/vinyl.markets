@@ -21,6 +21,7 @@ import {
   List,
   Link as LinkIcon,
   Eye,
+  X,
 } from "lucide-react";
 
 const TraderNewsletters = () => {
@@ -356,19 +357,38 @@ const TraderNewsletters = () => {
                     />
                   </div>
 
-                  <Button onClick={handleAIGenerate} disabled={isGenerating || !aiPrompt.trim()}>
-                    {isGenerating ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Generating...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="h-4 w-4 mr-2" />
-                        Generate Newsletter
-                      </>
+                  <div className="flex gap-2">
+                    <Button onClick={handleAIGenerate} disabled={isGenerating || !aiPrompt.trim()}>
+                      {isGenerating ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="h-4 w-4 mr-2" />
+                          Generate Newsletter
+                        </>
+                      )}
+                    </Button>
+                    
+                    {(title || content) && (
+                      <Button 
+                        variant="outline" 
+                        onClick={() => {
+                          setTitle("");
+                          setContent("");
+                          toast({
+                            title: "Cleared",
+                            description: "Generated content has been cleared",
+                          });
+                        }}
+                      >
+                        <X className="h-4 w-4 mr-2" />
+                        Clear
+                      </Button>
                     )}
-                  </Button>
+                  </div>
 
                   {(title || content) && (
                     <>
