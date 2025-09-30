@@ -290,13 +290,6 @@ export const TradingAutomationDiagnostic = () => {
             <Activity className="h-4 w-4" />
             Trading Automation
           </div>
-          <Button 
-            onClick={runDiagnostics} 
-            disabled={isRunning}
-            className="bg-purple-600 hover:bg-purple-700 text-white"
-          >
-            {isRunning ? "Running..." : "Run Diagnostic"}
-          </Button>
         </CardTitle>
         <CardDescription className="text-xs">
           Debug trading signals and automation
@@ -322,7 +315,7 @@ export const TradingAutomationDiagnostic = () => {
 
         {diagnostics.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
-            Click "Run Diagnostics" to check why automated trading isn't working
+            No diagnostics run yet
           </div>
         ) : (
           <div className="space-y-4">
@@ -364,6 +357,16 @@ export const TradingAutomationDiagnostic = () => {
             })}
           </div>
         )}
+        
+        <div className="mt-4 pt-4 border-t">
+          <Button 
+            onClick={runDiagnostics} 
+            disabled={isRunning}
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+          >
+            {isRunning ? "Running..." : "Run Diagnostic"}
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

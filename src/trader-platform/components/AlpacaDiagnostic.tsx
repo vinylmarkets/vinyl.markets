@@ -108,18 +108,9 @@ export const AlpacaDiagnostic = () => {
   return (
     <Card className="h-full !shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)]">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center justify-between text-lg">
-          <div className="flex items-center gap-2">
-            <Activity className="h-4 w-4" />
-            Alpaca Connection
-          </div>
-          <Button 
-            onClick={runDiagnostic} 
-            disabled={isRunning}
-            className="bg-purple-600 hover:bg-purple-700 text-white"
-          >
-            {isRunning ? "Running..." : "Run Diagnostic"}
-          </Button>
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <Activity className="h-4 w-4" />
+          Alpaca Connection
         </CardTitle>
         <CardDescription className="text-xs">
           Test API connection and credentials
@@ -129,7 +120,7 @@ export const AlpacaDiagnostic = () => {
         {!diagnosticResult && !isRunning && (
           <div className="text-center text-muted-foreground py-4">
             <WifiOff className="h-8 w-8 mx-auto mb-2 opacity-50" />
-            <p className="text-xs">Click test to diagnose API issues</p>
+            <p className="text-xs">No diagnostics run yet</p>
           </div>
         )}
 
@@ -220,6 +211,16 @@ export const AlpacaDiagnostic = () => {
             )}
           </div>
         )}
+        
+        <div className="mt-4 pt-4 border-t">
+          <Button 
+            onClick={runDiagnostic} 
+            disabled={isRunning}
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+          >
+            {isRunning ? "Running..." : "Run Diagnostic"}
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

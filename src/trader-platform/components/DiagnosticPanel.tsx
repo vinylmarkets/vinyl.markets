@@ -251,18 +251,9 @@ export const DiagnosticPanel = ({
   return (
     <Card className="w-full h-full !shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)]">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center justify-between text-lg">
-          <div className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            System Diagnostics
-          </div>
-          <Button 
-            onClick={runDiagnostics} 
-            disabled={isRunning}
-            className="bg-purple-600 hover:bg-purple-700 text-white"
-          >
-            {isRunning ? "Running..." : "Run Diagnostic"}
-          </Button>
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <Settings className="h-4 w-4" />
+          System Diagnostics
         </CardTitle>
         <CardDescription className="text-xs">
           Check connections and data sources
@@ -271,7 +262,7 @@ export const DiagnosticPanel = ({
       <CardContent className="space-y-3 pt-0">
         {diagnostics.length === 0 ? (
           <div className="text-center py-4 text-muted-foreground text-xs">
-            Click test to check system components
+            No diagnostics run yet
           </div>
         ) : (
           <div className="space-y-2">
@@ -304,6 +295,16 @@ export const DiagnosticPanel = ({
             ))}
           </div>
         )}
+        
+        <div className="mt-4 pt-4 border-t">
+          <Button 
+            onClick={runDiagnostics} 
+            disabled={isRunning}
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+          >
+            {isRunning ? "Running..." : "Run Diagnostic"}
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
