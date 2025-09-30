@@ -598,11 +598,11 @@ export const TradingDashboard = () => {
           {/* Account Stats - Hide on small screens */}
           <div className="hidden lg:flex items-center space-x-6">
             <div className="text-center">
-              <p className={`text-xs ${woodHeaderEnabled ? 'text-foreground dark:text-background' : 'text-muted-foreground'}`}>Portfolio Value</p>
+              <p className={`text-xs ${woodHeaderEnabled ? 'text-success dark:text-background' : 'text-muted-foreground'}`}>Portfolio Value</p>
               <p className={`text-lg font-semibold ${woodHeaderEnabled ? 'text-white/80 dark:text-foreground' : 'text-foreground'}`}>${accountData.portfolioValue.toLocaleString()}</p>
             </div>
             <div className="text-center">
-              <p className={`text-xs ${woodHeaderEnabled ? 'text-foreground dark:text-background' : 'text-muted-foreground'}`}>Daily P&L</p>
+              <p className={`text-xs ${woodHeaderEnabled ? 'text-success dark:text-background' : 'text-muted-foreground'}`}>Daily P&L</p>
               <p className={`text-lg font-semibold ${
                 woodHeaderEnabled 
                   ? 'text-white/80' 
@@ -612,7 +612,7 @@ export const TradingDashboard = () => {
               </p>
             </div>
             <div className="text-center">
-              <p className={`text-xs ${woodHeaderEnabled ? 'text-foreground dark:text-background' : 'text-muted-foreground'}`}>Buying Power</p>
+              <p className={`text-xs ${woodHeaderEnabled ? 'text-success dark:text-background' : 'text-muted-foreground'}`}>Buying Power</p>
               <p className={`text-lg font-semibold ${woodHeaderEnabled ? 'text-white/80 dark:text-card' : 'text-accent'}`}>${accountData.buyingPower.toLocaleString()}</p>
             </div>
           </div>
