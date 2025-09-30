@@ -70,7 +70,7 @@ const TraderNewsletters = () => {
     }
   };
 
-  const handleSave = async (publishToBeehiiv: boolean = false) => {
+  const handleSave = async (publishToKit: boolean = false) => {
     if (!title.trim() || !content.trim()) {
       toast({
         title: "Missing Content",
@@ -95,30 +95,30 @@ const TraderNewsletters = () => {
           content,
           category: "manual",
           created_by: user.id,
-          published: publishToBeehiiv,
-          published_at: publishToBeehiiv ? new Date().toISOString() : null,
+          published: publishToKit,
+          published_at: publishToKit ? new Date().toISOString() : null,
         })
         .select()
         .single();
 
       if (error) throw error;
 
-      // If publishing to BEEHIIV, call the push function
-      if (publishToBeehiiv && newsletter) {
-        const { error: pushError } = await supabase.functions.invoke("push-newsletter-to-beehiiv", {
+      // If publishing to Kit.com, call the push function
+      if (publishToKit && newsletter) {
+        const { error: pushError } = await supabase.functions.invoke("push-newsletter-to-kit", {
           body: { newsletter_id: newsletter.id },
         });
 
         if (pushError) {
           toast({
-            title: "Saved but BEEHIIV Push Failed",
-            description: "Newsletter saved but couldn't push to BEEHIIV. You can retry later.",
+            title: "Saved but Kit.com Push Failed",
+            description: "Newsletter saved but couldn't push to Kit.com. You can retry later.",
             variant: "destructive",
           });
         } else {
           toast({
-            title: "Published to BEEHIIV",
-            description: "Your newsletter has been saved and pushed to BEEHIIV",
+            title: "Published to Kit.com",
+            description: "Your newsletter has been saved and pushed to Kit.com",
           });
         }
       } else {
@@ -319,7 +319,7 @@ const TraderNewsletters = () => {
                       ) : (
                         <>
                           <Send className="h-4 w-4 mr-2" />
-                          Publish to BEEHIIV
+                          Publish to Kit.com
                         </>
                       )}
                     </Button>
@@ -441,7 +441,7 @@ const TraderNewsletters = () => {
                               ) : (
                                 <>
                                   <Send className="h-4 w-4 mr-2" />
-                                  Publish to BEEHIIV
+                                  Publish to Kit.com
                                 </>
                               )}
                             </Button>
