@@ -579,26 +579,6 @@ export const TradingDashboard = () => {
           borderColor: 'hsl(var(--border))'
         }}
       >
-        {/* Horizontal shine overlay */}
-        {woodHeaderEnabled && (
-          <div 
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: `
-                linear-gradient(
-                  180deg,
-                  transparent 0%,
-                  transparent 35%,
-                  rgba(255,255,255,0.2) 50%,
-                  transparent 65%,
-                  transparent 100%
-                )
-              `,
-              filter: 'blur(12px)',
-              mixBlendMode: 'overlay'
-            }}
-          />
-        )}
         <div className="flex items-center justify-between px-4 sm:px-6 h-full relative z-10">
           {/* Logo */}
           <div className="flex items-center space-x-2 sm:space-x-3">
