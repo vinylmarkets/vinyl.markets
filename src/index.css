@@ -9,7 +9,7 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* Fillow Light Theme - Exact Color Specifications */
-    --background: 240 10% 99%; /* Very light blue-tinted white */
+    --background: 40 20% 97%; /* Subtle creme color */
     --foreground: 215 25% 27%; /* Dark blue-gray text */
 
     --card: 0 0% 100%; /* Pure white cards */
@@ -91,13 +91,13 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 224 71% 4%;
+    --background: 0 0% 15%; /* Charcoal instead of pure black */
     --foreground: 210 40% 98%;
 
-    --card: 224 71% 4%;
+    --card: 0 0% 18%; /* Slightly lighter charcoal for cards */
     --card-foreground: 210 40% 98%;
 
-    --popover: 224 71% 4%;
+    --popover: 0 0% 18%;
     --popover-foreground: 210 40% 98%;
 
     --primary: 258 100% 65%;
@@ -137,6 +137,35 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground font-sans;
+    position: relative;
+  }
+
+  /* Subtle tweed texture overlay */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.03;
+    background-image: 
+      repeating-linear-gradient(0deg, transparent, transparent 2px, hsl(0 0% 0% / 0.1) 2px, hsl(0 0% 0% / 0.1) 3px),
+      repeating-linear-gradient(90deg, transparent, transparent 2px, hsl(0 0% 0% / 0.1) 2px, hsl(0 0% 0% / 0.1) 3px),
+      repeating-linear-gradient(45deg, transparent, transparent 3px, hsl(0 0% 0% / 0.05) 3px, hsl(0 0% 0% / 0.05) 4px),
+      repeating-linear-gradient(-45deg, transparent, transparent 3px, hsl(0 0% 0% / 0.05) 3px, hsl(0 0% 0% / 0.05) 4px);
+    background-size: 6px 6px, 6px 6px, 8px 8px, 8px 8px;
+  }
+
+  .dark body::before {
+    opacity: 0.04;
+    background-image: 
+      repeating-linear-gradient(0deg, transparent, transparent 2px, hsl(0 0% 100% / 0.1) 2px, hsl(0 0% 100% / 0.1) 3px),
+      repeating-linear-gradient(90deg, transparent, transparent 2px, hsl(0 0% 100% / 0.1) 2px, hsl(0 0% 100% / 0.1) 3px),
+      repeating-linear-gradient(45deg, transparent, transparent 3px, hsl(0 0% 100% / 0.05) 3px, hsl(0 0% 100% / 0.05) 4px),
+      repeating-linear-gradient(-45deg, transparent, transparent 3px, hsl(0 0% 100% / 0.05) 3px, hsl(0 0% 100% / 0.05) 4px);
   }
 
   /* Modern Typography System */
