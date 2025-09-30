@@ -20,6 +20,27 @@ export const NewsletterDiagnostic = () => {
   const [isRunning, setIsRunning] = useState(false);
   const { toast } = useToast();
 
+  const triggerNewsletter = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke("send-daily-market-email", {
+        body: { manual: true }
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Newsletter Triggered",
+        description: "Check your email shortly",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Failed to Trigger Newsletter",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   const runDiagnostics = async () => {
     setIsRunning(true);
     setDiagnostics([]);
@@ -139,7 +160,30 @@ export const NewsletterDiagnostic = () => {
         });
       }
 
-      // Check 5: Test Edge Function Connectivity
+      // Check 5: Newsletter Sending Function Status
+      const { data: emailLogs, error: emailLogsError } = await supabase
+        .from("cron_job_logs")
+        .select("*")
+        .eq("job_name", "send-daily-market-email")
+        .order("executed_at", { ascending: false })
+        .limit(5);
+
+      const hasRecentEmailSends = emailLogs && emailLogs.length > 0;
+      const lastEmailSent = hasRecentEmailSends 
+        ? new Date(emailLogs[0].executed_at).toLocaleDateString()
+        : "Never";
+
+      results.push({
+        category: "Newsletter Sending",
+        status: hasRecentEmailSends ? "success" : "error",
+        message: hasRecentEmailSends
+          ? `Newsletter sending is active. Last sent: ${lastEmailSent}`
+          : "⚠️ ISSUE FOUND: Newsletter sending function has never been executed. Cron job may not be configured.",
+        timestamp: new Date(),
+        data: { lastSent: lastEmailSent, totalSends: emailLogs?.length || 0 },
+      });
+
+      // Check 6: Test Morning Analysis Function
       try {
         const { data: edgeTest, error: edgeError } = await supabase.functions.invoke(
           "morning-market-analysis",
@@ -147,18 +191,18 @@ export const NewsletterDiagnostic = () => {
         );
 
         results.push({
-          category: "Edge Functions",
+          category: "Prediction Generation",
           status: edgeError ? "error" : "success",
           message: edgeError
-            ? `Edge function error: ${edgeError.message}`
-            : "Morning market analysis edge function is accessible",
+            ? `Morning analysis error: ${edgeError.message}`
+            : "Morning market analysis function is working",
           timestamp: new Date(),
         });
       } catch (err: any) {
         results.push({
-          category: "Edge Functions",
+          category: "Prediction Generation",
           status: "warning",
-          message: `Edge function test failed: ${err.message}`,
+          message: `Cannot reach morning analysis: ${err.message}`,
           timestamp: new Date(),
         });
       }
@@ -266,14 +310,24 @@ export const NewsletterDiagnostic = () => {
           )}
         </div>
 
-        <Button
-          onClick={runDiagnostics}
-          disabled={isRunning}
-          className="w-full mt-auto"
-          size="sm"
-        >
-          {isRunning ? "Running Diagnostic..." : "Run Newsletter Diagnostic"}
-        </Button>
+        <div className="space-y-2">
+          <Button
+            onClick={runDiagnostics}
+            disabled={isRunning}
+            className="w-full"
+            size="sm"
+          >
+            {isRunning ? "Running Diagnostic..." : "Run Newsletter Diagnostic"}
+          </Button>
+          <Button
+            onClick={triggerNewsletter}
+            variant="outline"
+            className="w-full"
+            size="sm"
+          >
+            Trigger Newsletter Manually
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
