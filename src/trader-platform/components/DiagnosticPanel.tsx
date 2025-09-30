@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { Settings, CheckCircle, XCircle, AlertCircle, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -249,51 +249,54 @@ export const DiagnosticPanel = ({
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          System Diagnostics
+    <Card className="w-full h-full !shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)]">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center justify-between text-lg">
+          <div className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            System Diagnostics
+          </div>
           <Button 
             onClick={runDiagnostics} 
             disabled={isRunning}
             size="sm"
+            variant="outline"
           >
-            <RefreshCw className={`h-4 w-4 mr-2 ${isRunning ? 'animate-spin' : ''}`} />
-            Run Diagnostics
+            <RefreshCw className={`h-3 w-3 ${isRunning ? 'animate-spin' : ''}`} />
           </Button>
         </CardTitle>
-        <CardDescription>
-          Check data sources, connections, and verify no mock data is being used
+        <CardDescription className="text-xs">
+          Check connections and data sources
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-3 pt-0">
         {diagnostics.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            Click "Run Diagnostics" to check all system components
+          <div className="text-center py-4 text-muted-foreground text-xs">
+            Click test to check system components
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-2">
             {diagnostics.map((result, index) => (
-              <div key={index} className="border rounded-lg p-4 space-y-2">
+              <div key={index} className="border rounded p-2 space-y-1">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
                     {getStatusIcon(result.status)}
-                    <span className="font-semibold">{result.category}</span>
+                    <span className="text-xs font-medium">{result.category}</span>
                   </div>
                   {getStatusBadge(result.status)}
                 </div>
-                <p className="text-sm text-muted-foreground">{result.message}</p>
+                <p className="text-xs text-muted-foreground">{result.message}</p>
                 {result.timestamp && (
                   <p className="text-xs text-muted-foreground">
-                    Checked at: {new Date(result.timestamp).toLocaleTimeString()}
+                    {new Date(result.timestamp).toLocaleTimeString()}
                   </p>
                 )}
                 {result.data && (
                   <details className="text-xs">
                     <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
-                      View raw data
+                      Details
                     </summary>
-                    <pre className="mt-2 p-2 bg-muted rounded overflow-x-auto">
+                    <pre className="mt-1 p-1 bg-muted rounded overflow-x-auto text-xs">
                       {JSON.stringify(result.data, null, 2)}
                     </pre>
                   </details>

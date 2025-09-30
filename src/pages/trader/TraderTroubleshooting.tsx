@@ -45,19 +45,9 @@ const TraderTroubleshooting = () => {
               <AlpacaDiagnostic />
             </div>
 
-            {/* General Diagnostic Panel */}
+            {/* System Diagnostic Panel */}
             <div className="lg:col-span-1">
-              <Card className="h-full shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1),0_4px_20px_-4px_rgba(0,0,0,0.06)] dark:shadow-[0_10px_30px_-10px_rgba(255,255,255,0.05),0_4px_20px_-4px_rgba(255,255,255,0.03)]">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg">System Diagnostic Panel</CardTitle>
-                  <p className="text-xs text-muted-foreground">
-                    Real-time checks of your trading system components.
-                  </p>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <DiagnosticPanel />
-                </CardContent>
-              </Card>
+              <DiagnosticPanel />
             </div>
           </div>
         </div>

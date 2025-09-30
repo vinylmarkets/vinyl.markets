@@ -106,7 +106,7 @@ export const AlpacaDiagnostic = () => {
   };
 
   return (
-    <Card className="h-full shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1),0_4px_20px_-4px_rgba(0,0,0,0.06)] dark:shadow-[0_10px_30px_-10px_rgba(255,255,255,0.05),0_4px_20px_-4px_rgba(255,255,255,0.03)]">
+    <Card className="h-full !shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)]">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center justify-between text-lg">
           <div className="flex items-center gap-2">
