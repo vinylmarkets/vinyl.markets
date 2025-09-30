@@ -4704,6 +4704,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      is_trader_by_user_id: {
+        Args: { user_uuid: string }
+        Returns: boolean
+      }
       is_whitelisted_trader: {
         Args: { user_email: string }
         Returns: boolean
