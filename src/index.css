@@ -43,7 +43,7 @@ All colors MUST be HSL.
     --input: 240 6% 95%; /* Input background */
     --ring: 239 56% 59%; /* Focus ring - matches primary */
 
-    --radius: 8px; /* Fillow's border radius */
+    --radius: 6px; /* Fillow's border radius */
     
     /* Fillow Gradient System */
     --gradient-primary: linear-gradient(135deg, hsl(239 56% 59%), hsl(239 56% 70%));
