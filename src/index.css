@@ -9,7 +9,7 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* Fillow Light Theme - Exact Color Specifications */
-    --background: 40 20% 87%; /* Darker creme color */
+    --background: 38 15% 92%; /* Creme-tan-grey blend */
     --foreground: 215 25% 27%; /* Dark blue-gray text */
 
     --card: 0 0% 100%; /* Pure white cards */
