@@ -400,6 +400,7 @@ const TraderReporting = () => {
                       <TableHead className="text-center">Sent</TableHead>
                       <TableHead className="text-center">Views</TableHead>
                       <TableHead className="text-center">Rating</TableHead>
+                      <TableHead className="text-center">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -452,6 +453,19 @@ const TraderReporting = () => {
                             ) : (
                               <span className="text-muted-foreground text-sm">-</span>
                             )}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Button 
+                              asChild 
+                              size="sm" 
+                              variant="ghost"
+                              className="h-7 px-2 text-xs"
+                            >
+                              <Link to={`/dashboard/briefings/${newsletter.id}`}>
+                                <Eye className="h-3 w-3 mr-1" />
+                                View
+                              </Link>
+                            </Button>
                           </TableCell>
                         </TableRow>
                       ))

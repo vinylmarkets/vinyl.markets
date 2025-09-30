@@ -53,3 +53,6 @@ verify_jwt = false
 
 [functions.sync-beehiiv-subscriber]
 verify_jwt = true
+
+[functions.generate-newsletter-content]
+verify_jwt = true
