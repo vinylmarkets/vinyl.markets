@@ -11,6 +11,7 @@ interface Position {
   side: 'long' | 'short';
   assetType: 'stock' | 'option' | 'crypto';
   broker?: string;
+  accountLast4?: string;
 }
 
 interface RecentTrade {
@@ -34,7 +35,8 @@ const DEMO_POSITIONS: Position[] = [
     unrealizedPnLPercent: 1.08,
     side: 'long',
     assetType: 'stock',
-    broker: 'alpaca'
+    broker: 'alpaca',
+    accountLast4: '5678'
   },
   {
     symbol: 'GOOGL',
@@ -46,7 +48,8 @@ const DEMO_POSITIONS: Position[] = [
     unrealizedPnLPercent: 1.10,
     side: 'long',
     assetType: 'stock',
-    broker: 'alpaca'
+    broker: 'alpaca',
+    accountLast4: '5678'
   }
 ];
 
@@ -126,6 +129,23 @@ async function fetchPositionsFromAPI(): Promise<{ positions: Position[], recentT
       try {
         console.log('Fetching positions from Alpaca API...');
         
+        // Fetch account info to get account number
+        const accountResponse = await fetch(`${alpacaBaseUrl}/v2/account`, {
+          method: 'GET',
+          headers: {
+            'APCA-API-KEY-ID': alpacaKey,
+            'APCA-API-SECRET-KEY': alpacaSecret,
+          },
+        });
+
+        let accountLast4 = '0000';
+        if (accountResponse.ok) {
+          const accountData = await accountResponse.json();
+          const accountNumber = accountData.account_number || '';
+          accountLast4 = accountNumber.slice(-4) || '0000';
+          console.log('Account last 4 digits:', accountLast4);
+        }
+        
         // Fetch positions from Alpaca
         const positionsResponse = await fetch(`${alpacaBaseUrl}/v2/positions`, {
           method: 'GET',
@@ -149,7 +169,8 @@ async function fetchPositionsFromAPI(): Promise<{ positions: Position[], recentT
             unrealizedPnLPercent: Number(pos.unrealized_plpc) * 100,
             side: pos.side,
             assetType: 'stock',
-            broker: brokerName
+            broker: brokerName,
+            accountLast4: accountLast4
           }));
 
           // Fetch recent orders from Alpaca
@@ -223,7 +244,8 @@ async function fetchPositionsFromAPI(): Promise<{ positions: Position[], recentT
       unrealizedPnLPercent: Number(pos.unrealized_pnl_percentage || 0),
       side: pos.side || 'long',
       assetType: pos.asset_type || 'stock',
-      broker: 'paper'
+      broker: 'paper',
+      accountLast4: accountId.slice(-4)
     }));
 
     const { data: paperTrades } = await supabase
