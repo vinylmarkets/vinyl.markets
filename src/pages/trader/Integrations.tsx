@@ -26,11 +26,13 @@ const Integrations = () => {
   const [testing, setTesting] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
   const [showSecretKey, setShowSecretKey] = useState(false);
+  const [selectedBroker, setSelectedBroker] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
     apiKey: "",
     secretKey: "",
-    environment: "paper"
+    environment: "paper",
+    broker: ""
   });
 
   const { user } = useAuth();
@@ -109,10 +111,10 @@ const Integrations = () => {
   };
 
   const saveIntegration = async () => {
-    if (!formData.apiKey || !formData.secretKey || !user) {
+    if (!formData.apiKey || !formData.secretKey || !formData.broker || !user) {
       toast({
         title: "Missing Information",
-        description: "Please enter both API key and secret key.",
+        description: "Please enter all required fields.",
         variant: "destructive",
       });
       return;
@@ -128,7 +130,7 @@ const Integrations = () => {
         .from('broker_integrations')
         .insert({
           user_id: user.id,
-          broker_name: 'alpaca',
+          broker_name: formData.broker,
           api_key_encrypted: encryptedApiKey,
           secret_key_encrypted: encryptedSecretKey,
           environment: formData.environment,
@@ -147,12 +149,13 @@ const Integrations = () => {
 
       toast({
         title: "Integration Saved",
-        description: "Alpaca integration saved successfully.",
+        description: `${formData.broker} integration saved successfully.`,
         variant: "default",
       });
 
       // Reset form and refresh integrations
-      setFormData({ apiKey: "", secretKey: "", environment: "paper" });
+      setFormData({ apiKey: "", secretKey: "", environment: "paper", broker: "" });
+      setSelectedBroker(null);
       fetchIntegrations();
     } catch (error) {
       console.error('Save integration failed:', error);
@@ -262,136 +265,262 @@ const Integrations = () => {
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Alpaca Integration Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <div className="w-8 h-8 bg-yellow-500 rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">A</span>
-                  </div>
-                  Alpaca Trading
-                </CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Commission-free stock trading with API access
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="apiKey">API Key</Label>
-                  <div className="relative">
-                    <Input
-                      id="apiKey"
-                      type={showApiKey ? "text" : "password"}
-                      placeholder="Enter your Alpaca API key"
-                      value={formData.apiKey}
-                      onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
-                      className="pr-10"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowApiKey(!showApiKey)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                    >
-                      {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
+            {/* Broker Selection Cards */}
+            {!selectedBroker && (
+              <>
+                {/* Alpaca */}
+                <Card 
+                  className="cursor-pointer hover:shadow-lg transition-shadow"
+                  onClick={() => {
+                    setSelectedBroker('alpaca');
+                    setFormData({ ...formData, broker: 'alpaca' });
+                  }}
+                >
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <div className="w-8 h-8 bg-yellow-500 rounded flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">A</span>
+                      </div>
+                      Alpaca Trading
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Commission-free stock trading with API access
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <Button variant="outline" className="w-full">
+                      Connect Alpaca
+                    </Button>
+                  </CardContent>
+                </Card>
 
-                <div className="space-y-2">
-                  <Label htmlFor="secretKey">Secret Key</Label>
-                  <div className="relative">
-                    <Input
-                      id="secretKey"
-                      type={showSecretKey ? "text" : "password"}
-                      placeholder="Enter your Alpaca secret key"
-                      value={formData.secretKey}
-                      onChange={(e) => setFormData({ ...formData, secretKey: e.target.value })}
-                      className="pr-10"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowSecretKey(!showSecretKey)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                    >
-                      {showSecretKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
+                {/* TD Ameritrade */}
+                <Card 
+                  className="cursor-pointer hover:shadow-lg transition-shadow"
+                  onClick={() => {
+                    setSelectedBroker('td-ameritrade');
+                    setFormData({ ...formData, broker: 'td-ameritrade' });
+                  }}
+                >
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <div className="w-8 h-8 bg-green-600 rounded flex items-center justify-center">
+                        <span className="text-white font-bold text-xs">TD</span>
+                      </div>
+                      TD Ameritrade
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      ThinkorSwim platform with API trading
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <Button variant="outline" className="w-full">
+                      Connect TD Ameritrade
+                    </Button>
+                  </CardContent>
+                </Card>
 
-                <div className="space-y-2">
-                  <Label>Environment</Label>
-                  <Select 
-                    value={formData.environment} 
-                    onValueChange={(value) => setFormData({ ...formData, environment: value })}
+                {/* Interactive Brokers */}
+                <Card 
+                  className="cursor-pointer hover:shadow-lg transition-shadow"
+                  onClick={() => {
+                    setSelectedBroker('interactive-brokers');
+                    setFormData({ ...formData, broker: 'interactive-brokers' });
+                  }}
+                >
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <div className="w-8 h-8 bg-red-600 rounded flex items-center justify-center">
+                        <span className="text-white font-bold text-xs">IB</span>
+                      </div>
+                      Interactive Brokers
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Professional trading with global market access
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <Button variant="outline" className="w-full">
+                      Connect IBKR
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* TradeStation */}
+                <Card 
+                  className="cursor-pointer hover:shadow-lg transition-shadow"
+                  onClick={() => {
+                    setSelectedBroker('tradestation');
+                    setFormData({ ...formData, broker: 'tradestation' });
+                  }}
+                >
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
+                        <span className="text-white font-bold text-xs">TS</span>
+                      </div>
+                      TradeStation
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Advanced algo trading platform with powerful API
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <Button variant="outline" className="w-full">
+                      Connect TradeStation
+                    </Button>
+                  </CardContent>
+                </Card>
+              </>
+            )}
+
+            {/* Integration Form */}
+            {selectedBroker && (
+              <Card className="md:col-span-2">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <div className={`w-8 h-8 rounded flex items-center justify-center ${
+                      selectedBroker === 'alpaca' ? 'bg-yellow-500' :
+                      selectedBroker === 'td-ameritrade' ? 'bg-green-600' :
+                      selectedBroker === 'interactive-brokers' ? 'bg-red-600' :
+                      'bg-blue-600'
+                    }`}>
+                      <span className="text-white font-bold text-xs">
+                        {selectedBroker === 'alpaca' ? 'A' :
+                         selectedBroker === 'td-ameritrade' ? 'TD' :
+                         selectedBroker === 'interactive-brokers' ? 'IB' :
+                         'TS'}
+                      </span>
+                    </div>
+                    {selectedBroker === 'alpaca' && 'Alpaca Trading'}
+                    {selectedBroker === 'td-ameritrade' && 'TD Ameritrade'}
+                    {selectedBroker === 'interactive-brokers' && 'Interactive Brokers'}
+                    {selectedBroker === 'tradestation' && 'TradeStation'}
+                  </CardTitle>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => {
+                      setSelectedBroker(null);
+                      setFormData({ apiKey: "", secretKey: "", environment: "paper", broker: "" });
+                    }}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select environment" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="paper">Paper Trading (Test)</SelectItem>
-                      <SelectItem value="live">Live Trading</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-3 pt-4">
-                  <Button
-                    variant="outline"
-                    onClick={testConnection}
-                    disabled={testing || !formData.apiKey || !formData.secretKey}
-                    className="w-full"
-                  >
-                    {testing ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Testing Connection...
-                      </>
-                    ) : (
-                      "Test Connection"
-                    )}
+                    ← Back to broker selection
                   </Button>
-
-                  <Button
-                    onClick={saveIntegration}
-                    disabled={saving || !formData.apiKey || !formData.secretKey}
-                    className="w-full"
-                  >
-                    {saving ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Saving Integration...
-                      </>
-                    ) : (
-                      "Save Integration"
-                    )}
-                  </Button>
-                </div>
-
-                <div className="text-xs text-muted-foreground space-y-1">
-                  <p>• Your API keys are encrypted before storage</p>
-                  <p>• Keys are only decrypted in memory for trading</p>
-                  <p>• Start with Paper Trading to test strategies</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Coming Soon Cards */}
-            <Card className="opacity-50">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <div className="w-8 h-8 bg-red-600 rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-xs">TD</span>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="apiKey">
+                      {selectedBroker === 'td-ameritrade' ? 'Client ID' : 'API Key'}
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="apiKey"
+                        type={showApiKey ? "text" : "password"}
+                        placeholder={`Enter your ${selectedBroker === 'td-ameritrade' ? 'Client ID' : 'API key'}`}
+                        value={formData.apiKey}
+                        onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
+                        className="pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowApiKey(!showApiKey)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
                   </div>
-                  TD Ameritrade
-                </CardTitle>
-                <p className="text-sm text-muted-foreground">Coming Soon</p>
-              </CardHeader>
-              <CardContent>
-                <div className="h-32 flex items-center justify-center text-muted-foreground">
-                  Integration coming soon
-                </div>
-              </CardContent>
-            </Card>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="secretKey">
+                      {selectedBroker === 'td-ameritrade' ? 'Refresh Token' : 
+                       selectedBroker === 'interactive-brokers' ? 'Account ID' :
+                       'Secret Key'}
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="secretKey"
+                        type={showSecretKey ? "text" : "password"}
+                        placeholder={`Enter your ${
+                          selectedBroker === 'td-ameritrade' ? 'refresh token' :
+                          selectedBroker === 'interactive-brokers' ? 'account ID' :
+                          'secret key'
+                        }`}
+                        value={formData.secretKey}
+                        onChange={(e) => setFormData({ ...formData, secretKey: e.target.value })}
+                        className="pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowSecretKey(!showSecretKey)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showSecretKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Environment</Label>
+                    <Select 
+                      value={formData.environment} 
+                      onValueChange={(value) => setFormData({ ...formData, environment: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select environment" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="paper">Paper Trading (Test)</SelectItem>
+                        <SelectItem value="live">Live Trading</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-3 pt-4">
+                    <Button
+                      variant="outline"
+                      onClick={testConnection}
+                      disabled={testing || !formData.apiKey || !formData.secretKey}
+                      className="w-full"
+                    >
+                      {testing ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Testing Connection...
+                        </>
+                      ) : (
+                        "Test Connection"
+                      )}
+                    </Button>
+
+                    <Button
+                      onClick={saveIntegration}
+                      disabled={saving || !formData.apiKey || !formData.secretKey}
+                      className="w-full"
+                    >
+                      {saving ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Saving Integration...
+                        </>
+                      ) : (
+                        "Save Integration"
+                      )}
+                    </Button>
+                  </div>
+
+                  <div className="text-xs text-muted-foreground space-y-1">
+                    <p>• Your credentials are encrypted before storage</p>
+                    <p>• Keys are only decrypted in memory for trading</p>
+                    <p>• Start with Paper Trading to test strategies</p>
+                    {selectedBroker === 'td-ameritrade' && (
+                      <p className="text-yellow-600">• TD Ameritrade is merging with Charles Schwab - future API access may change</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </CardContent>
       </Card>
