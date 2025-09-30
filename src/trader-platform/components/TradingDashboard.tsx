@@ -568,11 +568,7 @@ export const TradingDashboard = () => {
             )
           `,
           borderColor: '#5a3a1a',
-          boxShadow: `
-            inset 0 2px 4px rgba(255,255,255,0.25),
-            inset 0 -2px 4px rgba(0,0,0,0.5),
-            0 2px 8px rgba(0,0,0,0.3)
-          `
+          boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
         } : {
           background: 'hsl(var(--card) / 0.5)',
           backdropFilter: 'blur(8px)',
@@ -623,22 +619,22 @@ export const TradingDashboard = () => {
           {/* Account Stats - Hide on small screens */}
           <div className="hidden lg:flex items-center space-x-6">
             <div className="text-center">
-              <p className={`text-xs ${woodHeaderEnabled ? 'text-white/80 dark:text-background' : 'text-muted-foreground'}`}>Portfolio Value</p>
-              <p className={`text-lg font-semibold ${woodHeaderEnabled ? 'text-white dark:text-foreground' : 'text-foreground'}`}>${accountData.portfolioValue.toLocaleString()}</p>
+              <p className={`text-xs ${woodHeaderEnabled ? 'text-foreground dark:text-background' : 'text-muted-foreground'}`}>Portfolio Value</p>
+              <p className={`text-lg font-semibold ${woodHeaderEnabled ? 'text-white/80 dark:text-foreground' : 'text-foreground'}`}>${accountData.portfolioValue.toLocaleString()}</p>
             </div>
             <div className="text-center">
-              <p className={`text-xs ${woodHeaderEnabled ? 'text-white/80 dark:text-background' : 'text-muted-foreground'}`}>Daily P&L</p>
+              <p className={`text-xs ${woodHeaderEnabled ? 'text-foreground dark:text-background' : 'text-muted-foreground'}`}>Daily P&L</p>
               <p className={`text-lg font-semibold ${
                 woodHeaderEnabled 
-                  ? 'text-white' 
+                  ? 'text-white/80' 
                   : accountData.dailyPnL >= 0 ? 'text-success' : 'text-destructive'
               }`}>
                 {accountData.dailyPnL >= 0 ? '+' : ''}${accountData.dailyPnL.toLocaleString()}
               </p>
             </div>
             <div className="text-center">
-              <p className={`text-xs ${woodHeaderEnabled ? 'text-white/80 dark:text-background' : 'text-muted-foreground'}`}>Buying Power</p>
-              <p className={`text-lg font-semibold ${woodHeaderEnabled ? 'text-white dark:text-card' : 'text-accent'}`}>${accountData.buyingPower.toLocaleString()}</p>
+              <p className={`text-xs ${woodHeaderEnabled ? 'text-foreground dark:text-background' : 'text-muted-foreground'}`}>Buying Power</p>
+              <p className={`text-lg font-semibold ${woodHeaderEnabled ? 'text-white/80 dark:text-card' : 'text-accent'}`}>${accountData.buyingPower.toLocaleString()}</p>
             </div>
           </div>
 
