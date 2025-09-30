@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search, Plus, TrendingUp, Clock, Star, CheckCircle, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { useWatchlists } from '../hooks/useWatchlists';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface WatchlistManagerProps {
   onSymbolSelect?: (symbol: string) => void;
@@ -93,83 +94,56 @@ export const WatchlistManager: React.FC<WatchlistManagerProps> = ({ onSymbolSele
   };
 
   const handleAnalyze = async (symbol: string) => {
+    setAnalysisData({ symbol, loading: true });
+    
     try {
-      // Clear previous analysis first
-      setAnalysisData(null);
-      
-      // Set loading state for the new symbol
-      setAnalysisData({
-        symbol,
-        loading: true
+      const { data, error } = await supabase.functions.invoke('stock-analysis', {
+        body: { symbols: [symbol] }
       });
-      
-      // Simulate analysis with symbol-specific data
-      setTimeout(() => {
-        const mockAnalyses: { [key: string]: any } = {
-          'AAPL': {
-            sentiment: 'Bullish',
-            riskLevel: 'Low',
-            technicalScore: 8.5,
-            fundamentalScore: 9.0,
-            recommendation: 'BUY',
-            targetPrice: '$200.00',
-            supportLevel: '$175.00',
-            resistanceLevel: '$190.00',
-            keyPoints: [
-              'Strong iPhone 15 sales momentum',
-              'Services revenue growth accelerating',
-              'AI integration driving premium pricing',
-              'Strong balance sheet with $162B cash'
-            ]
-          },
-          'GME': {
-            sentiment: 'Neutral',
-            riskLevel: 'High',
-            technicalScore: 5.5,
-            fundamentalScore: 4.2,
-            recommendation: 'HOLD',
-            targetPrice: '$32.50',
-            supportLevel: '$24.80',
-            resistanceLevel: '$29.90',
-            keyPoints: [
-              'Meme stock volatility remains elevated',
-              'Digital transformation in progress',
-              'Retail sentiment driving price action',
-              'High short interest creates squeeze potential'
-            ]
-          }
-        };
 
-        const analysis = mockAnalyses[symbol] || {
-          sentiment: 'Neutral',
-          riskLevel: 'Medium',
-          technicalScore: 6.0,
-          fundamentalScore: 6.0,
-          recommendation: 'HOLD',
-          targetPrice: 'TBD',
-          supportLevel: 'TBD',
-          resistanceLevel: 'TBD',
-          keyPoints: [
-            'Analysis pending - limited data available',
-            'Requires further fundamental research',
-            'Monitor technical indicators',
-            'Consider sector trends'
-          ]
+      if (error) throw error;
+
+      if (data?.success && data?.data?.length > 0) {
+        const stockData = data.data[0];
+        
+        // Format real data for display
+        const sentiment = stockData.changePercent > 1 ? 'Bullish' : 
+                         stockData.changePercent < -1 ? 'Bearish' : 'Neutral';
+        
+        const analysis = {
+          sentiment,
+          riskLevel: Math.abs(stockData.changePercent) > 3 ? 'High' : 
+                    Math.abs(stockData.changePercent) > 1 ? 'Medium' : 'Low',
+          targetPrice: `$${stockData.currentPrice.toFixed(2)}`,
+          keyPoints: [stockData.analysis]
         };
 
         setAnalysisData({
           symbol,
           loading: false,
-          analysis
+          analysis,
+          realTimeData: {
+            currentPrice: stockData.currentPrice,
+            change: stockData.change,
+            changePercent: stockData.changePercent,
+            volume: stockData.volume,
+            marketCap: stockData.marketCap
+          }
         });
-      }, 2000);
-      
-    } catch (err) {
-      console.error('Analysis failed:', err);
+      } else {
+        throw new Error('No analysis data returned');
+      }
+    } catch (error) {
+      console.error('Error fetching stock analysis:', error);
+      toast({
+        title: "Analysis Error",
+        description: "Failed to fetch real-time analysis. Please try again.",
+        variant: "destructive"
+      });
       setAnalysisData({
         symbol,
         loading: false,
-        error: 'Analysis failed'
+        error: 'Failed to fetch analysis'
       });
     }
   };
@@ -372,8 +346,26 @@ export const WatchlistManager: React.FC<WatchlistManagerProps> = ({ onSymbolSele
                   <div className="text-red-600 text-sm">{analysisData.error}</div>
                 </div>
               ) : (
-                <div className="p-4 border rounded-lg bg-card">
-                  <div className="grid grid-cols-2 gap-4 mb-3">
+                <div className="p-4 border rounded-lg bg-card space-y-3">
+                  {analysisData.realTimeData && (
+                    <div className="grid grid-cols-3 gap-2 pb-3 border-b">
+                      <div>
+                        <span className="text-xs text-muted-foreground">Price:</span>
+                        <div className="text-sm font-medium">${analysisData.realTimeData.currentPrice.toFixed(2)}</div>
+                      </div>
+                      <div>
+                        <span className="text-xs text-muted-foreground">Change:</span>
+                        <div className={`text-sm font-medium ${analysisData.realTimeData.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {analysisData.realTimeData.change >= 0 ? '+' : ''}{analysisData.realTimeData.change.toFixed(2)} ({analysisData.realTimeData.changePercent.toFixed(2)}%)
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-xs text-muted-foreground">Volume:</span>
+                        <div className="text-sm font-medium">{(analysisData.realTimeData.volume / 1000000).toFixed(2)}M</div>
+                      </div>
+                    </div>
+                  )}
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
                       <span className="text-xs text-muted-foreground">Sentiment:</span>
                       <div className={`text-sm font-medium ${
@@ -384,8 +376,8 @@ export const WatchlistManager: React.FC<WatchlistManagerProps> = ({ onSymbolSele
                       </div>
                     </div>
                     <div>
-                      <span className="text-xs text-muted-foreground">Target:</span>
-                      <div className="text-sm font-medium">{analysisData.analysis.targetPrice}</div>
+                      <span className="text-xs text-muted-foreground">Risk:</span>
+                      <div className="text-sm font-medium">{analysisData.analysis.riskLevel}</div>
                     </div>
                   </div>
                   <div className="text-xs space-y-1">
