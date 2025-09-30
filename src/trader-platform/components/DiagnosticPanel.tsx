@@ -262,8 +262,9 @@ export const DiagnosticPanel = ({
       <CardContent className="space-y-3 pt-0 flex-1 flex flex-col">
         <div className="flex-1">
           {diagnostics.length === 0 ? (
-            <div className="text-center py-4 text-muted-foreground text-xs">
-              No diagnostics run yet
+            <div className="text-center text-muted-foreground py-4">
+              <Settings className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p className="text-xs">No diagnostics run yet</p>
             </div>
           ) : (
             <div className="space-y-2">
