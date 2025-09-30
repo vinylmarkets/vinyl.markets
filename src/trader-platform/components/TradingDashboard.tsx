@@ -663,7 +663,7 @@ export const TradingDashboard = () => {
             {/* View Mode Toggle */}
             <div className="flex bg-muted rounded-lg p-1">
               <Button
-                variant={viewMode === 'chart' ? 'default' : 'ghost'}
+                variant={viewMode === 'chart' ? 'active' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('chart')}
                 className="h-8 px-3 text-xs flex items-center space-x-1"
@@ -672,7 +672,7 @@ export const TradingDashboard = () => {
                 <span className="hidden sm:inline">Chart View</span>
               </Button>
               <Button
-                variant={viewMode === 'flow' ? 'default' : 'ghost'}
+                variant={viewMode === 'flow' ? 'active' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('flow')}
                 className="h-8 px-3 text-xs flex items-center space-x-1"
@@ -685,7 +685,7 @@ export const TradingDashboard = () => {
             {/* Knowledge Mode Toggle */}
             <div className="flex bg-muted rounded-lg p-1">
               <Button
-                variant={knowledgeMode === 'simple' ? 'default' : 'ghost'}
+                variant={knowledgeMode === 'simple' ? 'active' : 'ghost'}
                 size="sm"
                 onClick={() => setKnowledgeMode('simple')}
                 className="h-8 px-3 text-xs"
@@ -693,7 +693,7 @@ export const TradingDashboard = () => {
                 Simple
               </Button>
               <Button
-                variant={knowledgeMode === 'academic' ? 'default' : 'ghost'}
+                variant={knowledgeMode === 'academic' ? 'active' : 'ghost'}
                 size="sm"
                 onClick={() => setKnowledgeMode('academic')}
                 className="h-8 px-3 text-xs"
