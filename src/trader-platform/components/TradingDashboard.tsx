@@ -577,7 +577,7 @@ export const TradingDashboard = () => {
                 />
               </>
             )}
-            <div className="text-lg sm:text-xl font-bold text-foreground tracking-tight">
+            <div className={`text-lg sm:text-xl font-bold tracking-tight ${woodHeaderEnabled ? 'text-white' : 'text-foreground'}`}>
               <span className="hidden sm:inline">v5.0</span>
             </div>
             {/* Connection Status */}
