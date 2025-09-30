@@ -4349,6 +4349,7 @@ export type Database = {
           beehiiv_sent_count: number | null
           created_at: string
           id: string
+          kit_sent_count: number | null
           last_synced_at: string | null
           newsletter_id: string
           views: number | null
@@ -4359,6 +4360,7 @@ export type Database = {
           beehiiv_sent_count?: number | null
           created_at?: string
           id?: string
+          kit_sent_count?: number | null
           last_synced_at?: string | null
           newsletter_id: string
           views?: number | null
@@ -4369,6 +4371,7 @@ export type Database = {
           beehiiv_sent_count?: number | null
           created_at?: string
           id?: string
+          kit_sent_count?: number | null
           last_synced_at?: string | null
           newsletter_id?: string
           views?: number | null
@@ -4392,6 +4395,8 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          kit_broadcast_id: string | null
+          kit_pushed_at: string | null
           metadata: Json | null
           published: boolean | null
           published_at: string | null
@@ -4407,6 +4412,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          kit_broadcast_id?: string | null
+          kit_pushed_at?: string | null
           metadata?: Json | null
           published?: boolean | null
           published_at?: string | null
@@ -4422,6 +4429,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          kit_broadcast_id?: string | null
+          kit_pushed_at?: string | null
           metadata?: Json | null
           published?: boolean | null
           published_at?: string | null
