@@ -10,8 +10,9 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import vinylLogoDark from "@/assets/vinyl-logo-dark.png";
-import vinylLogoLight from "@/assets/vinyl-logo-light.png";
+import vinylLogoLight from "@/assets/vinyl-logo-light.svg";
+import vinylLogoDark from "@/assets/vinyl-logo-dark.svg";
+import vinylLogoWood from "@/assets/vinyl-logo-wood.svg";
 import { WatchlistManager } from "./WatchlistManager";
 import { SectorMap } from "./SectorMap";
 import { RelationshipNetworkGraph } from "./RelationshipNetworkGraph";
@@ -595,16 +596,26 @@ export const TradingDashboard = () => {
         <div className="flex items-center justify-between px-4 sm:px-6 h-full relative z-10">
           {/* Logo */}
           <div className="flex items-center space-x-2 sm:space-x-3">
-            <img 
-              src={vinylLogoDark} 
-              alt="Vinyl" 
-              className="h-8 w-auto dark:hidden"
-            />
-            <img 
-              src={vinylLogoLight} 
-              alt="Vinyl" 
-              className="h-8 w-auto hidden dark:block"
-            />
+            {woodHeaderEnabled ? (
+              <img 
+                src={vinylLogoWood} 
+                alt="Vinyl" 
+                className="h-8 w-auto"
+              />
+            ) : (
+              <>
+                <img 
+                  src={vinylLogoLight} 
+                  alt="Vinyl" 
+                  className="h-8 w-auto dark:hidden"
+                />
+                <img 
+                  src={vinylLogoDark} 
+                  alt="Vinyl" 
+                  className="h-8 w-auto hidden dark:block"
+                />
+              </>
+            )}
             <div className="text-lg sm:text-xl font-bold text-foreground tracking-tight">
               <span className="hidden sm:inline">v5.0</span>
             </div>
