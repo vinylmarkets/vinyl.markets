@@ -12,7 +12,40 @@ serve(async (req) => {
   }
 
   try {
-    const { newsletter_id } = await req.json();
+    const body = await req.json();
+    const { newsletter_id, test_credentials_only, test_function_only } = body;
+
+    // Handle diagnostic tests
+    if (test_credentials_only) {
+      const BEEHIIV_API_KEY = Deno.env.get('BEEHIIV_API_KEY');
+      const BEEHIIV_PUBLICATION_ID = Deno.env.get('BEEHIIV_PUBLICATION_ID');
+      
+      if (!BEEHIIV_API_KEY) {
+        return new Response(
+          JSON.stringify({ error: 'BEEHIIV_API_KEY not configured' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      if (!BEEHIIV_PUBLICATION_ID) {
+        return new Response(
+          JSON.stringify({ error: 'BEEHIIV_PUBLICATION_ID not configured' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      return new Response(
+        JSON.stringify({ success: true, message: 'Beehiiv credentials are configured' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (test_function_only) {
+      return new Response(
+        JSON.stringify({ success: true, message: 'Function is accessible' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     if (!newsletter_id) {
       throw new Error('Newsletter ID is required');

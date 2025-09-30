@@ -76,7 +76,26 @@ serve(async (req) => {
       )
     }
 
-    const { email, userData }: SubscriberData = await req.json()
+    const body = await req.json()
+    const { email, test_function_only, userData }: SubscriberData & { test_function_only?: boolean } = body
+
+    // Handle diagnostic test
+    if (test_function_only) {
+      const BEEHIIV_API_KEY = Deno.env.get('BEEHIIV_API_KEY');
+      const BEEHIIV_PUBLICATION_ID = Deno.env.get('BEEHIIV_PUBLICATION_ID');
+      
+      if (!BEEHIIV_API_KEY || !BEEHIIV_PUBLICATION_ID) {
+        return new Response(
+          JSON.stringify({ error: 'Beehiiv credentials not configured' }),
+          { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        );
+      }
+      
+      return new Response(
+        JSON.stringify({ success: true, message: 'Sync function is accessible' }),
+        { headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      );
+    }
 
     if (!email) {
       return new Response(

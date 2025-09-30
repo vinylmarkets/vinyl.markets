@@ -26,16 +26,16 @@ export const BeehiivDiagnostic = () => {
     try {
       // Check Beehiiv API credentials
       try {
-        const { data: credentialsTest } = await supabase.functions.invoke("push-newsletter-to-beehiiv", {
-          body: { test_credentials: true }
+        const { data: credentialsTest, error } = await supabase.functions.invoke("push-newsletter-to-beehiiv", {
+          body: { test_credentials_only: true }
         });
         
-        if (credentialsTest?.error) {
+        if (error || credentialsTest?.error) {
           results.push({
             category: "Beehiiv API Credentials",
             status: "error",
-            message: "Missing or invalid Beehiiv API credentials",
-            data: credentialsTest.error,
+            message: error?.message || credentialsTest?.error || "Failed to verify credentials",
+            data: error || credentialsTest,
             timestamp: new Date()
           });
         } else {
@@ -46,11 +46,11 @@ export const BeehiivDiagnostic = () => {
             timestamp: new Date()
           });
         }
-      } catch (error) {
+      } catch (error: any) {
         results.push({
           category: "Beehiiv API Credentials",
           status: "error",
-          message: "Unable to verify Beehiiv credentials",
+          message: `Credentials check failed: ${error.message}`,
           data: error,
           timestamp: new Date()
         });
@@ -92,24 +92,34 @@ export const BeehiivDiagnostic = () => {
         });
       }
 
-      // Check Beehiiv function availability
+      // Check Beehiiv function availability  
       try {
-        const { data: functionTest } = await supabase.functions.invoke("push-newsletter-to-beehiiv", {
-          body: { test_function: true }
+        const { data: functionTest, error } = await supabase.functions.invoke("push-newsletter-to-beehiiv", {
+          body: { test_function_only: true }
         });
         
-        results.push({
-          category: "Beehiiv Function",
-          status: "success",
-          message: "push-newsletter-to-beehiiv function is accessible",
-          data: functionTest,
-          timestamp: new Date()
-        });
+        if (error) {
+          results.push({
+            category: "Beehiiv Function",
+            status: "error",
+            message: `Function error: ${error.message}`,
+            data: error,
+            timestamp: new Date()
+          });
+        } else {
+          results.push({
+            category: "Beehiiv Function",
+            status: "success",
+            message: "push-newsletter-to-beehiiv function is accessible",
+            data: functionTest,
+            timestamp: new Date()
+          });
+        }
       } catch (error: any) {
         results.push({
           category: "Beehiiv Function",
           status: "error",
-          message: `Function error: ${error.message}`,
+          message: `Function access failed: ${error.message}`,
           data: error,
           timestamp: new Date()
         });
@@ -117,21 +127,31 @@ export const BeehiivDiagnostic = () => {
 
       // Check sync subscriber function
       try {
-        const { data: syncTest } = await supabase.functions.invoke("sync-beehiiv-subscriber", {
-          body: { test_function: true }
+        const { data: syncTest, error } = await supabase.functions.invoke("sync-beehiiv-subscriber", {
+          body: { test_function_only: true }
         });
         
-        results.push({
-          category: "Subscriber Sync",
-          status: "success",
-          message: "sync-beehiiv-subscriber function is accessible",
-          timestamp: new Date()
-        });
+        if (error) {
+          results.push({
+            category: "Subscriber Sync",
+            status: "warning",
+            message: `Sync function issue: ${error.message}`,
+            data: error,
+            timestamp: new Date()
+          });
+        } else {
+          results.push({
+            category: "Subscriber Sync",
+            status: "success",
+            message: "sync-beehiiv-subscriber function is accessible",
+            timestamp: new Date()
+          });
+        }
       } catch (error: any) {
         results.push({
           category: "Subscriber Sync",
           status: "warning",
-          message: `Sync function issue: ${error.message}`,
+          message: `Sync function test failed: ${error.message}`,
           data: error,
           timestamp: new Date()
         });
