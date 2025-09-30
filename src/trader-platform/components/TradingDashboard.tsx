@@ -1011,10 +1011,9 @@ export const TradingDashboard = () => {
             <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-200">
               <Tabs defaultValue="positions" className="w-full">
                 <CardHeader className="pb-2">
-                  <TabsList className="grid w-full grid-cols-3 h-8">
+                  <TabsList className="grid w-full grid-cols-2 h-8">
                     <TabsTrigger value="positions" className="text-xs">Positions</TabsTrigger>
                     <TabsTrigger value="trades" className="text-xs">Trades</TabsTrigger>
-                    <TabsTrigger value="status" className="text-xs">Status</TabsTrigger>
                   </TabsList>
                 </CardHeader>
                 
@@ -1099,26 +1098,6 @@ export const TradingDashboard = () => {
                       )}
                     </div>
                   </TabsContent>
-                  
-                  <TabsContent value="status" className="mt-0">
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">Cloud Status</span>
-                        <div className="flex items-center space-x-1">
-                          <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                          <span className="text-sm font-medium text-success">Active</span>
-                        </div>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">Signals Today</span>
-                        <span className="text-sm font-bold text-primary">12</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">Last Analysis</span>
-                        <span className="text-sm font-bold text-foreground">2m ago</span>
-                      </div>
-                    </div>
-                  </TabsContent>
                 </CardContent>
               </Tabs>
             </Card>
@@ -1138,6 +1117,26 @@ export const TradingDashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
+                {/* Status Information */}
+                <div className="space-y-2 pb-3 border-b border-border">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-muted-foreground">Cloud Status</span>
+                    <div className="flex items-center space-x-1">
+                      <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                      <span className="text-xs font-medium text-success">Active</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-muted-foreground">Signals Today</span>
+                    <span className="text-xs font-bold text-primary">12</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-muted-foreground">Last Analysis</span>
+                    <span className="text-xs font-bold text-foreground">2m ago</span>
+                  </div>
+                </div>
+
+                {/* AI Signals */}
                 {signals.length > 0 ? (
                   signals.map((signal, index) => (
                     <div key={index} className="p-3 bg-muted/30 rounded border border-border">
@@ -1160,7 +1159,7 @@ export const TradingDashboard = () => {
                     </div>
                   ))
                 ) : (
-                  <div className="py-8 text-center text-muted-foreground">
+                  <div className="py-8 text-center text-muted-foreground text-xs">
                     {hasIntegrations ? 'No AI signals available' : 'Connect a broker to view AI signals'}
                   </div>
                 )}
