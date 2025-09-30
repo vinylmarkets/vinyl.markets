@@ -9,7 +9,7 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* Fillow Light Theme - Exact Color Specifications */
-    --background: 38 15% 92%; /* Creme-tan-grey blend */
+    --background: 250 55% 96%; /* Light purple background */
     --foreground: 215 25% 27%; /* Dark blue-gray text */
 
     --card: 0 0% 100%; /* Pure white cards */
@@ -27,7 +27,7 @@ All colors MUST be HSL.
     --secondary: 240 6% 97%; /* Ultra light gray */
     --secondary-foreground: 215 25% 27%;
 
-    --muted: 240 5% 96%; /* Subtle gray background */
+    --muted: 250 45% 97%; /* Subtle purple-gray background */
     --muted-foreground: 215 16% 47%; /* Medium gray text */
 
     /* Fillow Accent Colors */

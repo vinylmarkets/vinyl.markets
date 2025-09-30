@@ -540,7 +540,7 @@ export const TradingDashboard = () => {
   }, [priceUpdateInterval]);
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-background">
+    <div className="min-h-screen bg-background">
       {/* Top Header Bar */}
       <header 
         className="h-16 border-b relative overflow-hidden"
