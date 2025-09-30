@@ -19,9 +19,9 @@ All colors MUST be HSL.
     --popover-foreground: 215 25% 27%;
 
     /* Fillow Purple System */
-    --primary: 258 100% 65%; /* Fillow signature purple */
+    --primary: 239 56% 59%; /* Fillow signature purple */
     --primary-foreground: 0 0% 100%;
-    --primary-light: 258 100% 85%; /* Light purple for backgrounds */
+    --primary-light: 239 56% 85%; /* Light purple for backgrounds */
     
     /* Fillow Secondary Colors */
     --secondary: 240 6% 97%; /* Ultra light gray */
@@ -35,24 +35,24 @@ All colors MUST be HSL.
     --accent-foreground: 0 0% 100%;
 
     /* Status Colors - Fillow Style */
-    --destructive: 0 91% 58%; /* Bright red */
+    --destructive: 2 91% 61%; /* Bright red */
     --destructive-foreground: 0 0% 100%;
 
     /* UI Element Colors */
     --border: 240 6% 90%; /* Subtle border color */
     --input: 240 6% 95%; /* Input background */
-    --ring: 258 100% 65%; /* Focus ring - matches primary */
+    --ring: 239 56% 59%; /* Focus ring - matches primary */
 
     --radius: 8px; /* Fillow's border radius */
     
     /* Fillow Gradient System */
-    --gradient-primary: linear-gradient(135deg, hsl(258 100% 65%), hsl(275 100% 70%));
+    --gradient-primary: linear-gradient(135deg, hsl(239 56% 59%), hsl(239 56% 70%));
     --gradient-secondary: linear-gradient(135deg, hsl(240 10% 99%), hsl(240 6% 97%));
     --gradient-accent: linear-gradient(135deg, hsl(208 100% 60%), hsl(208 100% 70%));
     --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(240 6% 99%));
     
     /* Fillow Status Colors */
-    --success: 142 69% 58%; /* Green */
+    --success: 78 51% 56%; /* Green */
     --success-foreground: 0 0% 100%;
     --warning: 38 100% 60%; /* Orange */
     --warning-foreground: 0 0% 100%;
@@ -60,12 +60,12 @@ All colors MUST be HSL.
     --info-foreground: 0 0% 100%;
     
     /* Data Visualization Colors (Fillow Palette) */
-    --chart-1: 258 100% 65%; /* Primary purple */
+    --chart-1: 239 56% 59%; /* Primary purple */
     --chart-2: 208 100% 60%; /* Blue */
-    --chart-3: 142 69% 58%; /* Green */
+    --chart-3: 78 51% 56%; /* Green */
     --chart-4: 38 100% 60%; /* Orange */
-    --chart-5: 0 91% 58%; /* Red */
-    --chart-6: 280 100% 75%; /* Light purple */
+    --chart-5: 2 91% 61%; /* Red */
+    --chart-6: 239 56% 75%; /* Light purple */
     
     /* Enhanced Shadows - Fillow Style */
     --shadow-sm: 0 1px 2px 0 hsl(215 25% 27% / 0.05);
@@ -82,12 +82,12 @@ All colors MUST be HSL.
     /* Modern Sidebar (Fillow-inspired) */
     --sidebar-background: 0 0% 100%; /* Pure white sidebar */
     --sidebar-foreground: 215 25% 27%;
-    --sidebar-primary: 258 100% 65%; /* Purple primary */
+    --sidebar-primary: 239 56% 59%; /* Purple primary */
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 258 100% 95%; /* Very light purple hover */
-    --sidebar-accent-foreground: 258 100% 65%;
+    --sidebar-accent: 239 56% 95%; /* Very light purple hover */
+    --sidebar-accent-foreground: 239 56% 59%;
     --sidebar-border: 240 6% 90%;
-    --sidebar-ring: 258 100% 65%;
+    --sidebar-ring: 239 56% 59%;
   }
 
   .dark {
@@ -100,7 +100,7 @@ All colors MUST be HSL.
     --popover: 0 0% 18%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 258 100% 65%;
+    --primary: 239 56% 59%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 240 6% 10%;
@@ -112,21 +112,21 @@ All colors MUST be HSL.
     --accent: 208 100% 60%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 91% 58%;
+    --destructive: 2 91% 61%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 240 6% 20%;
     --input: 240 6% 20%;
-    --ring: 258 100% 65%;
+    --ring: 239 56% 59%;
     
     --sidebar-background: 240 6% 10%;
     --sidebar-foreground: 240 5% 95%;
-    --sidebar-primary: 258 100% 65%;
+    --sidebar-primary: 239 56% 59%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 4% 16%;
     --sidebar-accent-foreground: 240 5% 95%;
     --sidebar-border: 240 4% 16%;
-    --sidebar-ring: 258 100% 65%;
+    --sidebar-ring: 239 56% 59%;
   }
 }
 
