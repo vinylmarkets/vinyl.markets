@@ -545,28 +545,7 @@ export const TradingDashboard = () => {
       <header 
         className="h-16 border-b relative overflow-hidden"
         style={woodHeaderEnabled ? {
-          background: `
-            linear-gradient(90deg, 
-              #5a3a1a 0%,
-              #6b4423 15%,
-              #7d5a3f 30%,
-              #8b6f47 45%,
-              #a5825a 48%,
-              #b89968 50%,
-              #a5825a 52%,
-              #8b6f47 55%,
-              #7d5a3f 70%,
-              #6b4423 85%,
-              #5a3a1a 100%
-            ),
-            repeating-linear-gradient(
-              90deg,
-              transparent,
-              transparent 3px,
-              rgba(101,67,33,0.12) 3px,
-              rgba(101,67,33,0.12) 6px
-            )
-          `,
+          background: '#5a3a1a',
           borderColor: '#5a3a1a',
           boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
         } : {
