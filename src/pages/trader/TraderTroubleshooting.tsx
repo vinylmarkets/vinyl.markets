@@ -5,6 +5,7 @@ import { TradingAutomationDiagnostic } from "@/trader-platform/components/Tradin
 import { AlpacaDiagnostic } from "@/trader-platform/components/AlpacaDiagnostic";
 import { DiagnosticPanel } from "@/trader-platform/components/DiagnosticPanel";
 import { NewsletterDiagnostic } from "@/trader-platform/components/NewsletterDiagnostic";
+import { BeehiivDiagnostic } from "@/trader-platform/components/BeehiivDiagnostic";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, ArrowLeft } from "lucide-react";
@@ -34,8 +35,8 @@ const TraderTroubleshooting = () => {
             Run diagnostics to verify system health, API connections, and trading automation status.
           </p>
 
-          {/* Bento Grid Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Bento Grid Layout - 3 columns on large screens */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {/* Trading Automation Diagnostic */}
             <div>
               <TradingAutomationDiagnostic />
@@ -54,6 +55,11 @@ const TraderTroubleshooting = () => {
             {/* Newsletter Diagnostic */}
             <div>
               <NewsletterDiagnostic />
+            </div>
+
+            {/* Beehiiv Publishing Diagnostic */}
+            <div>
+              <BeehiivDiagnostic />
             </div>
           </div>
         </div>
