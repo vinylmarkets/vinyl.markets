@@ -350,7 +350,7 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({ positions })
         {/* Chart Container */}
         <div className="flex-1 min-h-[350px] rounded-lg border bg-card p-2">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={chartData} margin={{ top: 10, right: 20, left: 20, bottom: 20 }}>
+            <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis 
                 dataKey="time" 
@@ -362,7 +362,7 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({ positions })
                 domain={['dataMin - 5', 'dataMax + 5']}
                 tick={{ fontSize: 11 }}
                 yAxisId="price"
-                label={{ value: 'Price ($)', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }}
+                label={{ value: 'PRICE', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle', fontSize: 9 } }}
                 tickFormatter={(value) => `$${value.toFixed(0)}`}
               />
               <YAxis 
@@ -370,7 +370,7 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({ positions })
                 orientation="right"
                 domain={[0, 'dataMax']}
                 tick={{ fontSize: 10 }}
-                label={{ value: 'Volume', angle: 90, position: 'insideRight', style: { textAnchor: 'middle' } }}
+                label={{ value: 'VOLUME', angle: 90, position: 'insideRight', style: { textAnchor: 'middle', fontSize: 9 } }}
                 tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`}
               />
               <Tooltip content={<CustomTooltip />} />
@@ -429,7 +429,7 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({ positions })
         )}
 
         {/* Legend */}
-        <div className="flex items-center justify-center space-x-6 mt-3 text-xs">
+        <div className="flex items-center justify-center space-x-6 mt-1 text-xs">
           <div className="flex items-center space-x-1">
             <BarChart3 className="h-3 w-3 text-green-500" />
             <span className="text-muted-foreground">Price Bars</span>
