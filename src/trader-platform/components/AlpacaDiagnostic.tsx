@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -106,12 +106,12 @@ export const AlpacaDiagnostic = () => {
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
+    <Card className="h-full shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1),0_4px_20px_-4px_rgba(0,0,0,0.06)] dark:shadow-[0_10px_30px_-10px_rgba(255,255,255,0.05),0_4px_20px_-4px_rgba(255,255,255,0.03)]">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center justify-between text-lg">
           <div className="flex items-center gap-2">
-            <Activity className="h-5 w-5" />
-            Alpaca Connection Diagnostic
+            <Activity className="h-4 w-4" />
+            Alpaca Connection
           </div>
           <Button 
             onClick={runDiagnostic} 
@@ -120,26 +120,28 @@ export const AlpacaDiagnostic = () => {
             variant="outline"
           >
             {isRunning ? (
-              <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+              <RefreshCw className="h-3 w-3 animate-spin" />
             ) : (
-              <Wifi className="h-4 w-4 mr-2" />
+              <Wifi className="h-3 w-3" />
             )}
-            {isRunning ? 'Running...' : 'Test Connection'}
           </Button>
         </CardTitle>
+        <CardDescription className="text-xs">
+          Test API connection and credentials
+        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3 pt-0">
         {!diagnosticResult && !isRunning && (
-          <div className="text-center text-muted-foreground py-8">
-            <WifiOff className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>Click "Test Connection" to diagnose Alpaca API issues</p>
+          <div className="text-center text-muted-foreground py-4">
+            <WifiOff className="h-8 w-8 mx-auto mb-2 opacity-50" />
+            <p className="text-xs">Click test to diagnose API issues</p>
           </div>
         )}
 
         {isRunning && (
-          <div className="text-center py-8">
-            <RefreshCw className="h-12 w-12 mx-auto mb-4 animate-spin text-blue-500" />
-            <p className="text-muted-foreground">Testing Alpaca connection...</p>
+          <div className="text-center py-4">
+            <RefreshCw className="h-8 w-8 mx-auto mb-2 animate-spin text-blue-500" />
+            <p className="text-muted-foreground text-xs">Testing connection...</p>
           </div>
         )}
 

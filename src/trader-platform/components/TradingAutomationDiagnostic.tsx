@@ -283,40 +283,40 @@ export const TradingAutomationDiagnostic = () => {
   const successCount = diagnostics.filter(d => d.status === "success").length;
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
+    <Card className="w-full h-full shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1),0_4px_20px_-4px_rgba(0,0,0,0.06)] dark:shadow-[0_10px_30px_-10px_rgba(255,255,255,0.05),0_4px_20px_-4px_rgba(255,255,255,0.03)]">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center justify-between text-lg">
           <div className="flex items-center gap-2">
-            <Activity className="h-5 w-5" />
-            Trading Automation Diagnostics
+            <Activity className="h-4 w-4" />
+            Trading Automation
           </div>
           <Button 
             onClick={runDiagnostics} 
             disabled={isRunning}
             size="sm"
+            variant="outline"
           >
-            <RefreshCw className={`h-4 w-4 mr-2 ${isRunning ? 'animate-spin' : ''}`} />
-            Run Diagnostics
+            <RefreshCw className={`h-3 w-3 ${isRunning ? 'animate-spin' : ''}`} />
           </Button>
         </CardTitle>
-        <CardDescription>
-          Debug why automated trading signals and executions aren't running
+        <CardDescription className="text-xs">
+          Debug trading signals and automation
         </CardDescription>
       </CardHeader>
       <CardContent>
         {diagnostics.length > 0 && (
-          <div className="flex gap-4 mb-4 p-4 bg-muted rounded-lg">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              <span className="text-sm font-medium">{successCount} Passed</span>
+          <div className="flex gap-2 mb-3 p-2 bg-muted rounded text-xs">
+            <div className="flex items-center gap-1">
+              <CheckCircle className="h-3 w-3 text-green-500" />
+              <span>{successCount}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <AlertCircle className="h-4 w-4 text-yellow-500" />
-              <span className="text-sm font-medium">{warningCount} Warnings</span>
+            <div className="flex items-center gap-1">
+              <AlertCircle className="h-3 w-3 text-yellow-500" />
+              <span>{warningCount}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <XCircle className="h-4 w-4 text-red-500" />
-              <span className="text-sm font-medium">{errorCount} Errors</span>
+            <div className="flex items-center gap-1">
+              <XCircle className="h-3 w-3 text-red-500" />
+              <span>{errorCount}</span>
             </div>
           </div>
         )}
