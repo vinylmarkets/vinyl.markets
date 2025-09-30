@@ -536,34 +536,72 @@ export const TradingDashboard = () => {
     <div className="min-h-screen bg-background">
       {/* Top Header Bar */}
       <header 
-        className="h-16 border-b border-border relative"
+        className="h-16 border-b relative overflow-hidden"
         style={woodHeaderEnabled ? {
           background: `
-            linear-gradient(90deg, 
-              #8b4513 0%, 
-              #a0522d 15%, 
-              #cd853f 35%, 
-              #d2691e 50%, 
-              #cd853f 65%, 
-              #a0522d 85%, 
-              #8b4513 100%
-            ),
+            linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 50%, rgba(0,0,0,0.2) 100%),
             repeating-linear-gradient(
-              90deg,
+              3deg,
               transparent,
-              transparent 80px,
-              rgba(139,69,19,0.4) 80px,
-              rgba(139,69,19,0.4) 160px
+              transparent 10px,
+              rgba(101,67,33,0.15) 10px,
+              rgba(101,67,33,0.15) 20px
+            ),
+            linear-gradient(90deg, 
+              #654321 0%,
+              #704214 8%,
+              #8b4513 15%,
+              #a0522d 22%,
+              #cd853f 30%,
+              #daa520 38%,
+              #d2b48c 45%,
+              #daa520 52%,
+              #cd853f 60%,
+              #a0522d 70%,
+              #8b4513 80%,
+              #704214 88%,
+              #654321 100%
             )
           `,
-          backgroundBlendMode: 'multiply',
-          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.3)'
+          borderColor: '#5a3a1a',
+          boxShadow: `
+            inset 0 2px 4px rgba(255,255,255,0.3),
+            inset 0 -2px 4px rgba(0,0,0,0.5),
+            0 2px 8px rgba(0,0,0,0.3)
+          `
         } : {
           background: 'hsl(var(--card) / 0.5)',
-          backdropFilter: 'blur(8px)'
+          backdropFilter: 'blur(8px)',
+          borderColor: 'hsl(var(--border))'
         }}
       >
-        <div className="flex items-center justify-between px-4 sm:px-6 h-full">
+        {/* Wood grain overlay */}
+        {woodHeaderEnabled && (
+          <div 
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: `
+                repeating-linear-gradient(
+                  90deg,
+                  transparent,
+                  transparent 120px,
+                  rgba(0,0,0,0.05) 120px,
+                  rgba(0,0,0,0.05) 122px
+                ),
+                linear-gradient(
+                  90deg,
+                  transparent 0%,
+                  transparent 30%,
+                  rgba(255,255,255,0.1) 50%,
+                  transparent 70%,
+                  transparent 100%
+                )
+              `,
+              mixBlendMode: 'overlay'
+            }}
+          />
+        )}
+        <div className="flex items-center justify-between px-4 sm:px-6 h-full relative z-10">
           {/* Logo */}
           <div className="flex items-center space-x-2 sm:space-x-3">
             <img 
