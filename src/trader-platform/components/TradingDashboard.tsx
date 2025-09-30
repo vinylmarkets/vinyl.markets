@@ -115,6 +115,7 @@ export const TradingDashboard = () => {
   const [isConnected, setIsConnected] = useState(true);
   const [knowledgeMode, setKnowledgeMode] = useState<'simple' | 'academic'>('simple');
   const [viewMode, setViewMode] = useState<'chart' | 'flow'>('chart');
+  const [woodHeaderEnabled, setWoodHeaderEnabled] = useState(false);
   const [quickTradeSymbol, setQuickTradeSymbol] = useState('');
   const [quickTradeData, setQuickTradeData] = useState<{
     symbol: string;
@@ -164,6 +165,15 @@ export const TradingDashboard = () => {
     // Auto-trigger the buy analysis for quick access
     handleTradeClick('BUY', symbol);
   };
+
+  // Load wood header setting
+  useEffect(() => {
+    const savedSettings = localStorage.getItem('trader-settings');
+    if (savedSettings) {
+      const settings = JSON.parse(savedSettings);
+      setWoodHeaderEnabled(settings.woodHeaderEnabled || false);
+    }
+  }, []);
 
   // Mock data
   useEffect(() => {
@@ -525,7 +535,34 @@ export const TradingDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Top Header Bar */}
-      <header className="h-16 border-b border-border bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/50">
+      <header 
+        className="h-16 border-b border-border relative"
+        style={woodHeaderEnabled ? {
+          background: `
+            linear-gradient(90deg, 
+              #8b4513 0%, 
+              #a0522d 15%, 
+              #cd853f 35%, 
+              #d2691e 50%, 
+              #cd853f 65%, 
+              #a0522d 85%, 
+              #8b4513 100%
+            ),
+            repeating-linear-gradient(
+              90deg,
+              transparent,
+              transparent 80px,
+              rgba(139,69,19,0.4) 80px,
+              rgba(139,69,19,0.4) 160px
+            )
+          `,
+          backgroundBlendMode: 'multiply',
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.3)'
+        } : {
+          background: 'hsl(var(--card) / 0.5)',
+          backdropFilter: 'blur(8px)'
+        }}
+      >
         <div className="flex items-center justify-between px-4 sm:px-6 h-full">
           {/* Logo */}
           <div className="flex items-center space-x-2 sm:space-x-3">

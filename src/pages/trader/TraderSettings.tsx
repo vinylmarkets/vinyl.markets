@@ -36,6 +36,7 @@ interface TradingSettings {
   timeZone: string;
   theme: 'light' | 'dark' | 'auto';
   accentColor: string;
+  woodHeaderEnabled: boolean;
 }
 
 const TraderSettings = () => {
@@ -54,7 +55,8 @@ const TraderSettings = () => {
     numberFormat: 'abbreviated',
     timeZone: 'America/New_York',
     theme: 'auto',
-    accentColor: 'blue'
+    accentColor: 'blue',
+    woodHeaderEnabled: false
   });
 
   useEffect(() => {
@@ -210,6 +212,21 @@ const TraderSettings = () => {
                     ))}
                   </div>
                 </div>
+              </div>
+
+              <Separator className="my-4" />
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Wood Panel Header</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Apply a realistic wood panel background to the trader platform header
+                  </p>
+                </div>
+                <Switch
+                  checked={settings.woodHeaderEnabled}
+                  onCheckedChange={(checked) => updateSetting('woodHeaderEnabled', checked)}
+                />
               </div>
             </CardContent>
           </Card>
