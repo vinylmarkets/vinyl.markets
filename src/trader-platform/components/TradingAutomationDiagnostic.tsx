@@ -283,7 +283,7 @@ export const TradingAutomationDiagnostic = () => {
   const successCount = diagnostics.filter(d => d.status === "success").length;
 
   return (
-    <Card className="w-full h-full !shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)]">
+    <Card className="w-full h-[400px] flex flex-col !shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)]">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center justify-between text-lg">
           <div className="flex items-center gap-2">
@@ -295,68 +295,70 @@ export const TradingAutomationDiagnostic = () => {
           Debug trading signals and automation
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        {diagnostics.length > 0 && (
-          <div className="flex gap-2 mb-3 p-2 bg-muted rounded text-xs">
-            <div className="flex items-center gap-1">
-              <CheckCircle className="h-3 w-3 text-green-500" />
-              <span>{successCount}</span>
+      <CardContent className="flex-1 flex flex-col">
+        <div className="flex-1">
+          {diagnostics.length > 0 && (
+            <div className="flex gap-2 mb-3 p-2 bg-muted rounded text-xs">
+              <div className="flex items-center gap-1">
+                <CheckCircle className="h-3 w-3 text-green-500" />
+                <span>{successCount}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <AlertCircle className="h-3 w-3 text-yellow-500" />
+                <span>{warningCount}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <XCircle className="h-3 w-3 text-red-500" />
+                <span>{errorCount}</span>
+              </div>
             </div>
-            <div className="flex items-center gap-1">
-              <AlertCircle className="h-3 w-3 text-yellow-500" />
-              <span>{warningCount}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <XCircle className="h-3 w-3 text-red-500" />
-              <span>{errorCount}</span>
-            </div>
-          </div>
-        )}
+          )}
 
-        {diagnostics.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            No diagnostics run yet
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {diagnostics.map((result, index) => {
-              const IconComponent = result.icon || AlertCircle;
-              return (
-                <div key={index} className="border rounded-lg p-4 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <IconComponent className="h-4 w-4 text-muted-foreground" />
-                      {getStatusIcon(result.status)}
-                      <span className="font-semibold">{result.category}</span>
+          {diagnostics.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              No diagnostics run yet
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {diagnostics.map((result, index) => {
+                const IconComponent = result.icon || AlertCircle;
+                return (
+                  <div key={index} className="border rounded-lg p-4 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <IconComponent className="h-4 w-4 text-muted-foreground" />
+                        {getStatusIcon(result.status)}
+                        <span className="font-semibold">{result.category}</span>
+                      </div>
+                      {getStatusBadge(result.status)}
                     </div>
-                    {getStatusBadge(result.status)}
+                    <p className="text-sm">{result.message}</p>
+                    {result.recommendation && (
+                      <div className="mt-2 p-2 bg-yellow-500/10 border border-yellow-500/20 rounded text-sm">
+                        <strong>Recommendation:</strong> {result.recommendation}
+                      </div>
+                    )}
+                    {result.timestamp && (
+                      <p className="text-xs text-muted-foreground">
+                        Checked at: {new Date(result.timestamp).toLocaleTimeString()}
+                      </p>
+                    )}
+                    {result.data && (
+                      <details className="text-xs">
+                        <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
+                          View technical details
+                        </summary>
+                        <pre className="mt-2 p-2 bg-muted rounded overflow-x-auto max-h-64">
+                          {JSON.stringify(result.data, null, 2)}
+                        </pre>
+                      </details>
+                    )}
                   </div>
-                  <p className="text-sm">{result.message}</p>
-                  {result.recommendation && (
-                    <div className="mt-2 p-2 bg-yellow-500/10 border border-yellow-500/20 rounded text-sm">
-                      <strong>Recommendation:</strong> {result.recommendation}
-                    </div>
-                  )}
-                  {result.timestamp && (
-                    <p className="text-xs text-muted-foreground">
-                      Checked at: {new Date(result.timestamp).toLocaleTimeString()}
-                    </p>
-                  )}
-                  {result.data && (
-                    <details className="text-xs">
-                      <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
-                        View technical details
-                      </summary>
-                      <pre className="mt-2 p-2 bg-muted rounded overflow-x-auto max-h-64">
-                        {JSON.stringify(result.data, null, 2)}
-                      </pre>
-                    </details>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
+                );
+              })}
+            </div>
+          )}
+        </div>
         
         <div className="mt-4 pt-4 border-t">
           <Button 
