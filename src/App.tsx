@@ -76,6 +76,7 @@ import TraderPerformance from "./pages/trader/TraderPerformance";
 import TraderTroubleshooting from "./pages/trader/TraderTroubleshooting";
 import TraderReporting from "./pages/trader/TraderReporting";
 import TraderNewsletters from "./pages/trader/TraderNewsletters";
+import TraderDiagnostics from "./pages/trader/TraderDiagnostics";
 
 const queryClient = new QueryClient();
 
@@ -177,6 +178,7 @@ const App = () => {
               <Route path="/trader/troubleshooting" element={<TraderTroubleshooting />} />
               <Route path="/trader/reporting" element={<TraderReporting />} />
               <Route path="/trader/newsletters" element={<TraderNewsletters />} />
+              <Route path="/trader/diagnostics" element={<TraderDiagnostics />} />
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

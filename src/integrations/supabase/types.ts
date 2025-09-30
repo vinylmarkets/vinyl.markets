@@ -47,6 +47,137 @@ export type Database = {
         }
         Relationships: []
       }
+      alert_history: {
+        Row: {
+          acknowledged: boolean | null
+          acknowledged_at: string | null
+          alert_data: Json | null
+          id: string
+          resolution_notes: string | null
+          rule_id: string | null
+          triggered_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          acknowledged?: boolean | null
+          acknowledged_at?: string | null
+          alert_data?: Json | null
+          id?: string
+          resolution_notes?: string | null
+          rule_id?: string | null
+          triggered_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          acknowledged?: boolean | null
+          acknowledged_at?: string | null
+          alert_data?: Json | null
+          id?: string
+          resolution_notes?: string | null
+          rule_id?: string | null
+          triggered_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alert_history_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "alert_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      alert_rules: {
+        Row: {
+          condition_type: string
+          cooldown_minutes: number | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          notification_channels: Json | null
+          rule_name: string
+          severity: string | null
+          threshold: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          condition_type: string
+          cooldown_minutes?: number | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          notification_channels?: Json | null
+          rule_name: string
+          severity?: string | null
+          threshold?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          condition_type?: string
+          cooldown_minutes?: number | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          notification_channels?: Json | null
+          rule_name?: string
+          severity?: string | null
+          threshold?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      algorithm_metrics: {
+        Row: {
+          algorithm_id: string
+          avg_execution_time_ms: number | null
+          created_at: string | null
+          id: string
+          max_drawdown: number | null
+          metrics_data: Json | null
+          sharpe_ratio: number | null
+          success_rate: number | null
+          timestamp: string | null
+          total_pnl: number | null
+          trade_count: number | null
+          user_id: string | null
+          win_rate: number | null
+        }
+        Insert: {
+          algorithm_id: string
+          avg_execution_time_ms?: number | null
+          created_at?: string | null
+          id?: string
+          max_drawdown?: number | null
+          metrics_data?: Json | null
+          sharpe_ratio?: number | null
+          success_rate?: number | null
+          timestamp?: string | null
+          total_pnl?: number | null
+          trade_count?: number | null
+          user_id?: string | null
+          win_rate?: number | null
+        }
+        Update: {
+          algorithm_id?: string
+          avg_execution_time_ms?: number | null
+          created_at?: string | null
+          id?: string
+          max_drawdown?: number | null
+          metrics_data?: Json | null
+          sharpe_ratio?: number | null
+          success_rate?: number | null
+          timestamp?: string | null
+          total_pnl?: number | null
+          trade_count?: number | null
+          user_id?: string | null
+          win_rate?: number | null
+        }
+        Relationships: []
+      }
       algorithm_performance: {
         Row: {
           algorithm_version: string
@@ -128,6 +259,51 @@ export type Database = {
           total_predictions?: number | null
           trending_market_accuracy?: number | null
           worst_performing_signal?: string | null
+        }
+        Relationships: []
+      }
+      algorithm_status: {
+        Row: {
+          algorithm_id: string
+          algorithm_name: string
+          created_at: string | null
+          error_count: number | null
+          id: string
+          last_activity: string | null
+          status: string
+          trades_executed: number | null
+          updated_at: string | null
+          uptime_seconds: number | null
+          user_id: string | null
+          warnings: Json | null
+        }
+        Insert: {
+          algorithm_id: string
+          algorithm_name: string
+          created_at?: string | null
+          error_count?: number | null
+          id?: string
+          last_activity?: string | null
+          status: string
+          trades_executed?: number | null
+          updated_at?: string | null
+          uptime_seconds?: number | null
+          user_id?: string | null
+          warnings?: Json | null
+        }
+        Update: {
+          algorithm_id?: string
+          algorithm_name?: string
+          created_at?: string | null
+          error_count?: number | null
+          id?: string
+          last_activity?: string | null
+          status?: string
+          trades_executed?: number | null
+          updated_at?: string | null
+          uptime_seconds?: number | null
+          user_id?: string | null
+          warnings?: Json | null
         }
         Relationships: []
       }
@@ -564,6 +740,45 @@ export type Database = {
           },
         ]
       }
+      connection_health: {
+        Row: {
+          connection_name: string
+          connection_type: string
+          created_at: string | null
+          endpoint: string | null
+          id: string
+          last_error: string | null
+          last_tested: string | null
+          response_time_ms: number | null
+          status: boolean | null
+          user_id: string | null
+        }
+        Insert: {
+          connection_name: string
+          connection_type: string
+          created_at?: string | null
+          endpoint?: string | null
+          id?: string
+          last_error?: string | null
+          last_tested?: string | null
+          response_time_ms?: number | null
+          status?: boolean | null
+          user_id?: string | null
+        }
+        Update: {
+          connection_name?: string
+          connection_type?: string
+          created_at?: string | null
+          endpoint?: string | null
+          id?: string
+          last_error?: string | null
+          last_tested?: string | null
+          response_time_ms?: number | null
+          status?: boolean | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       content_flags: {
         Row: {
           content_id: string
@@ -726,6 +941,51 @@ export type Database = {
           terminal_queries?: number | null
           total_users?: number | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      diagnostic_logs: {
+        Row: {
+          algorithm_name: string | null
+          created_at: string | null
+          details: Json | null
+          id: string
+          message: string
+          notes: string | null
+          resolved: boolean | null
+          resolved_at: string | null
+          severity: string
+          stack_trace: string | null
+          timestamp: string | null
+          user_id: string | null
+        }
+        Insert: {
+          algorithm_name?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          message: string
+          notes?: string | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          severity: string
+          stack_trace?: string | null
+          timestamp?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          algorithm_name?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          message?: string
+          notes?: string | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          severity?: string
+          stack_trace?: string | null
+          timestamp?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
