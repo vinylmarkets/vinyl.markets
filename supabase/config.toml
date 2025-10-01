@@ -80,3 +80,6 @@ verify_jwt = true
 
 [functions.scrape-kroll-documents]
 verify_jwt = true
+
+[functions.process-kroll-email]
+verify_jwt = false
