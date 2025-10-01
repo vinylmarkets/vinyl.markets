@@ -45,44 +45,82 @@ export const useForensicData = () => {
   
   const { fetchKnowledgeGraph, fetchInsights } = useCogneeData();
 
-  // Fetch evidence from knowledge graph nodes
+  // Fetch evidence from forensic documents
   const loadEvidence = async () => {
     try {
-      const { nodes } = await fetchKnowledgeGraph();
-      
+      const { data: documents, error } = await supabase
+        .from('forensic_documents')
+        .select('*')
+        .eq('analysis_status', 'complete')
+        .order('analyzed_at', { ascending: false });
+
+      if (error) throw error;
+
       const evidenceMap = new Map<string, ForensicEvidence>();
       
-      nodes.forEach(node => {
-        const nodeData = node as any;
-        const category = nodeData.node_type || 'General';
+      documents?.forEach(doc => {
+        const findings = doc.findings || [];
+        const analysisResult = doc.analysis_result as any;
+        const entities = analysisResult?.entities || [];
         
-        if (!evidenceMap.has(category)) {
-          evidenceMap.set(category, {
-            category,
-            status: 'investigating',
-            confidence: 60,
-            items: [],
-            source: 'knowledge_graph'
-          });
+        // Group by key entities mentioned
+        const categories = [
+          { key: 'ryan cohen', name: 'Ryan Cohen Activity' },
+          { key: 'dk-butterfly', name: 'DK-Butterfly Entity' },
+          { key: 'bbby', name: 'BBBY/Bed Bath & Beyond' },
+          { key: 'overstock', name: 'Overstock/Beyond' },
+          { key: 'section 382', name: 'Tax Strategy (Section 382)' },
+          { key: 'nol', name: 'NOLs & Financial Structure' }
+        ];
+
+        categories.forEach(({ key, name }) => {
+          const relevantFindings = findings.filter((f: string) => 
+            f.toLowerCase().includes(key)
+          );
+
+          if (relevantFindings.length > 0) {
+            if (!evidenceMap.has(name)) {
+              evidenceMap.set(name, {
+                category: name,
+                status: 'investigating',
+                confidence: doc.confidence_score || 60,
+                items: [],
+                source: `${doc.filename}`
+              });
+            }
+
+            const evidence = evidenceMap.get(name)!;
+            evidence.items.push(...relevantFindings);
+            evidence.confidence = Math.max(evidence.confidence, doc.confidence_score || 60);
+            
+            // Determine status based on confidence
+            if (evidence.confidence >= 85) evidence.status = 'confirmed';
+            else if (evidence.confidence >= 70) evidence.status = 'strong';
+            else if (evidence.confidence >= 50) evidence.status = 'investigating';
+            else evidence.status = 'weak';
+          }
+        });
+
+        // Add uncategorized findings as "General Evidence"
+        const uncategorizedFindings = findings.filter((f: string) => 
+          !categories.some(({ key }) => f.toLowerCase().includes(key))
+        );
+
+        if (uncategorizedFindings.length > 0) {
+          if (!evidenceMap.has('General Evidence')) {
+            evidenceMap.set('General Evidence', {
+              category: 'General Evidence',
+              status: 'investigating',
+              confidence: doc.confidence_score || 50,
+              items: [],
+              source: `${doc.filename}`
+            });
+          }
+          const generalEvidence = evidenceMap.get('General Evidence')!;
+          generalEvidence.items.push(...uncategorizedFindings);
         }
-        
-        const evidence = evidenceMap.get(category)!;
-        if (nodeData.properties?.description) {
-          evidence.items.push(nodeData.properties.description);
-        }
-        
-        // Update confidence based on node properties
-        if (nodeData.properties?.confidence) {
-          evidence.confidence = Math.max(evidence.confidence, nodeData.properties.confidence);
-        }
-        
-        // Determine status based on confidence
-        if (evidence.confidence >= 85) evidence.status = 'confirmed';
-        else if (evidence.confidence >= 70) evidence.status = 'strong';
-        else if (evidence.confidence >= 50) evidence.status = 'investigating';
-        else evidence.status = 'weak';
       });
-      
+
       setEvidence(Array.from(evidenceMap.values()));
     } catch (error) {
       console.error('Error loading evidence:', error);
