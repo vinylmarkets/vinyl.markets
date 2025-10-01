@@ -1,57 +1,32 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Search, Loader2, FileText, Calendar } from "lucide-react";
+import { ArrowLeft, Search, Loader2, FileText } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { TraderProtection } from "@/components/trader/TraderProtection";
+import { useForensicData, SearchResult } from "@/hooks/useForensicData";
 
 export default function SemanticSearch() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searching, setSearching] = useState(false);
-  const [results, setResults] = useState<any[]>([]);
-
-  const recentSearches = [
-    "NOL preservation strategies",
-    "Section 382 two-year rule",
-    "DK-Butterfly entity structure",
-    "Overstock acquisition timeline"
-  ];
-
-  const mockResults = [
-    {
-      title: "BBBY 10-K Filing - NOL Discussion",
-      type: "SEC Filing",
-      date: "2023-04-15",
-      relevance: 95,
-      excerpt: "Net Operating Loss carryforwards totaling $5.2B are subject to Section 382 limitations..."
-    },
-    {
-      title: "DK-Butterfly Formation Documents",
-      type: "Legal Document",
-      date: "2023-06-20",
-      relevance: 88,
-      excerpt: "Special purpose entity created to manage bankruptcy estate assets including intellectual property..."
-    },
-    {
-      title: "Overstock Strategic M&A Statement",
-      type: "Press Release",
-      date: "2024-01-10",
-      relevance: 82,
-      excerpt: "Company announces interest in retail sector acquisitions, particularly IP portfolios..."
-    }
-  ];
+  const [results, setResults] = useState<SearchResult[]>([]);
+  
+  const { searchDocuments, evidence } = useForensicData();
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
 
     setSearching(true);
-    // Simulate search delay
-    setTimeout(() => {
-      setResults(mockResults);
+    try {
+      const searchResults = await searchDocuments(searchQuery);
+      setResults(searchResults);
+    } catch (error) {
+      console.error('Search error:', error);
+    } finally {
       setSearching(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -181,16 +156,19 @@ export default function SemanticSearch() {
             <div className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Recent Searches</CardTitle>
+                  <CardTitle className="text-lg">Quick Searches</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  {recentSearches.map((search, idx) => (
+                  {['NOL', 'Section 382', 'DK-Butterfly', 'timeline'].map((term, idx) => (
                     <button
                       key={idx}
-                      onClick={() => setSearchQuery(search)}
+                      onClick={() => {
+                        setSearchQuery(term);
+                        handleSearch();
+                      }}
                       className="w-full text-left p-2 rounded-lg border border-border hover:border-primary/50 transition-colors text-sm"
                     >
-                      {search}
+                      {term}
                     </button>
                   ))}
                 </CardContent>
@@ -215,20 +193,22 @@ export default function SemanticSearch() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Search Stats</CardTitle>
+                  <CardTitle className="text-lg">Database Stats</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Total Documents:</span>
-                    <span className="font-semibold">1,247</span>
+                    <span className="text-muted-foreground">Evidence Categories:</span>
+                    <span className="font-semibold">{evidence.length}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Indexed Entries:</span>
-                    <span className="font-semibold">15,392</span>
+                    <span className="text-muted-foreground">Total Findings:</span>
+                    <span className="font-semibold">
+                      {evidence.reduce((sum, e) => sum + e.items.length, 0)}
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Last Updated:</span>
-                    <span className="font-semibold">2 hours ago</span>
+                    <span className="text-muted-foreground">Data Source:</span>
+                    <span className="font-semibold">Live</span>
                   </div>
                 </CardContent>
               </Card>

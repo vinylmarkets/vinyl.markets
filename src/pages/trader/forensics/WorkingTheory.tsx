@@ -1,58 +1,14 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, CheckCircle, Circle, AlertCircle, TrendingUp } from "lucide-react";
+import { ArrowLeft, CheckCircle, Circle, AlertCircle, TrendingUp, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { TraderProtection } from "@/components/trader/TraderProtection";
+import { useForensicData } from "@/hooks/useForensicData";
 
 export default function WorkingTheory() {
-  const evidencePoints = [
-    {
-      category: "Timeline Evidence",
-      status: "confirmed",
-      confidence: 85,
-      items: [
-        "BBBY bankruptcy filed: April 2023",
-        "Two-year Section 382 window: April 2025",
-        "DK-Butterfly entity formation timing",
-        "Overstock acquisition timeline alignment"
-      ]
-    },
-    {
-      category: "NOL Preservation",
-      status: "strong",
-      confidence: 75,
-      items: [
-        "$5B+ in tax loss carryforwards at stake",
-        "Section 382 two-year rule implications",
-        "Change of ownership threshold mechanics",
-        "Strategic timing to maximize preservation"
-      ]
-    },
-    {
-      category: "Entity Structure",
-      status: "investigating",
-      confidence: 60,
-      items: [
-        "DK-Butterfly bankruptcy entity purpose",
-        "Overstock acquisition structure",
-        "IP transfer mechanisms",
-        "Related party transactions"
-      ]
-    },
-    {
-      category: "Market Behavior",
-      status: "strong",
-      confidence: 70,
-      items: [
-        "Unusual trading volume patterns",
-        "Options activity anomalies",
-        "Insider transaction timing",
-        "Coordinated price movements"
-      ]
-    }
-  ];
+  const { evidence, loading } = useForensicData();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -103,8 +59,17 @@ export default function WorkingTheory() {
         </div>
 
         <div className="container mx-auto px-4 py-8">
-          {/* Main Hypothesis */}
-          <Card className="mb-8 border-primary/20">
+          {loading ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+                <p className="text-sm text-muted-foreground">Loading forensic data...</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              {/* Main Hypothesis */}
+              <Card className="mb-8 border-primary/20">
             <CardHeader>
               <CardTitle>Core Hypothesis</CardTitle>
               <CardDescription>
@@ -119,16 +84,22 @@ export default function WorkingTheory() {
               </p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-                  <div className="text-2xl font-bold text-green-500">85%</div>
+                  <div className="text-2xl font-bold text-green-500">
+                    {evidence.length > 0 
+                      ? Math.round(evidence.reduce((sum, e) => sum + e.confidence, 0) / evidence.length)
+                      : 0}%
+                  </div>
                   <div className="text-sm text-muted-foreground">Overall Confidence</div>
                 </div>
                 <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                  <div className="text-2xl font-bold text-blue-500">12</div>
+                  <div className="text-2xl font-bold text-blue-500">{evidence.length}</div>
                   <div className="text-sm text-muted-foreground">Evidence Categories</div>
                 </div>
                 <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                  <div className="text-2xl font-bold text-yellow-500">$5B+</div>
-                  <div className="text-sm text-muted-foreground">Potential NOL Value</div>
+                  <div className="text-2xl font-bold text-yellow-500">
+                    {evidence.reduce((sum, e) => sum + e.items.length, 0)}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Total Findings</div>
                 </div>
               </div>
             </CardContent>
@@ -136,7 +107,14 @@ export default function WorkingTheory() {
 
           {/* Evidence Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {evidencePoints.map((category, idx) => {
+            {evidence.length === 0 ? (
+              <Card className="lg:col-span-2">
+                <CardContent className="py-8 text-center text-muted-foreground">
+                  No evidence data available. Start by analyzing documents or building the knowledge graph.
+                </CardContent>
+              </Card>
+            ) : (
+              evidence.map((category, idx) => {
               const StatusIcon = getStatusIcon(category.status);
               return (
                 <Card key={idx}>
@@ -168,7 +146,7 @@ export default function WorkingTheory() {
                   </CardContent>
                 </Card>
               );
-            })}
+            }))}
           </div>
 
           {/* Key Milestones */}
@@ -220,6 +198,8 @@ export default function WorkingTheory() {
               </div>
             </CardContent>
           </Card>
+            </>
+          )}
         </div>
       </div>
     </TraderProtection>

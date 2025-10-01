@@ -1,49 +1,13 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Calendar, TrendingUp, AlertCircle } from "lucide-react";
+import { ArrowLeft, Calendar, TrendingUp, AlertCircle, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TraderProtection } from "@/components/trader/TraderProtection";
+import { useForensicData } from "@/hooks/useForensicData";
 
 export default function TimelineAnalysis() {
-  const timelineEvents = [
-    {
-      date: "April 2023",
-      event: "BBBY Bankruptcy Filing",
-      significance: "critical",
-      description: "Initial bankruptcy petition filed, triggering Section 382 two-year clock",
-      confidence: 95
-    },
-    {
-      date: "June 2023",
-      event: "DK-Butterfly Entity Formation",
-      significance: "high",
-      description: "Special purpose entity created to manage bankruptcy assets",
-      confidence: 85
-    },
-    {
-      date: "September 2023",
-      event: "Asset Sale Proceedings Begin",
-      significance: "high",
-      description: "Court approves process for selling intellectual property and NOLs",
-      confidence: 80
-    },
-    {
-      date: "January 2024",
-      event: "Overstock Strategic Positioning",
-      significance: "medium",
-      description: "Public statements about interest in retail IP acquisitions",
-      confidence: 70
-    },
-    {
-      date: "April 2025 (Projected)",
-      event: "Section 382 Window Closes",
-      significance: "critical",
-      description: "Two-year period expires for optimal NOL preservation",
-      confidence: 90
-    }
-  ];
+  const { timeline, loading } = useForensicData();
 
   const getSignificanceColor = (significance: string) => {
     switch (significance) {
@@ -81,14 +45,23 @@ export default function TimelineAnalysis() {
         </div>
 
         <div className="container mx-auto px-4 py-8">
-          {/* Summary Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          {loading ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+                <p className="text-sm text-muted-foreground">Loading timeline data...</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              {/* Summary Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium">Total Events</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{timelineEvents.length}</div>
+                <div className="text-2xl font-bold">{timeline.length}</div>
               </CardContent>
             </Card>
             <Card>
@@ -97,16 +70,18 @@ export default function TimelineAnalysis() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-red-500">
-                  {timelineEvents.filter(e => e.significance === "critical").length}
+                  {timeline.filter(e => e.significance === "critical").length}
                 </div>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium">Days to Window Close</CardTitle>
+                <CardTitle className="text-sm font-medium">High Significance</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-orange-500">~150</div>
+                <div className="text-2xl font-bold text-orange-500">
+                  {timeline.filter(e => e.significance === "high").length}
+                </div>
               </CardContent>
             </Card>
             <Card>
@@ -114,7 +89,11 @@ export default function TimelineAnalysis() {
                 <CardTitle className="text-sm font-medium">Average Confidence</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-green-500">84%</div>
+                <div className="text-2xl font-bold text-green-500">
+                  {timeline.length > 0 
+                    ? Math.round(timeline.reduce((sum, e) => sum + e.confidence, 0) / timeline.length)
+                    : 0}%
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -131,20 +110,25 @@ export default function TimelineAnalysis() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-6">
-                {timelineEvents.map((event, idx) => (
+              {timeline.length === 0 ? (
+                <p className="text-center py-8 text-muted-foreground">
+                  No timeline events found. Start by analyzing documents to build the timeline.
+                </p>
+              ) : (
+                <div className="space-y-6">
+                  {timeline.map((event, idx) => (
                   <div key={idx} className="flex gap-6">
                     {/* Timeline Line */}
-                    <div className="flex flex-col items-center">
-                      <div className={`h-4 w-4 rounded-full border-2 ${
-                        event.significance === "critical" ? "bg-red-500 border-red-500" :
-                        event.significance === "high" ? "bg-orange-500 border-orange-500" :
-                        "bg-yellow-500 border-yellow-500"
-                      }`} />
-                      {idx < timelineEvents.length - 1 && (
-                        <div className="h-full w-px bg-border mt-2" />
-                      )}
-                    </div>
+                      <div className="flex flex-col items-center">
+                        <div className={`h-4 w-4 rounded-full border-2 ${
+                          event.significance === "critical" ? "bg-red-500 border-red-500" :
+                          event.significance === "high" ? "bg-orange-500 border-orange-500" :
+                          "bg-yellow-500 border-yellow-500"
+                        }`} />
+                        {idx < timeline.length - 1 && (
+                          <div className="h-full w-px bg-border mt-2" />
+                        )}
+                      </div>
 
                     {/* Event Card */}
                     <div className="flex-1 pb-6">
@@ -176,55 +160,20 @@ export default function TimelineAnalysis() {
                           </div>
                         </CardContent>
                       </Card>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 
-          {/* Predictions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Predicted Events
-              </CardTitle>
-              <CardDescription>
-                AI-generated timeline predictions based on pattern analysis
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="p-4 rounded-lg border border-border bg-card/50">
-                  <div className="flex items-start gap-3">
-                    <AlertCircle className="h-5 w-5 text-orange-500 mt-0.5" />
-                    <div className="flex-1">
-                      <div className="font-semibold mb-1">Q1 2025: Initial Acquisition Signals</div>
-                      <p className="text-sm text-muted-foreground">
-                        Predicted increased SEC filing activity and strategic announcements
-                      </p>
-                      <div className="mt-2 text-xs text-muted-foreground">Probability: 75%</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="p-4 rounded-lg border border-border bg-card/50">
-                  <div className="flex items-start gap-3">
-                    <AlertCircle className="h-5 w-5 text-red-500 mt-0.5" />
-                    <div className="flex-1">
-                      <div className="font-semibold mb-1">March 2025: Announcement Window Opens</div>
-                      <p className="text-sm text-muted-foreground">
-                        Optimal timing window for acquisition announcement to preserve NOLs
-                      </p>
-                      <div className="mt-2 text-xs text-muted-foreground">Probability: 82%</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Predictions removed - use only real data */}
+            </>
+          )}
         </div>
       </div>
     </TraderProtection>
   );
 }
+
