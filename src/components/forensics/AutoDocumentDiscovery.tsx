@@ -155,41 +155,51 @@ export const AutoDocumentDiscovery = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" />
-          AI-Powered Document Discovery
+          Document Import Guide
         </CardTitle>
         <CardDescription>
-          Automatically discover and import relevant BBBY bankruptcy court documents
+          Access BBBY bankruptcy court documents from Kroll and import them for analysis
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="rounded-lg bg-yellow-500/10 border border-yellow-500/20 p-4 mb-4">
+          <div className="flex gap-3">
+            <AlertCircle className="h-5 w-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+            <div className="space-y-2 text-sm">
+              <p className="font-medium text-yellow-500">Kroll Site Limitations</p>
+              <p className="text-muted-foreground">
+                Kroll's website uses JavaScript rendering that prevents automated scraping. 
+                To import documents, you'll need to:
+              </p>
+              <ol className="list-decimal list-inside space-y-1 text-muted-foreground ml-2">
+                <li>Visit the <a href="https://cases.ra.kroll.com/bbby/Home-DocketInfo" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">BBBY Docket page</a></li>
+                <li>Use the search/filter to find relevant documents (search for "NOL", "Section 382", "DK-Butterfly", "Overstock", etc.)</li>
+                <li>Copy document URLs (right-click on document links → Copy Link Address)</li>
+                <li>Use the <span className="font-medium">Bulk Import</span> tab to paste and analyze multiple URLs at once</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
         <div className="space-y-2">
-          <label className="text-sm font-medium">Kroll Docket URL</label>
+          <label className="text-sm font-medium">Kroll Docket URL (For Reference)</label>
           <div className="flex gap-2">
             <Input
               value={docketUrl}
               onChange={(e) => setDocketUrl(e.target.value)}
-              disabled={discovering || importing}
-              placeholder="https://cases.ra.kroll.com/bbby/..."
+              disabled={true}
+              placeholder="https://cases.ra.kroll.com/bbby/Home-DocketInfo"
+              className="bg-muted"
             />
             <Button 
-              onClick={discoverDocuments} 
-              disabled={discovering || importing || !docketUrl}
+              onClick={() => window.open(docketUrl, '_blank')}
+              variant="outline"
             >
-              {discovering ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Scanning...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Discover
-                </>
-              )}
+              Open Docket
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
-            AI will scan the docket and identify documents relevant to NOL preservation and acquisition analysis
+            Click "Open Docket" to visit Kroll's site and manually collect document URLs for import
           </p>
         </div>
 
@@ -279,7 +289,8 @@ export const AutoDocumentDiscovery = () => {
         {!discovering && documents.length === 0 && (
           <div className="text-center py-8 text-sm text-muted-foreground">
             <Sparkles className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-            Click "Discover" to automatically find relevant BBBY bankruptcy documents
+            <p className="mb-2">Manual document import required</p>
+            <p className="text-xs">Visit the docket page above and use Bulk Import to analyze documents</p>
           </div>
         )}
       </CardContent>
