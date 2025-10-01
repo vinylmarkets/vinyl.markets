@@ -35,45 +35,75 @@ export const DocumentReprocessing = () => {
   const { toast } = useToast();
 
   const fetchStats = async () => {
-    const { data, error } = await supabase
-      .from('forensic_documents')
-      .select('analysis_result, analysis_status');
+    try {
+      const { data, error } = await supabase
+        .from('forensic_documents')
+        .select('analysis_result, analysis_status, findings');
 
-    if (error) {
-      console.error('Error fetching stats:', error);
-      return;
-    }
-
-    // More accurate failed document detection
-    const failed = data.filter(d => {
-      // Failed if no analysis result at all
-      if (!d.analysis_result) return true;
-      
-      // Failed if analysis_status is explicitly failed
-      if (d.analysis_status === 'failed') return true;
-      
-      const resultStr = JSON.stringify(d.analysis_result);
-      
-      // Failed if contains error indicators
-      if (resultStr.includes('"error"') || 
-          resultStr.includes('failed') || 
-          resultStr.includes('PDF parsing failed') ||
-          resultStr.includes('could not be parsed')) {
-        return true;
+      if (error) {
+        console.error('Error fetching stats:', error);
+        return;
       }
+
+      if (!data) {
+        console.error('No data returned from stats query');
+        return;
+      }
+
+      // Count failed documents - includes corrupted PDFs and parsing failures
+      const failed = data.filter(d => {
+        // Explicitly failed status
+        if (d.analysis_status === 'failed') return true;
+        
+        // No analysis result at all
+        if (!d.analysis_result) return true;
+        
+        const result = d.analysis_result as any;
+        
+        // Check for corrupted or invalid PDFs
+        if (result.fileCorrupted || result.error?.includes('Corrupted') || result.error?.includes('Invalid PDF')) {
+          return true;
+        }
+        
+        // Check for parsing errors
+        if (result.error || result.analysis?.includes('failed') || result.analysis?.includes('error')) {
+          return true;
+        }
+        
+        return false;
+      }).length;
+
+      // Count successful - has findings and complete status
+      const successful = data.filter(d => {
+        if (d.analysis_status !== 'complete' && d.analysis_status !== 'completed') return false;
+        if (!d.analysis_result) return false;
+        
+        const result = d.analysis_result as any;
+        if (result.fileCorrupted || result.error) return false;
+        
+        // Has actual findings or analysis
+        return d.findings && d.findings.length > 0;
+      }).length;
+
+      const newStats = {
+        total: data.length,
+        failed,
+        successful
+      };
+
+      console.log('📊 Stats updated:', newStats, {
+        failedDocs: data.filter(d => {
+          if (d.analysis_status === 'failed') return true;
+          if (!d.analysis_result) return true;
+          const result = d.analysis_result as any;
+          return result.fileCorrupted || result.error;
+        }).length
+      });
       
-      // Success if has findings or analysis content
-      return false;
-    }).length;
-
-    const newStats = {
-      total: data.length,
-      failed,
-      successful: data.length - failed
-    };
-
-    console.log('Stats updated:', newStats);
-    setStats(newStats);
+      setStats(newStats);
+    } catch (err) {
+      console.error('Error in fetchStats:', err);
+    }
   };
 
   const processFileWithOCR = async (documentUrl: string, filename: string): Promise<{ text: string; pageCount: number }> => {
