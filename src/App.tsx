@@ -37,6 +37,10 @@ import OptionsValueTool from "./pages/dashboard/OptionsValueTool";
 import KnowledgeExplorer from "./pages/trader/KnowledgeExplorer";
 import InsightsDashboard from "./pages/trader/InsightsDashboard";
 import BetaTesting from "./pages/trader/BetaTesting";
+import ForensicsAnalysis from "./pages/trader/ForensicsAnalysis";
+import WorkingTheory from "./pages/trader/forensics/WorkingTheory";
+import DocumentAnalysis from "./pages/trader/forensics/DocumentAnalysis";
+import KnowledgeGraphView from "./pages/trader/forensics/KnowledgeGraphView";
 import Charts from "./pages/dashboard/Charts";
 import LearningProgress from "./pages/dashboard/Progress";
 import Portfolio from "./pages/dashboard/Portfolio";
@@ -121,6 +125,10 @@ const App = () => {
           <Route path="/trader/intelligence/explorer" element={<KnowledgeExplorer />} />
           <Route path="/trader/intelligence/insights" element={<InsightsDashboard />} />
           <Route path="/trader/testing" element={<BetaTesting />} />
+          <Route path="/trader/forensics" element={<ForensicsAnalysis />} />
+          <Route path="/trader/forensics/theory" element={<WorkingTheory />} />
+          <Route path="/trader/forensics/documents" element={<DocumentAnalysis />} />
+          <Route path="/trader/forensics/knowledge-graph" element={<KnowledgeGraphView />} />
               
               <Route path="/admin/executive-overview" element={<AdminProtected><ExecutiveOverview /></AdminProtected>} />
               <Route path="/admin/user-analytics" element={<AdminProtected><UserAnalytics /></AdminProtected>} />
