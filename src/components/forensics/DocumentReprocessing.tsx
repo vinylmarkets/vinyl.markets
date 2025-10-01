@@ -14,6 +14,11 @@ export const DocumentReprocessing = () => {
     failed: number;
     successful: number;
   } | null>(null);
+  const [processingProgress, setProcessingProgress] = useState<{
+    total: number;
+    completed: number;
+    processing: number;
+  } | null>(null);
   const { toast } = useToast();
 
   const fetchStats = async () => {
@@ -48,15 +53,17 @@ export const DocumentReprocessing = () => {
 
       if (error) throw error;
 
+      // Set initial progress
+      setProcessingProgress({
+        total: data.documentsQueued,
+        completed: 0,
+        processing: data.documentsQueued
+      });
+
       toast({
         title: "Reprocessing Started",
         description: `${data.documentsQueued} documents queued for reprocessing. This will take some time.`,
       });
-
-      // Refresh stats after a delay
-      setTimeout(() => {
-        fetchStats();
-      }, 2000);
 
     } catch (error) {
       console.error('Error reprocessing documents:', error);
@@ -65,8 +72,8 @@ export const DocumentReprocessing = () => {
         description: error.message,
         variant: "destructive"
       });
-    } finally {
       setIsProcessing(false);
+      setProcessingProgress(null);
     }
   };
 
@@ -75,7 +82,63 @@ export const DocumentReprocessing = () => {
     fetchStats();
   }, []);
 
+  // Set up real-time subscription for processing progress
+  useEffect(() => {
+    if (!isProcessing) return;
+
+    const channel = supabase
+      .channel('reprocessing-progress')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'forensic_documents',
+          filter: 'analysis_status=in.(processing,complete,failed)'
+        },
+        async () => {
+          // Fetch current processing stats
+          const { data } = await supabase
+            .from('forensic_documents')
+            .select('analysis_status, analysis_result');
+
+          if (data) {
+            const processing = data.filter(d => d.analysis_status === 'processing').length;
+            const completed = data.filter(d => {
+              const result = JSON.stringify(d.analysis_result || {});
+              return d.analysis_status === 'complete' && 
+                     !result.includes('failed') && 
+                     !result.includes('error') &&
+                     d.analysis_result !== null;
+            }).length;
+            const total = processingProgress?.total || 0;
+
+            setProcessingProgress({ total, completed, processing });
+
+            // If no more processing, we're done
+            if (processing === 0 && total > 0) {
+              setIsProcessing(false);
+              setProcessingProgress(null);
+              fetchStats();
+              toast({
+                title: "Reprocessing Complete",
+                description: `Successfully reprocessed documents`,
+              });
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [isProcessing, processingProgress?.total]);
+
   const successRate = stats ? parseFloat(((stats.successful / stats.total) * 100).toFixed(1)) : 0;
+  const progressPercentage = processingProgress 
+    ? Math.round((processingProgress.completed / processingProgress.total) * 100)
+    : 0;
 
   return (
     <Card>
@@ -111,7 +174,28 @@ export const DocumentReprocessing = () => {
           </div>
         )}
 
-        {stats && stats.failed > 0 && (
+        {isProcessing && processingProgress && (
+          <div className="space-y-2">
+            <Alert>
+              <RefreshCw className="h-4 w-4 animate-spin" />
+              <AlertDescription>
+                Reprocessing in progress: {processingProgress.completed} of {processingProgress.total} documents completed
+              </AlertDescription>
+            </Alert>
+            <div className="space-y-1">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Processing Progress</span>
+                <span className="font-medium">{progressPercentage}%</span>
+              </div>
+              <Progress value={progressPercentage} className="h-2" />
+              <p className="text-xs text-muted-foreground text-center">
+                {processingProgress.processing} documents currently being analyzed
+              </p>
+            </div>
+          </div>
+        )}
+
+        {!isProcessing && stats && stats.failed > 0 && (
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
