@@ -132,6 +132,8 @@ export const TradingDashboard = () => {
   const [priceUpdateInterval, setPriceUpdateInterval] = useState<NodeJS.Timeout | null>(null);
   const [analysisExpanded, setAnalysisExpanded] = useState(false);
   const [isExecutingTrades, setIsExecutingTrades] = useState(false);
+  const [isGeneratingSignals, setIsGeneratingSignals] = useState(false);
+  const [signalStats, setSignalStats] = useState<{ count: number; lastGenerated: string | null }>({ count: 0, lastGenerated: null });
   
   const isDevelopment = import.meta.env.DEV;
 
@@ -530,14 +532,91 @@ export const TradingDashboard = () => {
     }
   };
 
+  // Fetch signal stats
+  const fetchSignalStats = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('trading_signals')
+        .select('created_at')
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
+      
+      if (!error && data) {
+        setSignalStats({
+          count: data.length,
+          lastGenerated: data[0]?.created_at || null
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch signal stats:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSignalStats();
+    const interval = setInterval(fetchSignalStats, 30000); // Refresh every 30s
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleGenerateSignals = async () => {
+    setIsGeneratingSignals(true);
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      const response = await fetch('https://jhxjvpbwkdzjufjyqanq.supabase.co/functions/v1/trader-signals', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoeGp2cGJ3a2R6anVmanlxYW5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5MDQ3MzYsImV4cCI6MjA3MzQ4MDczNn0.K7bcrLAr8Kxvln7owSNW452GhijuxWduv3u4173DPsc',
+          'Authorization': `Bearer ${session.session?.access_token}`
+        }
+      });
+
+      const data = await response.json();
+      
+      if (data.signals && data.signals.length > 0) {
+        toast({
+          title: "Signals Generated",
+          description: `Generated ${data.signals.length} trading signal${data.signals.length > 1 ? 's' : ''}`,
+        });
+        await fetchSignalStats(); // Refresh stats
+      } else {
+        toast({
+          title: "No Signals",
+          description: "No tradeable signals generated at this time",
+          variant: "default"
+        });
+      }
+    } catch (error) {
+      console.error('Failed to generate signals:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate trading signals",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGeneratingSignals(false);
+    }
+  };
+
   const handleExecuteTrades = async () => {
+    if (signalStats.count === 0) {
+      toast({
+        title: "No Signals Available",
+        description: "Generate signals first before executing trades",
+        variant: "default"
+      });
+      return;
+    }
+
     setIsExecutingTrades(true);
     try {
+      const { data: session } = await supabase.auth.getSession();
       const response = await fetch('https://jhxjvpbwkdzjufjyqanq.supabase.co/functions/v1/execute-trades', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoeGp2cGJ3a2R6anVmanlxYW5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5MDQ3MzYsImV4cCI6MjA3MzQ4MDczNn0.K7bcrLAr8Kxvln7owSNW452GhijuxWduv3u4173DPsc',
+          'Authorization': `Bearer ${session.session?.access_token}`
         }
       });
 
@@ -546,20 +625,20 @@ export const TradingDashboard = () => {
       if (data.success) {
         const tradesCount = data.executedTrades?.length || 0;
         toast({
-          title: "Auto-Trading Complete",
+          title: tradesCount > 0 ? "Trades Executed" : "No Trades",
           description: tradesCount > 0 
             ? `Successfully executed ${tradesCount} trade${tradesCount > 1 ? 's' : ''}`
-            : "No executable signals found",
+            : data.message || "No executable signals met criteria",
         });
-        // Refresh positions after executing trades
         if (hasIntegrations && tradesCount > 0) {
+          await fetchSignalStats();
           setTimeout(() => window.location.reload(), 2000);
         }
       } else {
         toast({
-          title: "Auto-Trading Status",
+          title: "Execution Status",
           description: data.message || "No trades executed",
-          variant: data.tradingEnabled === false ? "default" : "destructive"
+          variant: "default"
         });
       }
     } catch (error) {
@@ -923,19 +1002,61 @@ export const TradingDashboard = () => {
               </CardContent>
             </Card>
 
-            {/* Auto-Trading Control */}
+            {/* Trading Signals & Execution */}
             <Card className="!shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)] transition-shadow duration-200">
               <CardHeader className="pb-2">
-                <CardTitle className="flex items-center space-x-2 text-base">
-                  <Zap className="h-4 w-4 text-primary" />
-                  <span>Auto-Trading</span>
+                <CardTitle className="flex items-center justify-between text-base">
+                  <div className="flex items-center space-x-2">
+                    <Zap className="h-4 w-4 text-primary" />
+                    <span>Trading Control</span>
+                  </div>
+                  <Badge variant={signalStats.count > 0 ? "default" : "secondary"}>
+                    {signalStats.count} Signal{signalStats.count !== 1 ? 's' : ''}
+                  </Badge>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-3">
+                {/* Status */}
+                <div className="text-xs space-y-1 p-2 bg-muted/50 rounded">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Active Signals:</span>
+                    <span className="font-medium">{signalStats.count}</span>
+                  </div>
+                  {signalStats.lastGenerated && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Last Generated:</span>
+                      <span className="font-medium">
+                        {new Date(signalStats.lastGenerated).toLocaleTimeString()}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Generate Signals Button */}
+                <Button 
+                  onClick={handleGenerateSignals}
+                  disabled={isGeneratingSignals}
+                  className="w-full"
+                  variant="outline"
+                >
+                  {isGeneratingSignals ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Generate Signals
+                    </>
+                  )}
+                </Button>
+
+                {/* Execute Trades Button */}
                 <Button 
                   onClick={handleExecuteTrades}
-                  disabled={isExecutingTrades}
-                  className="w-full mb-3"
+                  disabled={isExecutingTrades || signalStats.count === 0}
+                  className="w-full"
                   variant="default"
                 >
                   {isExecutingTrades ? (
@@ -946,14 +1067,19 @@ export const TradingDashboard = () => {
                   ) : (
                     <>
                       <Zap className="h-4 w-4 mr-2" />
-                      Execute Now
+                      Execute Trades
                     </>
                   )}
                 </Button>
-                <div className="text-xs text-muted-foreground space-y-1">
-                  <p>• Scans for signals</p>
-                  <p>• Validates risk limits</p>
-                  <p>• Executes trades</p>
+
+                <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
+                  <p className="font-medium">Manual Trading Flow:</p>
+                  <p>1. Generate signals from market data</p>
+                  <p>2. Review signals in AI Signals tab</p>
+                  <p>3. Execute trades based on signals</p>
+                  <p className="text-amber-600 dark:text-amber-400 pt-1">
+                    ⚠ Auto-trading toggle requires cron setup
+                  </p>
                 </div>
               </CardContent>
             </Card>
