@@ -1,4 +1,5 @@
 import { corsHeaders } from '../_shared/cors.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4'
 
 const PYTHON_API_URL = 'http://localhost:8080';
 
@@ -34,11 +35,11 @@ const DEMO_SIGNALS: TradingSignal[] = [
   },
   {
     symbol: 'AAPL',
-    action: 'HOLD',
-    confidence: 65,
+    action: 'BUY',
+    confidence: 78,
     targetPrice: 185.00,
     currentPrice: 182.45,
-    reasoning: 'Consolidating within support/resistance range',
+    reasoning: 'Strong support level with positive catalysts',
     timestamp: new Date().toISOString()
   }
 ];
@@ -70,6 +71,54 @@ async function fetchSignalsFromPythonAPI(): Promise<TradingSignal[]> {
   }
 }
 
+async function storeSignalsInDatabase(signals: TradingSignal[]) {
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
+  console.log(`Storing ${signals.length} signals in database...`);
+
+  // Only store BUY and SELL signals with confidence >= 70
+  const executableSignals = signals.filter(s => 
+    (s.action === 'BUY' || s.action === 'SELL') && s.confidence >= 70
+  );
+
+  if (executableSignals.length === 0) {
+    console.log('No executable signals to store');
+    return;
+  }
+
+  const signalsToStore = executableSignals.map(signal => ({
+    symbol: signal.symbol,
+    signal_type: signal.action.toLowerCase(),
+    confidence_score: signal.confidence,
+    target_price: signal.targetPrice,
+    current_price: signal.currentPrice,
+    reasoning: signal.reasoning,
+    status: 'active',
+    expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 hours
+    stop_loss_price: signal.action === 'BUY' 
+      ? signal.currentPrice * 0.98 
+      : signal.currentPrice * 1.02,
+    take_profit_price: signal.action === 'BUY'
+      ? signal.targetPrice
+      : signal.targetPrice
+  }));
+
+  const { error } = await supabase
+    .from('trading_signals')
+    .upsert(signalsToStore, { 
+      onConflict: 'symbol',
+      ignoreDuplicates: false 
+    });
+
+  if (error) {
+    console.error('Error storing signals:', error);
+  } else {
+    console.log(`Successfully stored ${signalsToStore.length} signals`);
+  }
+}
+
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -91,6 +140,9 @@ Deno.serve(async (req) => {
 
     // Try to fetch from Python API, fallback to demo data
     const signals = await fetchSignalsFromPythonAPI();
+
+    // Store signals in database for execute-trades to use
+    await storeSignalsInDatabase(signals);
 
     const response = {
       success: true,
