@@ -1,8 +1,9 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Plus, TrendingUp, DollarSign, Zap, Activity } from 'lucide-react';
+import { Plus, TrendingUp, DollarSign, Zap, Activity, ArrowLeft } from 'lucide-react';
 import { useUserAmps } from '@/hooks/useUserAmps';
 import { AmpCard } from '@/components/amps/AmpCard';
 import { AddAmpModal } from '@/components/amps/AddAmpModal';
@@ -51,6 +52,10 @@ export default function MyAmps() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
+          <Link to="/trader" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-2 transition-colors">
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            Back to Trading Dashboard
+          </Link>
           <h1 className="text-3xl font-bold">My Trading Algorithms</h1>
           <p className="text-muted-foreground">Manage your active trading strategies</p>
         </div>
