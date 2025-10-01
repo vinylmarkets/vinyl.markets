@@ -77,6 +77,8 @@ import TraderTroubleshooting from "./pages/trader/TraderTroubleshooting";
 import TraderReporting from "./pages/trader/TraderReporting";
 import TraderNewsletters from "./pages/trader/TraderNewsletters";
 import TraderDiagnostics from "./pages/trader/TraderDiagnostics";
+import SystemArchitecture from "./pages/trader/SystemArchitecture";
+import AlgorithmAnalysis from "./pages/trader/AlgorithmAnalysis";
 
 const queryClient = new QueryClient();
 
@@ -179,6 +181,8 @@ const App = () => {
               <Route path="/trader/reporting" element={<TraderReporting />} />
               <Route path="/trader/newsletters" element={<TraderNewsletters />} />
               <Route path="/trader/diagnostics" element={<TraderDiagnostics />} />
+              <Route path="/trader/system-maps/architecture" element={<SystemArchitecture />} />
+              <Route path="/trader/system-maps/algorithms" element={<AlgorithmAnalysis />} />
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
