@@ -743,28 +743,6 @@ export const TradingDashboard = () => {
               </Button>
             </Link>
             
-            {/* View Mode Toggle */}
-            <div className="flex bg-muted rounded-lg p-1">
-              <Button
-                variant={viewMode === 'chart' ? 'active' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('chart')}
-                className="h-8 px-3 text-xs flex items-center space-x-1"
-              >
-                <BarChart3 className="h-3 w-3" />
-                <span className="hidden sm:inline">Chart View</span>
-              </Button>
-              <Button
-                variant={viewMode === 'flow' ? 'active' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('flow')}
-                className="h-8 px-3 text-xs flex items-center space-x-1"
-              >
-                <Activity className="h-3 w-3" />
-                <span className="hidden sm:inline">Signal Flow</span>
-              </Button>
-            </div>
-            
             {/* Knowledge Mode Toggle */}
             <div className="flex bg-muted rounded-lg p-1">
               <Button
@@ -1119,36 +1097,56 @@ export const TradingDashboard = () => {
 
           </div>
 
-          {/* Center Column - Dynamic View */}
+          {/* Center Column - Chart & Signal Flow */}
           <div className="col-span-12 lg:col-span-6 space-y-3">
-            {viewMode === 'chart' ? (
-              /* Chart View with Educational Overlays */
-              <div className="h-[500px] relative">
-                <CandlestickChart 
-                  positions={positions} 
-                  knowledgeMode={knowledgeMode}
-                  showEducation={knowledgeMode === 'simple'}
-                />
-                <TeachingAssistant knowledgeMode={knowledgeMode} />
-              </div>
-            ) : (
-              /* Signal Flow View */
-              <div className="h-[500px]">
-                <SignalFlowView 
-                  signals={signals}
-                  knowledgeMode={knowledgeMode}
-                  onSignalAction={(signal, action) => {
-                    toast({
-                      title: action === 'execute' ? 'Trade Executed!' : 'Signal Passed',
-                      description: action === 'execute' 
-                        ? `Buying ${signal.symbol} at $${signal.currentPrice}`
-                        : `Passed on ${signal.symbol} signal`,
-                      variant: action === 'execute' ? 'default' : undefined
-                    });
-                  }}
-                />
-              </div>
-            )}
+            {/* Chart View with Educational Overlays */}
+            <div className="h-[500px] relative">
+              <CandlestickChart 
+                positions={positions} 
+                knowledgeMode={knowledgeMode}
+                showEducation={knowledgeMode === 'simple'}
+              />
+              <TeachingAssistant knowledgeMode={knowledgeMode} />
+            </div>
+
+            {/* Expandable Signal Flow */}
+            <Collapsible defaultOpen={false}>
+              <Card>
+                <CollapsibleTrigger asChild>
+                  <CardHeader className="cursor-pointer hover:bg-accent/50 transition-colors">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Activity className="h-4 w-4 text-primary" />
+                        <CardTitle className="text-sm">Signal Flow</CardTitle>
+                        <Badge variant="secondary" className="text-xs">
+                          {signals.length} Active
+                        </Badge>
+                      </div>
+                      <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                    </div>
+                  </CardHeader>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <CardContent className="pt-0">
+                    <div className="h-[400px]">
+                      <SignalFlowView 
+                        signals={signals}
+                        knowledgeMode={knowledgeMode}
+                        onSignalAction={(signal, action) => {
+                          toast({
+                            title: action === 'execute' ? 'Trade Executed!' : 'Signal Passed',
+                            description: action === 'execute' 
+                              ? `Buying ${signal.symbol} at $${signal.currentPrice}`
+                              : `Passed on ${signal.symbol} signal`,
+                            variant: action === 'execute' ? 'default' : undefined
+                          });
+                        }}
+                      />
+                    </div>
+                  </CardContent>
+                </CollapsibleContent>
+              </Card>
+            </Collapsible>
             
             <Card className="!shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)] transition-shadow duration-200">
               <Tabs defaultValue="positions" className="w-full">
