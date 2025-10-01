@@ -11,6 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { BulkDocumentImport } from "@/components/forensics/BulkDocumentImport";
 import { AutoDocumentDiscovery } from "@/components/forensics/AutoDocumentDiscovery";
+import { DocumentUpload } from "@/components/forensics/DocumentUpload";
+import { DocumentLibrary } from "@/components/forensics/DocumentLibrary";
 import { useForensicData } from "@/hooks/useForensicData";
 
 export default function DocumentAnalysis() {
@@ -88,12 +90,21 @@ export default function DocumentAnalysis() {
         </div>
 
         <div className="container mx-auto px-4 py-8">
-          <Tabs defaultValue="auto" className="space-y-6">
-            <TabsList className="grid w-full max-w-2xl grid-cols-3">
+          <Tabs defaultValue="upload" className="space-y-6">
+            <TabsList className="grid w-full max-w-3xl grid-cols-4">
+              <TabsTrigger value="upload">Upload PDFs</TabsTrigger>
+              <TabsTrigger value="library">Library</TabsTrigger>
+              <TabsTrigger value="bulk">Email URLs</TabsTrigger>
               <TabsTrigger value="auto">AI Discovery</TabsTrigger>
-              <TabsTrigger value="bulk">Bulk Import</TabsTrigger>
-              <TabsTrigger value="single">Single Document</TabsTrigger>
             </TabsList>
+
+            <TabsContent value="upload">
+              <DocumentUpload />
+            </TabsContent>
+
+            <TabsContent value="library">
+              <DocumentLibrary />
+            </TabsContent>
 
             <TabsContent value="auto">
               <AutoDocumentDiscovery />

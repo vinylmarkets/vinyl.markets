@@ -1286,6 +1286,57 @@ export type Database = {
         }
         Relationships: []
       }
+      forensic_documents: {
+        Row: {
+          analysis_result: Json | null
+          analysis_status: string
+          analyzed_at: string | null
+          confidence_score: number | null
+          document_url: string | null
+          file_path: string
+          file_size: number
+          filename: string
+          findings: string[] | null
+          id: string
+          metadata: Json | null
+          tags: string[] | null
+          uploaded_at: string
+          user_id: string
+        }
+        Insert: {
+          analysis_result?: Json | null
+          analysis_status?: string
+          analyzed_at?: string | null
+          confidence_score?: number | null
+          document_url?: string | null
+          file_path: string
+          file_size: number
+          filename: string
+          findings?: string[] | null
+          id?: string
+          metadata?: Json | null
+          tags?: string[] | null
+          uploaded_at?: string
+          user_id: string
+        }
+        Update: {
+          analysis_result?: Json | null
+          analysis_status?: string
+          analyzed_at?: string | null
+          confidence_score?: number | null
+          document_url?: string | null
+          file_path?: string
+          file_size?: number
+          filename?: string
+          findings?: string[] | null
+          id?: string
+          metadata?: Json | null
+          tags?: string[] | null
+          uploaded_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       forum_categories: {
         Row: {
           color: string | null
