@@ -65,7 +65,7 @@ export function AmpCard({ amp, onToggle, onAllocate, onSettings }: AmpCardProps)
 
         {/* Description */}
         {amp.catalog?.description && (
-          <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+          <p className="text-sm text-muted-foreground mb-4">
             {amp.catalog.description}
           </p>
         )}
