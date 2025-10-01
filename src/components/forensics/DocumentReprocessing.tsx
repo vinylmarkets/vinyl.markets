@@ -3,14 +3,24 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { RefreshCw, AlertCircle, CheckCircle, FileSearch } from "lucide-react";
+import { RefreshCw, AlertCircle, CheckCircle, FileSearch, Activity, Clock } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
 import Tesseract from 'tesseract.js';
 import * as pdfjsLib from 'pdfjs-dist';
 
 // Set up PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+interface ActivityLogEntry {
+  id: string;
+  timestamp: Date;
+  filename: string;
+  status: 'processing' | 'complete' | 'failed';
+  message: string;
+}
 
 export const DocumentReprocessing = () => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -32,7 +42,59 @@ export const DocumentReprocessing = () => {
     currentFile: string;
     stage: string;
   } | null>(null);
+  const [activityLog, setActivityLog] = useState<ActivityLogEntry[]>([]);
+  const [currentlyProcessing, setCurrentlyProcessing] = useState<string[]>([]);
   const { toast } = useToast();
+
+  // Load persistent state on mount
+  useEffect(() => {
+    const savedState = localStorage.getItem('forensic-processing-state');
+    if (savedState) {
+      try {
+        const state = JSON.parse(savedState);
+        if (state.isProcessing) {
+          setIsProcessing(true);
+          setProcessingProgress(state.processingProgress);
+        }
+        if (state.isOcrProcessing) {
+          setIsOcrProcessing(true);
+          setOcrProgress(state.ocrProgress);
+        }
+        if (state.activityLog) {
+          setActivityLog(state.activityLog.map((entry: any) => ({
+            ...entry,
+            timestamp: new Date(entry.timestamp)
+          })));
+        }
+      } catch (e) {
+        console.error('Error loading saved state:', e);
+      }
+    }
+  }, []);
+
+  // Save state to localStorage
+  useEffect(() => {
+    const state = {
+      isProcessing,
+      isOcrProcessing,
+      processingProgress,
+      ocrProgress,
+      activityLog: activityLog.slice(0, 50) // Keep last 50 entries
+    };
+    localStorage.setItem('forensic-processing-state', JSON.stringify(state));
+  }, [isProcessing, isOcrProcessing, processingProgress, ocrProgress, activityLog]);
+
+  // Add entry to activity log
+  const addActivityLog = (filename: string, status: ActivityLogEntry['status'], message: string) => {
+    const entry: ActivityLogEntry = {
+      id: `${Date.now()}-${Math.random()}`,
+      timestamp: new Date(),
+      filename,
+      status,
+      message
+    };
+    setActivityLog(prev => [entry, ...prev].slice(0, 100)); // Keep last 100
+  };
 
   const fetchStats = async () => {
     try {
@@ -299,6 +361,8 @@ export const DocumentReprocessing = () => {
             .update({ analysis_status: 'processing' })
             .eq('id', doc.id);
 
+          addActivityLog(doc.filename, 'processing', 'Starting OCR extraction...');
+
           // Extract text with OCR
           let text = '';
           let pageCount = 0;
@@ -309,6 +373,7 @@ export const DocumentReprocessing = () => {
             text = ocrResult.text;
             pageCount = ocrResult.pageCount;
             ocrSuccess = true;
+            addActivityLog(doc.filename, 'processing', `Extracted ${pageCount} pages, analyzing with AI...`);
           } catch (ocrError) {
             console.error(`OCR failed for ${doc.filename}:`, ocrError);
             
@@ -331,12 +396,14 @@ export const DocumentReprocessing = () => {
                 })
                 .eq('id', doc.id);
               
+              addActivityLog(doc.filename, 'failed', 'Corrupted or invalid PDF structure');
               errorCount++;
               continue; // Skip to next document
             }
             
             // For other OCR errors, continue with empty text
             text = '[OCR extraction failed - document may be password protected or encrypted]';
+            addActivityLog(doc.filename, 'failed', 'OCR extraction failed');
           }
 
           setOcrProgress(prev => prev ? { ...prev, stage: 'Analyzing with AI...' } : null);
@@ -380,6 +447,7 @@ export const DocumentReprocessing = () => {
               })
               .eq('id', doc.id);
 
+            addActivityLog(doc.filename, 'complete', `Analysis complete - ${analysisData.findings?.length || 0} findings`);
             successCount++;
           } else {
             // Not enough text extracted
@@ -398,11 +466,14 @@ export const DocumentReprocessing = () => {
               })
               .eq('id', doc.id);
             
+            addActivityLog(doc.filename, 'failed', 'Insufficient text extracted');
             errorCount++;
           }
         } catch (error) {
           console.error(`Error processing ${doc.filename}:`, error);
           errorCount++;
+          
+          addActivityLog(doc.filename, 'failed', error instanceof Error ? error.message : 'Processing failed');
           
           // Update with error
           await supabase
@@ -448,6 +519,8 @@ export const DocumentReprocessing = () => {
 
   const handleReprocessAll = async () => {
     setIsProcessing(true);
+    addActivityLog('System', 'processing', 'Starting batch reprocessing...');
+    
     try {
       const { data, error } = await supabase.functions.invoke('reprocess-documents', {
         body: { reprocessAll: true }
@@ -462,6 +535,8 @@ export const DocumentReprocessing = () => {
         processing: data.documentsQueued
       });
 
+      addActivityLog('System', 'processing', `${data.documentsQueued} documents queued for analysis`);
+
       toast({
         title: "Reprocessing Started",
         description: `${data.documentsQueued} documents queued for reprocessing. This will take some time.`,
@@ -469,6 +544,8 @@ export const DocumentReprocessing = () => {
 
     } catch (error) {
       console.error('Error reprocessing documents:', error);
+      addActivityLog('System', 'failed', error.message);
+      
       toast({
         title: "Reprocessing Failed",
         description: error.message,
@@ -493,9 +570,27 @@ export const DocumentReprocessing = () => {
           schema: 'public',
           table: 'forensic_documents'
         },
-        () => {
+        (payload) => {
           console.log('Document updated, refreshing stats...');
           fetchStats();
+          
+          // Update activity log based on changes
+          if (payload.eventType === 'UPDATE' && payload.new) {
+            const doc = payload.new as any;
+            const filename = doc.filename || 'Unknown document';
+            
+            if (doc.analysis_status === 'processing') {
+              setCurrentlyProcessing(prev => [...new Set([...prev, filename])]);
+              addActivityLog(filename, 'processing', 'Analysis started');
+            } else if (doc.analysis_status === 'complete') {
+              setCurrentlyProcessing(prev => prev.filter(f => f !== filename));
+              addActivityLog(filename, 'complete', `Analysis completed with ${doc.confidence_score || 0}% confidence`);
+            } else if (doc.analysis_status === 'failed') {
+              setCurrentlyProcessing(prev => prev.filter(f => f !== filename));
+              const result = doc.analysis_result as any;
+              addActivityLog(filename, 'failed', result?.error || 'Analysis failed');
+            }
+          }
         }
       )
       .subscribe();
@@ -563,15 +658,82 @@ export const DocumentReprocessing = () => {
     ? Math.round((processingProgress.completed / processingProgress.total) * 100)
     : 0;
 
+  const hasActiveProcessing = isProcessing || isOcrProcessing || currentlyProcessing.length > 0;
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Document Reprocessing</CardTitle>
-        <CardDescription>
-          Re-analyze failed documents with improved parsing
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              Document Reprocessing
+              {hasActiveProcessing && <Activity className="h-5 w-5 text-primary animate-pulse" />}
+            </CardTitle>
+            <CardDescription>
+              Re-analyze failed documents with improved parsing
+            </CardDescription>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Live Processing Feed */}
+        {hasActiveProcessing && (
+          <Card className="border-primary/50 bg-primary/5">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Activity className="h-4 w-4 animate-pulse" />
+                Live Processing Feed
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {/* Currently Processing */}
+              {currentlyProcessing.length > 0 && (
+                <div className="space-y-2">
+                  <div className="text-xs font-medium text-muted-foreground">Currently Processing:</div>
+                  <ScrollArea className="h-[100px] rounded-md border border-border/50 bg-card p-2">
+                    {currentlyProcessing.map((filename, idx) => (
+                      <div key={idx} className="flex items-center gap-2 py-1">
+                        <RefreshCw className="h-3 w-3 animate-spin text-primary" />
+                        <span className="text-xs truncate">{filename}</span>
+                      </div>
+                    ))}
+                  </ScrollArea>
+                </div>
+              )}
+
+              {/* Activity Log */}
+              {activityLog.length > 0 && (
+                <div className="space-y-2">
+                  <div className="text-xs font-medium text-muted-foreground">Recent Activity:</div>
+                  <ScrollArea className="h-[150px] rounded-md border border-border/50 bg-card p-2">
+                    <div className="space-y-2">
+                      {activityLog.map((entry) => (
+                        <div key={entry.id} className="flex items-start gap-2 text-xs">
+                          <Badge 
+                            variant={entry.status === 'complete' ? 'default' : entry.status === 'failed' ? 'destructive' : 'secondary'}
+                            className="shrink-0"
+                          >
+                            {entry.status === 'complete' && <CheckCircle className="h-3 w-3" />}
+                            {entry.status === 'failed' && <AlertCircle className="h-3 w-3" />}
+                            {entry.status === 'processing' && <RefreshCw className="h-3 w-3 animate-spin" />}
+                          </Badge>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium truncate">{entry.filename}</div>
+                            <div className="text-muted-foreground">{entry.message}</div>
+                            <div className="flex items-center gap-1 text-muted-foreground/60">
+                              <Clock className="h-3 w-3" />
+                              {entry.timestamp.toLocaleTimeString()}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
         {stats && (
           <div className="space-y-3">
             <div className="flex items-center justify-between text-sm">
