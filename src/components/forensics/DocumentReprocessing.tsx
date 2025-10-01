@@ -44,17 +44,36 @@ export const DocumentReprocessing = () => {
       return;
     }
 
-    const failed = data.filter(d => 
-      !d.analysis_result || 
-      JSON.stringify(d.analysis_result).includes('failed') ||
-      JSON.stringify(d.analysis_result).includes('error')
-    ).length;
+    // More accurate failed document detection
+    const failed = data.filter(d => {
+      // Failed if no analysis result at all
+      if (!d.analysis_result) return true;
+      
+      // Failed if analysis_status is explicitly failed
+      if (d.analysis_status === 'failed') return true;
+      
+      const resultStr = JSON.stringify(d.analysis_result);
+      
+      // Failed if contains error indicators
+      if (resultStr.includes('"error"') || 
+          resultStr.includes('failed') || 
+          resultStr.includes('PDF parsing failed') ||
+          resultStr.includes('could not be parsed')) {
+        return true;
+      }
+      
+      // Success if has findings or analysis content
+      return false;
+    }).length;
 
-    setStats({
+    const newStats = {
       total: data.length,
       failed,
       successful: data.length - failed
-    });
+    };
+
+    console.log('Stats updated:', newStats);
+    setStats(newStats);
   };
 
   const processFileWithOCR = async (documentUrl: string, filename: string): Promise<{ text: string; pageCount: number }> => {
@@ -169,48 +188,106 @@ export const DocumentReprocessing = () => {
             .eq('id', doc.id);
 
           // Extract text with OCR
-          const { text, pageCount } = await processFileWithOCR(doc.document_url, doc.filename);
+          let text = '';
+          let pageCount = 0;
+          let ocrSuccess = false;
+          
+          try {
+            const ocrResult = await processFileWithOCR(doc.document_url, doc.filename);
+            text = ocrResult.text;
+            pageCount = ocrResult.pageCount;
+            ocrSuccess = true;
+          } catch (ocrError) {
+            console.error(`OCR failed for ${doc.filename}:`, ocrError);
+            
+            // Check if it's a corrupted PDF
+            if (ocrError instanceof Error && 
+                (ocrError.message.includes('Invalid PDF') || 
+                 ocrError.message.includes('InvalidPDFException'))) {
+              // Mark as corrupted PDF - can't be processed
+              await supabase
+                .from('forensic_documents')
+                .update({
+                  analysis_status: 'failed',
+                  analysis_result: {
+                    error: 'Corrupted or invalid PDF file structure',
+                    fileCorrupted: true,
+                    ocrAttempted: true
+                  },
+                  findings: ['Document appears to be corrupted or has invalid PDF structure'],
+                  confidence_score: 0
+                })
+                .eq('id', doc.id);
+              
+              errorCount++;
+              continue; // Skip to next document
+            }
+            
+            // For other OCR errors, continue with empty text
+            text = '[OCR extraction failed - document may be password protected or encrypted]';
+          }
 
           setOcrProgress(prev => prev ? { ...prev, stage: 'Analyzing with AI...' } : null);
 
-          // Analyze with forensic-document-analysis
-          const { data: analysisData, error: analysisError } = await supabase.functions.invoke('forensic-document-analysis', {
-            body: {
-              documentUrl: doc.document_url,
-              extractedText: text,
-              analysisType: 'comprehensive',
-              focusAreas: [
-                'NOL preservation language',
-                'Section 382 references',
-                'Acquisition structures',
-                'Timeline references',
-                'Entity relationships',
-                'Bankruptcy proceedings',
-                'Asset transfers',
-                'Valuation discussions'
-              ]
-            }
-          });
+          // Only analyze if we got some text
+          if (ocrSuccess && text.trim().length > 50) {
+            // Analyze with forensic-document-analysis
+            const { data: analysisData, error: analysisError } = await supabase.functions.invoke('forensic-document-analysis', {
+              body: {
+                documentUrl: doc.document_url,
+                extractedText: text,
+                analysisType: 'comprehensive',
+                focusAreas: [
+                  'NOL preservation language',
+                  'Section 382 references',
+                  'Acquisition structures',
+                  'Timeline references',
+                  'Entity relationships',
+                  'Bankruptcy proceedings',
+                  'Asset transfers',
+                  'Valuation discussions'
+                ]
+              }
+            });
 
-          if (analysisError) throw analysisError;
+            if (analysisError) throw analysisError;
 
-          // Update document with results
-          await supabase
-            .from('forensic_documents')
-            .update({
-              analysis_status: 'complete',
-              analysis_result: {
-                ...analysisData,
-                ocrExtracted: true,
-                ocrPageCount: pageCount
-              },
-              findings: analysisData.findings || [],
-              confidence_score: analysisData.confidence_score || 0,
-              analyzed_at: new Date().toISOString()
-            })
-            .eq('id', doc.id);
+            // Update document with results
+            await supabase
+              .from('forensic_documents')
+              .update({
+                analysis_status: 'complete',
+                analysis_result: {
+                  ...analysisData,
+                  ocrExtracted: true,
+                  ocrPageCount: pageCount
+                },
+                findings: analysisData.findings || [],
+                confidence_score: analysisData.confidence_score || 0,
+                analyzed_at: new Date().toISOString()
+              })
+              .eq('id', doc.id);
 
-          successCount++;
+            successCount++;
+          } else {
+            // Not enough text extracted
+            await supabase
+              .from('forensic_documents')
+              .update({
+                analysis_status: 'failed',
+                analysis_result: {
+                  error: 'Insufficient text extracted from OCR',
+                  ocrExtracted: true,
+                  ocrPageCount: pageCount,
+                  extractedTextLength: text.length
+                },
+                findings: ['Unable to extract sufficient text content for analysis'],
+                confidence_score: 0
+              })
+              .eq('id', doc.id);
+            
+            errorCount++;
+          }
         } catch (error) {
           console.error(`Error processing ${doc.filename}:`, error);
           errorCount++;
@@ -231,7 +308,11 @@ export const DocumentReprocessing = () => {
 
       setIsOcrProcessing(false);
       setOcrProgress(null);
-      fetchStats();
+      
+      // Wait a moment for DB to settle, then refresh stats
+      setTimeout(() => {
+        fetchStats();
+      }, 1000);
 
       toast({
         title: "OCR Processing Complete",
@@ -247,6 +328,9 @@ export const DocumentReprocessing = () => {
       });
       setIsOcrProcessing(false);
       setOcrProgress(null);
+      
+      // Refresh stats even on error
+      fetchStats();
     }
   };
 
@@ -283,9 +367,30 @@ export const DocumentReprocessing = () => {
     }
   };
 
-  // Fetch stats on mount
+  // Fetch stats on mount and set up real-time updates
   useEffect(() => {
     fetchStats();
+
+    // Subscribe to changes in forensic_documents table
+    const channel = supabase
+      .channel('forensic-stats-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'forensic_documents'
+        },
+        () => {
+          console.log('Document updated, refreshing stats...');
+          fetchStats();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   // Set up real-time subscription for processing progress
