@@ -1,16 +1,40 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Brain, TrendingUp, AlertTriangle, CheckCircle2, XCircle, Target, ArrowLeft } from "lucide-react";
+import { Brain, TrendingUp, AlertTriangle, CheckCircle2, XCircle, Target, ArrowLeft, FileText, BookOpen } from "lucide-react";
 import { useForensicData } from "@/hooks/useForensicData";
 import { TraderProtection } from "@/components/trader/TraderProtection";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 
 export default function IntelligenceSynthesis() {
   const navigate = useNavigate();
   const { evidence, getSynthesisSummary, loading } = useForensicData();
   const synthesis = getSynthesisSummary();
+  const [documentStats, setDocumentStats] = useState({ totalDocuments: 0, totalPages: 0 });
+
+  useEffect(() => {
+    const fetchDocumentStats = async () => {
+      const { data, error } = await supabase
+        .from('forensic_documents')
+        .select('metadata');
+      
+      if (!error && data) {
+        const totalDocs = data.length;
+        const totalPages = data.reduce((sum, doc) => {
+          const metadata = doc.metadata as any;
+          const pageCount = metadata?.pageCount || 0;
+          return sum + pageCount;
+        }, 0);
+        
+        setDocumentStats({ totalDocuments: totalDocs, totalPages });
+      }
+    };
+    
+    fetchDocumentStats();
+  }, []);
 
   // Calculate acquisition probability based on evidence
   const calculateAcquisitionProbability = () => {
@@ -234,7 +258,7 @@ export default function IntelligenceSynthesis() {
           <Card className="border-primary/20">
             <div className="p-6">
               <h2 className="text-xl font-bold mb-4">Synthesis Summary</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
                 <div>
                   <div className="text-sm text-muted-foreground mb-1">Total Evidence Items</div>
                   <div className="text-3xl font-bold">{synthesis.totalFindings}</div>
@@ -246,6 +270,20 @@ export default function IntelligenceSynthesis() {
                 <div>
                   <div className="text-sm text-muted-foreground mb-1">Evidence Categories</div>
                   <div className="text-3xl font-bold text-blue-600">{evidence.length}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
+                    <FileText size={14} />
+                    Documents in Library
+                  </div>
+                  <div className="text-3xl font-bold text-purple-600">{documentStats.totalDocuments}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
+                    <BookOpen size={14} />
+                    Pages Analyzed
+                  </div>
+                  <div className="text-3xl font-bold text-orange-600">{documentStats.totalPages}</div>
                 </div>
               </div>
               
