@@ -74,3 +74,9 @@ verify_jwt = true
 
 [functions.cognee-query]
 verify_jwt = true
+
+[functions.forensic-document-analysis]
+verify_jwt = true
+
+[functions.scrape-kroll-documents]
+verify_jwt = true

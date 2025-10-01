@@ -10,6 +10,7 @@ import { TraderProtection } from "@/components/trader/TraderProtection";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { BulkDocumentImport } from "@/components/forensics/BulkDocumentImport";
+import { AutoDocumentDiscovery } from "@/components/forensics/AutoDocumentDiscovery";
 import { useForensicData } from "@/hooks/useForensicData";
 
 export default function DocumentAnalysis() {
@@ -87,11 +88,16 @@ export default function DocumentAnalysis() {
         </div>
 
         <div className="container mx-auto px-4 py-8">
-          <Tabs defaultValue="single" className="space-y-6">
-            <TabsList className="grid w-full max-w-md grid-cols-2">
-              <TabsTrigger value="single">Single Document</TabsTrigger>
+          <Tabs defaultValue="auto" className="space-y-6">
+            <TabsList className="grid w-full max-w-2xl grid-cols-3">
+              <TabsTrigger value="auto">AI Discovery</TabsTrigger>
               <TabsTrigger value="bulk">Bulk Import</TabsTrigger>
+              <TabsTrigger value="single">Single Document</TabsTrigger>
             </TabsList>
+
+            <TabsContent value="auto">
+              <AutoDocumentDiscovery />
+            </TabsContent>
 
             <TabsContent value="single" className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
