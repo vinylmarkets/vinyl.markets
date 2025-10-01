@@ -3869,6 +3869,51 @@ export type Database = {
         }
         Relationships: []
       }
+      risk_settings: {
+        Row: {
+          created_at: string | null
+          daily_loss_limit: number | null
+          id: string
+          max_open_positions: number | null
+          max_portfolio_risk: number | null
+          max_position_size: number | null
+          min_confidence_score: number | null
+          stop_loss_percent: number | null
+          take_profit_percent: number | null
+          trading_enabled: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          daily_loss_limit?: number | null
+          id?: string
+          max_open_positions?: number | null
+          max_portfolio_risk?: number | null
+          max_position_size?: number | null
+          min_confidence_score?: number | null
+          stop_loss_percent?: number | null
+          take_profit_percent?: number | null
+          trading_enabled?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          daily_loss_limit?: number | null
+          id?: string
+          max_open_positions?: number | null
+          max_portfolio_risk?: number | null
+          max_position_size?: number | null
+          min_confidence_score?: number | null
+          stop_loss_percent?: number | null
+          take_profit_percent?: number | null
+          trading_enabled?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       stock_analysis_cache: {
         Row: {
           analysis_data: Json
