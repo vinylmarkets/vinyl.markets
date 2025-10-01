@@ -122,8 +122,41 @@ export const DocumentReprocessing = () => {
   };
 
   const processFileWithOCR = async (documentUrl: string, filename: string): Promise<{ text: string; pageCount: number }> => {
-    // Fetch the PDF
-    const response = await fetch(documentUrl);
+    // Extract file path from the URL and generate a signed URL for private bucket access
+    let fetchUrl = documentUrl;
+    
+    if (documentUrl.includes('/storage/v1/object/public/')) {
+      // Convert public URL to file path
+      const pathMatch = documentUrl.match(/\/forensic-documents\/(.+)$/);
+      if (pathMatch) {
+        const filePath = pathMatch[1];
+        console.log('Generating signed URL for:', filePath);
+        
+        // Generate signed URL (valid for 1 hour)
+        const { data: signedUrlData, error: signedError } = await supabase.storage
+          .from('forensic-documents')
+          .createSignedUrl(filePath, 3600);
+        
+        if (signedError) {
+          console.error('Error creating signed URL:', signedError);
+          throw new Error(`Failed to access document: ${signedError.message}`);
+        }
+        
+        if (!signedUrlData?.signedUrl) {
+          throw new Error('No signed URL returned from storage');
+        }
+        
+        fetchUrl = signedUrlData.signedUrl;
+        console.log('Using signed URL for private document access');
+      }
+    }
+    
+    // Fetch the PDF with signed URL
+    const response = await fetch(fetchUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch PDF: ${response.status} ${response.statusText}`);
+    }
+    
     const arrayBuffer = await response.arrayBuffer();
     
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
