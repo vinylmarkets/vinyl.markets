@@ -348,9 +348,9 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({ positions })
         )}
 
         {/* Chart Container */}
-        <div className="flex-1 min-h-[350px] rounded-lg border bg-card p-2">
+        <div className="flex-1 min-h-[350px] rounded-lg border bg-card p-2 relative">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
+            <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 40 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis 
                 dataKey="time" 
@@ -414,6 +414,26 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({ positions })
               />
             </ComposedChart>
           </ResponsiveContainer>
+          
+          {/* Legend - positioned inside chart at bottom left */}
+          <div className="absolute bottom-2 left-14 flex items-center space-x-4 text-xs bg-card/80 backdrop-blur-sm px-2 py-1 rounded border border-border/50">
+            <div className="flex items-center space-x-1">
+              <BarChart3 className="h-3 w-3 text-green-500" />
+              <span className="text-muted-foreground">Price Bars</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <div className="w-3 h-0.5 bg-amber-500"></div>
+              <span className="text-muted-foreground">SMA 20</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <div className="w-3 h-0.5 bg-violet-500"></div>
+              <span className="text-muted-foreground">SMA 50</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <div className="w-3 h-0.5 bg-blue-400 opacity-60"></div>
+              <span className="text-muted-foreground">Volume</span>
+            </div>
+          </div>
         </div>
 
         {/* Position markers info */}
@@ -427,26 +447,6 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({ positions })
             ))}
           </div>
         )}
-
-        {/* Legend */}
-        <div className="flex items-center justify-center space-x-6 mt-1 text-xs">
-          <div className="flex items-center space-x-1">
-            <BarChart3 className="h-3 w-3 text-green-500" />
-            <span className="text-muted-foreground">Price Bars</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <div className="w-3 h-0.5 bg-amber-500"></div>
-            <span className="text-muted-foreground">SMA 20</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <div className="w-3 h-0.5 bg-violet-500"></div>
-            <span className="text-muted-foreground">SMA 50</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <div className="w-3 h-0.5 bg-blue-400 opacity-60"></div>
-            <span className="text-muted-foreground">Volume</span>
-          </div>
-        </div>
       </CardContent>
     </Card>
   );
