@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import vinylLogoWhite from "@/assets/vinyl-logo-white-new.svg";
 import vinylLogoBlack from "@/assets/vinyl-logo-black-new.svg";
+import { CronScheduler } from "./CronScheduler";
 import { WatchlistManager } from "./WatchlistManager";
 import { SectorMap } from "./SectorMap";
 import { RelationshipNetworkGraph } from "./RelationshipNetworkGraph";
@@ -1077,10 +1078,20 @@ export const TradingDashboard = () => {
                   <p>1. Generate signals from market data</p>
                   <p>2. Review signals in AI Signals tab</p>
                   <p>3. Execute trades based on signals</p>
-                  <p className="text-amber-600 dark:text-amber-400 pt-1">
-                    ⚠ Auto-trading toggle requires cron setup
-                  </p>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Automation Setup */}
+            <Card className="!shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)] transition-shadow duration-200">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center space-x-2 text-base">
+                  <Clock className="h-4 w-4 text-primary" />
+                  <span>Automation</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CronScheduler />
               </CardContent>
             </Card>
 
