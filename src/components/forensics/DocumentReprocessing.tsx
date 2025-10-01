@@ -26,6 +26,7 @@ export const DocumentReprocessing = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isOcrProcessing, setIsOcrProcessing] = useState(false);
   const [cancelOcr, setCancelOcr] = useState(false);
+  const [isProcessingPage, setIsProcessingPage] = useState(false);
   const skipCurrentPageRef = useRef<((value: string) => void) | null>(null);
   const [stats, setStats] = useState<{
     total: number;
@@ -241,6 +242,8 @@ export const DocumentReprocessing = () => {
       } : null);
 
       try {
+        setIsProcessingPage(true);
+        
         // Create a skip promise that can be triggered externally
         const skipPromise = new Promise<string>((resolve) => {
           skipCurrentPageRef.current = (reason: string) => {
@@ -291,6 +294,7 @@ export const DocumentReprocessing = () => {
 
         // Clear the skip handler
         skipCurrentPageRef.current = null;
+        setIsProcessingPage(false);
 
         // Check if it was skipped
         if (pageText.startsWith('SKIP:')) {
@@ -304,6 +308,7 @@ export const DocumentReprocessing = () => {
         }
       } catch (pageError) {
         skipCurrentPageRef.current = null;
+        setIsProcessingPage(false);
         const errorMsg = pageError instanceof Error ? pageError.message : 'Unknown error';
         console.error(`✗ ${filename}: Page ${pageNum} failed - ${errorMsg}`);
         addActivityLog(filename, 'failed', `Page ${pageNum} failed: ${errorMsg}`);
@@ -889,17 +894,24 @@ export const DocumentReprocessing = () => {
                 <>
                   <Button
                     onClick={() => {
-                      if (skipCurrentPageRef.current) {
-                        skipCurrentPageRef.current('User requested skip');
+                      const skipFn = skipCurrentPageRef.current;
+                      if (skipFn && typeof skipFn === 'function') {
+                        skipFn('User requested skip');
                         toast({
                           title: "Skipping Page",
                           description: "Skipped current page, continuing to next",
+                        });
+                      } else {
+                        toast({
+                          title: "Cannot Skip",
+                          description: "No page is currently being processed",
+                          variant: "destructive"
                         });
                       }
                     }}
                     variant="outline"
                     size="sm"
-                    disabled={!skipCurrentPageRef.current}
+                    disabled={!isProcessingPage}
                   >
                     <SkipForward className="mr-1 h-3 w-3" />
                     Skip Page
