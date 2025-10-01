@@ -204,20 +204,41 @@ export const DocumentReprocessing = () => {
           </Alert>
         )}
 
-        <Button
-          onClick={handleReprocessAll}
-          disabled={isProcessing || (stats && stats.failed === 0)}
-          className="w-full"
-        >
-          <RefreshCw className={`mr-2 h-4 w-4 ${isProcessing ? 'animate-spin' : ''}`} />
-          {isProcessing ? 'Reprocessing...' : `Reprocess ${stats?.failed || 0} Failed Documents`}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={handleReprocessAll}
+            disabled={isProcessing || (stats && stats.failed === 0)}
+            className="flex-1"
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${isProcessing ? 'animate-spin' : ''}`} />
+            {isProcessing ? 'Reprocessing...' : `Reprocess ${stats?.failed || 0} Failed Documents`}
+          </Button>
+          
+          <Button
+            onClick={fetchStats}
+            variant="outline"
+            size="icon"
+            title="Refresh stats"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        </div>
 
         {stats && stats.failed === 0 && (
           <Alert>
             <CheckCircle className="h-4 w-4" />
             <AlertDescription>
               All documents have been successfully processed!
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {stats && stats.successful > 0 && stats.failed > 100 && (
+          <Alert className="mt-4">
+            <AlertCircle className="h-4 w-4 text-yellow-500" />
+            <AlertDescription>
+              <strong>Note:</strong> {stats.failed} documents (~{Math.round((stats.failed/stats.total)*100)}%) appear to be scanned images or protected PDFs. 
+              These require OCR (Optical Character Recognition) for text extraction. Standard PDF parsing cannot read image-based content.
             </AlertDescription>
           </Alert>
         )}
