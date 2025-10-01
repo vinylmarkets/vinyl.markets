@@ -6,10 +6,12 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Brain, Search, RefreshCw, Maximize2, Download, Network } from 'lucide-react'
+import { Brain, Search, RefreshCw, Maximize2, Download, Network, ArrowLeft } from 'lucide-react'
 import { useCogneeData } from '@/hooks/useCogneeData'
 import Plot from 'react-plotly.js'
 import { darkPlotlyTheme } from '@/lib/plotly-themes'
+import { Link } from 'react-router-dom'
+import { TraderProtection } from '@/components/trader/TraderProtection'
 
 export default function KnowledgeExplorer() {
   const { loading, fetchKnowledgeGraph } = useCogneeData()
@@ -46,29 +48,41 @@ export default function KnowledgeExplorer() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between"
-      >
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Brain className="w-8 h-8 text-primary" />
-            Knowledge Graph Explorer
-          </h1>
-          <p className="text-muted-foreground">
-            Visualize and explore the intelligent knowledge graph
-          </p>
-        </div>
-        <Button onClick={loadGraph} disabled={loading}>
-          <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-          Refresh Graph
-        </Button>
-      </motion.div>
+    <TraderProtection>
+      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#1a1a2e] to-[#0a0a0f]">
+        {/* Header */}
+        <header className="border-b border-white/10 backdrop-blur-xl bg-white/5">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Link 
+                  to="/trader" 
+                  className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span className="text-sm">Back to Trader</span>
+                </Link>
+                <div className="h-6 w-px bg-white/10" />
+                <div>
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-[#00ffff] via-[#ff00ff] to-[#00ff88] bg-clip-text text-transparent flex items-center gap-2">
+                    <Brain className="w-6 h-6 text-[#00ffff]" />
+                    Knowledge Graph Explorer
+                  </h1>
+                  <p className="text-sm text-muted-foreground">
+                    Visualize and explore Vinyl's intelligent knowledge graph
+                  </p>
+                </div>
+              </div>
+              <Button onClick={loadGraph} disabled={loading} className="bg-white/5 hover:bg-white/10">
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                Refresh Graph
+              </Button>
+            </div>
+          </div>
+        </header>
 
-      {/* Controls */}
+        <div className="container mx-auto p-6 space-y-6">
+          {/* Controls */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -286,6 +300,14 @@ export default function KnowledgeExplorer() {
           </Card>
         </motion.div>
       </div>
-    </div>
+
+        </div>
+
+        {/* Particle Background Effect */}
+        <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(124,58,237,0.1),transparent_50%)]" />
+        </div>
+      </div>
+    </TraderProtection>
   )
 }

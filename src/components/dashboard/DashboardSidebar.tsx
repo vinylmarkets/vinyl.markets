@@ -34,9 +34,7 @@ import {
   Search,
   TrendingDown,
   Users,
-  Info,
-  Brain,
-  Lightbulb
+  Info
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useAdmin } from "@/hooks/useAdmin";
@@ -86,18 +84,6 @@ const navigationItems = [
   },
 ];
 
-const intelligenceItems = [
-  {
-    title: "Knowledge Explorer",
-    url: "/dashboard/intelligence/explorer",
-    icon: Brain,
-  },
-  {
-    title: "Insights Dashboard",
-    url: "/dashboard/intelligence/insights",
-    icon: Lightbulb,
-  },
-];
 
 export function DashboardSidebar() {
   const { state } = useSidebar();
@@ -198,33 +184,6 @@ export function DashboardSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               )}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        {/* Intelligence Section */}
-        <SidebarGroup>
-          <SidebarGroupLabel className={isCollapsed ? "sr-only" : ""}>
-            Intelligence
-          </SidebarGroupLabel>
-          
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {intelligenceItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink 
-                      to={item.url} 
-                      className={getNavClassName(item.url)}
-                    >
-                      <item.icon className="h-4 w-4" />
-                      {!isCollapsed && (
-                        <span>{item.title}</span>
-                      )}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

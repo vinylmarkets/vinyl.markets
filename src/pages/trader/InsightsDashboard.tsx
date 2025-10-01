@@ -4,9 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Lightbulb, AlertTriangle, TrendingUp, RefreshCw, CheckCircle2, Clock } from 'lucide-react'
+import { Lightbulb, AlertTriangle, TrendingUp, RefreshCw, CheckCircle2, Clock, ArrowLeft } from 'lucide-react'
 import { useCogneeData, CogneeInsight } from '@/hooks/useCogneeData'
 import { useToast } from '@/hooks/use-toast'
+import { Link } from 'react-router-dom'
+import { TraderProtection } from '@/components/trader/TraderProtection'
 
 export default function InsightsDashboard() {
   const { loading, fetchInsights, discoverInsights } = useCogneeData()
@@ -76,30 +78,44 @@ export default function InsightsDashboard() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between"
-      >
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Lightbulb className="w-8 h-8 text-primary" />
-            Insights Dashboard
-          </h1>
-          <p className="text-muted-foreground">
-            AI-powered insights automatically discovered from your system
-          </p>
-        </div>
-        <Button 
-          onClick={handleDiscoverInsights} 
-          disabled={discovering || loading}
-        >
-          <RefreshCw className={`w-4 h-4 mr-2 ${discovering ? 'animate-spin' : ''}`} />
-          Discover New Insights
-        </Button>
-      </motion.div>
+    <TraderProtection>
+      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#1a1a2e] to-[#0a0a0f]">
+        {/* Header */}
+        <header className="border-b border-white/10 backdrop-blur-xl bg-white/5">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Link 
+                  to="/trader" 
+                  className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span className="text-sm">Back to Trader</span>
+                </Link>
+                <div className="h-6 w-px bg-white/10" />
+                <div>
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-[#00ffff] via-[#ff00ff] to-[#00ff88] bg-clip-text text-transparent flex items-center gap-2">
+                    <Lightbulb className="w-6 h-6 text-[#00ffff]" />
+                    AI-Powered Insights
+                  </h1>
+                  <p className="text-sm text-muted-foreground">
+                    Discover patterns and opportunities from Vinyl's knowledge graph
+                  </p>
+                </div>
+              </div>
+              <Button 
+                onClick={handleDiscoverInsights} 
+                disabled={discovering || loading}
+                className="bg-white/5 hover:bg-white/10"
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${discovering ? 'animate-spin' : ''}`} />
+                Discover New Insights
+              </Button>
+            </div>
+          </div>
+        </header>
+
+        <div className="container mx-auto p-6 space-y-6">
 
       {/* Priority Insights */}
       <motion.div
@@ -214,7 +230,14 @@ export default function InsightsDashboard() {
           </CardContent>
         </Card>
       </motion.div>
-    </div>
+        </div>
+
+        {/* Particle Background Effect */}
+        <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(124,58,237,0.1),transparent_50%)]" />
+        </div>
+      </div>
+    </TraderProtection>
   )
 }
 
