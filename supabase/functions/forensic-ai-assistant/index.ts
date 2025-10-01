@@ -27,12 +27,21 @@ serve(async (req) => {
       throw new Error('No authorization header');
     }
 
-    // Fetch relevant forensic documents
-    const { data: documents } = await supabase
+    // Fetch relevant forensic documents with actual content
+    const { data: allDocuments } = await supabase
       .from('forensic_documents')
       .select('filename, metadata, findings, analysis_result')
+      .eq('analysis_status', 'complete')
       .order('uploaded_at', { ascending: false })
-      .limit(10);
+      .limit(50);
+
+    // Filter to only documents with actual extracted text (not just metadata)
+    const documents = allDocuments?.filter(doc => {
+      const extractedText = doc.analysis_result?.extractedText;
+      return extractedText && 
+             extractedText !== 'PDF parsing failed - analyzing metadata only' &&
+             extractedText.length > 100; // Has substantial content
+    }) || [];
 
     // Fetch knowledge graph nodes
     const { data: kgNodes } = await supabase
@@ -49,18 +58,41 @@ serve(async (req) => {
     // Build context from documents and knowledge graph
     let context = 'FORENSIC INVESTIGATION CONTEXT:\n\n';
     
-    // Add document findings
+    // Add document content
     if (documents && documents.length > 0) {
-      context += '=== DOCUMENT FINDINGS ===\n';
+      context += '=== DOCUMENT CONTENT ===\n';
+      context += `Total documents with readable content: ${documents.length}\n\n`;
+      
       documents.forEach(doc => {
-        context += `\nDocument: ${doc.filename}\n`;
-        if (doc.findings && Array.isArray(doc.findings)) {
-          doc.findings.forEach((finding: string) => {
-            context += `- ${finding}\n`;
-          });
+        context += `\n--- Document: ${doc.filename} ---\n`;
+        
+        // Add extracted text (truncate if very long)
+        const extractedText = doc.analysis_result?.extractedText || '';
+        const truncatedText = extractedText.length > 5000 
+          ? extractedText.substring(0, 5000) + '...[truncated]'
+          : extractedText;
+        context += `Content:\n${truncatedText}\n\n`;
+        
+        // Add structured findings if available
+        if (doc.analysis_result?.structuredFindings) {
+          context += `Key Findings:\n`;
+          const findings = doc.analysis_result.structuredFindings;
+          if (findings['Key People']?.length > 0) {
+            context += `- People: ${findings['Key People'].join(', ')}\n`;
+          }
+          if (findings['Timeline Events']?.length > 0) {
+            context += `- Events: ${findings['Timeline Events'].join('; ')}\n`;
+          }
+          if (findings['Financial Structures']?.length > 0) {
+            context += `- Financial: ${findings['Financial Structures'].join('; ')}\n`;
+          }
         }
+        context += '\n';
       });
-      context += '\n';
+    } else {
+      context += '=== NO READABLE DOCUMENTS ===\n';
+      context += 'Most documents are corrupted or have invalid PDF structures.\n';
+      context += 'Only metadata-based analysis is available.\n\n';
     }
 
     // Add knowledge graph relationships
