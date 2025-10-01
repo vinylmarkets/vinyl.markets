@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Switch } from "@/components/ui/switch";
 import { LogOut } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useNavigate, Link } from "react-router-dom";
@@ -132,9 +133,8 @@ export const TradingDashboard = () => {
   } | null>(null);
   const [priceUpdateInterval, setPriceUpdateInterval] = useState<NodeJS.Timeout | null>(null);
   const [analysisExpanded, setAnalysisExpanded] = useState(false);
-  const [isExecutingTrades, setIsExecutingTrades] = useState(false);
-  const [isGeneratingSignals, setIsGeneratingSignals] = useState(false);
   const [signalStats, setSignalStats] = useState<{ count: number; lastGenerated: string | null }>({ count: 0, lastGenerated: null });
+  const [autoTradeEnabled, setAutoTradeEnabled] = useState(false);
   
   const isDevelopment = import.meta.env.DEV;
 
@@ -172,12 +172,13 @@ export const TradingDashboard = () => {
     handleTradeClick('BUY', symbol);
   };
 
-  // Load wood header setting
+  // Load wood header setting and autotrading setting
   useEffect(() => {
     const savedSettings = localStorage.getItem('trader-settings');
     if (savedSettings) {
       const settings = JSON.parse(savedSettings);
       setWoodHeaderEnabled(settings.woodHeaderEnabled || false);
+      setAutoTradeEnabled(settings.autoTradeEnabled || false);
     }
   }, []);
 
@@ -559,98 +560,41 @@ export const TradingDashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleGenerateSignals = async () => {
-    setIsGeneratingSignals(true);
+  const handleAutoTradeToggle = async (checked: boolean) => {
+    setAutoTradeEnabled(checked);
+    
+    // Save to localStorage
+    const savedSettings = localStorage.getItem('trader-settings');
+    const settings = savedSettings ? JSON.parse(savedSettings) : {};
+    settings.autoTradeEnabled = checked;
+    localStorage.setItem('trader-settings', JSON.stringify(settings));
+    
+    // Save to database
     try {
-      const { data: session } = await supabase.auth.getSession();
-      const response = await fetch('https://jhxjvpbwkdzjufjyqanq.supabase.co/functions/v1/trader-signals', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoeGp2cGJ3a2R6anVmanlxYW5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5MDQ3MzYsImV4cCI6MjA3MzQ4MDczNn0.K7bcrLAr8Kxvln7owSNW452GhijuxWduv3u4173DPsc',
-          'Authorization': `Bearer ${session.session?.access_token}`
-        }
-      });
-
-      const data = await response.json();
-      
-      if (data.signals && data.signals.length > 0) {
+      const { error } = await supabase
+        .from('user_settings')
+        .upsert([{
+          user_id: user?.id,
+          settings: settings as any
+        }]);
+        
+      if (error) {
+        console.error('Error saving autotrading setting:', error);
         toast({
-          title: "Signals Generated",
-          description: `Generated ${data.signals.length} trading signal${data.signals.length > 1 ? 's' : ''}`,
+          title: "Settings Updated Locally",
+          description: `Auto-trading ${checked ? 'enabled' : 'disabled'} in browser. May not sync with automated jobs.`,
+          variant: "default"
         });
-        await fetchSignalStats(); // Refresh stats
       } else {
         toast({
-          title: "No Signals",
-          description: "No tradeable signals generated at this time",
-          variant: "default"
+          title: checked ? "Auto-Trading Enabled" : "Auto-Trading Disabled",
+          description: checked 
+            ? "Scheduled jobs will now execute trades automatically" 
+            : "Trades will require manual execution",
         });
       }
     } catch (error) {
-      console.error('Failed to generate signals:', error);
-      toast({
-        title: "Error",
-        description: "Failed to generate trading signals",
-        variant: "destructive"
-      });
-    } finally {
-      setIsGeneratingSignals(false);
-    }
-  };
-
-  const handleExecuteTrades = async () => {
-    if (signalStats.count === 0) {
-      toast({
-        title: "No Signals Available",
-        description: "Generate signals first before executing trades",
-        variant: "default"
-      });
-      return;
-    }
-
-    setIsExecutingTrades(true);
-    try {
-      const { data: session } = await supabase.auth.getSession();
-      const response = await fetch('https://jhxjvpbwkdzjufjyqanq.supabase.co/functions/v1/execute-trades', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoeGp2cGJ3a2R6anVmanlxYW5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5MDQ3MzYsImV4cCI6MjA3MzQ4MDczNn0.K7bcrLAr8Kxvln7owSNW452GhijuxWduv3u4173DPsc',
-          'Authorization': `Bearer ${session.session?.access_token}`
-        }
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        const tradesCount = data.executedTrades?.length || 0;
-        toast({
-          title: tradesCount > 0 ? "Trades Executed" : "No Trades",
-          description: tradesCount > 0 
-            ? `Successfully executed ${tradesCount} trade${tradesCount > 1 ? 's' : ''}`
-            : data.message || "No executable signals met criteria",
-        });
-        if (hasIntegrations && tradesCount > 0) {
-          await fetchSignalStats();
-          setTimeout(() => window.location.reload(), 2000);
-        }
-      } else {
-        toast({
-          title: "Execution Status",
-          description: data.message || "No trades executed",
-          variant: "default"
-        });
-      }
-    } catch (error) {
-      console.error('Failed to execute trades:', error);
-      toast({
-        title: "Error",
-        description: "Failed to execute auto-trading",
-        variant: "destructive"
-      });
-    } finally {
-      setIsExecutingTrades(false);
+      console.error('Error updating autotrading:', error);
     }
   };
 
@@ -1003,7 +947,7 @@ export const TradingDashboard = () => {
               </CardContent>
             </Card>
 
-            {/* Trading Signals & Execution */}
+            {/* Trading Control */}
             <Card className="!shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)] transition-shadow duration-200">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center justify-between text-base">
@@ -1033,51 +977,30 @@ export const TradingDashboard = () => {
                   )}
                 </div>
 
-                {/* Generate Signals Button */}
-                <Button 
-                  onClick={handleGenerateSignals}
-                  disabled={isGeneratingSignals}
-                  className="w-full"
-                  variant="outline"
-                >
-                  {isGeneratingSignals ? (
-                    <>
-                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                      Generating...
-                    </>
-                  ) : (
-                    <>
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      Generate Signals
-                    </>
-                  )}
-                </Button>
-
-                {/* Execute Trades Button */}
-                <Button 
-                  onClick={handleExecuteTrades}
-                  disabled={isExecutingTrades || signalStats.count === 0}
-                  className="w-full"
-                  variant="default"
-                >
-                  {isExecutingTrades ? (
-                    <>
-                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                      Executing...
-                    </>
-                  ) : (
-                    <>
-                      <Zap className="h-4 w-4 mr-2" />
-                      Execute Trades
-                    </>
-                  )}
-                </Button>
+                {/* Auto-Trading Toggle */}
+                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border">
+                  <div className="space-y-0.5">
+                    <div className="flex items-center space-x-2">
+                      <Zap className="h-4 w-4 text-accent" />
+                      <span className="font-medium text-sm">Auto-Trading</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {autoTradeEnabled 
+                        ? "Automated execution enabled" 
+                        : "Manual execution required"}
+                    </p>
+                  </div>
+                  <Switch
+                    checked={autoTradeEnabled}
+                    onCheckedChange={handleAutoTradeToggle}
+                  />
+                </div>
 
                 <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
-                  <p className="font-medium">Manual Trading Flow:</p>
-                  <p>1. Generate signals from market data</p>
-                  <p>2. Review signals in AI Signals tab</p>
-                  <p>3. Execute trades based on signals</p>
+                  <p className="font-medium">Automated Trading:</p>
+                  <p>• Signals generated daily at 8:00 AM ET</p>
+                  <p>• Trades executed at 9:35 AM ET</p>
+                  <p>• Configure schedules in Automation below</p>
                 </div>
               </CardContent>
             </Card>
