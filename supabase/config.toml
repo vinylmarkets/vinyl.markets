@@ -71,3 +71,6 @@ verify_jwt = true
 
 [functions.stock-analysis]
 verify_jwt = true
+
+[functions.cognee-query]
+verify_jwt = true

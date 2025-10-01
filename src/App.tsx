@@ -34,6 +34,8 @@ import BriefingDetail from "./pages/dashboard/BriefingDetail";
 import Terminal from "./pages/dashboard/Terminal";
 import PaperTrading from "./pages/dashboard/PaperTrading";
 import OptionsValueTool from "./pages/dashboard/OptionsValueTool";
+import KnowledgeExplorer from "./pages/dashboard/KnowledgeExplorer";
+import InsightsDashboard from "./pages/dashboard/InsightsDashboard";
 import Charts from "./pages/dashboard/Charts";
 import LearningProgress from "./pages/dashboard/Progress";
 import Portfolio from "./pages/dashboard/Portfolio";
@@ -113,6 +115,11 @@ const App = () => {
               <Route path="/dashboard/settings" element={<SettingsPage />} />
               <Route path="/dashboard/upgrade" element={<Upgrade />} />
               <Route path="/dashboard/top20" element={<Top20Predictions />} />
+              
+              {/* Intelligence Routes */}
+              <Route path="/dashboard/intelligence/explorer" element={<KnowledgeExplorer />} />
+              <Route path="/dashboard/intelligence/insights" element={<InsightsDashboard />} />
+              
               <Route path="/admin/executive-overview" element={<AdminProtected><ExecutiveOverview /></AdminProtected>} />
               <Route path="/admin/user-analytics" element={<AdminProtected><UserAnalytics /></AdminProtected>} />
               <Route path="/admin/product-intelligence" element={<AdminProtected><ProductIntelligence /></AdminProtected>} />

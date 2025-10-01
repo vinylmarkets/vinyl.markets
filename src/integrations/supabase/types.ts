@@ -696,6 +696,105 @@ export type Database = {
         }
         Relationships: []
       }
+      cognee_insights: {
+        Row: {
+          acknowledged: boolean | null
+          action_taken: string | null
+          created_at: string | null
+          description: string | null
+          evidence: Json | null
+          id: string
+          metadata: Json | null
+          priority: string
+          recommendations: Json | null
+          title: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          acknowledged?: boolean | null
+          action_taken?: string | null
+          created_at?: string | null
+          description?: string | null
+          evidence?: Json | null
+          id?: string
+          metadata?: Json | null
+          priority: string
+          recommendations?: Json | null
+          title: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          acknowledged?: boolean | null
+          action_taken?: string | null
+          created_at?: string | null
+          description?: string | null
+          evidence?: Json | null
+          id?: string
+          metadata?: Json | null
+          priority?: string
+          recommendations?: Json | null
+          title?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      cognee_learning_metrics: {
+        Row: {
+          id: string
+          metadata: Json | null
+          metric_type: string
+          recorded_at: string | null
+          value: number
+        }
+        Insert: {
+          id?: string
+          metadata?: Json | null
+          metric_type: string
+          recorded_at?: string | null
+          value: number
+        }
+        Update: {
+          id?: string
+          metadata?: Json | null
+          metric_type?: string
+          recorded_at?: string | null
+          value?: number
+        }
+        Relationships: []
+      }
+      cognee_queries: {
+        Row: {
+          confidence: number | null
+          created_at: string | null
+          execution_time_ms: number | null
+          id: string
+          query: string
+          response: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string | null
+          execution_time_ms?: number | null
+          id?: string
+          query: string
+          response?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string | null
+          execution_time_ms?: number | null
+          id?: string
+          query?: string
+          response?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       compliance_logs: {
         Row: {
           action_taken: string | null
