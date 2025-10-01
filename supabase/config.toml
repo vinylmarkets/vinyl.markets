@@ -16,7 +16,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.process-document]
-verify_jwt = true
+verify_jwt = false
 
 [functions.ai-knowledge-query]
 verify_jwt = true
@@ -82,9 +82,6 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.process-kroll-email]
-verify_jwt = false
-
-[functions.process-document]
 verify_jwt = false
 
 [functions.forensic-ai-assistant]
