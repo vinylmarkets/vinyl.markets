@@ -158,22 +158,30 @@ export default function ForensicsAnalysis() {
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-3">
-                <Button variant="outline" size="sm">
-                  <FileText className="h-4 w-4 mr-2" />
-                  Upload Document
-                </Button>
-                <Button variant="outline" size="sm">
-                  <Search className="h-4 w-4 mr-2" />
-                  Run Query
-                </Button>
-                <Button variant="outline" size="sm">
-                  <Brain className="h-4 w-4 mr-2" />
-                  Generate Report
-                </Button>
-                <Button variant="outline" size="sm">
-                  <Network className="h-4 w-4 mr-2" />
-                  View Connections
-                </Button>
+                <Link to="/trader/forensics/documents">
+                  <Button variant="outline" size="sm">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Upload Document
+                  </Button>
+                </Link>
+                <Link to="/trader/forensics/search">
+                  <Button variant="outline" size="sm">
+                    <Search className="h-4 w-4 mr-2" />
+                    Run Query
+                  </Button>
+                </Link>
+                <Link to="/trader/forensics/synthesis">
+                  <Button variant="outline" size="sm">
+                    <Brain className="h-4 w-4 mr-2" />
+                    Generate Report
+                  </Button>
+                </Link>
+                <Link to="/trader/forensics/knowledge-graph">
+                  <Button variant="outline" size="sm">
+                    <Network className="h-4 w-4 mr-2" />
+                    View Connections
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>
