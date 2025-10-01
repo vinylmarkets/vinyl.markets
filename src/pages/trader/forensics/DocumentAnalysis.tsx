@@ -4,24 +4,20 @@ import { ArrowLeft, FileText, Upload, Loader2, Search, Download } from "lucide-r
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TraderProtection } from "@/components/trader/TraderProtection";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { BulkDocumentImport } from "@/components/forensics/BulkDocumentImport";
+import { useForensicData } from "@/hooks/useForensicData";
 
 export default function DocumentAnalysis() {
   const [analyzing, setAnalyzing] = useState(false);
   const [documentUrl, setDocumentUrl] = useState("");
   const [analysis, setAnalysis] = useState<any>(null);
   const { toast } = useToast();
-
-  const recentDocuments = [
-    { name: "BBBY 10-K Filing 2023", type: "SEC Filing", date: "2023-04-15", status: "Analyzed" },
-    { name: "DK-Butterfly Formation Docs", type: "Legal", date: "2023-06-20", status: "Analyzed" },
-    { name: "Overstock M&A Statement", type: "Press Release", date: "2024-01-10", status: "Pending" },
-    { name: "Section 382 Analysis", type: "Tax Document", date: "2024-02-01", status: "Analyzed" },
-  ];
+  const { documentAnalyses, loading } = useForensicData();
 
   const analyzeDocument = async () => {
     if (!documentUrl.trim()) {
@@ -91,10 +87,17 @@ export default function DocumentAnalysis() {
         </div>
 
         <div className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Analysis Input */}
-            <div className="lg:col-span-2 space-y-6">
-              <Card>
+          <Tabs defaultValue="single" className="space-y-6">
+            <TabsList className="grid w-full max-w-md grid-cols-2">
+              <TabsTrigger value="single">Single Document</TabsTrigger>
+              <TabsTrigger value="bulk">Bulk Import</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="single" className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Analysis Input */}
+                <div className="lg:col-span-2 space-y-6">
+                  <Card>
                 <CardHeader>
                   <CardTitle>Analyze New Document</CardTitle>
                   <CardDescription>
@@ -170,38 +173,53 @@ export default function DocumentAnalysis() {
                     </Button>
                   </CardContent>
                 </Card>
-              )}
-            </div>
+                  )}
+                </div>
 
-            {/* Recent Documents */}
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Recent Documents</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {recentDocuments.map((doc, idx) => (
-                    <div
-                      key={idx}
-                      className="p-3 rounded-lg border border-border hover:border-primary/50 transition-colors cursor-pointer"
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1">
-                          <div className="font-medium text-sm">{doc.name}</div>
-                          <div className="text-xs text-muted-foreground">{doc.type}</div>
+                {/* Recent Documents */}
+                <div className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Recent Analyses</CardTitle>
+                      <CardDescription>
+                        {loading ? 'Loading...' : `${documentAnalyses.length} documents analyzed`}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {loading ? (
+                        <div className="text-center py-8 text-sm text-muted-foreground">
+                          <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
+                          Loading analyses...
                         </div>
-                        <Badge
-                          variant={doc.status === "Analyzed" ? "default" : "secondary"}
-                          className="text-xs"
-                        >
-                          {doc.status}
-                        </Badge>
-                      </div>
-                      <div className="text-xs text-muted-foreground">{doc.date}</div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
+                      ) : documentAnalyses.length === 0 ? (
+                        <div className="text-center py-8 text-sm text-muted-foreground">
+                          No documents analyzed yet. Start by analyzing a document above or use bulk import.
+                        </div>
+                      ) : (
+                        documentAnalyses.slice(0, 10).map((doc, idx) => (
+                          <div
+                            key={idx}
+                            className="p-3 rounded-lg border border-border hover:border-primary/50 transition-colors cursor-pointer"
+                          >
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex-1">
+                                <div className="font-medium text-sm truncate">{doc.documentUrl}</div>
+                                <div className="text-xs text-muted-foreground">
+                                  {doc.findings.length} findings • {doc.confidence}% confidence
+                                </div>
+                              </div>
+                              <Badge variant="default" className="text-xs">
+                                Analyzed
+                              </Badge>
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {new Date(doc.timestamp).toLocaleDateString()}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </CardContent>
+                  </Card>
 
               <Card>
                 <CardHeader>
@@ -231,9 +249,15 @@ export default function DocumentAnalysis() {
                     </div>
                   </div>
                 </CardContent>
-              </Card>
-            </div>
-          </div>
+                  </Card>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="bulk">
+              <BulkDocumentImport />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </TraderProtection>
