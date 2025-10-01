@@ -26,9 +26,30 @@ Deno.serve(async (req) => {
       const docketResponse = await fetch(docketUrl || 'https://cases.ra.kroll.com/bbby/Home-Index');
       const html = await docketResponse.text();
       
-      console.log('Fetched docket page, analyzing...');
+      console.log('Fetched docket page, length:', html.length);
+      console.log('HTML preview (first 500 chars):', html.slice(0, 500));
+      
+      // Extract links using regex patterns for common document structures
+      const linkPatterns = [
+        /<a[^>]+href=["']([^"']+)"[^>]*>([^<]+)<\/a>/gi,
+        /<a[^>]+href=["']([^"']+\.pdf)"[^>]*>/gi,
+        /href=["']([^"']*document[^"']*)"[^>]*>([^<]+)/gi,
+      ];
+      
+      const foundLinks: Array<{url: string, text: string}> = [];
+      for (const pattern of linkPatterns) {
+        let match;
+        while ((match = pattern.exec(html)) !== null) {
+          foundLinks.push({
+            url: match[1],
+            text: match[2] || match[1]
+          });
+        }
+      }
+      
+      console.log(`Found ${foundLinks.length} total links via regex`);
 
-      // Use AI to extract document links from the HTML
+      // Use AI to analyze and filter relevant documents
       const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -40,23 +61,41 @@ Deno.serve(async (req) => {
           messages: [
             {
               role: 'system',
-              content: `You are a bankruptcy court document analyzer. Extract ALL document links from court docket HTML.
-              
-Focus on these document types:
-- First Day Motions
-- Disclosure Statements
-- Asset Purchase Agreements
-- Schedules of Assets and Liabilities (SOAL)
-- Section 341 Meeting notices
-- NOL preservation documents
-- Entity formation documents (especially DK-Butterfly related)
-- Any documents mentioning "Overstock" or "Section 382"
+              content: `You are analyzing bankruptcy court document links. Your job is to:
+1. Extract ALL document links from the HTML provided
+2. Look for links to PDFs, court filings, motions, exhibits
+3. Parse document numbers (e.g., "Doc 123", "Exhibit A")
+4. Identify document types (Motion, Order, Disclosure Statement, etc.)
+5. Calculate relevance score (0-100) based on these priorities:
+   - NOL preservation mentions (90-100)
+   - Section 382 references (90-100)
+   - DK-Butterfly or entity formation (85-95)
+   - Overstock mentions (80-90)
+   - Asset Purchase Agreements (75-85)
+   - First Day Motions (70-80)
+   - Other filings (40-60)
 
-Return a JSON array of documents with: title, url, date, type, relevanceScore (0-100 based on importance to NOL/acquisition analysis), description.`
+Return JSON object with "documents" array. Each document must have:
+- title: string (document name/description)
+- url: string (full URL or relative path)
+- date: string (if available, or "Unknown")
+- type: string (Motion, Order, Disclosure, etc.)
+- relevanceScore: number (0-100)
+- description: string (brief summary)
+
+IMPORTANT: 
+- If links are relative (start with /), prepend "https://cases.ra.kroll.com"
+- Extract document numbers when visible
+- Return ALL documents found, not just high-relevance ones`
             },
             {
               role: 'user',
-              content: `Extract document metadata from this BBBY bankruptcy docket HTML:\n\n${html.slice(0, 50000)}`
+              content: `Analyze this BBBY bankruptcy docket page and extract ALL document links.
+
+HTML snippet (${html.length} total chars):
+${html.slice(0, 40000)}
+
+Also found these links via regex: ${JSON.stringify(foundLinks.slice(0, 50))}`
             }
           ],
           response_format: { type: "json_object" },
@@ -65,19 +104,34 @@ Return a JSON array of documents with: title, url, date, type, relevanceScore (0
       });
 
       if (!aiResponse.ok) {
-        throw new Error(`AI API error: ${aiResponse.status}`);
+        const errorText = await aiResponse.text();
+        console.error('AI API error:', aiResponse.status, errorText);
+        throw new Error(`AI API error: ${aiResponse.status} - ${errorText}`);
       }
 
       const aiData = await aiResponse.json();
+      console.log('AI response:', JSON.stringify(aiData).slice(0, 500));
+      
       const result = JSON.parse(aiData.choices[0].message.content);
       
-      console.log(`Discovered ${result.documents?.length || 0} documents`);
+      console.log(`AI discovered ${result.documents?.length || 0} documents`);
+      
+      // Fix relative URLs
+      const documents = (result.documents || []).map((doc: any) => ({
+        ...doc,
+        url: doc.url.startsWith('/') ? `https://cases.ra.kroll.com${doc.url}` : doc.url
+      }));
 
       return new Response(
         JSON.stringify({
           success: true,
-          documents: result.documents || [],
-          totalFound: result.documents?.length || 0
+          documents,
+          totalFound: documents.length,
+          debug: {
+            htmlLength: html.length,
+            regexLinksFound: foundLinks.length,
+            htmlPreview: html.slice(0, 500)
+          }
         }),
         { 
           status: 200,
