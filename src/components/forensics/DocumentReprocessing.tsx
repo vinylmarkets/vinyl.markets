@@ -26,7 +26,7 @@ export const DocumentReprocessing = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isOcrProcessing, setIsOcrProcessing] = useState(false);
   const [cancelOcr, setCancelOcr] = useState(false);
-  const skipCurrentPageRef = useRef(false);
+  const skipCurrentPageRef = useRef<((value: string) => void) | null>(null);
   const [stats, setStats] = useState<{
     total: number;
     failed: number;
@@ -233,14 +233,6 @@ export const DocumentReprocessing = () => {
         throw new Error('OCR cancelled by user');
       }
 
-      if (skipCurrentPageRef.current) {
-        console.log(`⏭️ ${filename}: Skipping page ${pageNum}/${pageCount} (user requested)`);
-        addActivityLog(filename, 'processing', `Skipped page ${pageNum}`);
-        fullText += `\n--- Page ${pageNum} (SKIPPED) ---\n[Skipped by user]\n`;
-        skipCurrentPageRef.current = false;
-        continue;
-      }
-
       console.log(`📄 ${filename}: Processing page ${pageNum}/${pageCount}`);
       addActivityLog(filename, 'processing', `Processing page ${pageNum}/${pageCount}`);
       setOcrProgress(prev => prev ? {
@@ -249,8 +241,16 @@ export const DocumentReprocessing = () => {
       } : null);
 
       try {
+        // Create a skip promise that can be triggered externally
+        const skipPromise = new Promise<string>((resolve) => {
+          skipCurrentPageRef.current = (reason: string) => {
+            resolve(`SKIP: ${reason}`);
+          };
+        });
+
         // Add timeout for each page (60 seconds)
         const pageText = await Promise.race([
+          skipPromise,
           (async () => {
             const page = await pdf.getPage(pageNum);
             const viewport = page.getViewport({ scale: 2.0 });
@@ -289,10 +289,21 @@ export const DocumentReprocessing = () => {
           )
         ]);
 
-        fullText += `\n--- Page ${pageNum} ---\n${pageText}\n`;
-        console.log(`✓ ${filename}: Page ${pageNum} complete (${pageText.length} chars)`);
-        addActivityLog(filename, 'processing', `Page ${pageNum} complete`);
+        // Clear the skip handler
+        skipCurrentPageRef.current = null;
+
+        // Check if it was skipped
+        if (pageText.startsWith('SKIP:')) {
+          console.log(`⏭️ ${filename}: Skipped page ${pageNum}/${pageCount}`);
+          addActivityLog(filename, 'processing', `Skipped page ${pageNum}`);
+          fullText += `\n--- Page ${pageNum} (SKIPPED) ---\n[Skipped by user]\n`;
+        } else {
+          fullText += `\n--- Page ${pageNum} ---\n${pageText}\n`;
+          console.log(`✓ ${filename}: Page ${pageNum} complete (${pageText.length} chars)`);
+          addActivityLog(filename, 'processing', `Page ${pageNum} complete`);
+        }
       } catch (pageError) {
+        skipCurrentPageRef.current = null;
         const errorMsg = pageError instanceof Error ? pageError.message : 'Unknown error';
         console.error(`✗ ${filename}: Page ${pageNum} failed - ${errorMsg}`);
         addActivityLog(filename, 'failed', `Page ${pageNum} failed: ${errorMsg}`);
@@ -878,14 +889,17 @@ export const DocumentReprocessing = () => {
                 <>
                   <Button
                     onClick={() => {
-                      skipCurrentPageRef.current = true;
-                      toast({
-                        title: "Skipping Page",
-                        description: "Will skip the current page and continue to next",
-                      });
+                      if (skipCurrentPageRef.current) {
+                        skipCurrentPageRef.current('User requested skip');
+                        toast({
+                          title: "Skipping Page",
+                          description: "Skipped current page, continuing to next",
+                        });
+                      }
                     }}
                     variant="outline"
                     size="sm"
+                    disabled={!skipCurrentPageRef.current}
                   >
                     <SkipForward className="mr-1 h-3 w-3" />
                     Skip Page
