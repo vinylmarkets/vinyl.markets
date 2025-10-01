@@ -182,12 +182,53 @@ export const TradingDashboard = () => {
     }
   }, []);
 
-  // Mock data
+  // Mock data and integrations check
   useEffect(() => {
+    console.log('TradingDashboard effect triggered');
+    
+    if (!user) {
+      navigate('/trader-auth');
+      return;
+    }
+
+    let signalsInterval: NodeJS.Timeout | undefined;
+
+    // Fetch real signals from database
+    const fetchSignals = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('trading_signals')
+          .select('*')
+          .eq('status', 'active')
+          .order('confidence_score', { ascending: false })
+          .limit(10);
+        
+        if (!error && data) {
+          const formattedSignals = data.map(signal => {
+            const signalData = signal.signal_data as any || {};
+            return {
+              symbol: signal.symbol,
+              action: signal.signal_type.toUpperCase() as 'BUY' | 'SELL' | 'HOLD',
+              confidence: signal.confidence_score,
+              targetPrice: signal.target_price || signalData.target_price || 0,
+              currentPrice: signalData.current_price || signalData.currentPrice || 0,
+              reasoning: signal.reasoning || 'No reasoning provided',
+              timestamp: signal.created_at
+            };
+          });
+          setSignals(formattedSignals);
+        }
+      } catch (error) {
+        console.error('Error fetching signals:', error);
+      }
+    };
+    
+    fetchSignals();
+    signalsInterval = setInterval(fetchSignals, 60000); // Refresh every minute
+
     // Only show mock data if no real integrations exist
     if (hasIntegrations) {
       // Clear mock data when real integrations are connected
-      setSignals([]);
       setPositions([]);
       setRecentTrades([]);
       // Update strategy performance with real data
@@ -196,8 +237,7 @@ export const TradingDashboard = () => {
         meanReversion: 0,
         mlPrediction: 0
       });
-      return;
-    }
+    } else {
 
     // Mock signals - only shown when no real broker connected
     setSignals([
@@ -267,7 +307,8 @@ export const TradingDashboard = () => {
         timestamp: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
         pnl: -45.20
       }
-    ]);
+      ]);
+    }
 
     // Check for existing broker integrations
     const checkIntegrations = async () => {
@@ -317,7 +358,13 @@ export const TradingDashboard = () => {
     };
 
     checkIntegrations();
-  }, [user, hasIntegrations]);
+    
+    return () => {
+      if (signalsInterval) {
+        clearInterval(signalsInterval);
+      }
+    };
+  }, [user, navigate, hasIntegrations]);
 
   // Fetch account data when integrations are detected
   useEffect(() => {
@@ -998,25 +1045,13 @@ export const TradingDashboard = () => {
 
                 <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
                   <p className="font-medium">Automated Trading:</p>
-                  <p>• Signals generated daily at 8:00 AM ET</p>
-                  <p>• Trades executed at 9:35 AM ET</p>
-                  <p>• Configure schedules in Automation below</p>
+                  <p>• Signals generated every 15 minutes</p>
+                  <p>• Trades executed daily at 9:35 AM ET (weekdays)</p>
+                  <p>• Toggle enabled to allow automated execution</p>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Automation Setup */}
-            <Card className="!shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)] transition-shadow duration-200">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center space-x-2 text-base">
-                  <Clock className="h-4 w-4 text-primary" />
-                  <span>Automation</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CronScheduler />
-              </CardContent>
-            </Card>
 
             {/* Strategy Performance */}
             <Card className="!shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)] transition-shadow duration-200">
@@ -1218,47 +1253,70 @@ export const TradingDashboard = () => {
                 {/* Status Information */}
                 <div className="space-y-2 pb-3 border-b border-border">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">Cloud Status</span>
-                    <div className="flex items-center space-x-1">
-                      <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                      <span className="text-xs font-medium text-success">Active</span>
+                    <span className="text-xs text-muted-foreground">Active Signals</span>
+                    <span className="text-xs font-bold text-primary">{signals.length}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-muted-foreground">High Confidence</span>
+                    <span className="text-xs font-bold text-success">
+                      {signals.filter(s => s.confidence >= 75).length}
+                    </span>
+                  </div>
+                  {signalStats.lastGenerated && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-muted-foreground">Last Updated</span>
+                      <span className="text-xs font-bold text-foreground">
+                        {new Date(signalStats.lastGenerated).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
                     </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">Signals Today</span>
-                    <span className="text-xs font-bold text-primary">12</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">Last Analysis</span>
-                    <span className="text-xs font-bold text-foreground">2m ago</span>
-                  </div>
+                  )}
                 </div>
 
                 {/* AI Signals */}
                 {signals.length > 0 ? (
-                  signals.map((signal, index) => (
-                    <div key={index} className="p-3 bg-muted/30 rounded border border-border">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-medium text-sm">{signal.symbol}</span>
-                        <Badge className={`text-xs ${
-                          signal.action === 'BUY' 
-                            ? 'bg-success/10 text-success border-success/20' 
-                            : 'bg-destructive/10 text-destructive border-destructive/20'
-                        }`}>
-                          {signal.action}
-                        </Badge>
+                  <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                    {signals.slice(0, 5).map((signal, index) => (
+                      <div key={index} className="p-3 bg-muted/30 rounded border border-border hover:border-primary/50 transition-colors">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-medium text-sm">{signal.symbol}</span>
+                          <Badge className={`text-xs ${
+                            signal.action === 'BUY' 
+                              ? 'bg-success/10 text-success border-success/20' 
+                              : signal.action === 'SELL'
+                              ? 'bg-destructive/10 text-destructive border-destructive/20'
+                              : 'bg-muted text-muted-foreground'
+                          }`}>
+                            {signal.action}
+                          </Badge>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex justify-between items-center text-xs">
+                            <span className="text-muted-foreground">Confidence:</span>
+                            <span className="font-medium">{signal.confidence}%</span>
+                          </div>
+                          <div className="flex justify-between items-center text-xs">
+                            <span className="text-muted-foreground">Price:</span>
+                            <span className="font-medium">${signal.currentPrice?.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between items-center text-xs">
+                            <span className="text-muted-foreground">Target:</span>
+                            <span className="font-medium">${signal.targetPrice?.toFixed(2)}</span>
+                          </div>
+                        </div>
+                        {signal.reasoning && (
+                          <p className="text-xs text-muted-foreground mt-2 line-clamp-2">
+                            {signal.reasoning}
+                          </p>
+                        )}
                       </div>
-                      <div className="text-xs text-muted-foreground mb-1">
-                        Confidence: {signal.confidence}%
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        ${signal.currentPrice} → ${signal.targetPrice}
-                      </div>
-                    </div>
-                  ))
+                    ))}
+                  </div>
                 ) : (
                   <div className="py-8 text-center text-muted-foreground text-xs">
-                    {hasIntegrations ? 'No AI signals available' : 'Connect a broker to view AI signals'}
+                    No active signals. Engine generates signals every 15 minutes.
                   </div>
                 )}
               </CardContent>
