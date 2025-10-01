@@ -223,6 +223,7 @@ export const DocumentReprocessing = () => {
     
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     const pageCount = pdf.numPages;
+    console.log(`📄 ${filename}: Starting OCR for ${pageCount} pages`);
     let fullText = '';
 
     for (let pageNum = 1; pageNum <= pageCount; pageNum++) {
@@ -230,44 +231,63 @@ export const DocumentReprocessing = () => {
         throw new Error('OCR cancelled by user');
       }
 
+      console.log(`📄 ${filename}: Processing page ${pageNum}/${pageCount}`);
       setOcrProgress(prev => prev ? {
         ...prev,
         stage: `Processing page ${pageNum} of ${pageCount}...`
       } : null);
 
-      const page = await pdf.getPage(pageNum);
-      const viewport = page.getViewport({ scale: 2.0 });
-      
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      if (!context) throw new Error('Failed to get canvas context');
-      
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
+      try {
+        // Add timeout for each page (60 seconds)
+        const pageText = await Promise.race([
+          (async () => {
+            const page = await pdf.getPage(pageNum);
+            const viewport = page.getViewport({ scale: 2.0 });
+            
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            if (!context) throw new Error('Failed to get canvas context');
+            
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
 
-      await page.render({ canvasContext: context, viewport }).promise;
-      
-      const imageData = canvas.toDataURL('image/png');
-      
-      const { data: { text } } = await Tesseract.recognize(
-        imageData,
-        'eng',
-        {
-          logger: (m) => {
-            if (m.status === 'recognizing text') {
-              const percent = Math.round(m.progress * 100);
-              setOcrProgress(prev => prev ? {
-                ...prev,
-                stage: `Page ${pageNum}/${pageCount}: ${percent}%`
-              } : null);
-            }
-          }
-        }
-      );
-      
-      fullText += `\n--- Page ${pageNum} ---\n${text}\n`;
+            await page.render({ canvasContext: context, viewport }).promise;
+            
+            const imageData = canvas.toDataURL('image/png');
+            
+            const { data: { text } } = await Tesseract.recognize(
+              imageData,
+              'eng',
+              {
+                logger: (m) => {
+                  if (m.status === 'recognizing text') {
+                    const percent = Math.round(m.progress * 100);
+                    setOcrProgress(prev => prev ? {
+                      ...prev,
+                      stage: `Page ${pageNum}/${pageCount}: ${percent}%`
+                    } : null);
+                  }
+                }
+              }
+            );
+            
+            return text;
+          })(),
+          new Promise<string>((_, reject) => 
+            setTimeout(() => reject(new Error(`Timeout on page ${pageNum}`)), 60000)
+          )
+        ]);
+
+        fullText += `\n--- Page ${pageNum} ---\n${pageText}\n`;
+        console.log(`✓ ${filename}: Page ${pageNum} complete (${pageText.length} chars)`);
+      } catch (pageError) {
+        const errorMsg = pageError instanceof Error ? pageError.message : 'Unknown error';
+        console.error(`✗ ${filename}: Page ${pageNum} failed - ${errorMsg}`);
+        fullText += `\n--- Page ${pageNum} (FAILED: ${errorMsg}) ---\n[OCR failed or timed out]\n`;
+      }
     }
 
+    console.log(`✓ ${filename}: OCR complete - ${fullText.length} total characters`);
     return { text: fullText, pageCount };
   };
 
