@@ -50,7 +50,10 @@ export const DocumentReprocessing = () => {
         return;
       }
 
-      // Count failed documents - includes corrupted PDFs and parsing failures
+      // Count failed documents - includes:
+      // 1. Corrupted/invalid PDFs (can't be fixed)
+      // 2. Other errors
+      // 3. Metadata-only analysis (needs OCR reprocessing)
       const failed = data.filter(d => {
         // Explicitly failed status
         if (d.analysis_status === 'failed') return true;
@@ -70,16 +73,28 @@ export const DocumentReprocessing = () => {
           return true;
         }
         
+        // Check for metadata-only analysis (needs reprocessing)
+        const extractedText = result.extractedText || '';
+        if (extractedText.includes('PDF parsing failed') || extractedText.length < 50) {
+          return true;
+        }
+        
         return false;
       }).length;
 
-      // Count successful - has findings and complete status
+      // Count successful - has findings and REAL extracted text
       const successful = data.filter(d => {
         if (d.analysis_status !== 'complete' && d.analysis_status !== 'completed') return false;
         if (!d.analysis_result) return false;
         
         const result = d.analysis_result as any;
         if (result.fileCorrupted || result.error) return false;
+        
+        // Must have real extracted text
+        const extractedText = result.extractedText || '';
+        if (extractedText.includes('PDF parsing failed') || extractedText.length < 50) {
+          return false;
+        }
         
         // Has actual findings or analysis
         return d.findings && d.findings.length > 0;
@@ -166,11 +181,45 @@ export const DocumentReprocessing = () => {
     setCancelOcr(false);
     
     try {
-      // Fetch all failed documents
-      const { data: failedDocs, error: fetchError } = await supabase
+      // Fetch all documents that need reprocessing:
+      // 1. No analysis result at all
+      // 2. Explicitly failed status
+      // 3. Has "PDF parsing failed" in extracted text (metadata-only analysis)
+      // 4. Missing extractedText field
+      // 5. Very short extractedText (< 50 chars)
+      const { data: allDocs, error: fetchError } = await supabase
         .from('forensic_documents')
-        .select('id, filename, document_url')
-        .or('analysis_result.is.null,analysis_result->>analysis.ilike.%failed%,analysis_result->>analysis.ilike.%error%');
+        .select('id, filename, document_url, analysis_result, analysis_status');
+
+      if (fetchError) throw fetchError;
+      
+      // Filter to documents that need real text extraction
+      const failedDocs = allDocs?.filter(doc => {
+        // No analysis result
+        if (!doc.analysis_result) return true;
+        
+        // Explicitly failed
+        if (doc.analysis_status === 'failed') return true;
+        
+        const result = doc.analysis_result as any;
+        
+        // Has corrupted file flag - skip these, they can't be processed
+        if (result.fileCorrupted) return false;
+        
+        // Has error
+        if (result.error) return true;
+        
+        // Check extracted text
+        const extractedText = result.extractedText || '';
+        
+        // Has "PDF parsing failed" message - needs real extraction
+        if (extractedText.includes('PDF parsing failed')) return true;
+        
+        // Missing or very short extracted text
+        if (extractedText.length < 50) return true;
+        
+        return false;
+      }) || [];
 
       if (fetchError) throw fetchError;
       if (!failedDocs || failedDocs.length === 0) {
