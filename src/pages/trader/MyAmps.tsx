@@ -10,6 +10,8 @@ import { AddAmpModal } from '@/components/amps/AddAmpModal';
 import { AllocateCapitalModal } from '@/components/amps/AllocateCapitalModal';
 import { AmpSettingsModal } from '@/components/amps/AmpSettingsModal';
 import { UserAmp } from '@/types/amps';
+import { TraderHeader } from '@/trader-platform/components/TraderHeader';
+import { TraderProtection } from '@/components/trader/TraderProtection';
 
 export default function MyAmps() {
   const { amps, summary, isLoading, toggleAmpActive, allocateCapital, addAmp, updateSettings } = useUserAmps();
@@ -36,42 +38,46 @@ export default function MyAmps() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto p-6 space-y-6">
-        <Skeleton className="h-12 w-64" />
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-24" />
-          ))}
+      <TraderProtection>
+        <div className="min-h-screen bg-background">
+          <TraderHeader showAccountStats={false} />
+          <div className="container mx-auto p-6 space-y-6">
+            <Skeleton className="h-12 w-64" />
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              {[...Array(4)].map((_, i) => (
+                <Skeleton key={i} className="h-24" />
+              ))}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[...Array(3)].map((_, i) => (
+                <Skeleton key={i} className="h-64" />
+              ))}
+            </div>
+          </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[...Array(3)].map((_, i) => (
-            <Skeleton key={i} className="h-64" />
-          ))}
-        </div>
-      </div>
+      </TraderProtection>
     );
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <TraderProtection>
+      <div className="min-h-screen bg-background">
+        <TraderHeader showAccountStats={false} />
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <Link to="/trader" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-2 transition-colors">
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Back to Trading Dashboard
-          </Link>
-          <h1 className="text-3xl font-bold">My Trading Algorithms</h1>
-          <p className="text-muted-foreground">Manage your active trading strategies</p>
+      <div className="container mx-auto p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-bold">My Trading Algorithms</h1>
+            <p className="text-muted-foreground">Manage your active trading strategies</p>
+          </div>
+          <Button onClick={() => setShowAddModal(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Algorithm
+          </Button>
         </div>
-        <Button onClick={() => setShowAddModal(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Add Algorithm
-        </Button>
-      </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-primary/10 rounded-lg">
@@ -123,10 +129,10 @@ export default function MyAmps() {
             </div>
           </div>
         </Card>
-      </div>
+        </div>
 
-      {/* Amps Grid */}
-      {amps.length === 0 ? (
+        {/* Amps Grid */}
+        {amps.length === 0 ? (
         <Card className="p-12 text-center">
           <div className="max-w-md mx-auto space-y-4">
             <div className="w-16 h-16 mx-auto bg-muted rounded-full flex items-center justify-center">
@@ -141,43 +147,45 @@ export default function MyAmps() {
               Add Your First Algorithm
             </Button>
           </div>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {amps.map((amp) => (
-            <AmpCard
-              key={amp.id}
-              amp={amp}
-              onToggle={toggleAmpActive}
-              onAllocate={handleAllocateClick}
-              onSettings={handleSettingsClick}
-            />
-          ))}
-        </div>
-      )}
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {amps.map((amp) => (
+              <AmpCard
+                key={amp.id}
+                amp={amp}
+                onToggle={toggleAmpActive}
+                onAllocate={handleAllocateClick}
+                onSettings={handleSettingsClick}
+              />
+            ))}
+          </div>
+        )}
 
-      {/* Modals */}
-      <AddAmpModal
-        open={showAddModal}
-        onOpenChange={setShowAddModal}
-        onAdd={addAmp}
-        availableCapital={summary.available_capital}
-      />
+        {/* Modals */}
+        <AddAmpModal
+          open={showAddModal}
+          onOpenChange={setShowAddModal}
+          onAdd={addAmp}
+          availableCapital={summary.available_capital}
+        />
 
-      <AllocateCapitalModal
-        open={showAllocateModal}
-        onOpenChange={setShowAllocateModal}
-        amp={selectedAmp}
-        onAllocate={allocateCapital}
-        availableCapital={summary.available_capital}
-      />
+        <AllocateCapitalModal
+          open={showAllocateModal}
+          onOpenChange={setShowAllocateModal}
+          amp={selectedAmp}
+          onAllocate={allocateCapital}
+          availableCapital={summary.available_capital}
+        />
 
-      <AmpSettingsModal
-        open={showSettingsModal}
-        onOpenChange={setShowSettingsModal}
-        amp={selectedAmp}
-        onSave={updateSettings}
-      />
+        <AmpSettingsModal
+          open={showSettingsModal}
+          onOpenChange={setShowSettingsModal}
+          amp={selectedAmp}
+          onSave={updateSettings}
+        />
+      </div>
     </div>
+  </TraderProtection>
   );
 }
