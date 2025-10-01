@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { RefreshCw, AlertCircle, CheckCircle, FileSearch, Activity, Clock, SkipForward } from "lucide-react";
+import { RefreshCw, AlertCircle, CheckCircle, FileSearch, Activity, Clock } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -26,8 +26,6 @@ export const DocumentReprocessing = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isOcrProcessing, setIsOcrProcessing] = useState(false);
   const [cancelOcr, setCancelOcr] = useState(false);
-  const [isProcessingPage, setIsProcessingPage] = useState(false);
-  const skipCurrentPageRef = useRef<((value: string) => void) | null>(null);
   const [stats, setStats] = useState<{
     total: number;
     failed: number;
@@ -237,37 +235,16 @@ export const DocumentReprocessing = () => {
       console.log(`📄 ${filename}: Processing page ${pageNum}/${pageCount}`);
       addActivityLog(filename, 'processing', `Processing page ${pageNum}/${pageCount}`);
       
-      // Set processing state BEFORE starting the async operation
-      setIsProcessingPage(true);
-      
       setOcrProgress(prev => prev ? {
         ...prev,
-        stage: `Processing page ${pageNum} of ${pageCount}...`
+        stage: `Processing page ${pageNum} of ${pageCount} (30s timeout)...`
       } : null);
 
       try {
-        // Create a skip promise that can be triggered externally
-        const skipPromise = new Promise<string>((resolve) => {
-          skipCurrentPageRef.current = (reason: string) => {
-            console.log(`⏭️ Skip button clicked for page ${pageNum}`);
-            resolve(`SKIP: ${reason}`);
-          };
-        });
-
-        // Reduce timeout to 30 seconds for faster recovery
-        const timeoutPromise = new Promise<string>((_, reject) => 
-          setTimeout(() => {
-            console.log(`⏱️ ${filename}: Page ${pageNum} timed out after 30s`);
-            reject(new Error(`Timeout on page ${pageNum}`));
-          }, 30000)
-        );
-
-        // Add timeout for each page (30 seconds)
+        // Use a shorter 30-second timeout that auto-skips stuck pages
         const pageText = await Promise.race([
-          skipPromise,
-          timeoutPromise,
           (async () => {
-            console.log(`🔍 ${filename}: Starting Tesseract on page ${pageNum}`);
+            console.log(`🔍 Starting OCR on page ${pageNum}`);
             const page = await pdf.getPage(pageNum);
             const viewport = page.getViewport({ scale: 2.0 });
             
@@ -278,12 +255,9 @@ export const DocumentReprocessing = () => {
             canvas.height = viewport.height;
             canvas.width = viewport.width;
 
-            console.log(`🎨 ${filename}: Rendering page ${pageNum} to canvas`);
             await page.render({ canvasContext: context, viewport }).promise;
-            
             const imageData = canvas.toDataURL('image/png');
             
-            console.log(`🤖 ${filename}: Starting OCR on page ${pageNum}`);
             const { data: { text } } = await Tesseract.recognize(
               imageData,
               'eng',
@@ -291,7 +265,6 @@ export const DocumentReprocessing = () => {
                 logger: (m) => {
                   if (m.status === 'recognizing text') {
                     const percent = Math.round(m.progress * 100);
-                    console.log(`📊 ${filename}: Page ${pageNum} OCR progress: ${percent}%`);
                     setOcrProgress(prev => prev ? {
                       ...prev,
                       stage: `Page ${pageNum}/${pageCount}: ${percent}%`
@@ -301,32 +274,24 @@ export const DocumentReprocessing = () => {
               }
             );
             
-            console.log(`✅ ${filename}: OCR complete for page ${pageNum} (${text.length} chars)`);
             return text;
-          })()
+          })(),
+          new Promise<string>((_, reject) => 
+            setTimeout(() => {
+              console.log(`⏱️ Page ${pageNum} auto-skipped after 30s timeout`);
+              reject(new Error(`Auto-skip: Page timeout`));
+            }, 30000)
+          )
         ]);
 
-        // Clear the skip handler
-        skipCurrentPageRef.current = null;
-        setIsProcessingPage(false);
-
-        // Check if it was skipped
-        if (pageText.startsWith('SKIP:')) {
-          console.log(`⏭️ ${filename}: Skipped page ${pageNum}/${pageCount}`);
-          addActivityLog(filename, 'processing', `Skipped page ${pageNum}`);
-          fullText += `\n--- Page ${pageNum} (SKIPPED) ---\n[Skipped by user]\n`;
-        } else {
-          fullText += `\n--- Page ${pageNum} ---\n${pageText}\n`;
-          console.log(`✓ ${filename}: Page ${pageNum} complete (${pageText.length} chars)`);
-          addActivityLog(filename, 'processing', `Page ${pageNum} complete`);
-        }
+        fullText += `\n--- Page ${pageNum} ---\n${pageText}\n`;
+        console.log(`✓ Page ${pageNum} complete (${pageText.length} chars)`);
+        addActivityLog(filename, 'processing', `Page ${pageNum} complete`);
       } catch (pageError) {
-        skipCurrentPageRef.current = null;
-        setIsProcessingPage(false);
         const errorMsg = pageError instanceof Error ? pageError.message : 'Unknown error';
-        console.error(`✗ ${filename}: Page ${pageNum} failed - ${errorMsg}`);
-        addActivityLog(filename, 'failed', `Page ${pageNum} failed: ${errorMsg}`);
-        fullText += `\n--- Page ${pageNum} (FAILED: ${errorMsg}) ---\n[OCR failed or timed out]\n`;
+        console.error(`✗ Page ${pageNum} failed - ${errorMsg}`);
+        addActivityLog(filename, 'processing', `Page ${pageNum} skipped (${errorMsg})`);
+        fullText += `\n--- Page ${pageNum} (AUTO-SKIPPED) ---\n[${errorMsg}]\n`;
       }
     }
 
@@ -905,39 +870,13 @@ export const DocumentReprocessing = () => {
               </Button>
               
               {isOcrProcessing && (
-                <>
-                  <Button
-                    onClick={() => {
-                      const skipFn = skipCurrentPageRef.current;
-                      if (skipFn && typeof skipFn === 'function') {
-                        skipFn('User requested skip');
-                        toast({
-                          title: "Skipping Page",
-                          description: "Skipped current page, continuing to next",
-                        });
-                      } else {
-                        toast({
-                          title: "Cannot Skip",
-                          description: "No page is currently being processed",
-                          variant: "destructive"
-                        });
-                      }
-                    }}
-                    variant="outline"
-                    size="sm"
-                    disabled={!isProcessingPage}
-                  >
-                    <SkipForward className="mr-1 h-3 w-3" />
-                    Skip Page
-                  </Button>
-                  <Button
-                    onClick={() => setCancelOcr(true)}
-                    variant="destructive"
-                    size="sm"
-                  >
-                    Cancel
-                  </Button>
-                </>
+                <Button
+                  onClick={() => setCancelOcr(true)}
+                  variant="destructive"
+                  size="sm"
+                >
+                  Cancel All
+                </Button>
               )}
             </div>
           )}
