@@ -3,12 +3,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { RefreshCw, AlertCircle, CheckCircle } from "lucide-react";
+import { RefreshCw, AlertCircle, CheckCircle, FileSearch } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
+import Tesseract from 'tesseract.js';
+import * as pdfjsLib from 'pdfjs-dist';
+
+// Set up PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 export const DocumentReprocessing = () => {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isOcrProcessing, setIsOcrProcessing] = useState(false);
+  const [cancelOcr, setCancelOcr] = useState(false);
   const [stats, setStats] = useState<{
     total: number;
     failed: number;
@@ -18,6 +25,12 @@ export const DocumentReprocessing = () => {
     total: number;
     completed: number;
     processing: number;
+  } | null>(null);
+  const [ocrProgress, setOcrProgress] = useState<{
+    current: number;
+    total: number;
+    currentFile: string;
+    stage: string;
   } | null>(null);
   const { toast } = useToast();
 
@@ -42,6 +55,199 @@ export const DocumentReprocessing = () => {
       failed,
       successful: data.length - failed
     });
+  };
+
+  const processFileWithOCR = async (documentUrl: string, filename: string): Promise<{ text: string; pageCount: number }> => {
+    // Fetch the PDF
+    const response = await fetch(documentUrl);
+    const arrayBuffer = await response.arrayBuffer();
+    
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const pageCount = pdf.numPages;
+    let fullText = '';
+
+    for (let pageNum = 1; pageNum <= pageCount; pageNum++) {
+      if (cancelOcr) {
+        throw new Error('OCR cancelled by user');
+      }
+
+      setOcrProgress(prev => prev ? {
+        ...prev,
+        stage: `Processing page ${pageNum} of ${pageCount}...`
+      } : null);
+
+      const page = await pdf.getPage(pageNum);
+      const viewport = page.getViewport({ scale: 2.0 });
+      
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('Failed to get canvas context');
+      
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+
+      await page.render({ canvasContext: context, viewport }).promise;
+      
+      const imageData = canvas.toDataURL('image/png');
+      
+      const { data: { text } } = await Tesseract.recognize(
+        imageData,
+        'eng',
+        {
+          logger: (m) => {
+            if (m.status === 'recognizing text') {
+              const percent = Math.round(m.progress * 100);
+              setOcrProgress(prev => prev ? {
+                ...prev,
+                stage: `Page ${pageNum}/${pageCount}: ${percent}%`
+              } : null);
+            }
+          }
+        }
+      );
+      
+      fullText += `\n--- Page ${pageNum} ---\n${text}\n`;
+    }
+
+    return { text: fullText, pageCount };
+  };
+
+  const handleOcrReprocess = async () => {
+    setIsOcrProcessing(true);
+    setCancelOcr(false);
+    
+    try {
+      // Fetch all failed documents
+      const { data: failedDocs, error: fetchError } = await supabase
+        .from('forensic_documents')
+        .select('id, filename, document_url')
+        .or('analysis_result.is.null,analysis_result->>analysis.ilike.%failed%,analysis_result->>analysis.ilike.%error%');
+
+      if (fetchError) throw fetchError;
+      if (!failedDocs || failedDocs.length === 0) {
+        toast({
+          title: "No Failed Documents",
+          description: "All documents have been successfully processed",
+        });
+        setIsOcrProcessing(false);
+        return;
+      }
+
+      setOcrProgress({
+        current: 0,
+        total: failedDocs.length,
+        currentFile: '',
+        stage: 'Starting...'
+      });
+
+      let successCount = 0;
+      let errorCount = 0;
+
+      for (let i = 0; i < failedDocs.length; i++) {
+        if (cancelOcr) {
+          toast({
+            title: "OCR Cancelled",
+            description: `Processed ${successCount} of ${failedDocs.length} documents before cancellation`,
+          });
+          break;
+        }
+
+        const doc = failedDocs[i];
+        
+        setOcrProgress({
+          current: i + 1,
+          total: failedDocs.length,
+          currentFile: doc.filename,
+          stage: 'Loading PDF...'
+        });
+
+        try {
+          // Update document status
+          await supabase
+            .from('forensic_documents')
+            .update({ analysis_status: 'processing' })
+            .eq('id', doc.id);
+
+          // Extract text with OCR
+          const { text, pageCount } = await processFileWithOCR(doc.document_url, doc.filename);
+
+          setOcrProgress(prev => prev ? { ...prev, stage: 'Analyzing with AI...' } : null);
+
+          // Analyze with forensic-document-analysis
+          const { data: analysisData, error: analysisError } = await supabase.functions.invoke('forensic-document-analysis', {
+            body: {
+              documentUrl: doc.document_url,
+              extractedText: text,
+              analysisType: 'comprehensive',
+              focusAreas: [
+                'NOL preservation language',
+                'Section 382 references',
+                'Acquisition structures',
+                'Timeline references',
+                'Entity relationships',
+                'Bankruptcy proceedings',
+                'Asset transfers',
+                'Valuation discussions'
+              ]
+            }
+          });
+
+          if (analysisError) throw analysisError;
+
+          // Update document with results
+          await supabase
+            .from('forensic_documents')
+            .update({
+              analysis_status: 'complete',
+              analysis_result: {
+                ...analysisData,
+                ocrExtracted: true,
+                ocrPageCount: pageCount
+              },
+              findings: analysisData.findings || [],
+              confidence_score: analysisData.confidence_score || 0,
+              analyzed_at: new Date().toISOString()
+            })
+            .eq('id', doc.id);
+
+          successCount++;
+        } catch (error) {
+          console.error(`Error processing ${doc.filename}:`, error);
+          errorCount++;
+          
+          // Update with error
+          await supabase
+            .from('forensic_documents')
+            .update({
+              analysis_status: 'failed',
+              analysis_result: {
+                error: error instanceof Error ? error.message : 'OCR processing failed',
+                ocrAttempted: true
+              }
+            })
+            .eq('id', doc.id);
+        }
+      }
+
+      setIsOcrProcessing(false);
+      setOcrProgress(null);
+      fetchStats();
+
+      toast({
+        title: "OCR Processing Complete",
+        description: `Successfully processed ${successCount} documents. ${errorCount} failed.`,
+      });
+
+    } catch (error) {
+      console.error('Error in OCR reprocess:', error);
+      toast({
+        title: "OCR Processing Failed",
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: "destructive"
+      });
+      setIsOcrProcessing(false);
+      setOcrProgress(null);
+    }
   };
 
   const handleReprocessAll = async () => {
@@ -204,24 +410,69 @@ export const DocumentReprocessing = () => {
           </Alert>
         )}
 
-        <div className="flex gap-2">
-          <Button
-            onClick={handleReprocessAll}
-            disabled={isProcessing || (stats && stats.failed === 0)}
-            className="flex-1"
-          >
-            <RefreshCw className={`mr-2 h-4 w-4 ${isProcessing ? 'animate-spin' : ''}`} />
-            {isProcessing ? 'Reprocessing...' : `Reprocess ${stats?.failed || 0} Failed Documents`}
-          </Button>
-          
-          <Button
-            onClick={fetchStats}
-            variant="outline"
-            size="icon"
-            title="Refresh stats"
-          >
-            <RefreshCw className="h-4 w-4" />
-          </Button>
+        {isOcrProcessing && ocrProgress && (
+          <div className="space-y-2">
+            <Alert>
+              <FileSearch className="h-4 w-4 animate-pulse" />
+              <AlertDescription>
+                <div className="space-y-1">
+                  <div>OCR Processing: {ocrProgress.current} of {ocrProgress.total} documents</div>
+                  <div className="text-xs text-muted-foreground">
+                    Current: {ocrProgress.currentFile}
+                  </div>
+                  <div className="text-xs font-medium">{ocrProgress.stage}</div>
+                </div>
+              </AlertDescription>
+            </Alert>
+            <Progress value={(ocrProgress.current / ocrProgress.total) * 100} className="h-2" />
+          </div>
+        )}
+
+        <div className="flex flex-col gap-2">
+          <div className="flex gap-2">
+            <Button
+              onClick={handleReprocessAll}
+              disabled={isProcessing || isOcrProcessing || (stats && stats.failed === 0)}
+              className="flex-1"
+            >
+              <RefreshCw className={`mr-2 h-4 w-4 ${isProcessing ? 'animate-spin' : ''}`} />
+              {isProcessing ? 'Reprocessing...' : `Reprocess ${stats?.failed || 0} Failed Documents`}
+            </Button>
+            
+            <Button
+              onClick={fetchStats}
+              variant="outline"
+              size="icon"
+              title="Refresh stats"
+              disabled={isProcessing || isOcrProcessing}
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {stats && stats.failed > 0 && (
+            <div className="flex gap-2">
+              <Button
+                onClick={handleOcrReprocess}
+                disabled={isProcessing || isOcrProcessing}
+                variant="secondary"
+                className="flex-1"
+              >
+                <FileSearch className={`mr-2 h-4 w-4 ${isOcrProcessing ? 'animate-pulse' : ''}`} />
+                {isOcrProcessing ? 'OCR Processing...' : `OCR Reprocess ${stats.failed} Failed PDFs`}
+              </Button>
+              
+              {isOcrProcessing && (
+                <Button
+                  onClick={() => setCancelOcr(true)}
+                  variant="destructive"
+                  size="sm"
+                >
+                  Cancel
+                </Button>
+              )}
+            </div>
+          )}
         </div>
 
         {stats && stats.failed === 0 && (
