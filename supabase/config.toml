@@ -89,3 +89,6 @@ verify_jwt = false
 
 [functions.forensic-ai-assistant]
 verify_jwt = true
+
+[functions.reprocess-documents]
+verify_jwt = true

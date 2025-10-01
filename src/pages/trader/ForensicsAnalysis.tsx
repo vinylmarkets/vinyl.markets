@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { TraderProtection } from "@/components/trader/TraderProtection";
+import { DocumentReprocessing } from "@/components/forensics/DocumentReprocessing";
 
 export default function ForensicsAnalysis() {
   const analysisModules = [
@@ -152,45 +153,49 @@ export default function ForensicsAnalysis() {
           </div>
 
           {/* Quick Actions */}
-          <Card className="mt-8">
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-3">
-                <Link to="/trader/forensics/documents">
-                  <Button variant="outline" size="sm">
-                    <FileText className="h-4 w-4 mr-2" />
-                    Upload Document
-                  </Button>
-                </Link>
-                <Link to="/trader/forensics/search">
-                  <Button variant="outline" size="sm">
-                    <Search className="h-4 w-4 mr-2" />
-                    Run Query
-                  </Button>
-                </Link>
-                <Link to="/trader/forensics/ai-assistant">
-                  <Button variant="outline" size="sm">
-                    <Brain className="h-4 w-4 mr-2" />
-                    Ask AI Assistant
-                  </Button>
-                </Link>
-                <Link to="/trader/forensics/synthesis">
-                  <Button variant="outline" size="sm">
-                    <Lightbulb className="h-4 w-4 mr-2" />
-                    Generate Report
-                  </Button>
-                </Link>
-                <Link to="/trader/forensics/knowledge-graph">
-                  <Button variant="outline" size="sm">
-                    <Network className="h-4 w-4 mr-2" />
-                    View Connections
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+            <Card className="lg:col-span-2">
+              <CardHeader>
+                <CardTitle>Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-3">
+                  <Link to="/trader/forensics/documents">
+                    <Button variant="outline" size="sm">
+                      <FileText className="h-4 w-4 mr-2" />
+                      Upload Document
+                    </Button>
+                  </Link>
+                  <Link to="/trader/forensics/search">
+                    <Button variant="outline" size="sm">
+                      <Search className="h-4 w-4 mr-2" />
+                      Run Query
+                    </Button>
+                  </Link>
+                  <Link to="/trader/forensics/ai-assistant">
+                    <Button variant="outline" size="sm">
+                      <Brain className="h-4 w-4 mr-2" />
+                      Ask AI Assistant
+                    </Button>
+                  </Link>
+                  <Link to="/trader/forensics/synthesis">
+                    <Button variant="outline" size="sm">
+                      <Lightbulb className="h-4 w-4 mr-2" />
+                      Generate Report
+                    </Button>
+                  </Link>
+                  <Link to="/trader/forensics/knowledge-graph">
+                    <Button variant="outline" size="sm">
+                      <Network className="h-4 w-4 mr-2" />
+                      View Connections
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+
+            <DocumentReprocessing />
+          </div>
         </div>
       </div>
     </TraderProtection>
