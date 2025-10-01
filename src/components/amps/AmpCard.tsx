@@ -4,9 +4,10 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { UserAmp } from '@/types/amps';
-import { Settings } from 'lucide-react';
+import { Settings, Info } from 'lucide-react';
 import { useState } from 'react';
 import tubeAmpImage from '@/assets/vintage-tube-amp.jpg';
+import { StrategyGuideModal } from './StrategyGuideModal';
 
 interface AmpCardProps {
   amp: UserAmp;
@@ -17,6 +18,7 @@ interface AmpCardProps {
 
 export function AmpCard({ amp, onToggle, onAllocate, onSettings }: AmpCardProps) {
   const [isToggling, setIsToggling] = useState(false);
+  const [showStrategyGuide, setShowStrategyGuide] = useState(false);
 
   const handleToggle = async (checked: boolean) => {
     setIsToggling(true);
@@ -48,6 +50,13 @@ export function AmpCard({ amp, onToggle, onAllocate, onSettings }: AmpCardProps)
           <div>
             <div className="flex items-center gap-2 mb-1">
               <h3 className="text-lg font-semibold">{amp.name}</h3>
+              <button
+                onClick={() => setShowStrategyGuide(true)}
+                className="text-muted-foreground hover:text-primary transition-colors"
+                aria-label="View strategy guide"
+              >
+                <Info className="w-5 h-5" />
+              </button>
               {amp.is_active && (
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
               )}
@@ -131,6 +140,13 @@ export function AmpCard({ amp, onToggle, onAllocate, onSettings }: AmpCardProps)
           </div>
         )}
       </div>
+
+      {/* Strategy Guide Modal */}
+      <StrategyGuideModal 
+        amp={amp}
+        isOpen={showStrategyGuide}
+        onClose={() => setShowStrategyGuide(false)}
+      />
     </Card>
   );
 }
