@@ -43,13 +43,9 @@ serve(async (req) => {
 
     console.log('File downloaded successfully, size:', fileData.size);
 
-    // Convert blob to base64 for AI analysis (simplified approach)
-    // In production, you might want to use a proper PDF parser
-    const arrayBuffer = await fileData.arrayBuffer();
-    const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
-    
     // For now, analyze based on metadata since PDF parsing is complex
-    // In a real system, you'd extract text from the PDF first
+    // In production, you'd use a proper PDF parser to extract text
+    // The current approach analyzes filename and document metadata
     const analysisPrompt = `Analyze this forensic document: ${fileName}
 
 Category: ${category}
