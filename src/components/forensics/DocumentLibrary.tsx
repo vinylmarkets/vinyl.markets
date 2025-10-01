@@ -187,14 +187,11 @@ export function DocumentLibrary() {
                     {doc.findings && doc.findings.length > 0 && (
                       <div className="flex items-start gap-2 mt-2">
                         <AlertCircle className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                        <div className="text-xs space-y-1">
-                          {doc.findings.slice(0, 2).map((finding, i) => (
-                            <p key={i} className="text-muted-foreground">• {finding}</p>
+                        <ul className="text-xs space-y-1 list-none">
+                          {doc.findings.map((finding, i) => (
+                            <li key={i} className="text-muted-foreground">• {finding}</li>
                           ))}
-                          {doc.findings.length > 2 && (
-                            <p className="text-primary">+{doc.findings.length - 2} more findings</p>
-                          )}
-                        </div>
+                        </ul>
                       </div>
                     )}
                   </div>
