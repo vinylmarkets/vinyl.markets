@@ -122,10 +122,8 @@ export const VisualizationControls: React.FC<VisualizationControlsProps> = ({
           </Button>
 
           <Select onValueChange={(v) => onExport(v as 'png' | 'svg' | 'json')}>
-            <SelectTrigger asChild>
-              <Button variant="outline" size="icon" className="bg-white/5 border-white/10 hover:bg-white/10">
-                <Download className="w-4 h-4" />
-              </Button>
+            <SelectTrigger className="w-10 h-10 p-0 bg-white/5 border-white/10 hover:bg-white/10">
+              <Download className="w-4 h-4" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="png">Export as PNG</SelectItem>
