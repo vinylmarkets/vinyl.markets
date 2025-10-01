@@ -131,6 +131,7 @@ export const TradingDashboard = () => {
   } | null>(null);
   const [priceUpdateInterval, setPriceUpdateInterval] = useState<NodeJS.Timeout | null>(null);
   const [analysisExpanded, setAnalysisExpanded] = useState(false);
+  const [isExecutingTrades, setIsExecutingTrades] = useState(false);
   
   const isDevelopment = import.meta.env.DEV;
 
@@ -529,6 +530,50 @@ export const TradingDashboard = () => {
     }
   };
 
+  const handleExecuteTrades = async () => {
+    setIsExecutingTrades(true);
+    try {
+      const response = await fetch('https://jhxjvpbwkdzjufjyqanq.supabase.co/functions/v1/execute-trades', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoeGp2cGJ3a2R6anVmanlxYW5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5MDQ3MzYsImV4cCI6MjA3MzQ4MDczNn0.K7bcrLAr8Kxvln7owSNW452GhijuxWduv3u4173DPsc',
+        }
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        const tradesCount = data.executedTrades?.length || 0;
+        toast({
+          title: "Auto-Trading Complete",
+          description: tradesCount > 0 
+            ? `Successfully executed ${tradesCount} trade${tradesCount > 1 ? 's' : ''}`
+            : "No executable signals found",
+        });
+        // Refresh positions after executing trades
+        if (hasIntegrations && tradesCount > 0) {
+          setTimeout(() => window.location.reload(), 2000);
+        }
+      } else {
+        toast({
+          title: "Auto-Trading Status",
+          description: data.message || "No trades executed",
+          variant: data.tradingEnabled === false ? "default" : "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Failed to execute trades:', error);
+      toast({
+        title: "Error",
+        description: "Failed to execute auto-trading",
+        variant: "destructive"
+      });
+    } finally {
+      setIsExecutingTrades(false);
+    }
+  };
+
   // Cleanup interval on unmount
   useEffect(() => {
     return () => {
@@ -875,6 +920,41 @@ export const TradingDashboard = () => {
                     </div>
                   </>
                 )}
+              </CardContent>
+            </Card>
+
+            {/* Auto-Trading Control */}
+            <Card className="!shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)] transition-shadow duration-200">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center space-x-2 text-base">
+                  <Zap className="h-4 w-4 text-primary" />
+                  <span>Auto-Trading</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Button 
+                  onClick={handleExecuteTrades}
+                  disabled={isExecutingTrades}
+                  className="w-full mb-3"
+                  variant="default"
+                >
+                  {isExecutingTrades ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                      Executing...
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="h-4 w-4 mr-2" />
+                      Execute Now
+                    </>
+                  )}
+                </Button>
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <p>• Scans for signals</p>
+                  <p>• Validates risk limits</p>
+                  <p>• Executes trades</p>
+                </div>
               </CardContent>
             </Card>
 
