@@ -173,14 +173,28 @@ export const TradingDashboard = () => {
     handleTradeClick('BUY', symbol);
   };
 
-  // Load wood header setting and autotrading setting
+  // Load settings from localStorage (wood header, autotrading, knowledge mode)
   useEffect(() => {
     const savedSettings = localStorage.getItem('trader-settings');
     if (savedSettings) {
       const settings = JSON.parse(savedSettings);
       setWoodHeaderEnabled(settings.woodHeaderEnabled || false);
       setAutoTradeEnabled(settings.autoTradeEnabled || false);
+      setKnowledgeMode(settings.knowledgeMode || 'simple');
     }
+
+    // Listen for storage changes (e.g., when settings are updated in another tab or the settings page)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'trader-settings' && e.newValue) {
+        const settings = JSON.parse(e.newValue);
+        setWoodHeaderEnabled(settings.woodHeaderEnabled || false);
+        setAutoTradeEnabled(settings.autoTradeEnabled || false);
+        setKnowledgeMode(settings.knowledgeMode || 'simple');
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   // Mock data and integrations check
@@ -742,26 +756,6 @@ export const TradingDashboard = () => {
                 <span className="hidden sm:inline">My Amps</span>
               </Button>
             </Link>
-            
-            {/* Knowledge Mode Toggle */}
-            <div className="flex bg-muted rounded-lg p-1">
-              <Button
-                variant={knowledgeMode === 'simple' ? 'active' : 'ghost'}
-                size="sm"
-                onClick={() => setKnowledgeMode('simple')}
-                className="h-8 px-3 text-xs"
-              >
-                Simple
-              </Button>
-              <Button
-                variant={knowledgeMode === 'academic' ? 'active' : 'ghost'}
-                size="sm"
-                onClick={() => setKnowledgeMode('academic')}
-                className="h-8 px-3 text-xs"
-              >
-                Academic
-              </Button>
-            </div>
             
             {/* Profile Dropdown */}
             <ProfileDropdown />

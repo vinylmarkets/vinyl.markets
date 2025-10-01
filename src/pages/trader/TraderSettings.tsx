@@ -381,7 +381,7 @@ const TraderSettings = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Knowledge Mode Default</Label>
+                  <Label>Knowledge Mode</Label>
                   <Select 
                     value={settings.knowledgeMode} 
                     onValueChange={(value: 'simple' | 'academic') => updateSetting('knowledgeMode', value)}
@@ -390,10 +390,13 @@ const TraderSettings = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="simple">Simple</SelectItem>
-                      <SelectItem value="academic">Academic</SelectItem>
+                      <SelectItem value="simple">Simple (Beginner-friendly explanations)</SelectItem>
+                      <SelectItem value="academic">Academic (Advanced technical details)</SelectItem>
                     </SelectContent>
                   </Select>
+                  <p className="text-xs text-muted-foreground">
+                    Controls how information is displayed throughout the platform
+                  </p>
                 </div>
 
                 <div className="space-y-2">
