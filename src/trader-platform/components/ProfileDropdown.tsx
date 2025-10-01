@@ -26,7 +26,8 @@ import {
   Mail,
   Activity,
   Network,
-  ChevronRight
+  ChevronRight,
+  Lightbulb
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
@@ -178,6 +179,25 @@ export const ProfileDropdown = () => {
             <Link to="/trader/system-maps/algorithms" className="flex items-center w-full">
               <Activity className="mr-3 h-3 w-3" />
               <span className="text-sm">Algorithm Analysis</span>
+            </Link>
+          </DropdownMenuItem>
+        </div>
+        
+        <DropdownMenuSeparator className="bg-border/50" />
+        
+        {/* Intelligence Submenu */}
+        <div className="px-2 py-1">
+          <p className="text-xs font-semibold text-muted-foreground px-2 mb-1">Intelligence</p>
+          <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors pl-4">
+            <Link to="/trader/intelligence/explorer" className="flex items-center w-full">
+              <Brain className="mr-3 h-3 w-3" />
+              <span className="text-sm">Knowledge Graph</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors pl-4">
+            <Link to="/trader/intelligence/insights" className="flex items-center w-full">
+              <Lightbulb className="mr-3 h-3 w-3" />
+              <span className="text-sm">AI Insights</span>
             </Link>
           </DropdownMenuItem>
         </div>
