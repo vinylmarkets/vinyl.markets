@@ -237,29 +237,85 @@ export const useForensicData = () => {
   // Semantic search function
   const searchDocuments = async (query: string): Promise<SearchResult[]> => {
     try {
+      const queryLower = query.toLowerCase();
+      const results: SearchResult[] = [];
+      
+      // Search forensic documents
+      const { data: documents, error: docError } = await supabase
+        .from('forensic_documents')
+        .select('*')
+        .order('uploaded_at', { ascending: false })
+        .limit(50);
+
+      if (!docError && documents) {
+        documents.forEach(doc => {
+          let relevanceScore = 0;
+          let matchedExcerpt = '';
+          
+          // Search in filename
+          if (doc.filename?.toLowerCase().includes(queryLower)) {
+            relevanceScore += 30;
+            matchedExcerpt = doc.filename;
+          }
+          
+          // Search in findings
+          if (doc.findings && Array.isArray(doc.findings)) {
+            const matchingFindings = doc.findings.filter((f: string) => 
+              f.toLowerCase().includes(queryLower)
+            );
+            if (matchingFindings.length > 0) {
+              relevanceScore += matchingFindings.length * 20;
+              matchedExcerpt = matchingFindings[0].substring(0, 200);
+            }
+          }
+          
+          // Search in metadata
+          if (doc.metadata) {
+            const metadataStr = JSON.stringify(doc.metadata).toLowerCase();
+            if (metadataStr.includes(queryLower)) {
+              relevanceScore += 15;
+            }
+          }
+          
+          if (relevanceScore > 0) {
+            results.push({
+              title: doc.filename,
+              type: 'Forensic Document',
+              date: new Date(doc.uploaded_at).toLocaleDateString(),
+              relevance: Math.min(relevanceScore, 100),
+              excerpt: matchedExcerpt || 'Document contains relevant information',
+              source: 'forensic_documents'
+            });
+          }
+        });
+      }
+      
+      // Search knowledge graph
       const { nodes } = await fetchKnowledgeGraph();
       
-      const results: SearchResult[] = nodes
-        .filter(node => {
-          const nodeData = node as any;
-          const searchText = `${nodeData.entity_id} ${nodeData.properties?.description || ''}`.toLowerCase();
-          return searchText.includes(query.toLowerCase());
-        })
-        .map(node => {
-          const nodeData = node as any;
-          return {
+      nodes.forEach(node => {
+        const nodeData = node as any;
+        const searchText = `${nodeData.entity_id} ${nodeData.properties?.description || ''}`.toLowerCase();
+        
+        if (searchText.includes(queryLower)) {
+          const relevance = calculateRelevance(node, query);
+          
+          results.push({
             title: nodeData.entity_id,
-            type: nodeData.node_type || 'Document',
-            date: nodeData.properties?.date || new Date(nodeData.created_at).toLocaleDateString(),
-            relevance: calculateRelevance(node, query),
-            excerpt: nodeData.properties?.description || '',
+            type: nodeData.node_type || 'Knowledge Graph Node',
+            date: nodeData.properties?.date || new Date().toLocaleDateString(),
+            relevance,
+            excerpt: nodeData.properties?.description || nodeData.entity_id,
             source: 'knowledge_graph'
-          };
-        })
-        .sort((a, b) => b.relevance - a.relevance)
-        .slice(0, 10);
+          });
+        }
+      });
       
-      return results;
+      // Sort by relevance and return top results
+      return results
+        .sort((a, b) => b.relevance - a.relevance)
+        .slice(0, 20);
+      
     } catch (error) {
       console.error('Error searching documents:', error);
       return [];

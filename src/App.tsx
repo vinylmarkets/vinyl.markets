@@ -44,6 +44,7 @@ import KnowledgeGraphView from "./pages/trader/forensics/KnowledgeGraphView";
 import TimelineAnalysis from "./pages/trader/forensics/TimelineAnalysis";
 import SemanticSearch from "./pages/trader/forensics/SemanticSearch";
 import IntelligenceSynthesis from "./pages/trader/forensics/IntelligenceSynthesis";
+import ForensicAIAssistant from "./pages/trader/forensics/AIAssistant";
 import Charts from "./pages/dashboard/Charts";
 import LearningProgress from "./pages/dashboard/Progress";
 import Portfolio from "./pages/dashboard/Portfolio";
@@ -135,6 +136,7 @@ const App = () => {
           <Route path="/trader/forensics/timeline" element={<TimelineAnalysis />} />
           <Route path="/trader/forensics/search" element={<SemanticSearch />} />
           <Route path="/trader/forensics/synthesis" element={<IntelligenceSynthesis />} />
+          <Route path="/trader/forensics/ai-assistant" element={<ForensicAIAssistant />} />
               
               <Route path="/admin/executive-overview" element={<AdminProtected><ExecutiveOverview /></AdminProtected>} />
               <Route path="/admin/user-analytics" element={<AdminProtected><UserAnalytics /></AdminProtected>} />

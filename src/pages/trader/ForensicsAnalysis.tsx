@@ -170,9 +170,15 @@ export default function ForensicsAnalysis() {
                     Run Query
                   </Button>
                 </Link>
-                <Link to="/trader/forensics/synthesis">
+                <Link to="/trader/forensics/ai-assistant">
                   <Button variant="outline" size="sm">
                     <Brain className="h-4 w-4 mr-2" />
+                    Ask AI Assistant
+                  </Button>
+                </Link>
+                <Link to="/trader/forensics/synthesis">
+                  <Button variant="outline" size="sm">
+                    <Lightbulb className="h-4 w-4 mr-2" />
                     Generate Report
                   </Button>
                 </Link>
