@@ -61,16 +61,47 @@ export const useForensicData = () => {
       // Helper function to filter out negative/limitation statements
       const isValidFinding = (finding: string): boolean => {
         const lowerFinding = finding.toLowerCase();
-        return !(
-          lowerFinding.includes('no specific') ||
-          lowerFinding.includes('cannot be extracted') ||
-          lowerFinding.includes('not available') ||
-          lowerFinding.includes('no evidence') ||
-          lowerFinding.includes('metadata alone') ||
-          lowerFinding.includes('no direct') ||
-          lowerFinding.includes('no clear') ||
-          lowerFinding.trim().length < 20
+        
+        // Filter out any statement that indicates absence or inability to determine
+        const negativePatterns = [
+          'no specific',
+          'cannot be extracted',
+          'cannot be identified',
+          'not available',
+          'no evidence',
+          'metadata alone',
+          'no direct',
+          'no clear',
+          'without content',
+          'without document content',
+          'entirely unavailable',
+          'no forensic analysis',
+          'can be provided without',
+          'cannot be provided',
+          'no information',
+          'lack of',
+          'unable to',
+          'impossible to',
+          'not possible',
+          'requires content',
+          'requires document',
+          'not present',
+          'absence of',
+          'no mention',
+          'not mentioned',
+          'no details',
+          'no data'
+        ];
+        
+        // Check if finding contains any negative pattern
+        const hasNegativePattern = negativePatterns.some(pattern => 
+          lowerFinding.includes(pattern)
         );
+        
+        // Also filter very short findings
+        const isTooShort = lowerFinding.trim().length < 30;
+        
+        return !hasNegativePattern && !isTooShort;
       };
       
       documents?.forEach(doc => {
