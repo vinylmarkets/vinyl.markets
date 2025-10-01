@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
 import { corsHeaders } from '../_shared/cors.ts';
+import pdf from 'npm:pdf-parse@1.1.1';
 
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
@@ -43,31 +44,66 @@ serve(async (req) => {
 
     console.log('File downloaded successfully, size:', fileData.size);
 
-    // For now, analyze based on metadata since PDF parsing is complex
-    // In production, you'd use a proper PDF parser to extract text
-    // The current approach analyzes filename and document metadata
-    const analysisPrompt = `Analyze this forensic document: ${fileName}
+    // Parse PDF to extract text content
+    let pdfText = '';
+    try {
+      const arrayBuffer = await fileData.arrayBuffer();
+      const pdfData = await pdf(Buffer.from(arrayBuffer));
+      pdfText = pdfData.text;
+      console.log('PDF parsed successfully, extracted', pdfText.length, 'characters');
+    } catch (parseError) {
+      console.error('PDF parsing error:', parseError);
+      pdfText = 'PDF parsing failed - analyzing metadata only';
+    }
 
-Category: ${category}
-File Size: ${fileData.size} bytes
-${instructions ? `Instructions: ${instructions}` : ''}
+    // Truncate text if too long (keep first 15000 chars for analysis)
+    const textForAnalysis = pdfText.length > 15000 ? pdfText.substring(0, 15000) + '...[truncated]' : pdfText;
 
-Based on the document name and context, provide a forensic analysis focusing on:
-1. Likely document type (court filing, financial statement, agreement, etc.)
-2. Key areas to investigate related to the BBBY/Overstock/DK-Butterfly hypothesis
-3. Potential NOL (Net Operating Loss) preservation indicators
-4. Section 382 tax code implications
-5. Timeline indicators and strategic timing patterns
-6. Entity relationships and structures that may be present
-7. Red flags or unusual patterns to look for
+    const analysisPrompt = `Analyze this forensic document from the BBBY/Kroll bankruptcy docket.
+
+DOCUMENT: ${fileName}
+FILE SIZE: ${fileData.size} bytes
+
+EXTRACTED CONTENT:
+${textForAnalysis}
+
+${instructions ? `SPECIAL INSTRUCTIONS: ${instructions}` : ''}
+
+Perform a deep forensic analysis focusing on:
+1. **Key People**: Look for Ryan Cohen, Carl Icahn, or other key players
+2. **Entities**: BBBY, Overstock, DK-Butterfly, any subsidiaries or special purpose entities
+3. **Timeline Events**: Critical dates, ownership changes, asset transfers
+4. **NOL Preservation**: Section 382 indicators, ownership change analysis
+5. **Asset Transfers**: IP sales, brand sales, strategic asset movements
+6. **Financial Structures**: Debt arrangements, equity transfers, valuations
+7. **Legal Proceedings**: Court orders, motions, agreements
+8. **Red Flags**: Unusual patterns, strategic timing, hidden connections
+
+CRITICAL: Extract specific entities, dates, dollar amounts, and relationships.
 
 Provide:
-- A comprehensive analysis summary
-- Key findings (as an array of 3-5 specific strings)
-- Confidence level (0-100) for the overall analysis
-- Structured findings categorized by topic
+- Comprehensive analysis summary
+- Key findings array (5-10 specific, actionable findings)
+- Entities mentioned (people, companies, dates)
+- Confidence level (0-100)
+- Structured findings with categories
 
-Format response as JSON with keys: analysis, findings, confidence, structuredFindings`;
+Format as JSON:
+{
+  "analysis": "detailed analysis text",
+  "findings": ["finding 1", "finding 2", ...],
+  "entities": {
+    "people": ["person1", "person2"],
+    "companies": ["company1", "company2"],
+    "dates": ["date1", "date2"],
+    "amounts": ["$X", "$Y"]
+  },
+  "confidence": 85,
+  "structuredFindings": {
+    "category1": ["detail1", "detail2"],
+    "category2": ["detail1"]
+  }
+}`;
 
     console.log('Calling AI for analysis...');
 
@@ -89,7 +125,7 @@ Format response as JSON with keys: analysis, findings, confidence, structuredFin
             content: analysisPrompt
           }
         ],
-        max_completion_tokens: 2000
+        max_completion_tokens: 4000
       }),
     });
 
@@ -128,18 +164,25 @@ Format response as JSON with keys: analysis, findings, confidence, structuredFin
       };
     }
 
-    // Update the forensic_documents table
+    // Update the forensic_documents table with full analysis
     const { error: updateError } = await supabase
       .from('forensic_documents')
       .update({
         analysis_status: 'complete',
         analysis_result: {
           analysis: parsedAnalysis.analysis || analysisText,
-          structuredFindings: parsedAnalysis.structuredFindings || {}
+          structuredFindings: parsedAnalysis.structuredFindings || {},
+          entities: parsedAnalysis.entities || {},
+          extractedText: pdfText.substring(0, 5000) // Store first 5000 chars
         },
         findings: parsedAnalysis.findings || [],
         confidence_score: parsedAnalysis.confidence || 70,
-        analyzed_at: new Date().toISOString()
+        analyzed_at: new Date().toISOString(),
+        metadata: {
+          ...category,
+          textLength: pdfText.length,
+          parsedSuccessfully: pdfText.length > 0
+        }
       })
       .eq('file_path', filePath);
 
