@@ -58,8 +58,24 @@ export const useForensicData = () => {
 
       const evidenceMap = new Map<string, ForensicEvidence>();
       
+      // Helper function to filter out negative/limitation statements
+      const isValidFinding = (finding: string): boolean => {
+        const lowerFinding = finding.toLowerCase();
+        return !(
+          lowerFinding.includes('no specific') ||
+          lowerFinding.includes('cannot be extracted') ||
+          lowerFinding.includes('not available') ||
+          lowerFinding.includes('no evidence') ||
+          lowerFinding.includes('metadata alone') ||
+          lowerFinding.includes('no direct') ||
+          lowerFinding.includes('no clear') ||
+          lowerFinding.trim().length < 20
+        );
+      };
+      
       documents?.forEach(doc => {
-        const findings = doc.findings || [];
+        const rawFindings = doc.findings || [];
+        const findings = rawFindings.filter(isValidFinding);
         const analysisResult = doc.analysis_result as any;
         const entities = analysisResult?.entities || [];
         
