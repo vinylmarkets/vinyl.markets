@@ -236,25 +236,38 @@ export const DocumentReprocessing = () => {
 
       console.log(`📄 ${filename}: Processing page ${pageNum}/${pageCount}`);
       addActivityLog(filename, 'processing', `Processing page ${pageNum}/${pageCount}`);
+      
+      // Set processing state BEFORE starting the async operation
+      setIsProcessingPage(true);
+      
       setOcrProgress(prev => prev ? {
         ...prev,
         stage: `Processing page ${pageNum} of ${pageCount}...`
       } : null);
 
       try {
-        setIsProcessingPage(true);
-        
         // Create a skip promise that can be triggered externally
         const skipPromise = new Promise<string>((resolve) => {
           skipCurrentPageRef.current = (reason: string) => {
+            console.log(`⏭️ Skip button clicked for page ${pageNum}`);
             resolve(`SKIP: ${reason}`);
           };
         });
 
-        // Add timeout for each page (60 seconds)
+        // Reduce timeout to 30 seconds for faster recovery
+        const timeoutPromise = new Promise<string>((_, reject) => 
+          setTimeout(() => {
+            console.log(`⏱️ ${filename}: Page ${pageNum} timed out after 30s`);
+            reject(new Error(`Timeout on page ${pageNum}`));
+          }, 30000)
+        );
+
+        // Add timeout for each page (30 seconds)
         const pageText = await Promise.race([
           skipPromise,
+          timeoutPromise,
           (async () => {
+            console.log(`🔍 ${filename}: Starting Tesseract on page ${pageNum}`);
             const page = await pdf.getPage(pageNum);
             const viewport = page.getViewport({ scale: 2.0 });
             
@@ -265,10 +278,12 @@ export const DocumentReprocessing = () => {
             canvas.height = viewport.height;
             canvas.width = viewport.width;
 
+            console.log(`🎨 ${filename}: Rendering page ${pageNum} to canvas`);
             await page.render({ canvasContext: context, viewport }).promise;
             
             const imageData = canvas.toDataURL('image/png');
             
+            console.log(`🤖 ${filename}: Starting OCR on page ${pageNum}`);
             const { data: { text } } = await Tesseract.recognize(
               imageData,
               'eng',
@@ -276,6 +291,7 @@ export const DocumentReprocessing = () => {
                 logger: (m) => {
                   if (m.status === 'recognizing text') {
                     const percent = Math.round(m.progress * 100);
+                    console.log(`📊 ${filename}: Page ${pageNum} OCR progress: ${percent}%`);
                     setOcrProgress(prev => prev ? {
                       ...prev,
                       stage: `Page ${pageNum}/${pageCount}: ${percent}%`
@@ -285,11 +301,9 @@ export const DocumentReprocessing = () => {
               }
             );
             
+            console.log(`✅ ${filename}: OCR complete for page ${pageNum} (${text.length} chars)`);
             return text;
-          })(),
-          new Promise<string>((_, reject) => 
-            setTimeout(() => reject(new Error(`Timeout on page ${pageNum}`)), 60000)
-          )
+          })()
         ]);
 
         // Clear the skip handler
