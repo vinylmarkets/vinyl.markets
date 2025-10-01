@@ -115,6 +115,7 @@ export function DocumentUpload() {
       // Trigger analysis via edge function
       const { data, error: analysisError } = await supabase.functions.invoke('process-document', {
         body: {
+          filePath: filePath,
           fileUrl: publicUrl,
           fileName: file.name,
           category: 'kroll-docket',
@@ -122,7 +123,14 @@ export function DocumentUpload() {
         }
       });
 
-      if (analysisError) throw analysisError;
+      if (analysisError) {
+        console.error('Analysis error:', analysisError);
+        // Don't throw - mark as error but continue
+        setUploads(prev => prev.map((u, i) => 
+          i === index ? { ...u, status: 'error', error: 'Analysis failed but file uploaded' } : u
+        ));
+        return;
+      }
 
       // Complete
       setUploads(prev => prev.map((u, i) => 
