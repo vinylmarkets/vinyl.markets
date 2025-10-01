@@ -200,6 +200,12 @@ export const ProfileDropdown = () => {
               <span className="text-sm">AI Insights</span>
             </Link>
           </DropdownMenuItem>
+          <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors pl-4">
+            <Link to="/trader/testing" className="flex items-center w-full">
+              <Activity className="mr-3 h-3 w-3" />
+              <span className="text-sm">Beta Testing</span>
+            </Link>
+          </DropdownMenuItem>
         </div>
         
         <DropdownMenuSeparator className="bg-border/50" />
