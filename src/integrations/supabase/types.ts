@@ -307,6 +307,77 @@ export type Database = {
         }
         Relationships: []
       }
+      amp_catalog: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          default_settings: Json | null
+          description: string | null
+          id: string
+          name: string
+          parameter_schema: Json | null
+          version: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          default_settings?: Json | null
+          description?: string | null
+          id: string
+          name: string
+          parameter_schema?: Json | null
+          version?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          default_settings?: Json | null
+          description?: string | null
+          id?: string
+          name?: string
+          parameter_schema?: Json | null
+          version?: string | null
+        }
+        Relationships: []
+      }
+      amp_events: {
+        Row: {
+          created_at: string | null
+          description: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          user_amp_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          user_amp_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          user_amp_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "amp_events_user_amp_id_fkey"
+            columns: ["user_amp_id"]
+            isOneToOne: false
+            referencedRelation: "user_amps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       analytics_events: {
         Row: {
           created_at: string | null
@@ -2876,6 +2947,7 @@ export type Database = {
           option_type: string | null
           quantity: number
           rho: number | null
+          settings_snapshot: Json | null
           side: string
           strike_price: number | null
           symbol: string
@@ -2883,6 +2955,7 @@ export type Database = {
           unrealized_pnl: number | null
           unrealized_pnl_percentage: number | null
           updated_at: string | null
+          user_amp_id: string | null
           vega: number | null
         }
         Insert: {
@@ -2902,6 +2975,7 @@ export type Database = {
           option_type?: string | null
           quantity: number
           rho?: number | null
+          settings_snapshot?: Json | null
           side: string
           strike_price?: number | null
           symbol: string
@@ -2909,6 +2983,7 @@ export type Database = {
           unrealized_pnl?: number | null
           unrealized_pnl_percentage?: number | null
           updated_at?: string | null
+          user_amp_id?: string | null
           vega?: number | null
         }
         Update: {
@@ -2928,6 +3003,7 @@ export type Database = {
           option_type?: string | null
           quantity?: number
           rho?: number | null
+          settings_snapshot?: Json | null
           side?: string
           strike_price?: number | null
           symbol?: string
@@ -2935,6 +3011,7 @@ export type Database = {
           unrealized_pnl?: number | null
           unrealized_pnl_percentage?: number | null
           updated_at?: string | null
+          user_amp_id?: string | null
           vega?: number | null
         }
         Relationships: [
@@ -2943,6 +3020,13 @@ export type Database = {
             columns: ["account_id"]
             isOneToOne: false
             referencedRelation: "paper_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paper_positions_user_amp_id_fkey"
+            columns: ["user_amp_id"]
+            isOneToOne: false
+            referencedRelation: "user_amps"
             referencedColumns: ["id"]
           },
         ]
@@ -3041,12 +3125,14 @@ export type Database = {
           price: number
           quantity: number
           realized_pnl: number | null
+          settings_snapshot: Json | null
           settlement_date: string | null
           slippage: number | null
           strike_price: number | null
           symbol: string
           total_amount: number
           transaction_type: string
+          user_amp_id: string | null
         }
         Insert: {
           account_id?: string | null
@@ -3063,12 +3149,14 @@ export type Database = {
           price: number
           quantity: number
           realized_pnl?: number | null
+          settings_snapshot?: Json | null
           settlement_date?: string | null
           slippage?: number | null
           strike_price?: number | null
           symbol: string
           total_amount: number
           transaction_type: string
+          user_amp_id?: string | null
         }
         Update: {
           account_id?: string | null
@@ -3085,12 +3173,14 @@ export type Database = {
           price?: number
           quantity?: number
           realized_pnl?: number | null
+          settings_snapshot?: Json | null
           settlement_date?: string | null
           slippage?: number | null
           strike_price?: number | null
           symbol?: string
           total_amount?: number
           transaction_type?: string
+          user_amp_id?: string | null
         }
         Relationships: [
           {
@@ -3105,6 +3195,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "paper_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paper_transactions_user_amp_id_fkey"
+            columns: ["user_amp_id"]
+            isOneToOne: false
+            referencedRelation: "user_amps"
             referencedColumns: ["id"]
           },
         ]
@@ -4356,6 +4453,232 @@ export type Database = {
           },
         ]
       }
+      user_amp_performance: {
+        Row: {
+          avg_loss: number | null
+          avg_win: number | null
+          created_at: string | null
+          cumulative_losses: number | null
+          cumulative_pnl: number | null
+          cumulative_trades: number | null
+          cumulative_wins: number | null
+          current_drawdown: number | null
+          date: string
+          id: string
+          largest_loss: number | null
+          largest_win: number | null
+          losing_trades: number | null
+          max_drawdown: number | null
+          realized_pnl: number | null
+          total_pnl: number | null
+          trades_executed: number | null
+          unrealized_pnl: number | null
+          user_amp_id: string
+          win_rate: number | null
+          winning_trades: number | null
+        }
+        Insert: {
+          avg_loss?: number | null
+          avg_win?: number | null
+          created_at?: string | null
+          cumulative_losses?: number | null
+          cumulative_pnl?: number | null
+          cumulative_trades?: number | null
+          cumulative_wins?: number | null
+          current_drawdown?: number | null
+          date: string
+          id?: string
+          largest_loss?: number | null
+          largest_win?: number | null
+          losing_trades?: number | null
+          max_drawdown?: number | null
+          realized_pnl?: number | null
+          total_pnl?: number | null
+          trades_executed?: number | null
+          unrealized_pnl?: number | null
+          user_amp_id: string
+          win_rate?: number | null
+          winning_trades?: number | null
+        }
+        Update: {
+          avg_loss?: number | null
+          avg_win?: number | null
+          created_at?: string | null
+          cumulative_losses?: number | null
+          cumulative_pnl?: number | null
+          cumulative_trades?: number | null
+          cumulative_wins?: number | null
+          current_drawdown?: number | null
+          date?: string
+          id?: string
+          largest_loss?: number | null
+          largest_win?: number | null
+          losing_trades?: number | null
+          max_drawdown?: number | null
+          realized_pnl?: number | null
+          total_pnl?: number | null
+          trades_executed?: number | null
+          unrealized_pnl?: number | null
+          user_amp_id?: string
+          win_rate?: number | null
+          winning_trades?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_amp_performance_user_amp_id_fkey"
+            columns: ["user_amp_id"]
+            isOneToOne: false
+            referencedRelation: "user_amps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_amp_settings: {
+        Row: {
+          block_earnings_announcements: boolean | null
+          created_at: string | null
+          custom_parameters: Json | null
+          daily_loss_limit: number | null
+          id: string
+          limit_order_offset_pct: number | null
+          max_open_positions: number | null
+          max_position_size: number | null
+          min_confidence_score: number | null
+          only_trade_with_trend: boolean | null
+          order_type: string | null
+          position_sizing_method: string | null
+          require_volume_confirmation: boolean | null
+          signal_generation_frequency: string | null
+          stop_loss_percentage: number | null
+          take_profit_percentage: number | null
+          time_in_force: string | null
+          total_portfolio_risk_pct: number | null
+          trade_on_friday: boolean | null
+          trade_on_monday: boolean | null
+          trade_on_saturday: boolean | null
+          trade_on_sunday: boolean | null
+          trade_on_thursday: boolean | null
+          trade_on_tuesday: boolean | null
+          trade_on_wednesday: boolean | null
+          trading_end_time: string | null
+          trading_start_time: string | null
+          trailing_stop_enabled: boolean | null
+          updated_at: string | null
+          user_amp_id: string
+        }
+        Insert: {
+          block_earnings_announcements?: boolean | null
+          created_at?: string | null
+          custom_parameters?: Json | null
+          daily_loss_limit?: number | null
+          id?: string
+          limit_order_offset_pct?: number | null
+          max_open_positions?: number | null
+          max_position_size?: number | null
+          min_confidence_score?: number | null
+          only_trade_with_trend?: boolean | null
+          order_type?: string | null
+          position_sizing_method?: string | null
+          require_volume_confirmation?: boolean | null
+          signal_generation_frequency?: string | null
+          stop_loss_percentage?: number | null
+          take_profit_percentage?: number | null
+          time_in_force?: string | null
+          total_portfolio_risk_pct?: number | null
+          trade_on_friday?: boolean | null
+          trade_on_monday?: boolean | null
+          trade_on_saturday?: boolean | null
+          trade_on_sunday?: boolean | null
+          trade_on_thursday?: boolean | null
+          trade_on_tuesday?: boolean | null
+          trade_on_wednesday?: boolean | null
+          trading_end_time?: string | null
+          trading_start_time?: string | null
+          trailing_stop_enabled?: boolean | null
+          updated_at?: string | null
+          user_amp_id: string
+        }
+        Update: {
+          block_earnings_announcements?: boolean | null
+          created_at?: string | null
+          custom_parameters?: Json | null
+          daily_loss_limit?: number | null
+          id?: string
+          limit_order_offset_pct?: number | null
+          max_open_positions?: number | null
+          max_position_size?: number | null
+          min_confidence_score?: number | null
+          only_trade_with_trend?: boolean | null
+          order_type?: string | null
+          position_sizing_method?: string | null
+          require_volume_confirmation?: boolean | null
+          signal_generation_frequency?: string | null
+          stop_loss_percentage?: number | null
+          take_profit_percentage?: number | null
+          time_in_force?: string | null
+          total_portfolio_risk_pct?: number | null
+          trade_on_friday?: boolean | null
+          trade_on_monday?: boolean | null
+          trade_on_saturday?: boolean | null
+          trade_on_sunday?: boolean | null
+          trade_on_thursday?: boolean | null
+          trade_on_tuesday?: boolean | null
+          trade_on_wednesday?: boolean | null
+          trading_end_time?: string | null
+          trading_start_time?: string | null
+          trailing_stop_enabled?: boolean | null
+          updated_at?: string | null
+          user_amp_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_amp_settings_user_amp_id_fkey"
+            columns: ["user_amp_id"]
+            isOneToOne: true
+            referencedRelation: "user_amps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_amps: {
+        Row: {
+          allocated_capital: number | null
+          amp_id: string
+          created_at: string | null
+          display_order: number | null
+          id: string
+          is_active: boolean | null
+          name: string
+          priority: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          allocated_capital?: number | null
+          amp_id: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          priority?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          allocated_capital?: number | null
+          amp_id?: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          priority?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_briefings: {
         Row: {
           briefing_id: string | null
@@ -5000,6 +5323,10 @@ export type Database = {
         Args: { target_date?: string }
         Returns: undefined
       }
+      can_amp_open_position: {
+        Args: { p_position_size: number; p_user_amp_id: string }
+        Returns: boolean
+      }
       check_and_award_achievements: {
         Args: { user_uuid: string }
         Returns: undefined
@@ -5070,6 +5397,10 @@ export type Database = {
           signup_date: string
         }[]
       }
+      get_amp_open_position_value: {
+        Args: { p_user_amp_id: string }
+        Returns: number
+      }
       get_business_metrics_summary: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -5112,6 +5443,10 @@ export type Database = {
           unique_users_asking: number
           user_intent_category: string
         }[]
+      }
+      get_total_allocated_capital: {
+        Args: { p_user_id: string }
+        Returns: number
       }
       get_trader_access_level: {
         Args: { user_email: string }

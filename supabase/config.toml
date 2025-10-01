@@ -89,3 +89,24 @@ verify_jwt = true
 
 [functions.reprocess-documents]
 verify_jwt = true
+
+[functions.get-user-amps]
+verify_jwt = true
+
+[functions.add-user-amp]
+verify_jwt = true
+
+[functions.toggle-amp-active]
+verify_jwt = true
+
+[functions.allocate-capital]
+verify_jwt = true
+
+[functions.update-amp-settings]
+verify_jwt = true
+
+[functions.get-amp-performance]
+verify_jwt = true
+
+[functions.get-amp-events]
+verify_jwt = true
