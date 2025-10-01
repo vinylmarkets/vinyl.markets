@@ -3,9 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { UserAmp } from '@/types/amps';
-import { Settings, TrendingUp, DollarSign, Activity } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import { useState } from 'react';
 
 interface AmpCardProps {
@@ -96,34 +95,14 @@ export function AmpCard({ amp, onToggle, onAllocate, onSettings }: AmpCardProps)
       </div>
 
       {/* Actions */}
-      <div className="flex gap-2">
-        <Button 
-          variant="outline" 
-          className="flex-1"
-          onClick={() => onSettings(amp.id)}
-        >
-          <Settings className="w-4 h-4 mr-2" />
-          Settings
-        </Button>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                variant="outline"
-                size="icon"
-                className={amp.is_active ? 'border-green-500' : ''}
-              >
-                <Activity className={`w-4 h-4 ${amp.is_active ? 'text-green-500' : ''}`} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="text-sm">
-                {amp.is_active ? 'Algorithm is active and monitoring' : 'Algorithm is inactive'}
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
+      <Button 
+        variant="outline" 
+        className="w-full"
+        onClick={() => onSettings(amp.id)}
+      >
+        <Settings className="w-4 h-4 mr-2" />
+        Settings
+      </Button>
 
       {/* Warning if no capital */}
       {amp.allocated_capital <= 0 && (
