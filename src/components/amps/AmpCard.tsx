@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { UserAmp } from '@/types/amps';
 import { Settings, TrendingUp, DollarSign, Activity } from 'lucide-react';
 import { useState } from 'react';
@@ -104,12 +105,24 @@ export function AmpCard({ amp, onToggle, onAllocate, onSettings }: AmpCardProps)
           <Settings className="w-4 h-4 mr-2" />
           Settings
         </Button>
-        <Button 
-          variant="outline"
-          size="icon"
-        >
-          <Activity className="w-4 h-4" />
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="outline"
+                size="icon"
+                className={amp.is_active ? 'border-green-500' : ''}
+              >
+                <Activity className={`w-4 h-4 ${amp.is_active ? 'text-green-500' : ''}`} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="text-sm">
+                {amp.is_active ? 'Algorithm is active and monitoring' : 'Algorithm is inactive'}
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
 
       {/* Warning if no capital */}

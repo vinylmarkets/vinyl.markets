@@ -8,12 +8,14 @@ import { useUserAmps } from '@/hooks/useUserAmps';
 import { AmpCard } from '@/components/amps/AmpCard';
 import { AddAmpModal } from '@/components/amps/AddAmpModal';
 import { AllocateCapitalModal } from '@/components/amps/AllocateCapitalModal';
+import { AmpSettingsModal } from '@/components/amps/AmpSettingsModal';
 import { UserAmp } from '@/types/amps';
 
 export default function MyAmps() {
-  const { amps, summary, isLoading, toggleAmpActive, allocateCapital, addAmp } = useUserAmps();
+  const { amps, summary, isLoading, toggleAmpActive, allocateCapital, addAmp, updateSettings } = useUserAmps();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showAllocateModal, setShowAllocateModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [selectedAmp, setSelectedAmp] = useState<UserAmp | null>(null);
 
   const handleAllocateClick = (ampId: string) => {
@@ -25,8 +27,11 @@ export default function MyAmps() {
   };
 
   const handleSettingsClick = (ampId: string) => {
-    // TODO: Navigate to settings page or open settings modal
-    console.log('Settings for amp:', ampId);
+    const amp = amps.find(a => a.id === ampId);
+    if (amp) {
+      setSelectedAmp(amp);
+      setShowSettingsModal(true);
+    }
   };
 
   if (isLoading) {
@@ -165,6 +170,13 @@ export default function MyAmps() {
         amp={selectedAmp}
         onAllocate={allocateCapital}
         availableCapital={summary.available_capital}
+      />
+
+      <AmpSettingsModal
+        open={showSettingsModal}
+        onOpenChange={setShowSettingsModal}
+        amp={selectedAmp}
+        onSave={updateSettings}
       />
     </div>
   );
