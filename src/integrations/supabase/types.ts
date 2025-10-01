@@ -4677,7 +4677,15 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_user_amps_catalog"
+            columns: ["amp_id"]
+            isOneToOne: false
+            referencedRelation: "amp_catalog"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_briefings: {
         Row: {
