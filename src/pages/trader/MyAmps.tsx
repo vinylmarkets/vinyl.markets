@@ -67,7 +67,7 @@ export default function MyAmps() {
       <div className="container mx-auto p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold">My Trading Algorithms</h1>
+            <h1 className="text-3xl font-bold">Amps - My Trading Algorithms</h1>
             <p className="text-muted-foreground">Manage your active trading strategies</p>
           </div>
           <Button onClick={() => setShowAddModal(true)}>
