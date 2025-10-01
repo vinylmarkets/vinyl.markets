@@ -28,6 +28,7 @@ import {
   Target,
   BookOpen,
   Zap,
+  Radio,
   Search,
   Activity,
   Shield,
@@ -736,8 +737,8 @@ export const TradingDashboard = () => {
           <div className="flex items-center space-x-2 sm:space-x-4">
             {/* My Amps Button */}
             <Link to="/trader/amps">
-              <Button variant="outline" size="sm" className="h-8 px-3 text-xs">
-                <Zap className="h-3 w-3 mr-1" />
+              <Button variant="outline" size="sm" className="h-8 px-3 text-xs bg-[#2c2c2c] hover:bg-[#3c3c3c] text-success border-success/30 hover:border-success/50">
+                <Radio className="h-3 w-3 mr-1" />
                 <span className="hidden sm:inline">My Amps</span>
               </Button>
             </Link>
