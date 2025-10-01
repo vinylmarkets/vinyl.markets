@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { RefreshCw, AlertCircle, CheckCircle, FileSearch, Activity, Clock } from "lucide-react";
+import { RefreshCw, AlertCircle, CheckCircle, FileSearch, Activity, Clock, SkipForward } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -26,6 +26,7 @@ export const DocumentReprocessing = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isOcrProcessing, setIsOcrProcessing] = useState(false);
   const [cancelOcr, setCancelOcr] = useState(false);
+  const skipCurrentPageRef = useRef(false);
   const [stats, setStats] = useState<{
     total: number;
     failed: number;
@@ -228,10 +229,20 @@ export const DocumentReprocessing = () => {
 
     for (let pageNum = 1; pageNum <= pageCount; pageNum++) {
       if (cancelOcr) {
+        console.log(`🛑 ${filename}: OCR cancelled by user`);
         throw new Error('OCR cancelled by user');
       }
 
+      if (skipCurrentPageRef.current) {
+        console.log(`⏭️ ${filename}: Skipping page ${pageNum}/${pageCount} (user requested)`);
+        addActivityLog(filename, 'processing', `Skipped page ${pageNum}`);
+        fullText += `\n--- Page ${pageNum} (SKIPPED) ---\n[Skipped by user]\n`;
+        skipCurrentPageRef.current = false;
+        continue;
+      }
+
       console.log(`📄 ${filename}: Processing page ${pageNum}/${pageCount}`);
+      addActivityLog(filename, 'processing', `Processing page ${pageNum}/${pageCount}`);
       setOcrProgress(prev => prev ? {
         ...prev,
         stage: `Processing page ${pageNum} of ${pageCount}...`
@@ -280,9 +291,11 @@ export const DocumentReprocessing = () => {
 
         fullText += `\n--- Page ${pageNum} ---\n${pageText}\n`;
         console.log(`✓ ${filename}: Page ${pageNum} complete (${pageText.length} chars)`);
+        addActivityLog(filename, 'processing', `Page ${pageNum} complete`);
       } catch (pageError) {
         const errorMsg = pageError instanceof Error ? pageError.message : 'Unknown error';
         console.error(`✗ ${filename}: Page ${pageNum} failed - ${errorMsg}`);
+        addActivityLog(filename, 'failed', `Page ${pageNum} failed: ${errorMsg}`);
         fullText += `\n--- Page ${pageNum} (FAILED: ${errorMsg}) ---\n[OCR failed or timed out]\n`;
       }
     }
@@ -862,13 +875,29 @@ export const DocumentReprocessing = () => {
               </Button>
               
               {isOcrProcessing && (
-                <Button
-                  onClick={() => setCancelOcr(true)}
-                  variant="destructive"
-                  size="sm"
-                >
-                  Cancel
-                </Button>
+                <>
+                  <Button
+                    onClick={() => {
+                      skipCurrentPageRef.current = true;
+                      toast({
+                        title: "Skipping Page",
+                        description: "Will skip the current page and continue to next",
+                      });
+                    }}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <SkipForward className="mr-1 h-3 w-3" />
+                    Skip Page
+                  </Button>
+                  <Button
+                    onClick={() => setCancelOcr(true)}
+                    variant="destructive"
+                    size="sm"
+                  >
+                    Cancel
+                  </Button>
+                </>
               )}
             </div>
           )}
