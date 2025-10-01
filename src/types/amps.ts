@@ -60,6 +60,7 @@ export interface CatalogAmp {
   version: string;
   parameter_schema: any;
   default_settings: any;
+  image_url: string | null;
   created_at: string;
 }
 

@@ -314,6 +314,7 @@ export type Database = {
           default_settings: Json | null
           description: string | null
           id: string
+          image_url: string | null
           name: string
           parameter_schema: Json | null
           version: string | null
@@ -324,6 +325,7 @@ export type Database = {
           default_settings?: Json | null
           description?: string | null
           id: string
+          image_url?: string | null
           name: string
           parameter_schema?: Json | null
           version?: string | null
@@ -334,6 +336,7 @@ export type Database = {
           default_settings?: Json | null
           description?: string | null
           id?: string
+          image_url?: string | null
           name?: string
           parameter_schema?: Json | null
           version?: string | null

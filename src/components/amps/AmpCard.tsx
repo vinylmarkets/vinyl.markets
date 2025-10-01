@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { UserAmp } from '@/types/amps';
 import { Settings } from 'lucide-react';
 import { useState } from 'react';
+import tubeAmpImage from '@/assets/vintage-tube-amp.jpg';
 
 interface AmpCardProps {
   amp: UserAmp;
@@ -29,26 +30,45 @@ export function AmpCard({ amp, onToggle, onAllocate, onSettings }: AmpCardProps)
   const pnlColor = (amp.today_pnl || 0) >= 0 ? 'text-green-500' : 'text-red-500';
 
   return (
-    <Card className={`p-6 transition-all ${amp.is_active ? 'border-green-500 border-2' : 'border-border'}`}>
-      {/* Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-lg font-semibold">{amp.name}</h3>
-            {amp.is_active && (
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-            )}
-          </div>
-          <Badge variant="secondary" className="text-xs">
-            {amp.catalog?.category || 'momentum'}
-          </Badge>
+    <Card className={`overflow-hidden transition-all ${amp.is_active ? 'border-green-500 border-2' : 'border-border'}`}>
+      {/* Featured Image */}
+      {amp.catalog?.image_url && (
+        <div className="relative w-full aspect-video overflow-hidden">
+          <img 
+            src={tubeAmpImage} 
+            alt={amp.name}
+            className="w-full h-full object-cover"
+          />
         </div>
-        <Switch
-          checked={amp.is_active}
-          onCheckedChange={handleToggle}
-          disabled={isToggling}
-        />
-      </div>
+      )}
+      
+      <div className="p-6">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="text-lg font-semibold">{amp.name}</h3>
+              {amp.is_active && (
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              )}
+            </div>
+            <Badge variant="secondary" className="text-xs">
+              {amp.catalog?.category || 'momentum'}
+            </Badge>
+          </div>
+          <Switch
+            checked={amp.is_active}
+            onCheckedChange={handleToggle}
+            disabled={isToggling}
+          />
+        </div>
+
+        {/* Description */}
+        {amp.catalog?.description && (
+          <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+            {amp.catalog.description}
+          </p>
+        )}
 
       {/* Capital Section */}
       <div className="space-y-3 mb-4">
@@ -104,12 +124,13 @@ export function AmpCard({ amp, onToggle, onAllocate, onSettings }: AmpCardProps)
         Settings
       </Button>
 
-      {/* Warning if no capital */}
-      {amp.allocated_capital <= 0 && (
-        <div className="mt-3 p-2 bg-yellow-500/10 border border-yellow-500/20 rounded text-xs text-yellow-600">
-          ⚠️ No capital allocated
-        </div>
-      )}
+        {/* Warning if no capital */}
+        {amp.allocated_capital <= 0 && (
+          <div className="mt-3 p-2 bg-yellow-500/10 border border-yellow-500/20 rounded text-xs text-yellow-600">
+            ⚠️ No capital allocated
+          </div>
+        )}
+      </div>
     </Card>
   );
 }
