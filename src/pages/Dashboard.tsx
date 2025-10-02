@@ -3,7 +3,6 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { BlogGrid } from "@/components/blog/BlogGrid";
 import { PaperTradingLeaderboard } from "@/components/dashboard/PaperTradingLeaderboard";
 import { FollowedStocks } from "@/components/dashboard/FollowedStocks";
 import { AlertCircle } from "lucide-react";
@@ -134,20 +133,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Latest Articles Section */}
-        <div className={`mb-8 transition-all duration-700 ${contentReady ? 'opacity-100 animate-fade-in' : 'opacity-0'}`} style={{ animationDelay: '150ms' }}>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold text-foreground">Latest Articles</h2>
-            <Link 
-              to="/articles" 
-              className="text-primary hover:text-primary/80 transition-colors font-medium"
-            >
-              View All Articles →
-            </Link>
-          </div>
-          <BlogGrid />
-        </div>
-
         {/* Dashboard Widgets Section */}
         <div className={`grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 transition-all duration-700 ${contentReady ? 'opacity-100 animate-fade-in' : 'opacity-0'}`} style={{ animationDelay: '300ms' }}>
           <FollowedStocks />
@@ -158,18 +143,18 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Educational Disclaimer */}
+        {/* Risk Disclaimer */}
         <Card className={`border-2 border-muted transition-all duration-700 ${contentReady ? 'opacity-100 animate-fade-in' : 'opacity-0'}`} style={{ animationDelay: '450ms' }}>
           <CardContent className="pt-6">
             <div className="flex items-start gap-3">
               <AlertCircle className="h-5 w-5 text-destructive mt-0.5 flex-shrink-0" />
               <div className="space-y-2">
-                <h3 className="font-semibold text-sm">Educational Platform Notice</h3>
+                <h3 className="font-semibold text-sm">Trading Risk Notice</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  AtomicMarket provides educational market analysis and research for learning purposes only. 
-                  This is not investment advice, financial advice, or recommendations to buy or sell securities. 
-                  All content is for educational and informational purposes. Please consult with qualified 
-                  financial professionals before making investment decisions.
+                  Trading involves substantial risk of loss and is not suitable for all investors. 
+                  Past performance is not indicative of future results. You should carefully consider 
+                  whether trading is suitable for you in light of your experience, objectives, financial 
+                  resources and other relevant circumstances.
                 </p>
               </div>
             </div>

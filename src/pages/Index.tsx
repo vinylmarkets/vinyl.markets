@@ -1,46 +1,20 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Navigation } from "@/components/Navigation";
 import { TickerBanner } from "@/components/TickerBanner";
-import heroGradientBackground from "../assets/hero-gradient-background.jpg";
+import { Link } from "react-router-dom";
 
 import { 
   TrendingUp, 
-  BookOpen, 
-  Eye, 
-  Terminal, 
-  CheckCircle, 
-  AlertTriangle,
+  Bot, 
+  Shield,
+  Zap,
   BarChart3,
-  FileText,
-  Users,
-  Shield
+  Mail,
+  ExternalLink
 } from "lucide-react";
 
 export default function Index() {
-  console.log('Index component is rendering');
-  console.log('Background image path:', '/home_background.jpg');
-  
-  const [toggleState, setToggleState] = useState<'academic' | 'plain'>('plain');
-
-  console.log('Index component state initialized');
-
-  const sampleBriefing = {
-    academic: {
-      title: "Market Microstructure Analysis: Options Flow Asymmetry",
-      content: "Today's options flow exhibits significant put/call ratio deviations (1.2x above 30-day mean) concentrated in financials sector. Utilizing Pan & Poteshman (2006) methodology, unusual options activity suggests informed trading preceding earnings announcements. The Cremers-Weinbaum (2010) deviations-from-put-call-parity framework indicates potential price discovery inefficiencies in XLF constituents.",
-      confidence: "Based on 5 peer-reviewed studies, 12 data sources"
-    },
-    plain: {
-      title: "Big Money is Betting Against Banks",
-      content: "Unusual options activity shows smart money buying protective puts in banking stocks - 20% more than usual. This often happens before big news or earnings. When professional traders make these moves, it sometimes signals they expect prices to drop. We're seeing this pattern in major bank stocks like JPM and BAC.",
-      confidence: "Based on proven research methods, explained in simple terms"
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -53,50 +27,65 @@ export default function Index() {
           <div className="space-y-8">
             <h1 className="text-5xl md:text-7xl font-display font-bold leading-tight">
               <span className="bg-gradient-primary bg-clip-text text-transparent">
-                Market Analytics
+                Algorithmic Trading
               </span>
               <br />
-              <span className="text-foreground">You Can Understand</span>
+              <span className="text-foreground">Automated</span>
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Get daily market analysis with complete transparency - no black box algorithms
+              Deploy pre-built trading algorithms (Amps) that execute automatically based on market signals
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button 
                 size="lg" 
                 className="text-lg px-8 py-6 h-auto font-medium"
+                asChild
               >
-                Start Learning Free
+                <Link to="/trader-auth">
+                  Access Trading Platform
+                </Link>
               </Button>
               <Button 
                 size="lg" 
                 variant="outline"
                 className="text-lg px-8 py-6 h-auto font-medium"
+                asChild
               >
-                View Research
+                <a href="https://vinyl.finance" target="_blank" rel="noopener noreferrer">
+                  Learn More <ExternalLink className="ml-2 h-4 w-4" />
+                </a>
               </Button>
             </div>
             
             <p className="text-sm text-muted-foreground">
-              No credit card required • Educational content only
+              Trading involves risk • For whitelisted beta users only
             </p>
           </div>
         </div>
       </section>
 
-      {/* Value Propositions */}
+      {/* What Are Amps */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto max-w-6xl px-4">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-display font-bold text-foreground mb-4">
+              What Are Amps?
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Amps (Algorithmic Market Participants) are pre-built trading strategies that run automatically on your behalf
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <Card className="border-0 shadow-fillow hover:shadow-fillow-lg transition-all duration-300">
               <CardContent className="p-6 text-center">
                 <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <BookOpen className="h-6 w-6 text-primary" />
+                  <Bot className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="font-display font-semibold text-lg mb-2">Academic & Plain Speak</h3>
+                <h3 className="font-display font-semibold text-lg mb-2">Automated Execution</h3>
                 <p className="text-muted-foreground text-sm">
-                  Choose your explanation style - from peer-reviewed research to everyday language
+                  Amps monitor markets 24/7 and execute trades automatically when conditions are met
                 </p>
               </CardContent>
             </Card>
@@ -104,11 +93,11 @@ export default function Index() {
             <Card className="border-0 shadow-fillow hover:shadow-fillow-lg transition-all duration-300">
               <CardContent className="p-6 text-center">
                 <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <Eye className="h-6 w-6 text-accent" />
+                  <Zap className="h-6 w-6 text-accent" />
                 </div>
-                <h3 className="font-display font-semibold text-lg mb-2">Complete Transparency</h3>
+                <h3 className="font-display font-semibold text-lg mb-2">Customizable Settings</h3>
                 <p className="text-muted-foreground text-sm">
-                  See exactly how we reach every conclusion - methodology fully exposed
+                  Adjust risk parameters, position sizes, and timing to match your trading style
                 </p>
               </CardContent>
             </Card>
@@ -118,21 +107,9 @@ export default function Index() {
                 <div className="w-12 h-12 bg-success/10 rounded-lg flex items-center justify-center mx-auto mb-4">
                   <Shield className="h-6 w-6 text-success" />
                 </div>
-                <h3 className="font-display font-semibold text-lg mb-2">Educational Focus</h3>
+                <h3 className="font-display font-semibold text-lg mb-2">Built-in Risk Management</h3>
                 <p className="text-muted-foreground text-sm">
-                  Learn market analysis - this is education, not investment advice
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card className="border-0 shadow-fillow hover:shadow-fillow-lg transition-all duration-300">
-              <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-warning/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <Terminal className="h-6 w-6 text-warning" />
-                </div>
-                <h3 className="font-display font-semibold text-lg mb-2">AI-Powered Ask AtomicMarket</h3>
-                <p className="text-muted-foreground text-sm">
-                  Interactive terminal for personalized market education and analysis
+                  Automatic stop losses, position limits, and daily loss caps protect your capital
                 </p>
               </CardContent>
             </Card>
@@ -140,239 +117,85 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Sample Intelligence Briefing */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto max-w-4xl">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-headline font-bold text-foreground mb-4 uppercase">
-              DAILY INTELLIGENCE BRIEFING
-            </h2>
-            <p className="text-muted-foreground">
-              See how we transform complex market data into clear, educational insights
-            </p>
-          </div>
-
-          {/* Toggle Controls */}
-          <div className="flex justify-center mb-8">
-            <div className="bg-muted rounded-lg p-1 flex">
-              <Button
-                variant={toggleState === 'plain' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setToggleState('plain')}
-                className="rounded-md"
-              >
-                Plain Speak
-              </Button>
-              <Button
-                variant={toggleState === 'academic' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setToggleState('academic')}
-                className="rounded-md"
-              >
-                Academic
-              </Button>
-            </div>
-          </div>
-
-          {/* Sample Content */}
-          <Card className="border-2">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div>
-                  <CardTitle className="text-xl font-serif">
-                    {sampleBriefing[toggleState].title}
-                  </CardTitle>
-                  <Badge variant="secondary" className="mt-2">
-                    Today's Market Intelligence
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-primary" />
-                  <span className="text-sm font-medium">High Confidence</span>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-foreground mb-4 leading-relaxed">
-                {sampleBriefing[toggleState].content}
-              </p>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <CheckCircle className="h-4 w-4" />
-                {sampleBriefing[toggleState].confidence}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section className="py-16 px-4 bg-muted/30">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-serif font-bold text-foreground mb-4">
-              Choose Your Learning Path
-            </h2>
-            <p className="text-muted-foreground">
-              All plans focused on education and transparency
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {/* Free Plan */}
-            <Card className="relative border-2">
-              <CardHeader>
-                <CardTitle className="text-xl">Free</CardTitle>
-                <div className="text-3xl font-bold">$0</div>
-                <p className="text-muted-foreground text-sm">Perfect for getting started</p>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    <span className="text-sm">Daily market briefing</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    <span className="text-sm">Academic/Plain speak toggle</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    <span className="text-sm">Research methodology access</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    <span className="text-sm">5 Ask AtomicMarket queries/day</span>
-                  </li>
-                </ul>
-                <Button className="w-full mt-6" variant="outline">
-                  Start Free
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Essential Plan */}
-            <Card className="relative border-2 border-secondary shadow-lg">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-secondary text-secondary-foreground">Most Popular</Badge>
-              </div>
-              <CardHeader>
-                <CardTitle className="text-xl">Essential</CardTitle>
-                <div className="text-3xl font-bold">$29<span className="text-lg font-normal text-muted-foreground">/month</span></div>
-                <p className="text-muted-foreground text-sm">For serious market students</p>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-secondary" />
-                    <span className="text-sm">Everything in Free</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-secondary" />
-                    <span className="text-sm">Sector-specific analysis</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-secondary" />
-                    <span className="text-sm">Options flow intelligence</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-secondary" />
-                    <span className="text-sm">100 Ask AtomicMarket queries/day</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-secondary" />
-                    <span className="text-sm">Weekly deep-dive reports</span>
-                  </li>
-                </ul>
-                <Button className="w-full mt-6 bg-secondary hover:bg-secondary/90 text-secondary-foreground">
-                  Start Essential
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Pro Plan */}
-            <Card className="relative border-2">
-              <CardHeader>
-                <CardTitle className="text-xl">Pro</CardTitle>
-                <div className="text-3xl font-bold">$79<span className="text-lg font-normal text-muted-foreground">/month</span></div>
-                <p className="text-muted-foreground text-sm">For advanced researchers</p>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-secondary" />
-                    <span className="text-sm">Everything in Essential</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-secondary" />
-                    <span className="text-sm">Real-time alerts</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-secondary" />
-                    <span className="text-sm">Custom research requests</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-secondary" />
-                    <span className="text-sm">Unlimited AtomicMarket</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-secondary" />
-                    <span className="text-sm">API access for researchers</span>
-                  </li>
-                </ul>
-                <Button className="w-full mt-6" variant="outline">
-                  Start Pro
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Showcase */}
+      {/* Platform Features */}
       <section className="py-16 px-4">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-serif font-bold text-foreground mb-4">
-              Built for Market Education
+            <h2 className="text-3xl font-display font-bold text-foreground mb-4">
+              Trading Platform Features
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 gap-8">
             <Card>
               <CardHeader>
                 <BarChart3 className="h-8 w-8 text-primary mb-2" />
-                <CardTitle className="text-lg">Real-Time Analysis</CardTitle>
+                <CardTitle className="text-lg">Performance Tracking</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm">
-                  Live market data transformed into educational insights with full methodology transparency.
+                  Monitor real-time performance, track P&L, and analyze your Amps' execution history.
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <FileText className="h-8 w-8 text-primary mb-2" />
-                <CardTitle className="text-lg">Research Archive</CardTitle>
+                <TrendingUp className="h-8 w-8 text-primary mb-2" />
+                <CardTitle className="text-lg">Capital Allocation</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm">
-                  Access our complete library of academic research and methodology explanations.
+                  Allocate capital across multiple Amps and adjust allocations as markets change.
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <Users className="h-8 w-8 text-primary mb-2" />
-                <CardTitle className="text-lg">Community Learning</CardTitle>
+                <Shield className="h-8 w-8 text-primary mb-2" />
+                <CardTitle className="text-lg">Broker Integration</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm">
-                  Join discussions with fellow market students and contribute to research validation.
+                  Connect with Alpaca for seamless execution and real-time position tracking.
                 </p>
               </CardContent>
             </Card>
+
+            <Card>
+              <CardHeader>
+                <Mail className="h-8 w-8 text-primary mb-2" />
+                <CardTitle className="text-lg">Daily Newsletter</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm">
+                  Receive daily market analysis and performance summaries in your inbox.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 px-4 bg-muted/30">
+        <div className="container mx-auto max-w-4xl text-center">
+          <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">
+            Ready to Start Trading?
+          </h2>
+          <p className="text-xl text-muted-foreground mb-8">
+            Join the beta and get access to the Vinyl trading platform
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" asChild>
+              <Link to="/trader-auth">Access Platform</Link>
+            </Button>
+            <Button size="lg" variant="outline" asChild>
+              <a href="https://vinyl.finance" target="_blank" rel="noopener noreferrer">
+                Learn More About Vinyl <ExternalLink className="ml-2 h-4 w-4" />
+              </a>
+            </Button>
           </div>
         </div>
       </section>
@@ -382,72 +205,50 @@ export default function Index() {
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
             <div>
-              <h3 className="font-semibold mb-4">Product</h3>
+              <h3 className="font-semibold mb-4">Platform</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="/research" className="hover:text-foreground transition-colors">Research</a></li>
-                <li><a href="/research/methodology" className="hover:text-foreground transition-colors">Methodology</a></li>
-                <li><a href="/research/data-sources" className="hover:text-foreground transition-colors">Data Sources</a></li>
+                <li><Link to="/trader-auth" className="hover:text-foreground transition-colors">Trading Platform</Link></li>
+                <li><Link to="/trader/amps" className="hover:text-foreground transition-colors">My Amps</Link></li>
+                <li><Link to="/trader/performance" className="hover:text-foreground transition-colors">Performance</Link></li>
               </ul>
             </div>
             
             <div>
-              <h3 className="font-semibold mb-4">Company</h3>
+              <h3 className="font-semibold mb-4">Resources</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Team</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Careers</a></li>
+                <li><a href="https://vinyl.finance" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Vinyl.finance</a></li>
+                <li><Link to="/trader/help" className="hover:text-foreground transition-colors">Help & Support</Link></li>
               </ul>
             </div>
             
             <div>
               <h3 className="font-semibold mb-4">Legal</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a></li>
                 <li><a href="#" className="hover:text-foreground transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Disclaimers</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colors">Risk Disclosure</a></li>
               </ul>
             </div>
             
             <div>
-              <h3 className="font-semibold mb-4">Support</h3>
+              <h3 className="font-semibold mb-4">Company</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Contact</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Community</a></li>
+                <li><a href="https://vinyl.finance/about" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">About</a></li>
+                <li><a href="mailto:support@vinyl.markets" className="hover:text-foreground transition-colors">Contact</a></li>
               </ul>
             </div>
           </div>
           
-          <Separator className="mb-8" />
-          
-          {/* Compliance Disclaimers */}
-          <div className="space-y-4 text-xs text-muted-foreground">
-            <div className="flex items-start gap-2">
-              <AlertTriangle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
-              <p>
-                <strong>Educational Content Only:</strong> AtomicMarket provides educational market analysis and research. This is not investment advice, financial advice, or recommendations to buy or sell securities. All content is for educational and informational purposes only.
+          <div className="border-t border-border pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+              <p className="text-sm text-muted-foreground">
+                © 2025 Vinyl Markets. All rights reserved.
+              </p>
+              <p className="text-xs text-muted-foreground text-center md:text-right max-w-2xl">
+                Trading involves substantial risk and is not suitable for all investors. Past performance is not indicative of future results. 
+                This platform is for authorized users only.
               </p>
             </div>
-            
-            <div className="flex items-start gap-2">
-              <AlertTriangle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
-              <p>
-                <strong>Risk Disclosure:</strong> Trading and investing involves substantial risk of loss and is not suitable for all investors. Past performance does not guarantee future results. You should carefully consider your financial situation and consult with financial professionals before making investment decisions.
-              </p>
-            </div>
-            
-            <div className="flex items-start gap-2">
-              <AlertTriangle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
-              <p>
-                <strong>No Financial Services:</strong> AtomicMarket is not a registered investment advisor, broker-dealer, or financial services provider. We do not provide personalized investment advice or manage assets. Our platform is designed for educational purposes and market research transparency.
-              </p>
-            </div>
-          </div>
-          
-          <Separator className="my-8" />
-          
-          <div className="text-center text-sm text-muted-foreground">
-            <p>&copy; 2025 AtomicMarket. All rights reserved. Built for market education and research transparency.</p>
           </div>
         </div>
       </footer>
