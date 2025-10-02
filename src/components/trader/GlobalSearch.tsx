@@ -257,11 +257,14 @@ export const GlobalSearch = ({ open, onOpenChange }: GlobalSearchProps) => {
 
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
-      <CommandInput 
-        placeholder="Search stocks, amps, positions, or pages..." 
-        value={searchQuery}
-        onValueChange={setSearchQuery}
-      />
+      <div className="[&_[cmdk-input]]:text-muted-foreground">
+        <CommandInput 
+          placeholder="Search stocks, amps, positions, or pages..." 
+          value={searchQuery}
+          onValueChange={setSearchQuery}
+          className="text-muted-foreground"
+        />
+      </div>
       <CommandList>
         {!searchQuery && recentSearches.length > 0 && (
           <>
