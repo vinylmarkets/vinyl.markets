@@ -670,10 +670,11 @@ export const TradingDashboard = () => {
   }, [priceUpdateInterval]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 pointer-events-none"></div>
       {/* Top Header Bar */}
       <header 
-        className="h-16 border-b relative overflow-hidden"
+        className="h-16 border-b relative overflow-hidden z-10"
         style={woodHeaderEnabled ? {
           background: '#5a3a1a',
           borderColor: '#5a3a1a',
@@ -765,7 +766,7 @@ export const TradingDashboard = () => {
 
       {/* Broker Integration Status - Only show if no integrations */}
       {!hasIntegrations && (
-        <div className="p-2 sm:p-4">
+        <div className="p-2 sm:p-4 relative z-10">
           <Card className="border-yellow-200 bg-yellow-50 border-l-4 border-l-yellow-500">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
@@ -792,7 +793,7 @@ export const TradingDashboard = () => {
       )}
 
       {/* Compact Bento Grid Layout */}
-      <div className="p-2 sm:p-4">
+      <div className="p-2 sm:p-4 relative z-10">
         <div className="grid grid-cols-12 gap-3">
           {/* Left Column - Account & Stats */}
           <div className="col-span-12 lg:col-span-3 space-y-3">
