@@ -221,20 +221,20 @@ export const MarketNewsCard = () => {
   // Render loading state
   if (loading && news.length === 0) {
     return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Newspaper className="h-5 w-5" style={{ color: '#5a3a1a' }} />
-            News for Your Portfolio
+      <Card className="w-full !shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)] transition-shadow duration-200">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Newspaper className="h-4 w-4" style={{ color: '#5a3a1a' }} />
+            <span>News for Your Portfolio</span>
           </CardTitle>
-          <CardDescription>Loading personalized market news...</CardDescription>
+          <CardDescription className="text-xs">Loading personalized market news...</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
+        <CardContent className="space-y-3">
+          <div className="space-y-3">
             {[1, 2, 3, 4, 5].map((i) => (
               <div key={i} className="space-y-2">
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-3 w-1/2" />
+                <Skeleton className="h-3 w-3/4" />
+                <Skeleton className="h-2 w-1/2" />
               </div>
             ))}
           </div>
@@ -246,19 +246,19 @@ export const MarketNewsCard = () => {
   // Render error state
   if (error) {
     return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Newspaper className="h-5 w-5" style={{ color: '#5a3a1a' }} />
-            News for Your Portfolio
+      <Card className="w-full !shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)] transition-shadow duration-200">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Newspaper className="h-4 w-4" style={{ color: '#5a3a1a' }} />
+            <span>News for Your Portfolio</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center justify-center py-8 text-center">
-            <AlertCircle className="h-12 w-12 text-destructive mb-4" />
-            <p className="text-muted-foreground mb-4">{error}</p>
-            <Button onClick={() => loadNews(true)} variant="outline">
-              <RefreshCw className="h-4 w-4 mr-2" />
+          <div className="flex flex-col items-center justify-center py-6 text-center">
+            <AlertCircle className="h-10 w-10 text-destructive mb-3" />
+            <p className="text-muted-foreground text-sm mb-3">{error}</p>
+            <Button onClick={() => loadNews(true)} variant="outline" size="sm">
+              <RefreshCw className="h-3 w-3 mr-2" />
               Retry
             </Button>
           </div>
@@ -270,17 +270,17 @@ export const MarketNewsCard = () => {
   // Render empty state
   if (userSymbols.length === 0) {
     return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Newspaper className="h-5 w-5" style={{ color: '#5a3a1a' }} />
-            News for Your Portfolio
+      <Card className="w-full !shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)] transition-shadow duration-200">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Newspaper className="h-4 w-4" style={{ color: '#5a3a1a' }} />
+            <span>News for Your Portfolio</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center justify-center py-8 text-center">
-            <Newspaper className="h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">
+          <div className="flex flex-col items-center justify-center py-6 text-center">
+            <Newspaper className="h-10 w-10 text-muted-foreground mb-3" />
+            <p className="text-muted-foreground text-sm">
               Add stocks to your portfolio or watchlist to see relevant market news
             </p>
           </div>
@@ -291,16 +291,16 @@ export const MarketNewsCard = () => {
 
   // Render news list
   return (
-    <Card className="w-full">
-      <CardHeader>
+    <Card className="w-full !shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)] transition-shadow duration-200">
+      <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2">
-              <Newspaper className="h-5 w-5" style={{ color: '#5a3a1a' }} />
-              News for Your Portfolio
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Newspaper className="h-4 w-4" style={{ color: '#5a3a1a' }} />
+              <span>Market News</span>
             </CardTitle>
-            <CardDescription>
-              {news.length} recent articles · Tracking {userSymbols.length} symbols
+            <CardDescription className="text-xs">
+              {news.length} articles · {userSymbols.length} symbols
             </CardDescription>
           </div>
           <Button 
@@ -308,45 +308,46 @@ export const MarketNewsCard = () => {
             size="icon"
             onClick={() => loadNews(true)}
             disabled={loading}
+            className="h-7 w-7"
           >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
       </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-[600px] pr-4">
-          <div className="space-y-4">
+      <CardContent className="space-y-3">
+        <ScrollArea className="h-[500px] pr-2">
+          <div className="space-y-3">
             {news.map((article) => (
               <div
                 key={article.id}
-                className="border-b border-border pb-4 last:border-0 hover:bg-accent/50 -mx-2 px-2 py-2 rounded-lg transition-colors"
+                className="border-b border-border pb-3 last:border-0 hover:bg-muted/30 -mx-1 px-2 py-2 rounded transition-colors"
               >
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-2">
                   {article.image_url && (
                     <img
                       src={article.image_url}
                       alt=""
-                      className="w-20 h-20 object-cover rounded flex-shrink-0"
+                      className="w-16 h-16 object-cover rounded flex-shrink-0"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
                       }}
                     />
                   )}
                   <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap gap-1 mb-2">
+                    <div className="flex flex-wrap gap-1 mb-1">
                       {isBreaking(article.published_utc) && (
-                        <Badge variant="destructive" className="text-xs">
+                        <Badge variant="destructive" className="text-[10px] h-4 px-1">
                           Breaking
                         </Badge>
                       )}
-                      {article.tickers.slice(0, 3).map((ticker) => (
-                        <Badge key={ticker} variant="secondary" className="text-xs">
+                      {article.tickers.slice(0, 2).map((ticker) => (
+                        <Badge key={ticker} variant="secondary" className="text-[10px] h-4 px-1">
                           {ticker}
                         </Badge>
                       ))}
-                      {article.tickers.length > 3 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{article.tickers.length - 3}
+                      {article.tickers.length > 2 && (
+                        <Badge variant="outline" className="text-[10px] h-4 px-1">
+                          +{article.tickers.length - 2}
                         </Badge>
                       )}
                     </div>
@@ -354,13 +355,13 @@ export const MarketNewsCard = () => {
                       href={article.article_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-medium hover:text-primary transition-colors line-clamp-2 mb-1 flex items-start gap-1"
+                      className="text-sm font-medium hover:text-primary transition-colors line-clamp-2 mb-1 flex items-start gap-1"
                     >
                       {article.title}
                       <ExternalLink className="h-3 w-3 flex-shrink-0 mt-0.5" />
                     </a>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <span>{article.publisher.name}</span>
+                    <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                      <span className="truncate max-w-[100px]">{article.publisher.name}</span>
                       <span>·</span>
                       <span>
                         {formatDistanceToNow(new Date(article.published_utc), {
@@ -374,9 +375,9 @@ export const MarketNewsCard = () => {
             ))}
           </div>
         </ScrollArea>
-        <div className="mt-4 pt-4 border-t border-border">
-          <p className="text-xs text-muted-foreground text-center">
-            News provided by Polygon.io for informational purposes only. Not investment advice.
+        <div className="pt-3 border-t border-border">
+          <p className="text-[10px] text-muted-foreground text-center">
+            News via Polygon.io · Not investment advice
           </p>
         </div>
       </CardContent>
