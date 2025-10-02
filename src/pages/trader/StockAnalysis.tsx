@@ -51,7 +51,7 @@ const StockAnalysis = () => {
     return { ma20, ma50, ma200, rsi };
   }, [aggregates]);
 
-  const currentPrice = snapshot?.day?.c || snapshot?.prevDay?.c || 0;
+  const currentPrice = snapshot?.day?.c || snapshot?.prevDay?.c || details?.market_cap ? (details.market_cap / (details.weighted_shares_outstanding || 1)) : 0;
   const priceChange = snapshot?.todaysChange || 0;
   const priceChangePercent = snapshot?.todaysChangePerc || 0;
   const isPositive = priceChange >= 0;
@@ -123,6 +123,11 @@ const StockAnalysis = () => {
                       <Badge variant={getMarketStatus(snapshot?.updated) === 'Open' ? 'default' : 'secondary'}>
                         {getMarketStatus(snapshot?.updated)}
                       </Badge>
+                      {!snapshotLoading && snapshot && (
+                        <span className="text-xs text-muted-foreground">
+                          Previous day's close
+                        </span>
+                      )}
                     </>
                   )}
                 </div>
@@ -190,7 +195,15 @@ const StockAnalysis = () => {
             <CardContent>
               {aggregatesLoading ? (
                 <Skeleton className="h-[400px] w-full" />
-              ) : aggregates && aggregates.length > 0 ? (
+              ) : !aggregates || aggregates.length === 0 ? (
+                <div className="h-[400px] flex flex-col items-center justify-center text-muted-foreground space-y-4">
+                  <AlertCircle className="h-12 w-12" />
+                  <div className="text-center space-y-2">
+                    <p className="font-medium">Chart data temporarily unavailable</p>
+                    <p className="text-sm">API rate limit reached. Please wait a moment and refresh.</p>
+                  </div>
+                </div>
+              ) : (
                 <Plot
                   data={[
                     chartType === 'candlestick' ? {
@@ -259,10 +272,6 @@ const StockAnalysis = () => {
                   config={{ responsive: true, displayModeBar: false }}
                   style={{ width: '100%' }}
                 />
-              ) : (
-                <div className="h-[400px] flex items-center justify-center text-muted-foreground">
-                  No chart data available
-                </div>
               )}
             </CardContent>
           </Card>

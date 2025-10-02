@@ -122,32 +122,12 @@ export const GlobalSearch = ({ className }: GlobalSearchProps) => {
     }
   };
 
-  // Fetch stock prices
+  // Fetch stock prices - removed to reduce API calls
+  // Prices will be shown on the stock detail page instead
   const fetchStockPrices = async (stocks: StockSearchResult[]) => {
-    const prices: Record<string, { price: number; change: number }> = {};
-    
-    for (const stock of stocks) {
-      try {
-        const response = await fetch(
-          `https://api.polygon.io/v2/aggs/ticker/${stock.ticker}/prev?adjusted=true&apiKey=${POLYGON_API_KEY}`
-        );
-        
-        if (response.ok) {
-          const data = await response.json();
-          if (data.results?.[0]) {
-            const result = data.results[0];
-            prices[stock.ticker] = {
-              price: result.c,
-              change: ((result.c - result.o) / result.o) * 100
-            };
-          }
-        }
-      } catch (e) {
-        console.error(`Price fetch error for ${stock.ticker}:`, e);
-      }
-    }
-    
-    setStockPrices(prices);
+    // Disabled to prevent rate limiting
+    // Users will see prices when they navigate to the stock page
+    setStockPrices({});
   };
 
   // Search amps and positions

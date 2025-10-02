@@ -121,16 +121,63 @@ export const useTickerSnapshot = (symbol: string) => {
   return useQuery({
     queryKey: ['tickerSnapshot', symbol],
     queryFn: async () => {
-      const response = await fetch(
-        `${BASE_URL}/v2/snapshot/locale/us/markets/stocks/tickers/${symbol}?apiKey=${POLYGON_API_KEY}`
-      );
-      if (!response.ok) throw new Error('Failed to fetch ticker snapshot');
-      const data = await response.json();
-      return data.ticker as TickerSnapshot;
+      try {
+        // Try snapshot endpoint first (requires paid plan)
+        const response = await fetch(
+          `${BASE_URL}/v2/snapshot/locale/us/markets/stocks/tickers/${symbol}?apiKey=${POLYGON_API_KEY}`
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          return data.ticker as TickerSnapshot;
+        }
+        
+        // Fallback to previous day's data (available on free tier)
+        if (response.status === 403 || response.status === 429) {
+          const prevDayResponse = await fetch(
+            `${BASE_URL}/v2/aggs/ticker/${symbol}/prev?adjusted=true&apiKey=${POLYGON_API_KEY}`
+          );
+          
+          if (prevDayResponse.ok) {
+            const prevData = await prevDayResponse.json();
+            if (prevData.results && prevData.results[0]) {
+              const result = prevData.results[0];
+              // Transform to snapshot format
+              return {
+                ticker: symbol,
+                todaysChangePerc: ((result.c - result.o) / result.o) * 100,
+                todaysChange: result.c - result.o,
+                updated: result.t,
+                day: {
+                  o: result.o,
+                  h: result.h,
+                  l: result.l,
+                  c: result.c,
+                  v: result.v,
+                  vw: result.vw,
+                },
+                prevDay: {
+                  o: result.o,
+                  h: result.h,
+                  l: result.l,
+                  c: result.c,
+                  v: result.v,
+                  vw: result.vw,
+                },
+              } as TickerSnapshot;
+            }
+          }
+        }
+        
+        throw new Error('Failed to fetch ticker data');
+      } catch (error) {
+        console.error('Error fetching ticker snapshot:', error);
+        throw error;
+      }
     },
     enabled: !!symbol,
-    refetchInterval: 30000, // 30 seconds
-    staleTime: 30000,
+    retry: 1,
+    staleTime: 60000, // 1 minute
   });
 };
 
@@ -147,11 +194,24 @@ export const useAggregates = (
       const response = await fetch(
         `${BASE_URL}/v2/aggs/ticker/${symbol}/range/${multiplier}/${timespan}/${from}/${to}?adjusted=true&sort=asc&apiKey=${POLYGON_API_KEY}`
       );
-      if (!response.ok) throw new Error('Failed to fetch aggregates');
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        
+        // If rate limited, return empty array with warning
+        if (response.status === 429) {
+          console.warn('Rate limited - please wait before requesting more data');
+          return [];
+        }
+        
+        throw new Error(errorData.error || 'Failed to fetch aggregates');
+      }
+      
       const data = await response.json();
-      return data.results as AggregateBar[];
+      return data.results as AggregateBar[] || [];
     },
     enabled: !!symbol && !!from && !!to,
+    retry: 1,
     staleTime: timespan === 'day' ? 60000 : 3600000, // 1 min for daily, 1 hour for others
   });
 };
