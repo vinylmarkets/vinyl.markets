@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Plus, TrendingUp, DollarSign, Zap, Activity, ArrowLeft } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Plus, TrendingUp, DollarSign, Zap, Activity } from 'lucide-react';
 import { useUserAmps } from '@/hooks/useUserAmps';
 import { AmpCard } from '@/components/amps/AmpCard';
 import { AddAmpModal } from '@/components/amps/AddAmpModal';
@@ -12,13 +14,20 @@ import { AmpSettingsModal } from '@/components/amps/AmpSettingsModal';
 import { UserAmp } from '@/types/amps';
 import { TraderHeader } from '@/trader-platform/components/TraderHeader';
 import { TraderProtection } from '@/components/trader/TraderProtection';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { useToast } from '@/hooks/use-toast';
 
 export default function MyAmps() {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const { amps, summary, isLoading, toggleAmpActive, allocateCapital, addAmp, updateSettings } = useUserAmps();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showAllocateModal, setShowAllocateModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [selectedAmp, setSelectedAmp] = useState<UserAmp | null>(null);
+  const [signalStats, setSignalStats] = useState<{ count: number; lastGenerated: string | null }>({ count: 0, lastGenerated: null });
+  const [autoTradeEnabled, setAutoTradeEnabled] = useState(false);
 
   const handleAllocateClick = (ampId: string) => {
     const amp = amps.find(a => a.id === ampId);
@@ -33,6 +42,79 @@ export default function MyAmps() {
     if (amp) {
       setSelectedAmp(amp);
       setShowSettingsModal(true);
+    }
+  };
+
+  // Load autotrading setting
+  useEffect(() => {
+    const savedSettings = localStorage.getItem('trader-settings');
+    if (savedSettings) {
+      const settings = JSON.parse(savedSettings);
+      setAutoTradeEnabled(settings.autoTradeEnabled || false);
+    }
+  }, []);
+
+  // Fetch signal stats
+  useEffect(() => {
+    const fetchSignalStats = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('trading_signals')
+          .select('created_at')
+          .eq('status', 'active')
+          .order('created_at', { ascending: false });
+        
+        if (!error && data) {
+          setSignalStats({
+            count: data.length,
+            lastGenerated: data[0]?.created_at || null
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch signal stats:', error);
+      }
+    };
+
+    fetchSignalStats();
+    const interval = setInterval(fetchSignalStats, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleAutoTradeToggle = async (checked: boolean) => {
+    setAutoTradeEnabled(checked);
+    
+    // Save to localStorage
+    const savedSettings = localStorage.getItem('trader-settings');
+    const settings = savedSettings ? JSON.parse(savedSettings) : {};
+    settings.autoTradeEnabled = checked;
+    localStorage.setItem('trader-settings', JSON.stringify(settings));
+    
+    // Save to database
+    try {
+      const { error } = await supabase
+        .from('user_settings')
+        .upsert([{
+          user_id: user?.id,
+          settings: settings as any
+        }]);
+        
+      if (error) {
+        console.error('Error saving autotrading setting:', error);
+        toast({
+          title: "Settings Updated Locally",
+          description: `Auto-trading ${checked ? 'enabled' : 'disabled'} in browser. May not sync with automated jobs.`,
+          variant: "default"
+        });
+      } else {
+        toast({
+          title: checked ? "Auto-Trading Enabled" : "Auto-Trading Disabled",
+          description: checked 
+            ? "Scheduled jobs will now execute trades automatically" 
+            : "Trades will require manual execution",
+        });
+      }
+    } catch (error) {
+      console.error('Error updating autotrading:', error);
     }
   };
 
@@ -79,7 +161,7 @@ export default function MyAmps() {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-primary/10 rounded-lg">
@@ -130,6 +212,55 @@ export default function MyAmps() {
               <p className="text-xl font-bold">{summary.active_amps}</p>
             </div>
           </div>
+        </Card>
+
+        {/* Trading Control Card */}
+        <Card className="p-4">
+          <CardHeader className="p-0 pb-2">
+            <CardTitle className="flex items-center justify-between text-sm">
+              <div className="flex items-center space-x-2">
+                <Zap className="h-4 w-4" style={{ color: '#5a3a1a' }} />
+                <span>Trading Control</span>
+              </div>
+              <Badge variant={signalStats.count > 0 ? "default" : "secondary"} className="text-xs">
+                {signalStats.count}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0 pt-3 space-y-3">
+            {/* Status */}
+            <div className="text-xs space-y-1 p-2 bg-muted/50 rounded">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Active Signals:</span>
+                <span className="font-medium">{signalStats.count}</span>
+              </div>
+              {signalStats.lastGenerated && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Last Generated:</span>
+                  <span className="font-medium">
+                    {new Date(signalStats.lastGenerated).toLocaleTimeString()}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Auto-Trading Toggle */}
+            <div className="flex items-center justify-between p-2 bg-muted/30 rounded-lg border">
+              <div className="space-y-0.5">
+                <div className="flex items-center space-x-2">
+                  <Zap className="h-3 w-3 text-accent" />
+                  <span className="font-medium text-xs">Auto-Trading</span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {autoTradeEnabled ? "Enabled" : "Disabled"}
+                </p>
+              </div>
+              <Switch
+                checked={autoTradeEnabled}
+                onCheckedChange={handleAutoTradeToggle}
+              />
+            </div>
+          </CardContent>
         </Card>
         </div>
 

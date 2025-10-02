@@ -619,7 +619,7 @@ export const TradingDashboard = () => {
             <Card className="!shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)] transition-shadow duration-200">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center space-x-2 text-base">
-                  <DollarSign className="h-4 w-4 text-primary" />
+                  <DollarSign className="h-4 w-4" style={{ color: '#5a3a1a' }} />
                   <span>Account</span>
                 </CardTitle>
               </CardHeader>
@@ -646,7 +646,7 @@ export const TradingDashboard = () => {
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center justify-between text-base">
                   <div className="flex items-center space-x-2">
-                    <Zap className="h-4 w-4 text-accent" />
+                    <Zap className="h-4 w-4" style={{ color: '#5a3a1a' }} />
                     <span>Quick Trade</span>
                   </div>
                   {quickTradeData?.isExpanded && (
@@ -794,63 +794,6 @@ export const TradingDashboard = () => {
               </CardContent>
             </Card>
 
-            {/* Trading Control */}
-            <Card className="!shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)] transition-shadow duration-200">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center justify-between text-base">
-                  <div className="flex items-center space-x-2">
-                    <Zap className="h-4 w-4 text-primary" />
-                    <span>Trading Control</span>
-                  </div>
-                  <Badge variant={signalStats.count > 0 ? "default" : "secondary"}>
-                    {signalStats.count} Signal{signalStats.count !== 1 ? 's' : ''}
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {/* Status */}
-                <div className="text-xs space-y-1 p-2 bg-muted/50 rounded">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Active Signals:</span>
-                    <span className="font-medium">{signalStats.count}</span>
-                  </div>
-                  {signalStats.lastGenerated && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Last Generated:</span>
-                      <span className="font-medium">
-                        {new Date(signalStats.lastGenerated).toLocaleTimeString()}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Auto-Trading Toggle */}
-                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border">
-                  <div className="space-y-0.5">
-                    <div className="flex items-center space-x-2">
-                      <Zap className="h-4 w-4 text-accent" />
-                      <span className="font-medium text-sm">Auto-Trading</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {autoTradeEnabled 
-                        ? "Automated execution enabled" 
-                        : "Manual execution required"}
-                    </p>
-                  </div>
-                  <Switch
-                    checked={autoTradeEnabled}
-                    onCheckedChange={handleAutoTradeToggle}
-                  />
-                </div>
-
-                <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
-                  <p className="font-medium">Automated Trading:</p>
-                  <p>• Signals generated every 15 minutes</p>
-                  <p>• Trades executed daily at 9:35 AM ET (weekdays)</p>
-                  <p>• Toggle enabled to allow automated execution</p>
-                </div>
-              </CardContent>
-            </Card>
 
           </div>
 
@@ -868,12 +811,12 @@ export const TradingDashboard = () => {
 
             {/* Expandable Signal Flow */}
             <Collapsible defaultOpen={false}>
-              <Card>
+              <Card className="bg-purple-500/10 border-purple-500/20">
                 <CollapsibleTrigger asChild>
-                  <CardHeader className="cursor-pointer hover:bg-accent/50 transition-colors">
+                  <CardHeader className="cursor-pointer hover:bg-purple-500/20 transition-colors">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
-                        <Activity className="h-4 w-4 text-primary" />
+                        <Activity className="h-4 w-4" style={{ color: '#5a3a1a' }} />
                         <CardTitle className="text-sm">Signal Flow</CardTitle>
                         <Badge variant="secondary" className="text-xs">
                           {signals.length} Active
@@ -1006,7 +949,7 @@ export const TradingDashboard = () => {
             <Card className="!shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)] transition-shadow duration-200">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center space-x-2 text-base">
-                  <Zap className="h-4 w-4 text-primary" />
+                  <Zap className="h-4 w-4" style={{ color: '#5a3a1a' }} />
                   <span>AI Signals</span>
                 </CardTitle>
               </CardHeader>
@@ -1093,7 +1036,7 @@ export const TradingDashboard = () => {
                 <CardHeader className="pb-2 cursor-pointer hover:bg-muted/50 transition-colors rounded-t-lg">
                   <CardTitle className="flex items-center justify-between text-base">
                     <div className="flex items-center space-x-2">
-                      <BarChart3 className="h-4 w-4 text-primary" />
+                      <BarChart3 className="h-4 w-4" style={{ color: '#5a3a1a' }} />
                       <span>Advanced Analysis</span>
                       <Badge variant="secondary" className="text-xs">
                         5 Tools
