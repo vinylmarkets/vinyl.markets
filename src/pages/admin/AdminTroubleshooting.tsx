@@ -48,37 +48,39 @@ const AdminTroubleshooting = () => {
     const results: DiagnosticResult[] = [];
 
     try {
-      // 1. Check if user exists and is whitelisted
-      const { data: traderCheck } = await supabase
-        .from('traders_whitelist')
-        .select('*')
-        .eq('email', userEmail)
-        .maybeSingle();
+      // 1. Check if user exists and is whitelisted (only if email provided)
+      if (userEmail) {
+        const { data: traderCheck } = await supabase
+          .from('traders_whitelist')
+          .select('*')
+          .eq('email', userEmail)
+          .maybeSingle();
 
-      results.push({
-        check: "Trader Whitelist",
-        status: traderCheck ? 'pass' : 'fail',
-        message: traderCheck 
-          ? `User is whitelisted with ${traderCheck.access_level} access` 
-          : "User is not in traders whitelist",
-        details: traderCheck,
-        iconName: 'User'
-      });
+        results.push({
+          check: "Trader Whitelist",
+          status: traderCheck ? 'pass' : 'fail',
+          message: traderCheck 
+            ? `User is whitelisted with ${traderCheck.access_level} access` 
+            : "User is not in traders whitelist",
+          details: traderCheck,
+          iconName: 'User'
+        });
 
-      if (!traderCheck) {
-        setDiagnostics(results);
-        setIsRunning(false);
-        return;
+        if (!traderCheck) {
+          setDiagnostics(results);
+          setIsRunning(false);
+          return;
+        }
       }
 
-      // Use provided user ID or show error
+      // Use provided user ID
       if (!userId) {
         results.push({
           check: "User ID Required",
           status: 'fail',
-          message: "Please provide the user's UUID to continue diagnostics. User must have signed up and logged in at least once.",
+          message: "Please provide the user's UUID to continue diagnostics.",
           details: { 
-            note: "You can find the user ID in Supabase Auth Users table",
+            note: "You can find the user ID in Supabase Auth Users table or by running: SELECT id FROM auth.users WHERE email='user@example.com'",
             whitelistedEmail: userEmail 
           },
           iconName: 'User'
@@ -285,7 +287,7 @@ const AdminTroubleshooting = () => {
             <CardHeader>
               <CardTitle>User Auto-Trading Diagnostics</CardTitle>
               <CardDescription>
-                Enter a user's email and UUID to check all auto-trading requirements. Note: User must have signed up and logged in at least once. Find User IDs in Supabase Auth Users table.
+                Enter user's email (optional) and UUID (required) to check auto-trading requirements. Email checks whitelist status. Find User IDs: SELECT id FROM auth.users WHERE email='user@example.com'
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
