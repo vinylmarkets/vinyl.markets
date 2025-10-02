@@ -204,15 +204,15 @@ const AdminTroubleshooting = () => {
 
       // 9. Call backend diagnostics
       const { data: backendDiag, error: diagError } = await supabase.functions.invoke('diagnostics', {
-        body: { action: 'test_connection', connection_type: 'broker' }
+        body: { action: 'test_connection', connectionType: 'broker' }
       });
 
       results.push({
         check: "Backend Broker Connection",
-        status: !diagError && backendDiag?.success ? 'pass' : 'fail',
-        message: !diagError && backendDiag?.success 
+        status: !diagError && backendDiag?.status ? 'pass' : 'fail',
+        message: !diagError && backendDiag?.status 
           ? "Broker API connection successful" 
-          : `Broker connection failed: ${diagError?.message || 'Unknown error'}`,
+          : `Broker connection failed: ${backendDiag?.error || diagError?.message || 'Unknown error'}`,
         details: backendDiag,
         iconName: 'Link'
       });
