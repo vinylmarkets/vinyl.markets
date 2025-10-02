@@ -11,7 +11,7 @@ import {
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Zap, User, Settings, LogOut, Bell } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
-import atomicLogo from "@/assets/atomic_logo.png";
+import vinylLogo from "@/assets/vinyl-logo-dark.svg";
 
 export function DashboardHeader() {
   const { user, signOut } = useAuth();
@@ -41,8 +41,8 @@ export function DashboardHeader() {
           <Link to="/dashboard" className="flex items-center gap-3 group">
             <div className="flex items-center gap-2">
               <img 
-                src={atomicLogo} 
-                alt="AtomicMarket"
+                src={vinylLogo} 
+                alt="Vinyl"
                 className="h-9"
               />
             </div>

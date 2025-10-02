@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import atomicLogo from '@/assets/atomic_logo.png';
+import vinylLogo from '@/assets/vinyl-logo-dark.svg';
 
 interface PaperAccount {
   id: string;
@@ -228,8 +228,8 @@ export default function PaperTrading() {
           <div className="mb-8">
             <div className="flex items-center justify-center gap-3 mb-4">
               <img 
-                src={atomicLogo} 
-                alt="AtomicMarket"
+                src={vinylLogo} 
+                alt="Vinyl"
                 className="h-12"
               />
               <h1 className="text-4xl font-bold text-foreground">
@@ -291,8 +291,8 @@ export default function PaperTrading() {
         <div className="space-y-2">
           <div className="flex items-center gap-3">
             <img 
-              src={atomicLogo} 
-              alt="AtomicMarket"
+              src={vinylLogo} 
+              alt="Vinyl"
               className="h-10"
             />
             <h1 className="text-4xl font-bold text-foreground">
