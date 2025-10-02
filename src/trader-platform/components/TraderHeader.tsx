@@ -69,88 +69,10 @@ const navigationItems = [
     description: "Connect brokers & APIs"
   },
   { 
-    label: "System Architecture", 
-    path: "/trader/system-architecture", 
-    icon: Activity,
-    description: "View system components"
-  },
-  { 
-    label: "Algorithm Analysis", 
-    path: "/trader/algorithm-analysis", 
-    icon: Search,
-    description: "Analyze algorithm performance"
-  },
-  { 
-    label: "Forensics", 
-    path: "/trader/forensics", 
-    icon: BookOpen,
-    description: "Document analysis & intelligence"
-  },
-  { 
-    label: "Knowledge Explorer", 
-    path: "/trader/knowledge-explorer", 
-    icon: Network,
-    description: "Explore knowledge graphs"
-  },
-  { 
-    label: "Insights Dashboard", 
-    path: "/trader/insights", 
-    icon: Zap,
-    description: "AI-powered insights"
-  },
-  { 
-    label: "Diagnostics", 
-    path: "/trader/diagnostics", 
-    icon: TestTube,
-    description: "System diagnostics & monitoring"
-  },
-  { 
-    label: "Beta Testing", 
-    path: "/trader/beta-testing", 
-    icon: TestTube,
-    description: "Test new features"
-  },
-  { 
-    label: "Alerts", 
-    path: "/trader/alerts", 
-    icon: Bell,
-    description: "Configure trading alerts"
-  },
-  { 
-    label: "Reporting", 
-    path: "/trader/reporting", 
-    icon: FileText,
-    description: "Generate reports"
-  },
-  { 
-    label: "Newsletters", 
-    path: "/trader/newsletters", 
-    icon: Mail,
-    description: "Manage newsletters"
-  },
-  { 
-    label: "API Keys", 
-    path: "/trader/api-keys", 
-    icon: Key,
-    description: "Manage API keys"
-  },
-  { 
-    label: "Settings", 
-    path: "/trader/settings", 
-    icon: Settings,
-    description: "Platform settings"
-  },
-  { 
     label: "Help", 
     path: "/trader/help", 
     icon: HelpCircle,
     description: "Get help & support"
-  },
-  { 
-    label: "Troubleshooting", 
-    path: "/trader/troubleshooting", 
-    icon: AlertTriangle,
-    description: "Troubleshoot issues"
   }
 ];
 

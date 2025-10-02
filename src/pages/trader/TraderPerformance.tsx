@@ -11,79 +11,83 @@ import { MonthlyHeatmap } from "@/trader-platform/components/performance/Monthly
 import { ExportTools } from "@/trader-platform/components/performance/ExportTools";
 import { TraderHeader } from "@/trader-platform/components/TraderHeader";
 import { TraderProtection } from "@/components/trader/TraderProtection";
+import { FadeInWrapper } from "@/components/FadeInWrapper";
 import { AlertTriangle } from "lucide-react";
 
 export default function TraderPerformance() {
   return (
     <TraderProtection>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 pointer-events-none"></div>
         <TraderHeader showAccountStats={false} />
-        <div className="container mx-auto p-6 space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold">Performance History</h1>
-              <p className="text-muted-foreground">
-                Analyze your trading system's effectiveness with detailed performance metrics
-              </p>
+        <FadeInWrapper>
+          <div className="p-6 max-w-7xl mx-auto space-y-6 relative z-10">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold">Performance History</h1>
+                <p className="text-muted-foreground">
+                  Analyze your trading system's effectiveness with detailed performance metrics
+                </p>
+              </div>
+              <ExportTools />
             </div>
-            <ExportTools />
+
+            {/* Performance Overview Cards */}
+            <PerformanceOverview />
+
+            {/* Main Content Tabs */}
+            <Tabs defaultValue="equity-curve" className="space-y-6">
+              <TabsList className="grid grid-cols-6 w-full">
+                <TabsTrigger value="equity-curve">Equity Curve</TabsTrigger>
+                <TabsTrigger value="trades">Trade History</TabsTrigger>
+                <TabsTrigger value="strategies">Strategies</TabsTrigger>
+                <TabsTrigger value="time-analysis">Time Analysis</TabsTrigger>
+                <TabsTrigger value="risk">Risk Metrics</TabsTrigger>
+                <TabsTrigger value="calendar">Monthly View</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="equity-curve">
+                <EquityCurveChart />
+              </TabsContent>
+
+              <TabsContent value="trades">
+                <TradeHistoryTable />
+              </TabsContent>
+
+              <TabsContent value="strategies">
+                <StrategyBreakdown />
+              </TabsContent>
+
+              <TabsContent value="time-analysis">
+                <TimeAnalysis />
+              </TabsContent>
+
+              <TabsContent value="risk">
+                <RiskMetrics />
+              </TabsContent>
+
+              <TabsContent value="calendar">
+                <MonthlyHeatmap />
+              </TabsContent>
+            </Tabs>
+
+            {/* Risk Warning Alert */}
+            <Card className="border-destructive/20 bg-destructive/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-destructive">
+                  <AlertTriangle className="h-5 w-5" />
+                  Performance Analysis Notice
+                </CardTitle>
+                <CardDescription>
+                  This performance data reflects paper trading results. Real market conditions, 
+                  slippage, and execution delays will impact live trading performance. Past 
+                  performance does not guarantee future results.
+                </CardDescription>
+              </CardHeader>
+            </Card>
           </div>
-
-        {/* Performance Overview Cards */}
-        <PerformanceOverview />
-
-        {/* Main Content Tabs */}
-        <Tabs defaultValue="equity-curve" className="space-y-6">
-          <TabsList className="grid grid-cols-6 w-full">
-            <TabsTrigger value="equity-curve">Equity Curve</TabsTrigger>
-            <TabsTrigger value="trades">Trade History</TabsTrigger>
-            <TabsTrigger value="strategies">Strategies</TabsTrigger>
-            <TabsTrigger value="time-analysis">Time Analysis</TabsTrigger>
-            <TabsTrigger value="risk">Risk Metrics</TabsTrigger>
-            <TabsTrigger value="calendar">Monthly View</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="equity-curve">
-            <EquityCurveChart />
-          </TabsContent>
-
-          <TabsContent value="trades">
-            <TradeHistoryTable />
-          </TabsContent>
-
-          <TabsContent value="strategies">
-            <StrategyBreakdown />
-          </TabsContent>
-
-          <TabsContent value="time-analysis">
-            <TimeAnalysis />
-          </TabsContent>
-
-          <TabsContent value="risk">
-            <RiskMetrics />
-          </TabsContent>
-
-          <TabsContent value="calendar">
-            <MonthlyHeatmap />
-          </TabsContent>
-        </Tabs>
-
-          {/* Risk Warning Alert */}
-          <Card className="border-destructive/20 bg-destructive/5">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-destructive">
-                <AlertTriangle className="h-5 w-5" />
-                Performance Analysis Notice
-              </CardTitle>
-              <CardDescription>
-                This performance data reflects paper trading results. Real market conditions, 
-                slippage, and execution delays will impact live trading performance. Past 
-                performance does not guarantee future results.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
+        </FadeInWrapper>
       </div>
     </TraderProtection>
   );

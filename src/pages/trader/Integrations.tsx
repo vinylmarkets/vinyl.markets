@@ -9,6 +9,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { Shield, CheckCircle, AlertCircle, Eye, EyeOff, Link as LinkIcon, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { TraderProtection } from "@/components/trader/TraderProtection";
+import { TraderHeader } from "@/trader-platform/components/TraderHeader";
+import { FadeInWrapper } from "@/components/FadeInWrapper";
 
 interface Integration {
   id: string;
@@ -198,16 +201,27 @@ const Integrations = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <Loader2 className="h-8 w-8 animate-spin" />
+      <TraderProtection>
+        <div className="min-h-screen bg-background relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 pointer-events-none"></div>
+          <TraderHeader showAccountStats={false} />
+          <div className="container mx-auto p-6 relative z-10">
+            <div className="flex items-center justify-center min-h-[400px]">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          </div>
         </div>
-      </div>
+      </TraderProtection>
     );
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <TraderProtection>
+      <div className="min-h-screen bg-background relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 pointer-events-none"></div>
+        <TraderHeader showAccountStats={false} />
+        <FadeInWrapper>
+          <div className="container mx-auto p-6 space-y-6 relative z-10">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <LinkIcon className="h-8 w-8 text-primary" />
@@ -542,6 +556,9 @@ const Integrations = () => {
         </CardContent>
       </Card>
     </div>
+    </FadeInWrapper>
+    </div>
+    </TraderProtection>
   );
 };
 

@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { TraderProtection } from "@/components/trader/TraderProtection";
 import { TraderHeader } from "@/trader-platform/components/TraderHeader";
+import { FadeInWrapper } from "@/components/FadeInWrapper";
 
 interface TradingSettings {
   defaultPositionSize: number;
@@ -145,21 +146,23 @@ const TraderSettings = () => {
 
   return (
     <TraderProtection>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 pointer-events-none"></div>
         <TraderHeader showAccountStats={false} />
 
         {/* Settings Content */}
-        <div className="p-6 max-w-4xl mx-auto space-y-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-3xl font-bold">Settings</h1>
-              <p className="text-muted-foreground">Configure your trading platform preferences</p>
+        <FadeInWrapper>
+          <div className="p-6 max-w-4xl mx-auto space-y-6 relative z-10">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h1 className="text-3xl font-bold">Settings</h1>
+                <p className="text-muted-foreground">Configure your trading platform preferences</p>
+              </div>
+              <Button onClick={handleSave} className="flex items-center space-x-2">
+                <Save className="h-4 w-4" />
+                <span>Save Changes</span>
+              </Button>
             </div>
-            <Button onClick={handleSave} className="flex items-center space-x-2">
-              <Save className="h-4 w-4" />
-              <span>Save Changes</span>
-            </Button>
-          </div>
           {/* Theme Preferences */}
           <Card>
             <CardHeader>
@@ -437,6 +440,7 @@ const TraderSettings = () => {
             </Button>
           </div>
         </div>
+        </FadeInWrapper>
       </div>
     </TraderProtection>
   );

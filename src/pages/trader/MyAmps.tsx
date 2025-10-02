@@ -39,9 +39,10 @@ export default function MyAmps() {
   if (isLoading) {
     return (
       <TraderProtection>
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-background relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 pointer-events-none"></div>
           <TraderHeader showAccountStats={false} />
-          <div className="container mx-auto p-6 space-y-6">
+          <div className="container mx-auto p-6 space-y-6 relative z-10">
             <Skeleton className="h-12 w-64" />
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               {[...Array(4)].map((_, i) => (
@@ -61,10 +62,11 @@ export default function MyAmps() {
 
   return (
     <TraderProtection>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 pointer-events-none"></div>
         <TraderHeader showAccountStats={false} />
       {/* Header */}
-      <div className="container mx-auto p-6">
+      <div className="container mx-auto p-6 relative z-10">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold">Amps - My Trading Algorithms</h1>
