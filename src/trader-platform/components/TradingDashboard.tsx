@@ -50,6 +50,8 @@ import { CandlestickChart } from "./CandlestickChart";
 import { TeachingAssistant } from "./TeachingAssistant";
 import { SignalFlowView } from "./SignalFlowView";
 import { ProfileDropdown } from "./ProfileDropdown";
+import { WatchlistManager } from "./WatchlistManager";
+import { MarketNewsCard } from "@/components/trader/MarketNewsCard";
 
 interface TradingSignal {
   symbol: string;
@@ -943,8 +945,11 @@ export const TradingDashboard = () => {
             </Card>
           </div>
 
-          {/* Right Column - AI Signals */}
+          {/* Right Column - AI Signals + Market News */}
           <div className="col-span-12 lg:col-span-3 space-y-3">
+            {/* Market News */}
+            <MarketNewsCard />
+            
             {/* AI Signals */}
             <Card className="!shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)] transition-shadow duration-200">
               <CardHeader className="pb-2">
