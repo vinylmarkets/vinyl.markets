@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { UserAmp } from '@/types/amps';
-import { Settings, Info, TrendingUp, TrendingDown, DollarSign, Activity } from 'lucide-react';
+import { Settings, Info, TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
 import { useState } from 'react';
 import { StrategyGuideModal } from './StrategyGuideModal';
 
@@ -33,40 +33,39 @@ export function AmpCard({ amp, onToggle, onAllocate, onSettings }: AmpCardProps)
   return (
     <Card className={`transition-all hover:shadow-md ${amp.is_active ? 'border-green-500' : 'border-border'}`}>
       <div className="p-4">
-        {/* Compact Header - Horizontal Layout */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            {/* Status Indicator */}
-            <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-              amp.is_active ? 'bg-green-500/10' : 'bg-muted'
-            }`}>
-              <Activity className={`w-5 h-5 ${amp.is_active ? 'text-green-500' : 'text-muted-foreground'}`} />
-            </div>
-            
-            {/* Name, Category, Info inline */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-semibold truncate">{amp.name}</h3>
-                <button
-                  onClick={() => setShowStrategyGuide(true)}
-                  className="text-muted-foreground hover:text-primary transition-colors flex-shrink-0"
-                  aria-label="View strategy guide"
-                >
-                  <Info className="w-4 h-4" />
-                </button>
-              </div>
-              <Badge variant="secondary" className="text-xs mt-1">
-                {amp.catalog?.category || 'momentum'}
-              </Badge>
-            </div>
-            
-            {/* Toggle Switch */}
+        {/* Hero Image */}
+        <div className="relative mb-3 rounded-lg overflow-hidden h-32">
+          <img 
+            src={amp.catalog?.image_url || 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&q=80'} 
+            alt={amp.name}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute top-2 right-2">
             <Switch
               checked={amp.is_active}
               onCheckedChange={handleToggle}
               disabled={isToggling}
               className="flex-shrink-0"
             />
+          </div>
+        </div>
+
+        {/* Compact Header */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <h3 className="text-base font-semibold truncate">{amp.name}</h3>
+              <button
+                onClick={() => setShowStrategyGuide(true)}
+                className="text-muted-foreground hover:text-primary transition-colors flex-shrink-0"
+                aria-label="View strategy guide"
+              >
+                <Info className="w-4 h-4" />
+              </button>
+            </div>
+            <Badge variant="secondary" className="text-xs mt-1">
+              {amp.catalog?.category || 'momentum'}
+            </Badge>
           </div>
         </div>
 
