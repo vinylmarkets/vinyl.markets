@@ -10,7 +10,6 @@ import { PolygonNewsArticle, UserSymbol } from '@/types/market-news';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 
-const POLYGON_API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
 const REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
@@ -83,16 +82,8 @@ export const MarketNewsCard = () => {
     }
   };
 
-  // Fetch news from Polygon.io
-  const fetchNews = async (symbols: UserSymbol[]): Promise<{ articles: PolygonNewsArticle[]; error: string | null }> => {
-    if (!POLYGON_API_KEY) {
-      return { articles: [], error: 'API key not configured' };
-    }
-
-    if (symbols.length === 0) {
-      return { articles: [], error: null };
-    }
-
+  // Fetch news via edge function
+  const fetchNews = async (): Promise<{ articles: PolygonNewsArticle[]; error: string | null }> => {
     // Check cache
     const cached = sessionStorage.getItem('market-news-cache');
     if (cached) {
@@ -107,40 +98,29 @@ export const MarketNewsCard = () => {
     }
 
     try {
-      // Batch fetch news for all symbols
-      const tickerParam = symbols.map(s => s.symbol).join(',');
-      const response = await fetch(
-        `https://api.polygon.io/v2/reference/news?ticker=${tickerParam}&limit=50&order=desc&apiKey=${POLYGON_API_KEY}`
-      );
+      const { data, error } = await supabase.functions.invoke('market-news');
 
-      if (!response.ok) {
-        if (response.status === 429) {
-          return { articles: [], error: 'Rate limit reached. Please try again later.' };
-        }
-        return { articles: [], error: `API error: ${response.status}` };
+      if (error) {
+        throw error;
       }
 
-      const data = await response.json();
-      const articles: PolygonNewsArticle[] = data.results || [];
+      if (data.error) {
+        return { articles: [], error: data.error };
+      }
 
-      // Deduplicate and sort by date
-      const uniqueArticles = Array.from(
-        new Map(articles.map(article => [article.id, article])).values()
-      ).sort((a, b) => 
-        new Date(b.published_utc).getTime() - new Date(a.published_utc).getTime()
-      ).slice(0, 15);
+      const articles: PolygonNewsArticle[] = data.articles || [];
 
       // Cache results
       try {
         sessionStorage.setItem('market-news-cache', JSON.stringify({
-          data: uniqueArticles,
+          data: articles,
           timestamp: Date.now()
         }));
       } catch (e) {
         console.error('Error caching news:', e);
       }
 
-      return { articles: uniqueArticles, error: null };
+      return { articles, error: null };
     } catch (err) {
       console.error('Error fetching news:', err);
       return { articles: [], error: err instanceof Error ? err.message : 'Failed to fetch news' };
@@ -162,7 +142,7 @@ export const MarketNewsCard = () => {
         return;
       }
 
-      const { articles, error: fetchError } = await fetchNews(symbols);
+      const { articles, error: fetchError } = await fetchNews();
       
       if (fetchError) {
         setError(fetchError);
