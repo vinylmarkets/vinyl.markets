@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import {
-  CommandDialog,
+  Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
@@ -10,7 +10,9 @@ import {
   CommandList,
   CommandSeparator,
 } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { 
   TrendingUp, 
   TrendingDown,
@@ -42,11 +44,11 @@ const PLATFORM_PAGES: PlatformPage[] = [
 ];
 
 interface GlobalSearchProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  className?: string;
 }
 
-export const GlobalSearch = ({ open, onOpenChange }: GlobalSearchProps) => {
+export const GlobalSearch = ({ className }: GlobalSearchProps) => {
+  const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [stockResults, setStockResults] = useState<StockSearchResult[]>([]);
@@ -55,6 +57,7 @@ export const GlobalSearch = ({ open, onOpenChange }: GlobalSearchProps) => {
   const [pageResults, setPageResults] = useState<PlatformPage[]>([]);
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
   const [stockPrices, setStockPrices] = useState<Record<string, { price: number; change: number }>>({});
+  const inputRef = useRef<HTMLInputElement>(null);
   
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -231,13 +234,15 @@ export const GlobalSearch = ({ open, onOpenChange }: GlobalSearchProps) => {
       title: `${stock.ticker} - ${stock.name}`,
       description: 'Stock information feature coming soon',
     });
-    onOpenChange(false);
+    setOpen(false);
+    setSearchQuery('');
   };
 
   const handleAmpSelect = (amp: SearchResultAmp) => {
     saveRecentSearch(amp.name, 'amp');
     navigate('/trader/amps');
-    onOpenChange(false);
+    setOpen(false);
+    setSearchQuery('');
   };
 
   const handlePositionSelect = (position: SearchResultPosition) => {
@@ -246,150 +251,49 @@ export const GlobalSearch = ({ open, onOpenChange }: GlobalSearchProps) => {
       title: `${position.symbol}`,
       description: `Position: ${position.quantity} shares @ $${position.average_cost.toFixed(2)}`,
     });
-    onOpenChange(false);
+    setOpen(false);
+    setSearchQuery('');
   };
 
   const handlePageSelect = (page: PlatformPage) => {
     saveRecentSearch(page.name, 'page');
     navigate(page.path);
-    onOpenChange(false);
+    setOpen(false);
+    setSearchQuery('');
   };
 
   return (
-    <CommandDialog open={open} onOpenChange={onOpenChange}>
-      <div className="[&_[cmdk-input]]:text-muted-foreground">
-        <CommandInput 
-          placeholder="Search stocks, amps, positions, or pages..." 
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Input
+          ref={inputRef}
+          type="text"
+          placeholder="Search stocks, amps, positions..."
           value={searchQuery}
-          onValueChange={setSearchQuery}
-          className="text-muted-foreground"
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            if (e.target.value && !open) setOpen(true);
+          }}
+          onFocus={() => setOpen(true)}
+          className={className}
         />
-      </div>
-      <CommandList>
-        {!searchQuery && recentSearches.length > 0 && (
-          <>
-            <CommandGroup heading="Recent Searches">
-              {recentSearches.slice(0, 5).map((search, idx) => (
-                <CommandItem key={idx} className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span>{search.query}</span>
-                  <Badge variant="outline" className="ml-auto text-xs">
-                    {search.type}
-                  </Badge>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-            <CommandSeparator />
-          </>
-        )}
-
-        {searchQuery && !loading && (
-          <>
-            {stockResults.length === 0 && 
-             ampResults.length === 0 && 
-             positionResults.length === 0 && 
-             pageResults.length === 0 && (
-              <CommandEmpty>No results found.</CommandEmpty>
-            )}
-
-            {stockResults.length > 0 && (
+      </PopoverTrigger>
+      <PopoverContent 
+        className="w-[800px] p-0" 
+        align="center"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        <Command shouldFilter={false}>
+          <CommandList className="max-h-[400px]">
+            {!searchQuery && recentSearches.length > 0 && (
               <>
-                <CommandGroup heading="Stocks">
-                  {stockResults.map((stock) => {
-                    const priceData = stockPrices[stock.ticker];
-                    return (
-                      <CommandItem
-                        key={stock.ticker}
-                        onSelect={() => handleStockSelect(stock)}
-                        className="flex items-center justify-between"
-                      >
-                        <div className="flex items-center gap-2">
-                          <Activity className="h-4 w-4" style={{ color: '#5a3a1a' }} />
-                          <div>
-                            <div className="font-medium">{stock.ticker}</div>
-                            <div className="text-xs text-muted-foreground truncate max-w-[200px]">
-                              {stock.name}
-                            </div>
-                          </div>
-                        </div>
-                        {priceData && (
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium">
-                              ${priceData.price.toFixed(2)}
-                            </span>
-                            <Badge 
-                              variant={priceData.change >= 0 ? 'default' : 'destructive'}
-                              className="text-xs"
-                            >
-                              {priceData.change >= 0 ? (
-                                <TrendingUp className="h-3 w-3 mr-1" />
-                              ) : (
-                                <TrendingDown className="h-3 w-3 mr-1" />
-                              )}
-                              {Math.abs(priceData.change).toFixed(2)}%
-                            </Badge>
-                          </div>
-                        )}
-                      </CommandItem>
-                    );
-                  })}
-                </CommandGroup>
-                <CommandSeparator />
-              </>
-            )}
-
-            {ampResults.length > 0 && (
-              <>
-                <CommandGroup heading="My Amps">
-                  {ampResults.map((amp) => (
-                    <CommandItem
-                      key={amp.id}
-                      onSelect={() => handleAmpSelect(amp)}
-                      className="flex items-center justify-between"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Zap className="h-4 w-4" style={{ color: '#5a3a1a' }} />
-                        <span>{amp.name}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground">
-                          ${amp.allocated_capital.toLocaleString()}
-                        </span>
-                        <Badge variant={amp.is_active ? 'default' : 'secondary'} className="text-xs">
-                          {amp.is_active ? 'Active' : 'Inactive'}
-                        </Badge>
-                      </div>
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-                <CommandSeparator />
-              </>
-            )}
-
-            {positionResults.length > 0 && (
-              <>
-                <CommandGroup heading="My Positions">
-                  {positionResults.map((position) => (
-                    <CommandItem
-                      key={position.symbol}
-                      onSelect={() => handlePositionSelect(position)}
-                      className="flex items-center justify-between"
-                    >
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4" style={{ color: '#5a3a1a' }} />
-                        <div>
-                          <div className="font-medium">{position.symbol}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {position.quantity} shares @ ${position.average_cost.toFixed(2)}
-                          </div>
-                        </div>
-                      </div>
-                      <Badge 
-                        variant={position.unrealized_pnl >= 0 ? 'default' : 'destructive'}
-                        className="text-xs"
-                      >
-                        {position.unrealized_pnl >= 0 ? '+' : ''}
-                        ${position.unrealized_pnl.toFixed(2)}
+                <CommandGroup heading="Recent Searches">
+                  {recentSearches.slice(0, 5).map((search, idx) => (
+                    <CommandItem key={idx} className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <span>{search.query}</span>
+                      <Badge variant="outline" className="ml-auto text-xs">
+                        {search.type}
                       </Badge>
                     </CommandItem>
                   ))}
@@ -398,30 +302,147 @@ export const GlobalSearch = ({ open, onOpenChange }: GlobalSearchProps) => {
               </>
             )}
 
-            {pageResults.length > 0 && (
-              <CommandGroup heading="Pages">
-                {pageResults.map((page) => (
-                  <CommandItem
-                    key={page.path}
-                    onSelect={() => handlePageSelect(page)}
-                    className="flex items-center gap-2"
-                  >
-                    <Navigation className="h-4 w-4" style={{ color: '#5a3a1a' }} />
-                    <div>
-                      <div className="font-medium">{page.name}</div>
-                      <div className="text-xs text-muted-foreground">{page.category}</div>
-                    </div>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            )}
-          </>
-        )}
+            {searchQuery && !loading && (
+              <>
+                {stockResults.length === 0 && 
+                 ampResults.length === 0 && 
+                 positionResults.length === 0 && 
+                 pageResults.length === 0 && (
+                  <CommandEmpty>No results found.</CommandEmpty>
+                )}
 
-        {loading && (
-          <CommandEmpty>Searching...</CommandEmpty>
-        )}
-      </CommandList>
-    </CommandDialog>
+                {stockResults.length > 0 && (
+                  <>
+                    <CommandGroup heading="Stocks">
+                      {stockResults.map((stock) => {
+                        const priceData = stockPrices[stock.ticker];
+                        return (
+                          <CommandItem
+                            key={stock.ticker}
+                            onSelect={() => handleStockSelect(stock)}
+                            className="flex items-center justify-between"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Activity className="h-4 w-4" style={{ color: '#5a3a1a' }} />
+                              <div>
+                                <div className="font-medium">{stock.ticker}</div>
+                                <div className="text-xs text-muted-foreground truncate max-w-[200px]">
+                                  {stock.name}
+                                </div>
+                              </div>
+                            </div>
+                            {priceData && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium">
+                                  ${priceData.price.toFixed(2)}
+                                </span>
+                                <Badge 
+                                  variant={priceData.change >= 0 ? 'default' : 'destructive'}
+                                  className="text-xs"
+                                >
+                                  {priceData.change >= 0 ? (
+                                    <TrendingUp className="h-3 w-3 mr-1" />
+                                  ) : (
+                                    <TrendingDown className="h-3 w-3 mr-1" />
+                                  )}
+                                  {Math.abs(priceData.change).toFixed(2)}%
+                                </Badge>
+                              </div>
+                            )}
+                          </CommandItem>
+                        );
+                      })}
+                    </CommandGroup>
+                    <CommandSeparator />
+                  </>
+                )}
+
+                {ampResults.length > 0 && (
+                  <>
+                    <CommandGroup heading="My Amps">
+                      {ampResults.map((amp) => (
+                        <CommandItem
+                          key={amp.id}
+                          onSelect={() => handleAmpSelect(amp)}
+                          className="flex items-center justify-between"
+                        >
+                          <div className="flex items-center gap-2">
+                            <Zap className="h-4 w-4" style={{ color: '#5a3a1a' }} />
+                            <span>{amp.name}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-muted-foreground">
+                              ${amp.allocated_capital.toLocaleString()}
+                            </span>
+                            <Badge variant={amp.is_active ? 'default' : 'secondary'} className="text-xs">
+                              {amp.is_active ? 'Active' : 'Inactive'}
+                            </Badge>
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                    <CommandSeparator />
+                  </>
+                )}
+
+                {positionResults.length > 0 && (
+                  <>
+                    <CommandGroup heading="My Positions">
+                      {positionResults.map((position) => (
+                        <CommandItem
+                          key={position.symbol}
+                          onSelect={() => handlePositionSelect(position)}
+                          className="flex items-center justify-between"
+                        >
+                          <div className="flex items-center gap-2">
+                            <DollarSign className="h-4 w-4" style={{ color: '#5a3a1a' }} />
+                            <div>
+                              <div className="font-medium">{position.symbol}</div>
+                              <div className="text-xs text-muted-foreground">
+                                {position.quantity} shares @ ${position.average_cost.toFixed(2)}
+                              </div>
+                            </div>
+                          </div>
+                          <Badge 
+                            variant={position.unrealized_pnl >= 0 ? 'default' : 'destructive'}
+                            className="text-xs"
+                          >
+                            {position.unrealized_pnl >= 0 ? '+' : ''}
+                            ${position.unrealized_pnl.toFixed(2)}
+                          </Badge>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                    <CommandSeparator />
+                  </>
+                )}
+
+                {pageResults.length > 0 && (
+                  <CommandGroup heading="Pages">
+                    {pageResults.map((page) => (
+                      <CommandItem
+                        key={page.path}
+                        onSelect={() => handlePageSelect(page)}
+                        className="flex items-center gap-2"
+                      >
+                        <Navigation className="h-4 w-4" style={{ color: '#5a3a1a' }} />
+                        <div>
+                          <div className="font-medium">{page.name}</div>
+                          <div className="text-xs text-muted-foreground">{page.category}</div>
+                        </div>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                )}
+              </>
+            )}
+
+            {loading && (
+              <CommandEmpty>Searching...</CommandEmpty>
+            )}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 };

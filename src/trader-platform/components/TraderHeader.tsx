@@ -90,21 +90,7 @@ export const TraderHeader: React.FC<TraderHeaderProps> = ({
 }) => {
   const location = useLocation();
   const [woodHeaderEnabled, setWoodHeaderEnabled] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
   const isDevelopment = import.meta.env.DEV;
-
-  // Keyboard shortcut for search (Cmd/Ctrl + K)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setSearchOpen(true);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
 
   // Load wood header setting
   useEffect(() => {
@@ -227,50 +213,13 @@ export const TraderHeader: React.FC<TraderHeaderProps> = ({
           )}
         </div>
 
-        {/* Account Stats - Hide on small screens */}
-        {showAccountStats && accountData && (
-          <div className="hidden lg:flex items-center space-x-6">
-            <div className="text-center">
-              <p className={`text-xs ${woodHeaderEnabled ? 'text-success dark:text-background' : 'text-muted-foreground'}`}>Portfolio Value</p>
-              <p className={`text-lg font-semibold ${woodHeaderEnabled ? 'text-white/80 dark:text-foreground' : 'text-foreground'}`}>
-                ${accountData.portfolioValue.toLocaleString()}
-              </p>
-            </div>
-            <div className="text-center">
-              <p className={`text-xs ${woodHeaderEnabled ? 'text-success dark:text-background' : 'text-muted-foreground'}`}>Daily P&L</p>
-              <p className={`text-lg font-semibold ${
-                woodHeaderEnabled 
-                  ? 'text-white/80' 
-                  : accountData.dailyPnL >= 0 ? 'text-success' : 'text-destructive'
-              }`}>
-                {accountData.dailyPnL >= 0 ? '+' : ''}${accountData.dailyPnL.toLocaleString()}
-              </p>
-            </div>
-            <div className="text-center">
-              <p className={`text-xs ${woodHeaderEnabled ? 'text-success dark:text-background' : 'text-muted-foreground'}`}>Buying Power</p>
-              <p className={`text-lg font-semibold ${woodHeaderEnabled ? 'text-white/80 dark:text-card' : 'text-accent'}`}>
-                ${accountData.buyingPower.toLocaleString()}
-              </p>
-            </div>
-          </div>
-        )}
+        {/* Center Section - Global Search */}
+        <div className="flex-1 flex justify-center px-4 max-w-2xl mx-auto">
+          <GlobalSearch className="w-full text-muted-foreground placeholder:text-muted-foreground/60" />
+        </div>
 
         {/* Right Side Controls */}
         <div className="flex items-center space-x-2 sm:space-x-4">
-          {/* Global Search */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setSearchOpen(true)}
-            className={`h-8 px-3 text-xs ${woodHeaderEnabled ? 'text-white/80 border-white/20 hover:bg-white/10' : ''}`}
-          >
-            <Search className="h-3 w-3 mr-1" />
-            <span className="hidden sm:inline">Search</span>
-            <kbd className="hidden sm:inline ml-2 pointer-events-none h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100">
-              <span className="text-xs">⌘</span>K
-            </kbd>
-          </Button>
-
           {/* My Amps Button */}
           <Link to="/trader/amps">
             <Button 
@@ -287,9 +236,6 @@ export const TraderHeader: React.FC<TraderHeaderProps> = ({
           <ProfileDropdown />
         </div>
       </div>
-
-      {/* Global Search Dialog */}
-      <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
     </header>
   );
 };
