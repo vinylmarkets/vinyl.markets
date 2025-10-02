@@ -314,68 +314,39 @@ export const MarketNewsCard = () => {
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <ScrollArea className="h-[500px] pr-2">
-          <div className="space-y-3">
-            {news.map((article) => (
-              <div
-                key={article.id}
-                className="border-b border-border pb-3 last:border-0 hover:bg-muted/30 -mx-1 px-2 py-2 rounded transition-colors"
-              >
-                <div className="flex items-start gap-2">
-                  {article.image_url && (
-                    <img
-                      src={article.image_url}
-                      alt=""
-                      className="w-16 h-16 object-cover rounded flex-shrink-0"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap gap-1 mb-1">
-                      {isBreaking(article.published_utc) && (
-                        <Badge variant="destructive" className="text-[10px] h-4 px-1">
-                          Breaking
-                        </Badge>
-                      )}
-                      {article.tickers.slice(0, 2).map((ticker) => (
-                        <Badge key={ticker} variant="secondary" className="text-[10px] h-4 px-1">
-                          {ticker}
-                        </Badge>
-                      ))}
-                      {article.tickers.length > 2 && (
-                        <Badge variant="outline" className="text-[10px] h-4 px-1">
-                          +{article.tickers.length - 2}
-                        </Badge>
-                      )}
-                    </div>
-                    <a
-                      href={article.article_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm font-medium hover:text-primary transition-colors line-clamp-2 mb-1 flex items-start gap-1"
-                    >
-                      {article.title}
-                      <ExternalLink className="h-3 w-3 flex-shrink-0 mt-0.5" />
-                    </a>
-                    <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                      <span className="truncate max-w-[100px]">{article.publisher.name}</span>
-                      <span>·</span>
-                      <span>
-                        {formatDistanceToNow(new Date(article.published_utc), {
-                          addSuffix: true,
-                        })}
-                      </span>
-                    </div>
-                  </div>
+      <CardContent className="space-y-2">
+        <div className="space-y-2">
+          {news.slice(0, 5).map((article) => (
+            <a
+              key={article.id}
+              href={article.article_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 p-2 hover:bg-muted/50 rounded transition-colors group"
+            >
+              {article.image_url ? (
+                <img
+                  src={article.image_url}
+                  alt=""
+                  className="w-12 h-12 object-cover rounded flex-shrink-0"
+                  onError={(e) => {
+                    e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="48" height="48"%3E%3Crect width="48" height="48" fill="%23ddd"/%3E%3C/svg%3E';
+                  }}
+                />
+              ) : (
+                <div className="w-12 h-12 bg-muted rounded flex-shrink-0 flex items-center justify-center">
+                  <Newspaper className="h-5 w-5 text-muted-foreground" />
                 </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium line-clamp-2 group-hover:text-primary transition-colors">
+                  {article.title}
+                </p>
               </div>
-            ))}
-          </div>
-        </ScrollArea>
-        <div className="pt-3 border-t border-border">
+            </a>
+          ))}
+        </div>
+        <div className="pt-2 border-t border-border">
           <p className="text-[10px] text-muted-foreground text-center">
             News via Polygon.io · Not investment advice
           </p>
