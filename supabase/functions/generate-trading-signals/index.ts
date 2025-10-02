@@ -2,7 +2,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7'
 import { corsHeaders } from '../_shared/cors.ts'
 
 const POLYGON_API_KEY = Deno.env.get('POLYGON_API_KEY')
-const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY')
+const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY')
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
@@ -70,117 +70,89 @@ async function getMarketData(symbol: string): Promise<MarketData | null> {
 
 async function analyzeWithAI(marketData: MarketData): Promise<TradingSignal | null> {
   try {
-    const prompt = `You are an expert trading analyst. Analyze the following market data and provide a trading signal.
+    const prompt = `Analyze the following market data and provide a professional trading signal.
 
 Market Data for ${marketData.symbol}:
 - Current Price: $${marketData.price}
 - Change: ${marketData.change > 0 ? '+' : ''}$${marketData.change.toFixed(2)} (${marketData.changePercent.toFixed(2)}%)
 - Volume: ${marketData.volume.toLocaleString()}
-- High: $${marketData.high}
-- Low: $${marketData.low}
+- Day High: $${marketData.high}
+- Day Low: $${marketData.low}
 - Previous Close: $${marketData.prevClose}
 
-Based on this data, provide a trading signal (BUY, SELL, or HOLD) with:
-1. Signal type (BUY/SELL/HOLD)
-2. Confidence score (0-100)
-3. Target price
-4. Stop loss price
-5. Take profit price
-6. Clear reasoning for the signal
+Analyze this data considering:
+1. Price momentum and trend direction
+2. Volume analysis
+3. Support/resistance levels
+4. Risk/reward ratio
 
-Respond in JSON format only.`
+Provide your analysis in the following JSON format only:
+{
+  "signal_type": "BUY" | "SELL" | "HOLD",
+  "confidence_score": <number 0-100>,
+  "target_price": <number>,
+  "stop_loss_price": <number>,
+  "take_profit_price": <number>,
+  "reasoning": "<detailed explanation>"
+}`
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json'
+        'x-api-key': ANTHROPIC_API_KEY!,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a professional trading analyst. Always respond with valid JSON only.'
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        tools: [{
-          type: 'function',
-          function: {
-            name: 'generate_trading_signal',
-            description: 'Generate a trading signal based on market analysis',
-            parameters: {
-              type: 'object',
-              properties: {
-                signal_type: {
-                  type: 'string',
-                  enum: ['BUY', 'SELL', 'HOLD']
-                },
-                confidence_score: {
-                  type: 'number',
-                  minimum: 0,
-                  maximum: 100
-                },
-                target_price: {
-                  type: 'number'
-                },
-                stop_loss_price: {
-                  type: 'number'
-                },
-                take_profit_price: {
-                  type: 'number'
-                },
-                reasoning: {
-                  type: 'string'
-                }
-              },
-              required: ['signal_type', 'confidence_score', 'target_price', 'stop_loss_price', 'take_profit_price', 'reasoning']
-            }
-          }
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1024,
+        messages: [{
+          role: 'user',
+          content: prompt
         }],
-        tool_choice: {
-          type: 'function',
-          function: { name: 'generate_trading_signal' }
-        }
+        system: 'You are a professional trading analyst with deep expertise in technical analysis and market dynamics. Always respond with valid JSON only, no markdown or code blocks.'
       })
     })
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('AI API error:', response.status, errorText)
+      console.error('Claude API error:', response.status, errorText)
       return null
     }
 
     const data = await response.json()
-    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0]
+    const content = data.content?.[0]?.text
     
-    if (!toolCall) {
-      console.error('No tool call in AI response')
+    if (!content) {
+      console.error('No content in Claude response')
       return null
     }
 
-    const args = JSON.parse(toolCall.function.arguments)
+    // Parse the JSON response, stripping any markdown code blocks if present
+    let jsonText = content.trim()
+    if (jsonText.startsWith('```')) {
+      jsonText = jsonText.replace(/```json?\n?/g, '').replace(/```\n?$/g, '').trim()
+    }
+    
+    const analysis = JSON.parse(jsonText)
     
     return {
       symbol: marketData.symbol,
-      signal_type: args.signal_type,
-      confidence_score: Math.round(args.confidence_score),
-      target_price: args.target_price,
-      stop_loss_price: args.stop_loss_price,
-      take_profit_price: args.take_profit_price,
-      reasoning: args.reasoning,
+      signal_type: analysis.signal_type,
+      confidence_score: Math.round(analysis.confidence_score),
+      target_price: analysis.target_price,
+      stop_loss_price: analysis.stop_loss_price,
+      take_profit_price: analysis.take_profit_price,
+      reasoning: analysis.reasoning,
       signal_data: {
-        strategy: 'ai_analysis',
+        strategy: 'claude_analysis',
+        model: 'claude-sonnet-4',
         current_price: marketData.price,
         market_data: marketData
       }
     }
   } catch (error) {
-    console.error('Error analyzing with AI:', error)
+    console.error('Error analyzing with Claude:', error)
     return null
   }
 }
