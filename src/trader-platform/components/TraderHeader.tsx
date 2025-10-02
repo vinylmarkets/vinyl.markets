@@ -32,6 +32,7 @@ import {
 import vinylLogoWhite from "@/assets/vinyl-logo-white-new.svg";
 import vinylLogoBlack from "@/assets/vinyl-logo-black-new.svg";
 import { ProfileDropdown } from "./ProfileDropdown";
+import { GlobalSearch } from "@/components/trader/GlobalSearch";
 
 interface TraderHeaderProps {
   accountData?: {
@@ -89,7 +90,21 @@ export const TraderHeader: React.FC<TraderHeaderProps> = ({
 }) => {
   const location = useLocation();
   const [woodHeaderEnabled, setWoodHeaderEnabled] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const isDevelopment = import.meta.env.DEV;
+
+  // Keyboard shortcut for search (Cmd/Ctrl + K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Load wood header setting
   useEffect(() => {
@@ -242,6 +257,20 @@ export const TraderHeader: React.FC<TraderHeaderProps> = ({
 
         {/* Right Side Controls */}
         <div className="flex items-center space-x-2 sm:space-x-4">
+          {/* Global Search */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setSearchOpen(true)}
+            className={`h-8 px-3 text-xs ${woodHeaderEnabled ? 'text-white/80 border-white/20 hover:bg-white/10' : ''}`}
+          >
+            <Search className="h-3 w-3 mr-1" />
+            <span className="hidden sm:inline">Search</span>
+            <kbd className="hidden sm:inline ml-2 pointer-events-none h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100">
+              <span className="text-xs">⌘</span>K
+            </kbd>
+          </Button>
+
           {/* My Amps Button */}
           <Link to="/trader/amps">
             <Button 
@@ -258,6 +287,9 @@ export const TraderHeader: React.FC<TraderHeaderProps> = ({
           <ProfileDropdown />
         </div>
       </div>
+
+      {/* Global Search Dialog */}
+      <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
     </header>
   );
 };
