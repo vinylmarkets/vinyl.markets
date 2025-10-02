@@ -52,14 +52,24 @@ serve(async (req) => {
       });
     }
 
-    // Fetch watchlist symbols
-    const { data: watchlist } = await supabaseClient
-      .from('watchlist_items')
-      .select('symbol');
+    // Fetch watchlist symbols - join through watchlists to handle both user and system watchlists
+    const { data: watchlistData } = await supabaseClient
+      .from('watchlists')
+      .select(`
+        id,
+        watchlist_items (
+          symbol
+        )
+      `)
+      .or(`user_id.eq.${user.id},is_system.eq.true`);
     
-    if (watchlist) {
-      watchlist.forEach((item: any) => {
-        if (item.symbol) symbols.add(item.symbol);
+    if (watchlistData) {
+      watchlistData.forEach((watchlist: any) => {
+        if (watchlist.watchlist_items) {
+          watchlist.watchlist_items.forEach((item: any) => {
+            if (item.symbol) symbols.add(item.symbol);
+          });
+        }
       });
     }
 
