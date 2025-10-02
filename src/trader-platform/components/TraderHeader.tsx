@@ -57,6 +57,12 @@ const navigationItems = [
     description: "Manage your trading algorithms"
   },
   { 
+    label: "Watchlists", 
+    path: "/trader/watchlists", 
+    icon: Search,
+    description: "Smart watchlists & stock discovery"
+  },
+  { 
     label: "Performance", 
     path: "/trader/performance", 
     icon: TrendingUp,

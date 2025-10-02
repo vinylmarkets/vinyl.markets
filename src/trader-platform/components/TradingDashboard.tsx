@@ -14,7 +14,6 @@ import { supabase } from "@/integrations/supabase/client";
 import vinylLogoWhite from "@/assets/vinyl-logo-white-new.svg";
 import vinylLogoBlack from "@/assets/vinyl-logo-black-new.svg";
 import { CronScheduler } from "./CronScheduler";
-import { WatchlistManager } from "./WatchlistManager";
 import { SectorMap } from "./SectorMap";
 import { RelationshipNetworkGraph } from "./RelationshipNetworkGraph";
 import { RelationshipSignals } from "./RelationshipSignals";
@@ -1147,11 +1146,8 @@ export const TradingDashboard = () => {
             </Card>
           </div>
 
-          {/* Right Column - Watchlists & AI Signals */}
+          {/* Right Column - AI Signals */}
           <div className="col-span-12 lg:col-span-3 space-y-3">
-            {/* Smart Watchlists */}
-            <WatchlistManager onSymbolSelect={handleSymbolSelect} />
-
             {/* AI Signals */}
             <Card className="!shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)] transition-shadow duration-200">
               <CardHeader className="pb-2">

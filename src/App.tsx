@@ -31,6 +31,7 @@ import TraderDiagnostics from "./pages/trader/TraderDiagnostics";
 import SystemArchitecture from "./pages/trader/SystemArchitecture";
 import AlgorithmAnalysis from "./pages/trader/AlgorithmAnalysis";
 import MyAmps from "./pages/trader/MyAmps";
+import Watchlists from "./pages/trader/Watchlists";
 
 const queryClient = new QueryClient();
 
@@ -73,6 +74,7 @@ const App = () => {
               <Route path="/trader/system-maps/architecture" element={<SystemArchitecture />} />
               <Route path="/trader/system-maps/algorithms" element={<AlgorithmAnalysis />} />
               <Route path="/trader/amps" element={<MyAmps />} />
+              <Route path="/trader/watchlists" element={<Watchlists />} />
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
