@@ -159,12 +159,6 @@ export const TradingDashboard = () => {
     lastUpdated: new Date().toISOString()
   });
 
-  const [strategyPerformance, setStrategyPerformance] = useState({
-    momentum: hasIntegrations ? 0 : 8.2,
-    meanReversion: hasIntegrations ? 0 : 12.5,
-    mlPrediction: hasIntegrations ? 0 : 87.3
-  });
-
   const handleSymbolSelect = (symbol: string) => {
     console.log('Symbol selected for analysis:', symbol);
     setQuickTradeSymbol(symbol);
@@ -245,12 +239,6 @@ export const TradingDashboard = () => {
       // Clear mock data when real integrations are connected
       setPositions([]);
       setRecentTrades([]);
-      // Update strategy performance with real data
-      setStrategyPerformance({
-        momentum: 0,
-        meanReversion: 0,
-        mlPrediction: 0
-      });
     } else {
 
     // Mock signals - only shown when no real broker connected
@@ -939,62 +927,6 @@ export const TradingDashboard = () => {
                   <p>• Trades executed daily at 9:35 AM ET (weekdays)</p>
                   <p>• Toggle enabled to allow automated execution</p>
                 </div>
-              </CardContent>
-            </Card>
-
-
-            {/* Strategy Performance */}
-            <Card className="!shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15),0_4px_20px_-4px_rgba(0,0,0,0.1)] dark:!shadow-[0_10px_30px_-10px_rgba(255,255,255,0.08),0_4px_20px_-4px_rgba(255,255,255,0.05)] transition-shadow duration-200">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center space-x-2 text-base">
-                  <BarChart3 className="h-4 w-4 text-primary" />
-                  <span>Strategies</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {hasIntegrations ? (
-                  <>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Momentum</span>
-                      <span className="text-sm font-bold text-muted-foreground">
-                        {strategyPerformance.momentum > 0 ? `+${strategyPerformance.momentum.toFixed(1)}%` : 'No data'}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Mean Rev.</span>
-                      <span className="text-sm font-bold text-muted-foreground">
-                        {strategyPerformance.meanReversion > 0 ? `+${strategyPerformance.meanReversion.toFixed(1)}%` : 'No data'}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">ML Pred.</span>
-                      <span className="text-sm font-bold text-muted-foreground">
-                        {strategyPerformance.mlPrediction > 0 ? `${strategyPerformance.mlPrediction.toFixed(1)}%` : 'No data'}
-                      </span>
-                    </div>
-                    <div className="text-xs text-muted-foreground text-center mt-2">
-                      Real-time performance
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Momentum</span>
-                      <span className="text-sm font-bold text-primary">+8.2%</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Mean Rev.</span>
-                      <span className="text-sm font-bold text-accent">+12.5%</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">ML Pred.</span>
-                      <span className="text-sm font-bold text-success">87.3%</span>
-                    </div>
-                    <div className="text-xs text-muted-foreground text-center mt-2">
-                      Demo performance
-                    </div>
-                  </>
-                )}
               </CardContent>
             </Card>
 
