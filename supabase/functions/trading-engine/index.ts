@@ -365,16 +365,42 @@ serve(async (req) => {
       );
     }
 
-    const symbols = ['AAPL', 'MSFT', 'GOOGL', 'NVDA', 'TSLA', 'META', 'AMZN'];
-    const allSignals = [];
-
-    console.log(`Analyzing ${symbols.length} symbols...`);
-
-    // Initialize Supabase client for sector analysis
+    // Initialize Supabase client
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
+
+    // Fetch symbols from watchlist_items table
+    console.log('Fetching symbols from watchlist...');
+    const { data: watchlistData, error: watchlistError } = await supabase
+      .from('watchlist_items')
+      .select('symbol')
+      .order('symbol');
+
+    if (watchlistError) {
+      console.error('Error fetching watchlist:', watchlistError);
+      throw new Error('Failed to fetch watchlist symbols');
+    }
+
+    // Get unique symbols from watchlist
+    const symbols = [...new Set(watchlistData?.map(item => item.symbol) || [])];
+    
+    if (symbols.length === 0) {
+      console.log('No symbols found in watchlist');
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: 'No symbols in watchlist to analyze',
+          symbolsAnalyzed: 0
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log(`Analyzing ${symbols.length} symbols from watchlist: ${symbols.slice(0, 5).join(', ')}${symbols.length > 5 ? '...' : ''}`);
+    
+    const allSignals = [];
 
     // Process each symbol
     for (const symbol of symbols) {
