@@ -52,7 +52,7 @@ const AdminTroubleshooting = () => {
         .from('traders_whitelist')
         .select('*')
         .eq('email', userEmail)
-        .single();
+        .maybeSingle();
 
       results.push({
         check: "Trader Whitelist",
@@ -75,7 +75,7 @@ const AdminTroubleshooting = () => {
         .from('profiles')
         .select('id')
         .eq('username', userEmail.split('@')[0])
-        .single();
+        .maybeSingle();
 
       const userId = authUser?.id;
 
@@ -85,7 +85,7 @@ const AdminTroubleshooting = () => {
         .select('*')
         .eq('user_id', userId)
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
 
       results.push({
         check: "Broker Integration",
@@ -102,7 +102,7 @@ const AdminTroubleshooting = () => {
         .from('paper_accounts')
         .select('*')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
       results.push({
         check: "Paper Trading Account",
