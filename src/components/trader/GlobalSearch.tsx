@@ -230,10 +230,7 @@ export const GlobalSearch = ({ className }: GlobalSearchProps) => {
   // Handle selections
   const handleStockSelect = (stock: StockSearchResult) => {
     saveRecentSearch(stock.ticker, 'stock');
-    toast({
-      title: `${stock.ticker} - ${stock.name}`,
-      description: 'Stock information feature coming soon',
-    });
+    navigate(`/trader/stock/${stock.ticker}`);
     setOpen(false);
     setSearchQuery('');
   };
@@ -247,10 +244,7 @@ export const GlobalSearch = ({ className }: GlobalSearchProps) => {
 
   const handlePositionSelect = (position: SearchResultPosition) => {
     saveRecentSearch(position.symbol, 'position');
-    toast({
-      title: `${position.symbol}`,
-      description: `Position: ${position.quantity} shares @ $${position.average_cost.toFixed(2)}`,
-    });
+    navigate(`/trader/stock/${position.symbol}`);
     setOpen(false);
     setSearchQuery('');
   };
