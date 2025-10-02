@@ -31,17 +31,17 @@ export function AmpCard({ amp, onToggle, onAllocate, onSettings }: AmpCardProps)
   const PnlIcon = (amp.today_pnl || 0) >= 0 ? TrendingUp : TrendingDown;
 
   return (
-    <Card className={`transition-all hover:shadow-md ${amp.is_active ? 'border-green-500' : 'border-border'}`}>
-      <div className="p-4">
-        {/* Hero Image */}
-        <div className="relative mb-3 rounded-lg overflow-hidden h-48">
-          <img 
-            src={amp.catalog?.image_url || 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&q=80'} 
-            alt={amp.name}
-            className="w-full h-full object-cover"
-          />
-        </div>
+    <Card className={`transition-all hover:shadow-md overflow-hidden ${amp.is_active ? 'border-green-500' : 'border-border'}`}>
+      {/* Hero Image */}
+      <div className="relative h-48">
+        <img 
+          src={amp.catalog?.image_url || 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&q=80'} 
+          alt={amp.name}
+          className="w-full h-full object-cover"
+        />
+      </div>
 
+      <div className="p-4">
         {/* Compact Header */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex-1 min-w-0">
