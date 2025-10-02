@@ -70,14 +70,25 @@ const AdminTroubleshooting = () => {
         return;
       }
 
-      // Get user ID from auth
-      const { data: authUser } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('username', userEmail.split('@')[0])
-        .maybeSingle();
+      // Get user ID by calling backend lookup function
+      const { data: userLookup, error: lookupError } = await supabase.functions.invoke('admin-user-lookup', {
+        body: { email: userEmail }
+      });
 
-      const userId = authUser?.id;
+      if (lookupError || !userLookup?.userId) {
+        results.push({
+          check: "User Authentication",
+          status: 'fail',
+          message: lookupError?.message || userLookup?.error || "User account not found",
+          details: { searchedEmail: userEmail, lookupError },
+          iconName: 'User'
+        });
+        setDiagnostics(results);
+        setIsRunning(false);
+        return;
+      }
+
+      const userId = userLookup.userId;
 
       // 2. Check broker integration
       const { data: integration } = await supabase
@@ -152,7 +163,7 @@ const AdminTroubleshooting = () => {
           .from('trading_signals')
           .select('*')
           .eq('user_id', userId)
-          .eq('is_executed', false)
+          .eq('status', 'active')
           .gte('expires_at', new Date().toISOString());
         
         signals = res.data || [];
