@@ -34,11 +34,12 @@ interface DiagnosticResult {
 
 const AdminTroubleshooting = () => {
   const [userEmail, setUserEmail] = useState("");
+  const [userId, setUserId] = useState("");
   const [isRunning, setIsRunning] = useState(false);
   const [diagnostics, setDiagnostics] = useState<DiagnosticResult[]>([]);
 
   const runDiagnostics = async () => {
-    if (!userEmail) {
+    if (!userEmail && !userId) {
       return;
     }
 
@@ -70,25 +71,22 @@ const AdminTroubleshooting = () => {
         return;
       }
 
-      // Get user ID by calling backend lookup function
-      const { data: userLookup, error: lookupError } = await supabase.functions.invoke('admin-user-lookup', {
-        body: { email: userEmail }
-      });
-
-      if (lookupError || !userLookup?.userId) {
+      // Use provided user ID or show error
+      if (!userId) {
         results.push({
-          check: "User Authentication",
+          check: "User ID Required",
           status: 'fail',
-          message: lookupError?.message || userLookup?.error || "User account not found",
-          details: { searchedEmail: userEmail, lookupError },
+          message: "Please provide the user's UUID to continue diagnostics. User must have signed up and logged in at least once.",
+          details: { 
+            note: "You can find the user ID in Supabase Auth Users table",
+            whitelistedEmail: userEmail 
+          },
           iconName: 'User'
         });
         setDiagnostics(results);
         setIsRunning(false);
         return;
       }
-
-      const userId = userLookup.userId;
 
       // 2. Check broker integration
       const { data: integration } = await supabase
@@ -287,7 +285,7 @@ const AdminTroubleshooting = () => {
             <CardHeader>
               <CardTitle>User Auto-Trading Diagnostics</CardTitle>
               <CardDescription>
-                Enter a user's email to check all auto-trading requirements
+                Enter a user's email and UUID to check all auto-trading requirements. Note: User must have signed up and logged in at least once. Find User IDs in Supabase Auth Users table.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -303,10 +301,21 @@ const AdminTroubleshooting = () => {
                     onKeyDown={(e) => e.key === 'Enter' && runDiagnostics()}
                   />
                 </div>
+                <div className="flex-1">
+                  <Label htmlFor="userId">User ID (UUID)</Label>
+                  <Input
+                    id="userId"
+                    type="text"
+                    placeholder="00000000-0000-0000-0000-000000000000"
+                    value={userId}
+                    onChange={(e) => setUserId(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && runDiagnostics()}
+                  />
+                </div>
                 <div className="flex items-end">
                   <Button 
                     onClick={runDiagnostics} 
-                    disabled={!userEmail || isRunning}
+                    disabled={(!userEmail && !userId) || isRunning}
                   >
                     {isRunning ? (
                       <>
