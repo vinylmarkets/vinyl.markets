@@ -107,3 +107,6 @@ verify_jwt = true
 
 [functions.get-amp-events]
 verify_jwt = true
+
+[functions.market-news]
+verify_jwt = true
