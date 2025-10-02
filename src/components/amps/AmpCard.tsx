@@ -34,20 +34,12 @@ export function AmpCard({ amp, onToggle, onAllocate, onSettings }: AmpCardProps)
     <Card className={`transition-all hover:shadow-md ${amp.is_active ? 'border-green-500' : 'border-border'}`}>
       <div className="p-4">
         {/* Hero Image */}
-        <div className="relative mb-3 rounded-lg overflow-hidden h-32">
+        <div className="relative mb-3 rounded-lg overflow-hidden h-48">
           <img 
             src={amp.catalog?.image_url || 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&q=80'} 
             alt={amp.name}
             className="w-full h-full object-cover"
           />
-          <div className="absolute top-2 right-2">
-            <Switch
-              checked={amp.is_active}
-              onCheckedChange={handleToggle}
-              disabled={isToggling}
-              className="flex-shrink-0"
-            />
-          </div>
         </div>
 
         {/* Compact Header */}
@@ -67,6 +59,12 @@ export function AmpCard({ amp, onToggle, onAllocate, onSettings }: AmpCardProps)
               {amp.catalog?.category || 'momentum'}
             </Badge>
           </div>
+          <Switch
+            checked={amp.is_active}
+            onCheckedChange={handleToggle}
+            disabled={isToggling}
+            className="flex-shrink-0"
+          />
         </div>
 
         {/* Condensed Description */}
