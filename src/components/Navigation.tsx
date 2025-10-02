@@ -171,17 +171,6 @@ export const Navigation = () => {
                     </div>
                   </div>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to="/dashboard" className="w-full cursor-pointer">
-                      <User className="mr-2 h-4 w-4" />
-                      Dashboard
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
                     <LogOut className="mr-2 h-4 w-4" />
                     Sign out
@@ -259,14 +248,6 @@ export const Navigation = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Link
-                      to="/dashboard"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center gap-2 text-black hover:text-black/80 py-2 transition-colors"
-                    >
-                      <User className="h-4 w-4" />
-                      Dashboard
-                    </Link>
                     <button
                       onClick={handleSignOut}
                       className="flex items-center gap-2 text-black hover:text-black/80 py-2 transition-colors w-full text-left"

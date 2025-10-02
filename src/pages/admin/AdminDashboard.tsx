@@ -245,133 +245,6 @@ export default function AdminDashboard() {
 
   const dashboardSections = [
     {
-      title: "Executive Overview",
-      description: "High-level metrics, revenue trends, and key performance indicators",
-      icon: BarChart3,
-      href: "/admin/executive-overview",
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-      metrics: stats ? [
-        { label: "Total Users", value: stats.totalUsers.toLocaleString() },
-        { label: "MRR", value: `$${stats.totalRevenue.toLocaleString()}` }
-      ] : []
-    },
-    {
-      title: "User Analytics",
-      description: "User behavior, signup trends, and engagement analysis",
-      icon: Users,
-      href: "/admin/user-analytics",
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-      metrics: stats ? [
-        { label: "Total Users", value: stats.totalUsers.toLocaleString() },
-        { label: "Active Users", value: stats.activeUsers.toLocaleString() }
-      ] : []
-    },
-    {
-      title: "Product Intelligence",
-      description: "Feature adoption, user satisfaction, and product insights",
-      icon: Brain,
-      href: "/admin/product-intelligence",
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-      metrics: [
-        { label: "Satisfaction", value: "4.3/5" },
-        { label: "Feature Adoption", value: "76%" }
-      ]
-    },
-    {
-      title: "Content Performance",
-      description: "Content analytics, engagement metrics, and topic trends",
-      icon: FileText,
-      href: "/admin/content-performance",
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
-      metrics: contentStats ? [
-        { label: "Avg Rating", value: `${contentStats.avgRating}/5` },
-        { label: "Read Time", value: `${contentStats.avgReadTime} min` }
-      ] : [
-        { label: "Avg Rating", value: "Loading..." },
-        { label: "Read Time", value: "Loading..." }
-      ]
-    },
-    {
-      title: "Business Metrics",
-      description: "Financial tracking, conversion funnels, and system performance",
-      icon: DollarSign,
-      href: "/admin/business-metrics",
-      color: "text-emerald-600",
-      bgColor: "bg-emerald-50",
-      metrics: stats ? [
-        { label: "LTV:CAC", value: stats.totalRevenue > 0 ? `${((stats.totalRevenue * 24) / Math.max(1, (stats.totalRevenue * 0.3))).toFixed(1)}:1` : "0:1" },
-        { label: "Conversion", value: stats.conversionRate || "0.0%" }
-      ] : [
-        { label: "LTV:CAC", value: "Loading..." },
-        { label: "Conversion", value: "Loading..." }
-      ]
-    },
-    {
-      title: "Algorithm Performance",
-      description: "Algorithm accuracy metrics, signal analysis, and optimization recommendations",
-      icon: Brain,
-      href: "/admin/algorithm-performance",
-      color: "text-indigo-600",
-      bgColor: "bg-indigo-50",
-      metrics: [
-        { label: "Accuracy", value: "73.2%" },
-        { label: "Confidence", value: "82%" }
-      ]
-    },
-    {
-      title: "Compliance Monitoring",
-      description: "Risk management, content flags, and regulatory compliance",
-      icon: Shield,
-      href: "/admin/compliance-monitoring",
-      color: "text-red-600",
-      bgColor: "bg-red-50",
-      metrics: stats ? [
-        { label: "Pending Flags", value: stats.pendingFlags.toString() },
-        { label: "Compliance", value: `${stats.complianceScore}%` },
-        { label: "Complaints", value: stats.totalComplaints.toString() }
-      ] : []
-    },
-    {
-      title: "Image Generator",
-      description: "AI-powered image generation for homepage and landing pages",
-      icon: Sparkles,
-      href: "/admin/image-generator",
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-      metrics: [
-        { label: "Generate", value: "New Images" },
-        { label: "AI Powered", value: "GPT-4" }
-      ]
-    },
-    {
-      title: "Image Library",
-      description: "Manage and organize your generated images and assets",
-      icon: Images,
-      href: "/admin/image-library",  
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-      metrics: [
-        { label: "Browse", value: "All Images" },
-        { label: "Download", value: "& Share" }
-      ]
-    },
-    {
-      title: "Product Development",
-      description: "Phase 2 features and development roadmap for advanced tools",
-      icon: Rocket,
-      href: "/admin/product-development",
-      color: "text-violet-600",
-      bgColor: "bg-violet-50",
-      metrics: [
-        { label: "Phase 2", value: "Features" },
-        { label: "Status", value: "In Progress" }
-      ]
-    },
-    {
       title: "Daily Predictions",
       description: "Generate and manage AI-powered daily stock predictions",
       icon: Brain,
@@ -410,30 +283,6 @@ export default function AdminDashboard() {
       ]
     },
     {
-      title: "Launch Checklist",
-      description: "Track beta launch readiness across functionality, copy, layout, and compliance",
-      icon: Rocket,
-      href: "/admin/launch-checklist",
-      color: "text-red-600",
-      bgColor: "bg-red-50",
-      metrics: [
-        { label: "Progress", value: "Tracking" },
-        { label: "Readiness", value: "Monitor" }
-      ]
-    },
-    {
-      title: "Knowledge Graph",
-      description: "AI-powered prediction enhancement using pattern correlation and historical accuracy",
-      icon: Network,
-      href: "/admin/knowledge-graph",
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-      metrics: [
-        { label: "Graph", value: "Enhanced" },
-        { label: "Accuracy", value: "AI Driven" }
-      ]
-    },
-    {
       title: "Atomic Playbook",
       description: "Company operations intelligence system with AI assistant",
       icon: Target,
@@ -443,18 +292,6 @@ export default function AdminDashboard() {
       metrics: [
         { label: "Phase 1", value: "Active" },
         { label: "AI", value: "Assistant" }
-      ]
-    },
-    {
-      title: "Cron Jobs Management",
-      description: "Monitor and manage automated tasks, schedules, and background processes",
-      icon: Clock,
-      href: "/admin/cron-jobs",
-      color: "text-amber-600",
-      bgColor: "bg-amber-50",
-      metrics: [
-        { label: "Active", value: "5 Jobs" },
-        { label: "Schedule", value: "Daily" }
       ]
     }
   ];
