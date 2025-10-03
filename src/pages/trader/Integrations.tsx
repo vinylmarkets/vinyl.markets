@@ -8,8 +8,9 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { Shield, CheckCircle, AlertCircle, Eye, EyeOff, Link as LinkIcon, Loader2 } from "lucide-react";
-import { Link } from "react-router-dom";
 import { TraderProtection } from "@/components/trader/TraderProtection";
+import { Sidebar } from "@/components/trader/Sidebar";
+import { ComingSoonModal } from "@/components/trader/ComingSoonModal";
 import { TraderHeader } from "@/trader-platform/components/TraderHeader";
 import { FadeInWrapper } from "@/components/FadeInWrapper";
 
@@ -23,6 +24,7 @@ interface Integration {
 }
 
 const Integrations = () => {
+  const [comingSoonFeature, setComingSoonFeature] = useState<string | null>(null);
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -202,12 +204,15 @@ const Integrations = () => {
   if (loading) {
     return (
       <TraderProtection>
-        <div className="min-h-screen bg-background relative">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 pointer-events-none"></div>
-          <TraderHeader showAccountStats={false} />
-          <div className="container mx-auto p-6 relative z-10">
-            <div className="flex items-center justify-center min-h-[400px]">
-              <Loader2 className="h-8 w-8 animate-spin" />
+        <div className="min-h-screen bg-background relative flex">
+          <Sidebar onComingSoonClick={setComingSoonFeature} />
+          <div className="flex-1 ml-16">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 pointer-events-none"></div>
+            <TraderHeader showAccountStats={false} />
+            <div className="container mx-auto p-6 relative z-10">
+              <div className="flex items-center justify-center min-h-[400px]">
+                <Loader2 className="h-8 w-8 animate-spin" />
+              </div>
             </div>
           </div>
         </div>
@@ -217,22 +222,19 @@ const Integrations = () => {
 
   return (
     <TraderProtection>
-      <div className="min-h-screen bg-background relative">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 pointer-events-none"></div>
-        <TraderHeader showAccountStats={false} />
-        <FadeInWrapper>
-          <div className="container mx-auto p-6 space-y-6 relative z-10">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <LinkIcon className="h-8 w-8 text-primary" />
-          <h1 className="text-3xl font-bold">Broker Integrations</h1>
-        </div>
-        <Button asChild variant="outline">
-          <Link to="/trader">
-            Back to Dashboard
-          </Link>
-        </Button>
-      </div>
+      <div className="min-h-screen bg-background relative flex">
+        <Sidebar onComingSoonClick={setComingSoonFeature} />
+        <div className="flex-1 ml-16">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 pointer-events-none"></div>
+          <TraderHeader showAccountStats={false} />
+          <FadeInWrapper>
+            <div className="container mx-auto p-6 space-y-6 relative z-10">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <LinkIcon className="h-8 w-8 text-primary" />
+                  <h1 className="text-3xl font-bold">Broker Integrations</h1>
+                </div>
+              </div>
 
       {/* Existing Integrations */}
       {integrations.length > 0 && (
@@ -555,9 +557,15 @@ const Integrations = () => {
           </div>
         </CardContent>
       </Card>
-    </div>
-    </FadeInWrapper>
-    </div>
+            </div>
+          </FadeInWrapper>
+        </div>
+        <ComingSoonModal
+          open={comingSoonFeature !== null}
+          onOpenChange={(open) => !open && setComingSoonFeature(null)}
+          featureName={comingSoonFeature || ""}
+        />
+      </div>
     </TraderProtection>
   );
 };

@@ -1,31 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, HelpCircle, BookOpen, Video, MessageCircle } from "lucide-react";
-import { Link } from "react-router-dom";
+import { HelpCircle } from "lucide-react";
 import { TraderProtection } from "@/components/trader/TraderProtection";
+import { Sidebar } from "@/components/trader/Sidebar";
+import { ComingSoonModal } from "@/components/trader/ComingSoonModal";
+import { TraderHeader } from "@/trader-platform/components/TraderHeader";
 
 const TraderHelp = () => {
+  const [comingSoonFeature, setComingSoonFeature] = useState<string | null>(null);
+
   return (
     <TraderProtection>
-      <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="h-16 border-b border-border bg-card/50 backdrop-blur">
-          <div className="flex items-center justify-between px-6 h-full">
-            <div className="flex items-center space-x-4">
-              <Link to="/trader">
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Trading
-                </Button>
-              </Link>
-              <h1 className="text-xl font-bold">Help & Tutorials</h1>
-            </div>
-          </div>
-        </header>
+      <div className="min-h-screen bg-background relative flex">
+        <Sidebar onComingSoonClick={setComingSoonFeature} />
+        <div className="flex-1 ml-16">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 pointer-events-none"></div>
+          <TraderHeader showAccountStats={false} />
 
-        {/* Content */}
-        <div className="p-6 max-w-4xl mx-auto space-y-6">
+          {/* Content */}
+          <div className="p-6 max-w-4xl mx-auto space-y-6 relative z-10">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -46,7 +39,13 @@ const TraderHelp = () => {
               </div>
             </CardContent>
           </Card>
+          </div>
         </div>
+        <ComingSoonModal
+          open={comingSoonFeature !== null}
+          onOpenChange={(open) => !open && setComingSoonFeature(null)}
+          featureName={comingSoonFeature || ""}
+        />
       </div>
     </TraderProtection>
   );

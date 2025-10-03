@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { TraderProtection } from "@/components/trader/TraderProtection";
+import { Sidebar } from "@/components/trader/Sidebar";
+import { ComingSoonModal } from "@/components/trader/ComingSoonModal";
+import { TraderHeader } from "@/trader-platform/components/TraderHeader";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +20,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import {
-  ArrowLeft,
   Mail,
   TrendingUp,
   Users,
@@ -53,6 +55,7 @@ interface TopicAnalysis {
 }
 
 const TraderReporting = () => {
+  const [comingSoonFeature, setComingSoonFeature] = useState<string | null>(null);
   const [stats, setStats] = useState<NewsletterStats>({
     totalSent: 0,
     totalViews: 0,
@@ -208,23 +211,20 @@ const TraderReporting = () => {
 
   return (
     <TraderProtection>
-      <div className="min-h-screen bg-background p-4 sm:p-6 lg:p-8">
-        <div className="max-w-7xl mx-auto space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button asChild variant="ghost" size="sm">
-                <Link to="/trader" className="flex items-center space-x-2">
-                  <ArrowLeft className="h-4 w-4" />
-                  <span>Back to Dashboard</span>
-                </Link>
-              </Button>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Mail className="h-6 w-6 text-primary" />
-              <h1 className="text-2xl font-semibold">Newsletter Reporting</h1>
-            </div>
-          </div>
+      <div className="min-h-screen bg-background relative flex">
+        <Sidebar onComingSoonClick={setComingSoonFeature} />
+        <div className="flex-1 ml-16">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 pointer-events-none"></div>
+          <TraderHeader showAccountStats={false} />
+          <div className="p-4 sm:p-6 lg:p-8 relative z-10">
+            <div className="max-w-7xl mx-auto space-y-6">
+              {/* Header */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <Mail className="h-6 w-6 text-primary" />
+                  <h1 className="text-2xl font-semibold">Newsletter Reporting</h1>
+                </div>
+              </div>
 
           {/* KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -505,7 +505,14 @@ const TraderReporting = () => {
               )}
             </CardContent>
           </Card>
+            </div>
+          </div>
         </div>
+        <ComingSoonModal
+          open={comingSoonFeature !== null}
+          onOpenChange={(open) => !open && setComingSoonFeature(null)}
+          featureName={comingSoonFeature || ""}
+        />
       </div>
     </TraderProtection>
   );
