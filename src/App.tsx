@@ -17,6 +17,7 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import Dashboard from "./pages/admin/Dashboard";
 import Users from "./pages/admin/Users";
 import UserDetail from "./pages/admin/UserDetail";
+import AuditLogs from "./pages/admin/AuditLogs";
 import AdminDashboardNew from "./pages/admin/AdminDashboardNew";
 import Auth from "./pages/Auth";
 import TraderPage from "./pages/trader/TraderPage";
@@ -64,6 +65,7 @@ const App = () => {
                 <Route index element={<Dashboard />} />
                 <Route path="users" element={<Users />} />
                 <Route path="users/:userId" element={<UserDetail />} />
+                <Route path="audit-logs" element={<AuditLogs />} />
               </Route>
               
               {/* Hidden Trader Platform - Not linked from navigation */}
