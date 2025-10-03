@@ -152,8 +152,14 @@ export const TradingDashboard = ({ onLoadingChange }: TradingDashboardProps = {}
   // Expose aggregate loading state for parent components
   const isPageLoading = isLoadingSignals || isLoadingIntegrations || isLoadingAccount;
 
+  // Debug logging for loading states
+  useEffect(() => {
+    console.log('Loading states:', { isLoadingSignals, isLoadingIntegrations, isLoadingAccount, isPageLoading });
+  }, [isLoadingSignals, isLoadingIntegrations, isLoadingAccount, isPageLoading]);
+
   // Notify parent component of loading state changes
   useEffect(() => {
+    console.log('Notifying parent of loading state:', isPageLoading);
     onLoadingChange?.(isPageLoading);
   }, [isPageLoading, onLoadingChange]);
 
@@ -320,7 +326,14 @@ export const TradingDashboard = ({ onLoadingChange }: TradingDashboardProps = {}
 
   // Fetch account data when integrations are detected
   useEffect(() => {
-    console.log('hasIntegrations changed to:', hasIntegrations);
+    console.log('hasIntegrations changed to:', hasIntegrations, 'isLoadingIntegrations:', isLoadingIntegrations);
+    
+    // If integrations check is still loading, wait for it
+    if (isLoadingIntegrations) {
+      console.log('Still checking integrations, waiting...');
+      return;
+    }
+    
     if (hasIntegrations) {
       console.log('Calling fetchAccountData and fetchPositionsData because hasIntegrations is true');
       // Call both account and positions functions
@@ -379,14 +392,16 @@ export const TradingDashboard = ({ onLoadingChange }: TradingDashboardProps = {}
         } catch (error) {
           console.error('Failed to fetch account/positions data:', error);
         } finally {
+          console.log('Account data fetch complete, setting isLoadingAccount to false');
           setIsLoadingAccount(false);
         }
       })();
     } else {
       // No integrations, mark account loading as complete
+      console.log('No integrations detected, setting isLoadingAccount to false');
       setIsLoadingAccount(false);
     }
-  }, [hasIntegrations]);
+  }, [hasIntegrations, isLoadingIntegrations]);
 
   const handleLogout = async () => {
     try {

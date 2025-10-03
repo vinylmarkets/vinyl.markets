@@ -17,6 +17,11 @@ const TraderPage = () => {
     setComingSoonOpen(true);
   };
 
+  // Debug logging
+  useEffect(() => {
+    console.log('TraderPage isPageLoading:', isPageLoading);
+  }, [isPageLoading]);
+
   // Listen for sidebar state changes
   useEffect(() => {
     const handleSidebarChange = () => {
