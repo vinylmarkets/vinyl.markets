@@ -55,43 +55,24 @@ export const TraderHeader: React.FC<TraderHeaderProps> = ({
 
   return (
     <header 
-      className="h-16 border-b relative overflow-hidden"
+      className="h-16 border-b border-[#2A2A2A] relative overflow-hidden bg-[#1A1A1A]"
       style={woodHeaderEnabled ? {
         background: '#5a3a1a',
         borderColor: '#5a3a1a',
         boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
-      } : {
-        background: 'hsl(var(--card) / 0.5)',
-        backdropFilter: 'blur(8px)',
-        borderColor: 'hsl(var(--border))'
-      }}
+      } : undefined}
     >
       <div className="flex items-center justify-between px-4 sm:px-6 h-full relative z-10">
         {/* Left Side - Logo */}
         <div className="flex items-center space-x-2 sm:space-x-4">
           {/* Logo */}
           <Link to="/trader" className="flex items-center space-x-2 sm:space-x-3">
-            {woodHeaderEnabled ? (
-              <img 
-                src={vinylLogoWhite} 
-                alt="Vinyl" 
-                className="h-9 w-auto"
-              />
-            ) : (
-              <>
-                <img 
-                  src={vinylLogoBlack} 
-                  alt="Vinyl" 
-                  className="h-9 w-auto dark:hidden"
-                />
-                <img 
-                  src={vinylLogoWhite} 
-                  alt="Vinyl" 
-                  className="h-9 w-auto hidden dark:block"
-                />
-              </>
-            )}
-            <div className={`text-lg sm:text-xl font-bold tracking-tight ${woodHeaderEnabled ? 'text-white' : 'text-foreground'}`}>
+            <img 
+              src={woodHeaderEnabled ? vinylLogoWhite : vinylLogoWhite} 
+              alt="Vinyl" 
+              className="h-9 w-auto"
+            />
+            <div className="text-lg sm:text-xl font-bold tracking-tight text-white">
               <span className="hidden sm:inline">v5.0</span>
             </div>
           </Link>

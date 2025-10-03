@@ -117,7 +117,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onComingSoonClick }) => {
     <TooltipProvider delayDuration={300}>
       <aside
         className={cn(
-          "fixed left-0 top-0 h-full bg-[#1a1a1a] border-r border-border/50 z-40 transition-all duration-200 flex flex-col",
+          "fixed left-0 top-0 h-full bg-[#1A1A1A] border-r border-[#2A2A2A] z-40 transition-all duration-200 flex flex-col",
           isExpanded ? "w-60" : "w-16"
         )}
       >
@@ -137,7 +137,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onComingSoonClick }) => {
                   {isExpanded && (
                     isAdvancedGroup ? (
                       <CollapsibleTrigger className="w-full px-4 mb-2 flex items-center justify-between group">
-                        <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                        <span className="text-[11px] font-medium text-gray-500 uppercase tracking-wider">
                           {group.label}
                         </span>
                         <ChevronRight
@@ -149,7 +149,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onComingSoonClick }) => {
                       </CollapsibleTrigger>
                     ) : (
                       <div className="px-4 mb-2">
-                        <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                        <span className="text-[11px] font-medium text-gray-500 uppercase tracking-wider">
                           {group.label}
                         </span>
                       </div>
@@ -163,27 +163,27 @@ export const Sidebar: React.FC<SidebarProps> = ({ onComingSoonClick }) => {
                         const Icon = item.icon;
                         const isActive = isActivePath(item.path);
                         const itemContent = (
-                          <NavLink
+                           <NavLink
                             to={item.path}
                             onClick={(e) => handleMenuClick(item, e)}
                             className={cn(
                               "flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-all relative group",
-                              "hover:bg-accent/50",
-                              isActive && "bg-accent text-primary",
-                              !isActive && "text-muted-foreground hover:text-foreground",
+                              "hover:bg-[#9540FF]/10",
+                              isActive && "bg-[#9540FF]/20 text-white",
+                              !isActive && "text-gray-400 hover:text-white",
                               item.comingSoon && "opacity-70 cursor-not-allowed",
                               !isExpanded && "justify-center"
                             )}
                           >
                             {/* Active indicator bar */}
                             {isActive && (
-                              <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r" />
+                              <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#9540FF] rounded-r" />
                             )}
 
                             <Icon
                               className={cn(
                                 "h-5 w-5 flex-shrink-0",
-                                isActive && "text-primary"
+                                isActive && "text-[#9540FF]"
                               )}
                             />
 
@@ -230,27 +230,27 @@ export const Sidebar: React.FC<SidebarProps> = ({ onComingSoonClick }) => {
                         const Icon = item.icon;
                         const isActive = isActivePath(item.path);
                         const itemContent = (
-                          <NavLink
+                           <NavLink
                             to={item.path}
                             onClick={(e) => handleMenuClick(item, e)}
                             className={cn(
                               "flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-all relative group",
-                              "hover:bg-accent/50",
-                              isActive && "bg-accent text-primary",
-                              !isActive && "text-muted-foreground hover:text-foreground",
+                              "hover:bg-[#9540FF]/10",
+                              isActive && "bg-[#9540FF]/20 text-white",
+                              !isActive && "text-gray-400 hover:text-white",
                               item.comingSoon && "opacity-70 cursor-not-allowed",
                               !isExpanded && "justify-center"
                             )}
                           >
                             {/* Active indicator bar */}
                             {isActive && (
-                              <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r" />
+                              <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#9540FF] rounded-r" />
                             )}
 
                             <Icon
                               className={cn(
                                 "h-5 w-5 flex-shrink-0",
-                                isActive && "text-primary"
+                                isActive && "text-[#9540FF]"
                               )}
                             />
 
@@ -295,7 +295,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onComingSoonClick }) => {
 
                   {/* Divider between groups */}
                   {groupIndex < menuGroups.length - 1 && (
-                    <div className="mx-4 my-4 border-t border-border/50" />
+                    <div className="mx-4 my-4 border-t border-[#2A2A2A]" />
                   )}
                 </GroupWrapper>
               );
@@ -304,7 +304,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onComingSoonClick }) => {
         </nav>
 
         {/* Toggle Button */}
-        <div className="p-4 border-t border-border/50">
+        <div className="p-4 border-t border-[#2A2A2A]">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
