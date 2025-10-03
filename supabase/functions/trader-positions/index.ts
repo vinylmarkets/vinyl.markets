@@ -298,7 +298,7 @@ Deno.serve(async (request) => {
   }
 
   try {
-    if (req.method !== 'GET') {
+    if (req.method !== 'POST' && req.method !== 'GET') {
       return new Response(
         JSON.stringify({ error: 'Method not allowed' }),
         { 
