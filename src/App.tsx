@@ -12,11 +12,9 @@ import KnowledgeExplorer from "./pages/trader/KnowledgeExplorer";
 import InsightsDashboard from "./pages/trader/InsightsDashboard";
 import BetaTesting from "./pages/trader/BetaTesting";
 // Admin Dashboard Components
-import { AdminProtected } from "./components/AdminProtected";
-import AdminLogin from "./pages/AdminLogin";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminTroubleshooting from "./pages/admin/AdminTroubleshooting";
-import Marketing from "./pages/admin/Marketing";
+import { AdminLayout } from "./components/admin/AdminLayout";
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminDashboardNew from "./pages/admin/AdminDashboardNew";
 import Auth from "./pages/Auth";
 import TraderPage from "./pages/trader/TraderPage";
 import TraderAuth from "./pages/trader/TraderAuth";
@@ -58,10 +56,10 @@ const App = () => {
               <Route path="/trader/testing" element={<BetaTesting />} />
               
               {/* Admin Dashboard Routes */}
-              <Route path="/admin-login" element={<AdminLogin />} />
-              <Route path="/admin" element={<AdminProtected><AdminDashboard /></AdminProtected>} />
-              <Route path="/admin/troubleshooting" element={<AdminProtected><AdminTroubleshooting /></AdminProtected>} />
-              <Route path="/admin/marketing" element={<AdminProtected><Marketing /></AdminProtected>} />
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<AdminDashboardNew />} />
+              </Route>
               
               {/* Hidden Trader Platform - Not linked from navigation */}
               <Route path="/trader-auth" element={<TraderAuth />} />
