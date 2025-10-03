@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { ChartFocus } from '@/components/trader/ChartFocus';
 import {
   TrendingUp,
   TrendingDown,
@@ -21,6 +22,8 @@ import {
 } from 'recharts';
 
 export default function BentoDashboard() {
+  const [focusMode, setFocusMode] = useState(false);
+
   // Mock data
   const portfolioValue = 47853.21;
   const portfolioChange = 2347.89;
@@ -129,7 +132,12 @@ export default function BentoDashboard() {
               <p className="text-sm text-gray-400">Last 30 days</p>
             </div>
             <div className="flex gap-2">
-              <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="text-gray-400 hover:text-white"
+                onClick={() => setFocusMode(true)}
+              >
                 <Maximize2 size={18} />
               </Button>
             </div>
@@ -306,6 +314,14 @@ export default function BentoDashboard() {
         </Card>
 
       </div>
+
+      {/* Full-Screen Chart Focus Mode */}
+      {focusMode && (
+        <ChartFocus 
+          symbol="AAPL" 
+          onClose={() => setFocusMode(false)} 
+        />
+      )}
     </div>
   );
 }
