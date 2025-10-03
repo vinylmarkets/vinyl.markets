@@ -618,21 +618,26 @@ export type Database = {
           author_id: string | null
           author_name: string
           category: string | null
+          category_id: string | null
           content: string
           created_at: string
           excerpt: string | null
+          featured_image: string | null
           featured_image_alt: string | null
           featured_image_url: string | null
           id: string
           keywords: string[] | null
           like_count: number | null
           meta_description: string | null
+          meta_keywords: string | null
           meta_title: string | null
           published: boolean | null
           published_at: string | null
+          read_time_minutes: number | null
           reading_time_minutes: number | null
           seo_schema: Json | null
           slug: string
+          status: string | null
           tags: string[] | null
           title: string
           updated_at: string
@@ -644,21 +649,26 @@ export type Database = {
           author_id?: string | null
           author_name: string
           category?: string | null
+          category_id?: string | null
           content: string
           created_at?: string
           excerpt?: string | null
+          featured_image?: string | null
           featured_image_alt?: string | null
           featured_image_url?: string | null
           id?: string
           keywords?: string[] | null
           like_count?: number | null
           meta_description?: string | null
+          meta_keywords?: string | null
           meta_title?: string | null
           published?: boolean | null
           published_at?: string | null
+          read_time_minutes?: number | null
           reading_time_minutes?: number | null
           seo_schema?: Json | null
           slug: string
+          status?: string | null
           tags?: string[] | null
           title: string
           updated_at?: string
@@ -670,27 +680,40 @@ export type Database = {
           author_id?: string | null
           author_name?: string
           category?: string | null
+          category_id?: string | null
           content?: string
           created_at?: string
           excerpt?: string | null
+          featured_image?: string | null
           featured_image_alt?: string | null
           featured_image_url?: string | null
           id?: string
           keywords?: string[] | null
           like_count?: number | null
           meta_description?: string | null
+          meta_keywords?: string | null
           meta_title?: string | null
           published?: boolean | null
           published_at?: string | null
+          read_time_minutes?: number | null
           reading_time_minutes?: number | null
           seo_schema?: Json | null
           slug?: string
+          status?: string | null
           tags?: string[] | null
           title?: string
           updated_at?: string
           view_count?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "blog_posts_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "blog_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       blog_views: {
         Row: {
@@ -1109,6 +1132,51 @@ export type Database = {
           resolved_at?: string | null
           reviewed?: boolean | null
           reviewer?: string | null
+        }
+        Relationships: []
+      }
+      content_pages: {
+        Row: {
+          author_id: string | null
+          content: string | null
+          created_at: string | null
+          id: string
+          meta_description: string | null
+          meta_keywords: string | null
+          published_at: string | null
+          reviewer_id: string | null
+          slug: string
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          author_id?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          meta_description?: string | null
+          meta_keywords?: string | null
+          published_at?: string | null
+          reviewer_id?: string | null
+          slug: string
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          author_id?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          meta_description?: string | null
+          meta_keywords?: string | null
+          published_at?: string | null
+          reviewer_id?: string | null
+          slug?: string
+          status?: string | null
+          title?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -2175,6 +2243,42 @@ export type Database = {
           parameters?: Json
           scan_type?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      media_library: {
+        Row: {
+          alt_text: string | null
+          created_at: string | null
+          file_path: string
+          file_size: number | null
+          file_type: string
+          filename: string
+          id: string
+          original_filename: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          alt_text?: string | null
+          created_at?: string | null
+          file_path: string
+          file_size?: number | null
+          file_type: string
+          filename: string
+          id?: string
+          original_filename: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          alt_text?: string | null
+          created_at?: string | null
+          file_path?: string
+          file_size?: number | null
+          file_type?: string
+          filename?: string
+          id?: string
+          original_filename?: string
+          uploaded_by?: string | null
         }
         Relationships: []
       }

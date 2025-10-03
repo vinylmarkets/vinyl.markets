@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Users, DollarSign, Settings, FileText, BarChart3 } from 'lucide-react';
+import { Home, Users, DollarSign, Settings, FileText, BarChart3, Newspaper } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -14,6 +14,7 @@ const navItems: NavItem[] = [
   { label: 'Dashboard', icon: Home, path: '/admin' },
   { label: 'Users', icon: Users, path: '/admin/users', permission: 'users' },
   { label: 'Amps', icon: BarChart3, path: '/admin/amps' },
+  { label: 'Content', icon: Newspaper, path: '/admin/content/blog', permission: 'content' },
   { label: 'Financial', icon: DollarSign, path: '/admin/financial', permission: 'financial' },
   { label: 'Audit Logs', icon: FileText, path: '/admin/audit-logs' },
   { label: 'Settings', icon: Settings, path: '/admin/settings' },
