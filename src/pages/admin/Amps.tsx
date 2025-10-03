@@ -159,7 +159,7 @@ export default function Amps() {
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Deployments</p>
                     <p className="text-lg font-semibold text-white">
-                      {amp.deployment_count || 0}
+                      N/A
                     </p>
                   </div>
                   <div>
@@ -176,7 +176,7 @@ export default function Amps() {
                     variant="ghost"
                     size="sm"
                     onClick={() => handleDeactivateAll(amp.id, amp.name)}
-                    disabled={deactivateDeployments.isPending || amp.deployment_count === 0}
+                    disabled={true}
                     className="text-red-400 hover:text-red-300 hover:bg-red-500/10 text-xs"
                   >
                     <Activity size={14} className="mr-1" />

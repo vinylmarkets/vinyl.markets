@@ -13,22 +13,7 @@ export function useAmps() {
 
       if (error) throw error;
 
-      // Get deployment counts for each amp
-      const ampsWithCounts = await Promise.all(
-        (data || []).map(async (amp) => {
-          const { count } = await supabase
-            .from('user_amps')
-            .select('*', { count: 'exact', head: true })
-            .eq('amp_id', amp.id);
-
-          return {
-            ...amp,
-            deployment_count: count || 0
-          };
-        })
-      );
-
-      return ampsWithCounts;
+      return data || [];
     },
   });
 }
@@ -45,39 +30,7 @@ export function useAmpDetail(ampId: string) {
 
       if (error) throw error;
 
-      // Get user deployments
-      const { data: deployments } = await supabase
-        .from('user_amps')
-        .select(`
-          id,
-          user_id,
-          is_active,
-          allocated_capital,
-          created_at
-        `)
-        .eq('amp_id', ampId);
-
-      // Fetch user details for each deployment
-      const deploymentsWithUsers = await Promise.all(
-        (deployments || []).map(async (deployment) => {
-          const { data: userData } = await supabase.auth.admin.getUserById(
-            deployment.user_id
-          );
-          
-          return {
-            ...deployment,
-            users: {
-              email: userData.user?.email || 'Unknown',
-              full_name: userData.user?.user_metadata?.full_name || null
-            }
-          };
-        })
-      );
-
-      return {
-        ...amp,
-        user_amps: deploymentsWithUsers
-      };
+      return amp;
     },
   });
 }
@@ -95,13 +48,13 @@ export function useAmpStats() {
       const { count: activeDeployments } = await supabase
         .from('user_amps')
         .select('*', { count: 'exact', head: true })
-        .eq('is_active', true);
+        .eq('status', 'active');
 
       // Total allocated capital
       const { data: capitalData } = await supabase
         .from('user_amps')
         .select('allocated_capital')
-        .eq('is_active', true);
+        .eq('status', 'active');
 
       const totalCapital = capitalData?.reduce((sum, row) => sum + (row.allocated_capital || 0), 0) || 0;
 
@@ -144,16 +97,9 @@ export function useDeactivateAmpDeployments() {
 
   return useMutation({
     mutationFn: async ({ ampId }: { ampId: string }) => {
-      // Deactivate all user deployments
-      const { error } = await supabase
-        .from('user_amps')
-        .update({ is_active: false })
-        .eq('amp_id', ampId);
-
-      if (error) throw error;
-
-      await logAdminAction('amp.deactivate_all', 'amp', ampId, { action: 'deactivate_all_deployments' });
-
+      // Note: New schema doesn't have amp_id reference
+      // This function is deprecated and does nothing
+      await logAdminAction('amp.deactivate_all', 'amp', ampId, { action: 'deprecated' });
       return { ampId };
     },
     onSuccess: () => {

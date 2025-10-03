@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ChartFocus } from '@/components/trader/ChartFocus';
 import { useAlpacaAccount, useAlpacaPositions, useAlpacaPortfolioHistory } from '@/integrations/alpaca/hooks';
 import { useMarketStatus } from '@/hooks/useMarketStatus';
+import { useUserAmps } from '@/hooks/useAmps';
 import {
   TrendingUp,
   TrendingDown,
@@ -24,6 +26,7 @@ import {
 } from 'recharts';
 
 export default function BentoDashboard() {
+  const navigate = useNavigate();
   const [focusMode, setFocusMode] = useState(false);
   const [chartTimeframe, setChartTimeframe] = useState('1M');
 
@@ -32,6 +35,9 @@ export default function BentoDashboard() {
   const { data: positionsData, isLoading: positionsLoading, error: positionsError } = useAlpacaPositions();
   const { data: portfolioChart, isLoading: chartLoading } = useAlpacaPortfolioHistory(chartTimeframe, '1D');
   const { data: marketStatus } = useMarketStatus();
+  
+  // Fetch real Amps data
+  const { data: amps, isLoading: ampsLoading } = useUserAmps();
 
   // Debug logging
   console.log('🔍 BentoDashboard - Alpaca Account Data:', {
@@ -56,11 +62,8 @@ export default function BentoDashboard() {
   const positions = positionsData?.positions || [];
   const recentTrades = positionsData?.recentTrades || [];
 
-  // Active Amps (placeholder for now)
-  const activeAmps = [
-    { id: 1, name: 'TubeAmp v1', status: 'active', pnl: 247.50, pnlPercent: 3.2, allocated: 5000 },
-    { id: 2, name: 'Momentum Pro', status: 'active', pnl: -42.10, pnlPercent: -0.8, allocated: 3000 },
-  ];
+  // Filter for active amps only
+  const activeAmps = amps?.filter(amp => amp.status === 'active') || [];
 
   // Real chart data from Alpaca portfolio history
   const chartData = portfolioChart?.map(bar => ({
@@ -122,47 +125,74 @@ export default function BentoDashboard() {
                 {activeAmps.length}
               </Badge>
             </div>
-            <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-              View All <ChevronRight size={16} className="ml-1" />
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => navigate('/trader/amps/deploy')}
+              className="text-gray-400 hover:text-white"
+            >
+              <Plus size={16} className="mr-2" />
+              Deploy Amp
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {activeAmps.map(amp => {
-              const isProfitable = amp.pnl >= 0;
-              return (
-                <div 
-                  key={amp.id}
-                  className="bg-[#0A0A0A] rounded-xl p-4 hover:bg-[#004751] transition-colors cursor-pointer group"
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <p className="text-white font-semibold mb-1">{amp.name}</p>
-                      <p className="text-xs text-gray-500">
-                        ${amp.allocated.toLocaleString()} allocated
-                      </p>
+          {ampsLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="h-32 bg-[#0A0A0A] rounded-xl animate-pulse" />
+              <div className="h-32 bg-[#0A0A0A] rounded-xl animate-pulse" />
+            </div>
+          ) : activeAmps.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-400 mb-4">No active algorithms</p>
+              <Button 
+                onClick={() => navigate('/trader/amps/deploy')}
+                className="bg-gradient-to-r from-[#9540FF] to-[#7C3AED] text-white hover:from-[#9540FF]/90 hover:to-[#7C3AED]/90"
+              >
+                Deploy Your First Amp
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {activeAmps.map(amp => {
+                const isProfitable = parseFloat(amp.total_pnl.toString()) >= 0;
+                return (
+                  <div 
+                    key={amp.id}
+                    onClick={() => navigate(`/trader/amps/${amp.id}`)}
+                    className="bg-[#0A0A0A] rounded-xl p-4 hover:bg-[#004751] transition-colors cursor-pointer group"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <p className="text-white font-semibold mb-1">{amp.name}</p>
+                        <p className="text-xs text-gray-500">
+                          ${parseFloat(amp.allocated_capital.toString()).toLocaleString()} allocated
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          {amp.trades_count} trades · {amp.win_rate}% win rate
+                        </p>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Settings size={14} className="text-gray-400" />
+                      </Button>
                     </div>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Settings size={14} className="text-gray-400" />
-                    </Button>
+                    
+                    <div className="flex items-center justify-between">
+                      <span className={`text-2xl font-bold font-mono ${isProfitable ? 'text-[#0AEF80]' : 'text-[#FF3B69]'}`}>
+                        {isProfitable ? '+' : ''}${Math.abs(parseFloat(amp.total_pnl.toString())).toFixed(2)}
+                      </span>
+                      <span className={`text-sm font-semibold ${isProfitable ? 'text-[#0AEF80]' : 'text-[#FF3B69]'}`}>
+                        {isProfitable ? '+' : ''}{parseFloat(amp.total_pnl_percent.toString()).toFixed(2)}%
+                      </span>
+                    </div>
                   </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <span className={`text-2xl font-bold font-mono ${isProfitable ? 'text-[#0AEF80]' : 'text-[#FF3B69]'}`}>
-                      {isProfitable ? '+' : ''}${Math.abs(amp.pnl).toFixed(2)}
-                    </span>
-                    <span className={`text-sm font-semibold ${isProfitable ? 'text-[#0AEF80]' : 'text-[#FF3B69]'}`}>
-                      {isProfitable ? '+' : ''}{amp.pnlPercent}%
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </Card>
 
         {/* Main Chart - Big Hero Card */}
@@ -315,7 +345,10 @@ export default function BentoDashboard() {
         </Card>
 
         {/* Quick Actions - Bottom Left */}
-        <Card className="col-span-12 md:col-span-4 bg-gradient-to-br from-[#9540FF] to-[#7C3AED] border-0 p-6 rounded-2xl hover:shadow-2xl transition-all hover:-translate-y-1 cursor-pointer">
+        <Card 
+          onClick={() => navigate('/trader/amps/deploy')}
+          className="col-span-12 md:col-span-4 bg-gradient-to-br from-[#9540FF] to-[#7C3AED] border-0 p-6 rounded-2xl hover:shadow-2xl transition-all hover:-translate-y-1 cursor-pointer"
+        >
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="text-xl font-bold text-white mb-1">Deploy New Amp</h3>

@@ -14,13 +14,13 @@ export function useAdminStats() {
       const { count: activeTraders } = await supabase
         .from('user_amps')
         .select('user_id', { count: 'exact', head: true })
-        .eq('is_active', true);
+        .eq('status', 'active');
 
       // Total capital deployed (sum of allocated capital)
       const { data: capitalData } = await supabase
         .from('user_amps')
         .select('allocated_capital')
-        .eq('is_active', true);
+        .eq('status', 'active');
 
       const totalCapital = capitalData?.reduce((sum, row) => sum + (row.allocated_capital || 0), 0) || 0;
 

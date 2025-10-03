@@ -167,21 +167,19 @@ export default function AmpDetail() {
           <div>
             <p className="text-xs text-gray-500 mb-1">Total Deployments</p>
             <p className="text-2xl font-bold text-white">
-              {amp.user_amps?.length || 0}
+              N/A
             </p>
           </div>
           <div>
             <p className="text-xs text-gray-500 mb-1">Active Users</p>
             <p className="text-2xl font-bold text-white">
-              {amp.user_amps?.filter((ua: any) => ua.is_active).length || 0}
+              N/A
             </p>
           </div>
           <div>
             <p className="text-xs text-gray-500 mb-1">Total Capital</p>
             <p className="text-2xl font-bold text-white">
-              ${amp.user_amps?.reduce((sum: number, ua: any) => 
-                sum + (ua.is_active ? ua.allocated_capital : 0), 0
-              ).toLocaleString() || 0}
+              N/A
             </p>
           </div>
           <div>
@@ -196,43 +194,9 @@ export default function AmpDetail() {
       {/* User Deployments */}
       <Card className="bg-[#1A1A1A] border-[#2A2A2A] p-6">
         <h3 className="text-lg font-semibold text-white mb-4">User Deployments</h3>
-        {amp.user_amps && amp.user_amps.length > 0 ? (
-          <div className="space-y-3">
-            {amp.user_amps.map((deployment: any) => (
-              <div 
-                key={deployment.id}
-                className="flex items-center justify-between p-4 rounded-lg bg-[#0A0A0A]"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold">
-                    {deployment.users?.email?.[0].toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-white">
-                      {deployment.users?.full_name || deployment.users?.email}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {deployment.users?.email}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <p className="text-sm font-semibold text-white">
-                      ${(deployment.allocated_capital || 0).toLocaleString()}
-                    </p>
-                    <p className="text-xs text-gray-500">Capital</p>
-                  </div>
-                  <Badge variant={deployment.is_active ? "default" : "secondary"}>
-                    {deployment.is_active ? 'Active' : 'Inactive'}
-                  </Badge>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-center text-gray-500 py-8">No deployments yet</p>
-        )}
+        <div className="text-center py-8">
+          <p className="text-gray-400">Deployment tracking not available in new schema</p>
+        </div>
       </Card>
     </div>
   );

@@ -43,6 +43,8 @@ import AlgorithmAnalysis from "./pages/trader/AlgorithmAnalysis";
 import MyAmps from "./pages/trader/MyAmps";
 import Watchlists from "./pages/trader/Watchlists";
 import StockAnalysis from "./pages/trader/StockAnalysis";
+import DeployAmp from "./pages/trader/DeployAmp";
+import BentoDashboard from "./pages/trader/BentoDashboard";
 
 const queryClient = new QueryClient();
 
@@ -83,8 +85,9 @@ const App = () => {
               
               {/* Hidden Trader Platform - Not linked from navigation */}
               <Route path="/trader-auth" element={<TraderAuth />} />
-              <Route path="/trader" element={<TraderPage />} />
+              <Route path="/trader" element={<BentoDashboard />} />
               <Route path="/trader/integrations" element={<Integrations />} />
+              <Route path="/trader/amps/deploy" element={<DeployAmp />} />
               <Route path="/trader/settings" element={<TraderSettings />} />
               <Route path="/trader/alerts" element={<TraderAlerts />} />
               <Route path="/trader/api-keys" element={<TraderApiKeys />} />

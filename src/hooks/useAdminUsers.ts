@@ -105,10 +105,10 @@ export function useSuspendUser() {
 
   return useMutation({
     mutationFn: async ({ userId, reason }: { userId: string; reason?: string }) => {
-      // Deactivate all user's amps
+      // Pause all user's amps
       const { error: ampsError } = await supabase
         .from('user_amps')
-        .update({ is_active: false })
+        .update({ status: 'paused' })
         .eq('user_id', userId);
 
       if (ampsError) throw ampsError;

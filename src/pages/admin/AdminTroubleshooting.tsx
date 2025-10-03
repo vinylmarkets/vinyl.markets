@@ -128,13 +128,10 @@ const AdminTroubleshooting = () => {
       // 4. Check user amps
       const { data: amps } = await supabase
         .from('user_amps')
-        .select(`
-          *,
-          user_amp_settings (*)
-        `)
+        .select('*')
         .eq('user_id', userId);
 
-      const activeAmps = amps?.filter(a => a.is_active) || [];
+      const activeAmps = amps?.filter(a => a.status === 'active') || [];
 
       results.push({
         check: "User Amps",
@@ -197,19 +194,19 @@ const AdminTroubleshooting = () => {
         iconName: 'Clock'
       });
 
-      // 8. Check recent amp events
-      const { data: events } = await supabase
-        .from('amp_events')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
+      // 8. Check recent amp trades
+      const { data: trades } = await supabase
+        .from('amp_trades')
+        .select('*, user_amps!inner(user_id)')
+        .eq('user_amps.user_id', userId)
+        .order('executed_at', { ascending: false })
         .limit(10);
 
       results.push({
-        check: "Recent Amp Events",
+        check: "Recent Amp Trades",
         status: 'pass',
-        message: `${events?.length || 0} recent events found`,
-        details: events,
+        message: `${trades?.length || 0} recent trades found`,
+        details: trades,
         iconName: 'Shield'
       });
 
