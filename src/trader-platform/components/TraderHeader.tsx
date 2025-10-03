@@ -54,21 +54,14 @@ export const TraderHeader: React.FC<TraderHeaderProps> = ({
   const currentPath = location.pathname;
 
   return (
-    <header 
-      className="h-16 border-b border-[#2A2A2A] relative overflow-hidden bg-[#1A1A1A]"
-      style={woodHeaderEnabled ? {
-        background: '#5a3a1a',
-        borderColor: '#5a3a1a',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
-      } : undefined}
-    >
+    <header className="h-16 border-b border-[#2A2A2A] bg-[#1A1A1A] relative overflow-hidden">
       <div className="flex items-center justify-between px-4 sm:px-6 h-full relative z-10">
         {/* Left Side - Logo */}
         <div className="flex items-center space-x-2 sm:space-x-4">
           {/* Logo */}
           <Link to="/trader" className="flex items-center space-x-2 sm:space-x-3">
             <img 
-              src={woodHeaderEnabled ? vinylLogoWhite : vinylLogoWhite} 
+              src={vinylLogoWhite} 
               alt="Vinyl" 
               className="h-9 w-auto"
             />
@@ -81,11 +74,11 @@ export const TraderHeader: React.FC<TraderHeaderProps> = ({
           {isDevelopment && (
             <div className="flex items-center space-x-1">
               {isConnected ? (
-                <Wifi className="h-4 w-4 text-success" />
+                <Wifi className="h-4 w-4 text-[#0AEF80]" />
               ) : (
-                <WifiOff className="h-4 w-4 text-destructive" />
+                <WifiOff className="h-4 w-4 text-[#FF3B69]" />
               )}
-              <span className={`text-xs ${isConnected ? 'text-success' : 'text-destructive'}`}>
+              <span className={`text-xs ${isConnected ? 'text-[#0AEF80]' : 'text-[#FF3B69]'}`}>
                 {isConnected ? 'Connected' : 'Disconnected'}
               </span>
             </div>
