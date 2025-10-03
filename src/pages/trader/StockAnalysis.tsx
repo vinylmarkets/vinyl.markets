@@ -37,10 +37,14 @@ export default function StockAnalysis() {
   const navigate = useNavigate();
   const [timeframe, setTimeframe] = useState('1D');
 
+  console.log('🔍 StockAnalysis rendering for symbol:', symbol);
+
   const { data: quote, isLoading: quoteLoading } = useStockQuote(symbol!);
   const { data: details, isLoading: detailsLoading } = useStockDetails(symbol!);
   const { data: chartData, isLoading: chartLoading } = useStockChart(symbol!, timeframe);
   const { data: news, isLoading: newsLoading } = useStockNews(symbol!);
+
+  console.log('📊 Stock data:', { quote, details, quoteLoading, detailsLoading });
 
   if (quoteLoading || detailsLoading) {
     return <StockAnalysisSkeleton />;
@@ -74,7 +78,7 @@ export default function StockAnalysis() {
   const sma50 = calculateSMA(closes, 50);
 
   return (
-    <div className="p-6 space-y-6 bg-background min-h-screen">
+    <div className="p-6 space-y-6 bg-[#0A0A0A] min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between">
         <Button 
