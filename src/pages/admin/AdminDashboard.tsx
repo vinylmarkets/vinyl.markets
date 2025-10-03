@@ -293,6 +293,18 @@ export default function AdminDashboard() {
         { label: "Phase 1", value: "Active" },
         { label: "AI", value: "Assistant" }
       ]
+    },
+    {
+      title: "Marketing & Assets",
+      description: "AMP cover art library and marketing materials",
+      icon: Images,
+      href: "/admin/marketing",
+      color: "text-purple-600",
+      bgColor: "bg-purple-50",
+      metrics: [
+        { label: "Cover Art", value: "AI Gen" },
+        { label: "Library", value: "Manage" }
+      ]
     }
   ];
 

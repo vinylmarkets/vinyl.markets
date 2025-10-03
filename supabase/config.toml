@@ -113,3 +113,6 @@ verify_jwt = true
 
 [functions.market-news]
 verify_jwt = true
+
+[functions.generate-amp-covers]
+verify_jwt = true

@@ -343,6 +343,45 @@ export type Database = {
         }
         Relationships: []
       }
+      amp_cover_art: {
+        Row: {
+          album_title: string
+          amp_type_id: string
+          band_name: string
+          created_at: string | null
+          generation_prompt: string | null
+          genre: string | null
+          id: string
+          image_url: string
+          is_featured: boolean | null
+          style_era: string | null
+        }
+        Insert: {
+          album_title: string
+          amp_type_id: string
+          band_name: string
+          created_at?: string | null
+          generation_prompt?: string | null
+          genre?: string | null
+          id?: string
+          image_url: string
+          is_featured?: boolean | null
+          style_era?: string | null
+        }
+        Update: {
+          album_title?: string
+          amp_type_id?: string
+          band_name?: string
+          created_at?: string | null
+          generation_prompt?: string | null
+          genre?: string | null
+          id?: string
+          image_url?: string
+          is_featured?: boolean | null
+          style_era?: string | null
+        }
+        Relationships: []
+      }
       amp_events: {
         Row: {
           created_at: string | null
