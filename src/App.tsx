@@ -20,6 +20,7 @@ import UserDetail from "./pages/admin/UserDetail";
 import AuditLogs from "./pages/admin/AuditLogs";
 import Amps from "./pages/admin/Amps";
 import AmpDetail from "./pages/admin/AmpDetail";
+import Settings from "./pages/admin/Settings";
 import AdminDashboardNew from "./pages/admin/AdminDashboardNew";
 import Auth from "./pages/Auth";
 import TraderPage from "./pages/trader/TraderPage";
@@ -70,6 +71,7 @@ const App = () => {
                 <Route path="audit-logs" element={<AuditLogs />} />
                 <Route path="amps" element={<Amps />} />
                 <Route path="amps/:ampId" element={<AmpDetail />} />
+                <Route path="settings" element={<Settings />} />
               </Route>
               
               {/* Hidden Trader Platform - Not linked from navigation */}
