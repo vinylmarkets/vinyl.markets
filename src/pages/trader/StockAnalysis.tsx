@@ -15,12 +15,16 @@ import { ArrowLeft, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
 
+console.log('✅ StockAnalysis module loaded');
+
 export default function StockAnalysis() {
+  console.log('🚀 StockAnalysis component rendering...');
+  
   const { symbol } = useParams();
   const navigate = useNavigate();
   const [timeframe, setTimeframe] = useState('1D');
 
-  console.log('🔍 StockAnalysis rendering for symbol:', symbol);
+  console.log('📍 Symbol:', symbol, 'Timeframe:', timeframe);
 
   const { data: quote, isLoading: quoteLoading, error: quoteError } = useStockQuote(symbol!);
   const { data: details, isLoading: detailsLoading } = useStockDetails(symbol!);
