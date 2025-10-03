@@ -133,167 +133,165 @@ export const Sidebar: React.FC<SidebarProps> = ({ onComingSoonClick }) => {
 
               return (
                 <GroupWrapper key={group.label} {...groupProps}>
-                  <div>
-                    {/* Group Header */}
-                    {isExpanded && (
-                      isAdvancedGroup ? (
-                        <CollapsibleTrigger className="w-full px-4 mb-2 flex items-center justify-between group">
-                          <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
-                            {group.label}
-                          </span>
-                          <ChevronRight
+                  {/* Group Header */}
+                  {isExpanded && (
+                    isAdvancedGroup ? (
+                      <CollapsibleTrigger className="w-full px-4 mb-2 flex items-center justify-between group">
+                        <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                          {group.label}
+                        </span>
+                        <ChevronRight
+                          className={cn(
+                            "h-3 w-3 text-muted-foreground transition-transform",
+                            advancedOpen && "rotate-90"
+                          )}
+                        />
+                      </CollapsibleTrigger>
+                    ) : (
+                      <div className="px-4 mb-2">
+                        <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                          {group.label}
+                        </span>
+                      </div>
+                    )
+                  )}
+
+                  {/* Menu Items */}
+                  {isAdvancedGroup ? (
+                    <CollapsibleContent className="space-y-1">
+                      {group.items.map((item) => {
+                        const Icon = item.icon;
+                        const isActive = isActivePath(item.path);
+                        const itemContent = (
+                          <NavLink
+                            to={item.path}
+                            onClick={(e) => handleMenuClick(item, e)}
                             className={cn(
-                              "h-3 w-3 text-muted-foreground transition-transform",
-                              advancedOpen && "rotate-90"
+                              "flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-all relative group",
+                              "hover:bg-accent/50",
+                              isActive && "bg-accent text-primary",
+                              !isActive && "text-muted-foreground hover:text-foreground",
+                              item.comingSoon && "opacity-70 cursor-not-allowed",
+                              !isExpanded && "justify-center"
                             )}
-                          />
-                        </CollapsibleTrigger>
-                      ) : (
-                        <div className="px-4 mb-2">
-                          <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
-                            {group.label}
-                          </span>
-                        </div>
-                      )
-                    )}
+                          >
+                            {/* Active indicator bar */}
+                            {isActive && (
+                              <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r" />
+                            )}
 
-                    {/* Menu Items */}
-                    <div className={cn(!isAdvancedGroup && "space-y-1")}>
-                      {isAdvancedGroup ? (
-                        <CollapsibleContent className="space-y-1">
-                          {group.items.map((item) => {
-                            const Icon = item.icon;
-                            const isActive = isActivePath(item.path);
-                            const itemContent = (
-                              <NavLink
-                                to={item.path}
-                                onClick={(e) => handleMenuClick(item, e)}
-                                className={cn(
-                                  "flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-all relative group",
-                                  "hover:bg-accent/50",
-                                  isActive && "bg-accent text-primary",
-                                  !isActive && "text-muted-foreground hover:text-foreground",
-                                  item.comingSoon && "opacity-70 cursor-not-allowed",
-                                  !isExpanded && "justify-center"
-                                )}
-                              >
-                                {/* Active indicator bar */}
-                                {isActive && (
-                                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r" />
-                                )}
-
-                                <Icon
-                                  className={cn(
-                                    "h-5 w-5 flex-shrink-0",
-                                    isActive && "text-primary"
-                                  )}
-                                />
-
-                                {isExpanded && (
-                                  <>
-                                    <span className="flex-1">{item.label}</span>
-                                    {item.comingSoon && (
-                                      <Badge
-                                        variant="secondary"
-                                        className="text-[10px] px-1.5 py-0 h-5"
-                                      >
-                                        Soon
-                                      </Badge>
-                                    )}
-                                  </>
-                                )}
-                              </NavLink>
-                            );
-
-                            return (
-                              <div key={item.path}>
-                                {!isExpanded ? (
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>{itemContent}</TooltipTrigger>
-                                    <TooltipContent side="right" className="flex items-center gap-2">
-                                      <span>{item.label}</span>
-                                      {item.comingSoon && (
-                                        <Badge variant="secondary" className="text-[10px]">
-                                          Soon
-                                        </Badge>
-                                      )}
-                                    </TooltipContent>
-                                  </Tooltip>
-                                ) : (
-                                  itemContent
-                                )}
-                              </div>
-                            );
-                          })}
-                        </CollapsibleContent>
-                      ) : (
-                        group.items.map((item) => {
-                          const Icon = item.icon;
-                          const isActive = isActivePath(item.path);
-                          const itemContent = (
-                            <NavLink
-                              to={item.path}
-                              onClick={(e) => handleMenuClick(item, e)}
+                            <Icon
                               className={cn(
-                                "flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-all relative group",
-                                "hover:bg-accent/50",
-                                isActive && "bg-accent text-primary",
-                                !isActive && "text-muted-foreground hover:text-foreground",
-                                item.comingSoon && "opacity-70 cursor-not-allowed",
-                                !isExpanded && "justify-center"
+                                "h-5 w-5 flex-shrink-0",
+                                isActive && "text-primary"
                               )}
-                            >
-                              {/* Active indicator bar */}
-                              {isActive && (
-                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r" />
-                              )}
+                            />
 
-                              <Icon
-                                className={cn(
-                                  "h-5 w-5 flex-shrink-0",
-                                  isActive && "text-primary"
+                            {isExpanded && (
+                              <>
+                                <span className="flex-1">{item.label}</span>
+                                {item.comingSoon && (
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-[10px] px-1.5 py-0 h-5"
+                                  >
+                                    Soon
+                                  </Badge>
                                 )}
-                              />
+                              </>
+                            )}
+                          </NavLink>
+                        );
 
-                              {isExpanded && (
-                                <>
-                                  <span className="flex-1">{item.label}</span>
+                        return (
+                          <div key={item.path}>
+                            {!isExpanded ? (
+                              <Tooltip>
+                                <TooltipTrigger asChild>{itemContent}</TooltipTrigger>
+                                <TooltipContent side="right" className="flex items-center gap-2">
+                                  <span>{item.label}</span>
                                   {item.comingSoon && (
-                                    <Badge
-                                      variant="secondary"
-                                      className="text-[10px] px-1.5 py-0 h-5"
-                                    >
+                                    <Badge variant="secondary" className="text-[10px]">
                                       Soon
                                     </Badge>
                                   )}
-                                </>
-                              )}
-                            </NavLink>
-                          );
+                                </TooltipContent>
+                              </Tooltip>
+                            ) : (
+                              itemContent
+                            )}
+                          </div>
+                        );
+                      })}
+                    </CollapsibleContent>
+                  ) : (
+                    <div className="space-y-1">
+                      {group.items.map((item) => {
+                        const Icon = item.icon;
+                        const isActive = isActivePath(item.path);
+                        const itemContent = (
+                          <NavLink
+                            to={item.path}
+                            onClick={(e) => handleMenuClick(item, e)}
+                            className={cn(
+                              "flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-all relative group",
+                              "hover:bg-accent/50",
+                              isActive && "bg-accent text-primary",
+                              !isActive && "text-muted-foreground hover:text-foreground",
+                              item.comingSoon && "opacity-70 cursor-not-allowed",
+                              !isExpanded && "justify-center"
+                            )}
+                          >
+                            {/* Active indicator bar */}
+                            {isActive && (
+                              <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r" />
+                            )}
 
-                          return (
-                            <div key={item.path}>
-                              {!isExpanded ? (
-                                <Tooltip>
-                                  <TooltipTrigger asChild>{itemContent}</TooltipTrigger>
-                                  <TooltipContent side="right" className="flex items-center gap-2">
-                                    <span>{item.label}</span>
-                                    {item.comingSoon && (
-                                      <Badge variant="secondary" className="text-[10px]">
-                                        Soon
-                                      </Badge>
-                                    )}
-                                  </TooltipContent>
-                                </Tooltip>
-                              ) : (
-                                itemContent
+                            <Icon
+                              className={cn(
+                                "h-5 w-5 flex-shrink-0",
+                                isActive && "text-primary"
                               )}
-                            </div>
-                          );
-                        })
-                      )}
+                            />
+
+                            {isExpanded && (
+                              <>
+                                <span className="flex-1">{item.label}</span>
+                                {item.comingSoon && (
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-[10px] px-1.5 py-0 h-5"
+                                  >
+                                    Soon
+                                  </Badge>
+                                )}
+                              </>
+                            )}
+                          </NavLink>
+                        );
+
+                        return (
+                          <div key={item.path}>
+                            {!isExpanded ? (
+                              <Tooltip>
+                                <TooltipTrigger asChild>{itemContent}</TooltipTrigger>
+                                <TooltipContent side="right" className="flex items-center gap-2">
+                                  <span>{item.label}</span>
+                                  {item.comingSoon && (
+                                    <Badge variant="secondary" className="text-[10px]">
+                                      Soon
+                                    </Badge>
+                                  )}
+                                </TooltipContent>
+                              </Tooltip>
+                            ) : (
+                              itemContent
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
-                  </div>
+                  )}
 
                   {/* Divider between groups */}
                   {groupIndex < menuGroups.length - 1 && (
