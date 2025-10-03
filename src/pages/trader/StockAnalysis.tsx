@@ -32,42 +32,27 @@ export default function StockAnalysis() {
 
   console.log('📊 Stock data:', { quote, details, quoteLoading, detailsLoading });
 
-  // Always render debug box first
-  const debugInfo = (
-    <div className="fixed top-0 left-0 bg-red-500 text-white p-4 z-50">
-      DEBUG: Component rendering, symbol: {symbol}, quoteLoading: {String(quoteLoading)}, quoteError: {quoteError?.message || 'none'}
-    </div>
-  );
-
   if (quoteLoading || detailsLoading) {
-    return (
-      <>
-        {debugInfo}
-        <StockAnalysisSkeleton />
-      </>
-    );
+    return <StockAnalysisSkeleton />;
   }
 
   if (quoteError || !quote) {
     return (
-      <>
-        {debugInfo}
-        <div className="p-6 bg-[#0A0A0A] min-h-screen">
-          <Button variant="ghost" onClick={() => navigate('/trader')} className="text-gray-400 mb-6">
-            <ArrowLeft size={16} className="mr-2" />
-            Back
-          </Button>
-          <Card className="bg-[#1A1A1A] border-[#2A2A2A] p-12">
-            <div className="text-center">
-              <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-white mb-2">Symbol not found</h2>
-              <p className="text-gray-400 mb-4">"{symbol}" doesn't exist or data is unavailable</p>
-              <p className="text-sm text-gray-500 mb-6">Error: {quoteError?.message}</p>
-              <Button onClick={() => navigate('/trader')}>Back to Dashboard</Button>
-            </div>
-          </Card>
-        </div>
-      </>
+      <div className="p-6 bg-[#0A0A0A] min-h-screen">
+        <Button variant="ghost" onClick={() => navigate('/trader')} className="text-gray-400 mb-6">
+          <ArrowLeft size={16} className="mr-2" />
+          Back
+        </Button>
+        <Card className="bg-[#1A1A1A] border-[#2A2A2A] p-12">
+          <div className="text-center">
+            <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-white mb-2">Symbol not found</h2>
+            <p className="text-gray-400 mb-4">"{symbol}" doesn't exist or data is unavailable</p>
+            <p className="text-sm text-gray-500 mb-6">Error: {quoteError?.message}</p>
+            <Button onClick={() => navigate('/trader')}>Back to Dashboard</Button>
+          </div>
+        </Card>
+      </div>
     );
   }
 
@@ -84,13 +69,11 @@ export default function StockAnalysis() {
   const sma50 = closes.length >= 50 ? calculateSMA(closes, 50) : currentPrice;
 
   return (
-    <>
-      {debugInfo}
-      <div className="p-6 space-y-6 bg-[#0A0A0A] min-h-screen">
-        <Button variant="ghost" onClick={() => navigate('/trader')} className="text-gray-400 hover:text-white">
-          <ArrowLeft size={16} className="mr-2" />
-          Back to Dashboard
-        </Button>
+    <div className="p-6 space-y-6 bg-[#0A0A0A] min-h-screen">
+      <Button variant="ghost" onClick={() => navigate('/trader')} className="text-gray-400 hover:text-white">
+        <ArrowLeft size={16} className="mr-2" />
+        Back to Dashboard
+      </Button>
 
       <Card className="bg-[#1A1A1A] border-[#2A2A2A] p-6">
         <div className="flex items-start justify-between mb-4">
@@ -207,7 +190,6 @@ export default function StockAnalysis() {
         </TabsContent>
       </Tabs>
     </div>
-    </>
   );
 }
 
