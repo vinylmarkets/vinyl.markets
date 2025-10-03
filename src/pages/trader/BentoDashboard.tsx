@@ -189,10 +189,14 @@ export default function BentoDashboard() {
               {['1D', '5D', '1M', '3M', '1Y', 'ALL'].map(tf => (
                 <Button
                   key={tf}
-                  variant={chartTimeframe === tf ? 'default' : 'outline'}
+                  variant="ghost"
                   size="sm"
                   onClick={() => setChartTimeframe(tf)}
-                  className={chartTimeframe === tf ? 'bg-[#9540FF]' : 'border-[#2A2A2A] text-gray-400'}
+                  className={`${
+                    chartTimeframe === tf 
+                      ? 'bg-[#9540FF] text-white hover:bg-[#9540FF]/90' 
+                      : 'bg-[#0A0A0A] text-gray-400 hover:text-white hover:bg-[#1A1A1A] border border-[#2A2A2A]'
+                  }`}
                 >
                   {tf}
                 </Button>
