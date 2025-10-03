@@ -90,8 +90,8 @@ export default function Marketing() {
   // Generation modal state
   const [selectedAmpType, setSelectedAmpType] = useState<string>("");
   const [generateCount, setGenerateCount] = useState<number>(5);
-  const [preferredEra, setPreferredEra] = useState<string>("");
-  const [preferredGenre, setPreferredGenre] = useState<string>("");
+  const [preferredEra, setPreferredEra] = useState<string>("auto");
+  const [preferredGenre, setPreferredGenre] = useState<string>("auto");
   const [generationProgress, setGenerationProgress] = useState<number>(0);
 
   useEffect(() => {
@@ -171,8 +171,8 @@ export default function Marketing() {
         body: {
           ampTypeId: selectedAmpType,
           count: generateCount,
-          preferEra: preferredEra || undefined,
-          preferGenre: preferredGenre || undefined,
+          preferEra: preferredEra === "auto" ? undefined : preferredEra,
+          preferGenre: preferredGenre === "auto" ? undefined : preferredGenre,
         }
       });
 
@@ -596,7 +596,7 @@ export default function Marketing() {
                       <SelectValue placeholder="Auto" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Auto</SelectItem>
+                      <SelectItem value="auto">Auto</SelectItem>
                       {eras.map(era => (
                         <SelectItem key={era} value={era}>{era}</SelectItem>
                       ))}
@@ -611,7 +611,7 @@ export default function Marketing() {
                       <SelectValue placeholder="Auto" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Auto</SelectItem>
+                      <SelectItem value="auto">Auto</SelectItem>
                       {genres.map(genre => (
                         <SelectItem key={genre} value={genre}>{genre}</SelectItem>
                       ))}
