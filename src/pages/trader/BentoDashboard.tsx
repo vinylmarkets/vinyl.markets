@@ -3,7 +3,8 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ChartFocus } from '@/components/trader/ChartFocus';
-import { usePortfolioData, useWatchlist, useStockChart, getWebSocketStatus } from '@/hooks/useStockData';
+import { useAlpacaAccount, useAlpacaPositions } from '@/hooks/useAlpaca';
+import { useStockChart } from '@/hooks/useStockData';
 import { useMarketStatus } from '@/hooks/useMarketStatus';
 import {
   TrendingUp,
@@ -26,26 +27,27 @@ import {
 export default function BentoDashboard() {
   const [focusMode, setFocusMode] = useState(false);
 
-  // Fetch real data
-  const { data: portfolio } = usePortfolioData();
-  const { data: watchlistData } = useWatchlist();
+  // Fetch real Alpaca data
+  const { data: account, isLoading: accountLoading } = useAlpacaAccount();
+  const { data: positionsData, isLoading: positionsLoading } = useAlpacaPositions();
   const { data: portfolioChart } = useStockChart('SPY', '1M');
   const { data: marketStatus } = useMarketStatus();
-  const wsConnected = getWebSocketStatus();
 
-  // Use real portfolio data
-  const portfolioValue = portfolio?.totalValue || 0;
-  const portfolioChange = portfolio?.change || 0;
-  const portfolioChangePercent = portfolio?.changePercent || 0;
+  // Use real Alpaca account data
+  const portfolioValue = account?.portfolioValue || 0;
+  const portfolioChange = account?.dailyPnL || 0;
+  const portfolioChangePercent = account?.dailyPnLPercent || 0;
   const isPositive = portfolioChange >= 0;
 
+  // Get positions
+  const positions = positionsData?.positions || [];
+  const recentTrades = positionsData?.recentTrades || [];
+
+  // Active Amps (placeholder for now)
   const activeAmps = [
     { id: 1, name: 'TubeAmp v1', status: 'active', pnl: 247.50, pnlPercent: 3.2, allocated: 5000 },
     { id: 2, name: 'Momentum Pro', status: 'active', pnl: -42.10, pnlPercent: -0.8, allocated: 3000 },
   ];
-
-  // Real watchlist data
-  const watchlist = watchlistData || [];
 
   // Real chart data (using SPY as portfolio proxy)
   const chartData = portfolioChart?.map(bar => ({
@@ -61,20 +63,29 @@ export default function BentoDashboard() {
         {/* Portfolio Value Card - Top Left */}
         <Card className="col-span-12 md:col-span-4 bg-[#1A1A1A] border-[#2A2A2A] p-6 rounded-2xl hover:shadow-2xl transition-all hover:-translate-y-1">
           <p className="text-sm text-gray-400 mb-2">Total Portfolio Value</p>
-          <p className="text-4xl font-bold text-white mb-3 font-mono">
-            ${portfolioValue.toLocaleString()}
-          </p>
-          <div className="flex items-center gap-2">
-            {isPositive ? (
-              <TrendingUp className="w-5 h-5 text-[#0AEF80]" />
-            ) : (
-              <TrendingDown className="w-5 h-5 text-[#FF3B69]" />
-            )}
-            <span className={`text-lg font-semibold ${isPositive ? 'text-[#0AEF80]' : 'text-[#FF3B69]'}`}>
-              {isPositive ? '+' : ''}{portfolioChange.toFixed(2)} ({isPositive ? '+' : ''}{portfolioChangePercent}%)
-            </span>
-          </div>
-          <p className="text-xs text-gray-500 mt-2">Today's change</p>
+          {accountLoading ? (
+            <div className="animate-pulse">
+              <div className="h-12 bg-[#0A0A0A] rounded mb-3" />
+              <div className="h-6 bg-[#0A0A0A] rounded w-2/3" />
+            </div>
+          ) : (
+            <>
+              <p className="text-4xl font-bold text-white mb-3 font-mono">
+                ${portfolioValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+              <div className="flex items-center gap-2">
+                {isPositive ? (
+                  <TrendingUp className="w-5 h-5 text-[#0AEF80]" />
+                ) : (
+                  <TrendingDown className="w-5 h-5 text-[#FF3B69]" />
+                )}
+                <span className={`text-lg font-semibold ${isPositive ? 'text-[#0AEF80]' : 'text-[#FF3B69]'}`}>
+                  {isPositive ? '+' : ''}${Math.abs(portfolioChange).toFixed(2)} ({isPositive ? '+' : ''}{portfolioChangePercent.toFixed(2)}%)
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">Today's change</p>
+            </>
+          )}
         </Card>
 
         {/* Active Amps - Top Right */}
@@ -206,51 +217,67 @@ export default function BentoDashboard() {
           </div>
         </Card>
 
-        {/* Watchlist - Right Sidebar */}
+        {/* Active Positions - Right Sidebar */}
         <Card className="col-span-12 md:col-span-3 bg-[#1A1A1A] border-[#2A2A2A] p-6 rounded-2xl hover:shadow-2xl transition-all">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">Watchlist</h3>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-white">
-              <Plus size={16} />
-            </Button>
+            <h3 className="text-lg font-semibold text-white">Positions</h3>
+            <Badge variant="secondary" className="bg-[#9540FF]/20 text-[#9540FF] border-0">
+              {positions.length}
+            </Badge>
           </div>
 
-          <div className="space-y-3">
-            {watchlist.map(stock => {
-              const isUp = stock.change >= 0;
-              return (
-                <div 
-                  key={stock.symbol}
-                  className="bg-[#0A0A0A] rounded-xl p-3 hover:bg-[#004751] transition-colors cursor-pointer"
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <p className="text-white font-semibold">{stock.symbol}</p>
-                      <p className="text-xs text-gray-500">{stock.name}</p>
-                    </div>
-                    {isUp ? (
-                      <TrendingUp className="w-4 h-4 text-[#0AEF80]" />
-                    ) : (
-                      <TrendingDown className="w-4 h-4 text-[#FF3B69]" />
-                    )}
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <span className="text-lg font-mono font-semibold text-white">
-                      ${stock.price}
-                    </span>
-                    <span className={`text-sm font-semibold ${isUp ? 'text-[#0AEF80]' : 'text-[#FF3B69]'}`}>
-                      {isUp ? '+' : ''}{stock.changePercent}%
-                    </span>
-                  </div>
+          {positionsLoading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="bg-[#0A0A0A] rounded-xl p-3 animate-pulse">
+                  <div className="h-12 bg-[#2A2A2A] rounded" />
                 </div>
-              );
-            })}
-          </div>
-
-          <Button variant="ghost" className="w-full mt-4 text-gray-400 hover:text-white">
-            View All Stocks <ChevronRight size={16} className="ml-1" />
-          </Button>
+              ))}
+            </div>
+          ) : positions.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500 text-sm">No open positions</p>
+              <p className="text-gray-600 text-xs mt-1">Start trading to see positions</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {positions.map(position => {
+                const isProfit = position.unrealizedPnL >= 0;
+                return (
+                  <div 
+                    key={position.symbol}
+                    className="bg-[#0A0A0A] rounded-xl p-3 hover:bg-[#004751] transition-colors cursor-pointer"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <p className="text-white font-semibold">{position.symbol}</p>
+                        <p className="text-xs text-gray-500">{position.quantity} shares @ ${position.averageCost.toFixed(2)}</p>
+                      </div>
+                      {isProfit ? (
+                        <TrendingUp className="w-4 h-4 text-[#0AEF80]" />
+                      ) : (
+                        <TrendingDown className="w-4 h-4 text-[#FF3B69]" />
+                      )}
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-mono font-semibold text-white">
+                        ${position.currentPrice.toFixed(2)}
+                      </span>
+                      <div className="text-right">
+                        <p className={`text-sm font-semibold ${isProfit ? 'text-[#0AEF80]' : 'text-[#FF3B69]'}`}>
+                          {isProfit ? '+' : ''}${Math.abs(position.unrealizedPnL).toFixed(2)}
+                        </p>
+                        <p className={`text-xs ${isProfit ? 'text-[#0AEF80]' : 'text-[#FF3B69]'}`}>
+                          {isProfit ? '+' : ''}{position.unrealizedPnLPercent.toFixed(2)}%
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </Card>
 
         {/* Quick Actions - Bottom Left */}
@@ -294,33 +321,35 @@ export default function BentoDashboard() {
           </div>
         </Card>
 
-        {/* Recent Activity - Bottom Right */}
+        {/* Recent Trades - Bottom Right */}
         <Card className="col-span-12 md:col-span-4 bg-[#1A1A1A] border-[#2A2A2A] p-6 rounded-2xl hover:shadow-2xl transition-all hover:-translate-y-1">
-          <h3 className="text-lg font-semibold text-white mb-4">Recent Signals</h3>
+          <h3 className="text-lg font-semibold text-white mb-4">Recent Trades</h3>
           
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-[#0AEF80]" />
-              <div className="flex-1">
-                <p className="text-sm text-white">AAPL Buy Signal</p>
-                <p className="text-xs text-gray-500">2 minutes ago</p>
-              </div>
+          {positionsLoading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="animate-pulse">
+                  <div className="h-10 bg-[#0A0A0A] rounded" />
+                </div>
+              ))}
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-[#FF3B69]" />
-              <div className="flex-1">
-                <p className="text-sm text-white">TSLA Sell Alert</p>
-                <p className="text-xs text-gray-500">15 minutes ago</p>
-              </div>
+          ) : recentTrades.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500 text-sm">No recent trades</p>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-[#9540FF]" />
-              <div className="flex-1">
-                <p className="text-sm text-white">NVDA Watch</p>
-                <p className="text-xs text-gray-500">1 hour ago</p>
-              </div>
+          ) : (
+            <div className="space-y-3">
+              {recentTrades.slice(0, 5).map((trade, idx) => (
+                <div key={idx} className="flex items-center gap-3">
+                  <div className={`w-2 h-2 rounded-full ${trade.action === 'BUY' ? 'bg-[#0AEF80]' : 'bg-[#FF3B69]'}`} />
+                  <div className="flex-1">
+                    <p className="text-sm text-white">{trade.symbol} {trade.action} {trade.quantity} @ ${trade.price.toFixed(2)}</p>
+                    <p className="text-xs text-gray-500">{trade.timeAgo}</p>
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
+          )}
         </Card>
 
       </div>
