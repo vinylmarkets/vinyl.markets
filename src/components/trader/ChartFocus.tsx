@@ -69,15 +69,6 @@ export function ChartFocus({ symbol, onClose }: ChartFocusProps) {
     return () => window.removeEventListener('keydown', handleEscape);
   }, [onClose]);
 
-  // Show loading state
-  if (quoteLoading || chartLoading) {
-    return (
-      <div className="fixed inset-0 bg-[#0A0A0A] z-50 flex items-center justify-center">
-        <ChartSkeleton />
-      </div>
-    );
-  }
-
   // Auto-hide controls after 3 seconds of inactivity
   useEffect(() => {
     let timeout: NodeJS.Timeout;
@@ -95,6 +86,15 @@ export function ChartFocus({ symbol, onClose }: ChartFocusProps) {
       clearTimeout(timeout);
     };
   }, []);
+
+  // Show loading state
+  if (quoteLoading || chartLoading) {
+    return (
+      <div className="fixed inset-0 bg-[#0A0A0A] z-50 flex items-center justify-center">
+        <ChartSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-[#0A0A0A] z-50 overflow-hidden animate-fade-in">
