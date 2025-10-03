@@ -26,7 +26,7 @@ import BlogEditor from "./pages/admin/BlogEditor";
 import AdminDashboardNew from "./pages/admin/AdminDashboardNew";
 import Financial from "./pages/admin/Financial";
 import Auth from "./pages/Auth";
-import TraderPage from "./pages/trader/TraderPage";
+import TraderLayout from "./pages/trader/TraderLayout";
 import TraderAuth from "./pages/trader/TraderAuth";
 import Integrations from "./pages/trader/Integrations";
 import TraderSettings from "./pages/trader/TraderSettings";
@@ -87,24 +87,26 @@ const App = () => {
               
               {/* Hidden Trader Platform - Not linked from navigation */}
               <Route path="/trader-auth" element={<TraderAuth />} />
-              <Route path="/trader" element={<BentoDashboard />} />
-              <Route path="/trader/integrations" element={<Integrations />} />
-              <Route path="/trader/amps/deploy" element={<DeployAmp />} />
-              <Route path="/trader/amps/:ampId" element={<TraderAmpDetail />} />
-              <Route path="/trader/settings" element={<TraderSettings />} />
-              <Route path="/trader/alerts" element={<TraderAlerts />} />
-              <Route path="/trader/api-keys" element={<TraderApiKeys />} />
-              <Route path="/trader/help" element={<TraderHelp />} />
-              <Route path="/trader/performance" element={<TraderPerformance />} />
-              <Route path="/trader/troubleshooting" element={<TraderTroubleshooting />} />
-              <Route path="/trader/reporting" element={<TraderReporting />} />
-              <Route path="/trader/newsletters" element={<TraderNewsletters />} />
-              <Route path="/trader/diagnostics" element={<TraderDiagnostics />} />
-              <Route path="/trader/system-maps/architecture" element={<SystemArchitecture />} />
-              <Route path="/trader/system-maps/algorithms" element={<AlgorithmAnalysis />} />
-              <Route path="/trader/amps" element={<MyAmps />} />
-              <Route path="/trader/watchlists" element={<Watchlists />} />
-              <Route path="/trader/stock/:symbol" element={<StockAnalysis />} />
+              <Route path="/trader" element={<TraderLayout />}>
+                <Route index element={<BentoDashboard />} />
+                <Route path="integrations" element={<Integrations />} />
+                <Route path="amps" element={<MyAmps />} />
+                <Route path="amps/deploy" element={<DeployAmp />} />
+                <Route path="amps/:ampId" element={<TraderAmpDetail />} />
+                <Route path="settings" element={<TraderSettings />} />
+                <Route path="alerts" element={<TraderAlerts />} />
+                <Route path="api-keys" element={<TraderApiKeys />} />
+                <Route path="help" element={<TraderHelp />} />
+                <Route path="performance" element={<TraderPerformance />} />
+                <Route path="troubleshooting" element={<TraderTroubleshooting />} />
+                <Route path="reporting" element={<TraderReporting />} />
+                <Route path="newsletters" element={<TraderNewsletters />} />
+                <Route path="diagnostics" element={<TraderDiagnostics />} />
+                <Route path="system-maps/architecture" element={<SystemArchitecture />} />
+                <Route path="system-maps/algorithms" element={<AlgorithmAnalysis />} />
+                <Route path="watchlists" element={<Watchlists />} />
+                <Route path="stock/:symbol" element={<StockAnalysis />} />
+              </Route>
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
