@@ -15,6 +15,8 @@ import BetaTesting from "./pages/trader/BetaTesting";
 import { AdminLayout } from "./components/admin/AdminLayout";
 import AdminLogin from "./pages/admin/AdminLogin";
 import Dashboard from "./pages/admin/Dashboard";
+import Users from "./pages/admin/Users";
+import UserDetail from "./pages/admin/UserDetail";
 import AdminDashboardNew from "./pages/admin/AdminDashboardNew";
 import Auth from "./pages/Auth";
 import TraderPage from "./pages/trader/TraderPage";
@@ -60,6 +62,8 @@ const App = () => {
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin" element={<AdminLayout />}>
                 <Route index element={<Dashboard />} />
+                <Route path="users" element={<Users />} />
+                <Route path="users/:userId" element={<UserDetail />} />
               </Route>
               
               {/* Hidden Trader Platform - Not linked from navigation */}
