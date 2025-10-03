@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 interface AccountData {
@@ -131,5 +131,46 @@ export function useAlpacaPortfolioHistory(period: string = '1M', timeframe: stri
     enabled: true,
     staleTime: 60000,
     retry: false,
+  });
+}
+
+export function usePlaceOrder() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (order: {
+      symbol: string;
+      qty: number;
+      side: 'buy' | 'sell';
+      type?: string;
+    }) => {
+      console.log('📤 Placing order:', order);
+      
+      const { data, error } = await supabase.functions.invoke('trader-place-order', {
+        body: order
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['alpaca-positions'] });
+      queryClient.invalidateQueries({ queryKey: ['alpaca-account'] });
+    }
+  });
+}
+
+export function useAlpacaOrders(status: string = 'all') {
+  return useQuery({
+    queryKey: ['alpaca-orders', status],
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke('trader-get-orders', {
+        body: { status }
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    refetchInterval: 10000
   });
 }

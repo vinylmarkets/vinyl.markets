@@ -45,6 +45,8 @@ import Watchlists from "./pages/trader/Watchlists";
 import StockAnalysis from "./pages/trader/StockAnalysis";
 import DeployAmp from "./pages/trader/DeployAmp";
 import BentoDashboard from "./pages/trader/BentoDashboard";
+import TraderAmpDetail from "./pages/trader/AmpDetail";
+import AdminAmpDetail from "./pages/admin/AmpDetail";
 
 const queryClient = new QueryClient();
 
@@ -75,7 +77,7 @@ const App = () => {
                 <Route path="users/:userId" element={<UserDetail />} />
                 <Route path="audit-logs" element={<AuditLogs />} />
                 <Route path="amps" element={<Amps />} />
-                <Route path="amps/:ampId" element={<AmpDetail />} />
+                <Route path="amps/:ampId" element={<AdminAmpDetail />} />
                 <Route path="financial" element={<Financial />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="content/blog" element={<BlogList />} />
@@ -88,6 +90,7 @@ const App = () => {
               <Route path="/trader" element={<BentoDashboard />} />
               <Route path="/trader/integrations" element={<Integrations />} />
               <Route path="/trader/amps/deploy" element={<DeployAmp />} />
+              <Route path="/trader/amps/:ampId" element={<TraderAmpDetail />} />
               <Route path="/trader/settings" element={<TraderSettings />} />
               <Route path="/trader/alerts" element={<TraderAlerts />} />
               <Route path="/trader/api-keys" element={<TraderApiKeys />} />
