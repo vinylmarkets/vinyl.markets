@@ -10,6 +10,8 @@ import {
   Layers,
   ChevronDown
 } from 'lucide-react';
+import { useStockQuote, useStockChart, useRealtimePrice } from '@/hooks/useStockData';
+import { ChartSkeleton } from './ChartSkeleton';
 import {
   ComposedChart,
   Area,
@@ -37,17 +39,26 @@ export function ChartFocus({ symbol, onClose }: ChartFocusProps) {
   const [showIndicators, setShowIndicators] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
 
-  // Mock data
-  const currentPrice = 178.45;
-  const change = 2.34;
-  const changePercent = 1.33;
+  // Fetch real data
+  const { data: quote, isLoading: quoteLoading } = useStockQuote(symbol);
+  const { data: chartData, isLoading: chartLoading } = useStockChart(symbol, timeframe);
+  const { price: realtimePrice } = useRealtimePrice(symbol);
+
+  // Calculate values from real data
+  const currentPrice = realtimePrice || quote?.day?.c || quote?.prevDay?.c || 0;
+  const previousClose = quote?.prevDay?.c || 0;
+  const change = currentPrice - previousClose;
+  const changePercent = previousClose ? (change / previousClose) * 100 : 0;
   const isPositive = change >= 0;
 
-  const chartData = Array.from({ length: 100 }, (_, i) => ({
-    time: Date.now() - (100 - i) * 300000,
-    price: 170 + Math.random() * 15,
-    volume: Math.random() * 1000000
-  }));
+  const formattedChartData = chartData?.map(bar => ({
+    time: bar.time,
+    price: bar.close,
+    volume: bar.volume,
+    open: bar.open,
+    high: bar.high,
+    low: bar.low
+  })) || [];
 
   // Handle escape key
   useEffect(() => {
@@ -57,6 +68,15 @@ export function ChartFocus({ symbol, onClose }: ChartFocusProps) {
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
   }, [onClose]);
+
+  // Show loading state
+  if (quoteLoading || chartLoading) {
+    return (
+      <div className="fixed inset-0 bg-[#0A0A0A] z-50 flex items-center justify-center">
+        <ChartSkeleton />
+      </div>
+    );
+  }
 
   // Auto-hide controls after 3 seconds of inactivity
   useEffect(() => {
@@ -180,7 +200,7 @@ export function ChartFocus({ symbol, onClose }: ChartFocusProps) {
       {/* Main Chart - Full Screen */}
       <div className="h-full w-full p-4 pt-24">
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={chartData}>
+          <ComposedChart data={formattedChartData}>
             <defs>
               <linearGradient id="focusColorPrice" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#0AEF80" stopOpacity={0.4}/>
@@ -288,19 +308,21 @@ export function ChartFocus({ symbol, onClose }: ChartFocusProps) {
           <div className="grid grid-cols-4 gap-6">
             <div>
               <p className="text-xs text-gray-500 mb-1">Open</p>
-              <p className="text-sm font-semibold text-white">$176.11</p>
+              <p className="text-sm font-semibold text-white">${quote?.day?.o?.toFixed(2) || '--'}</p>
             </div>
             <div>
               <p className="text-xs text-gray-500 mb-1">High</p>
-              <p className="text-sm font-semibold text-[#0AEF80]">$179.23</p>
+              <p className="text-sm font-semibold text-[#0AEF80]">${quote?.day?.h?.toFixed(2) || '--'}</p>
             </div>
             <div>
               <p className="text-xs text-gray-500 mb-1">Low</p>
-              <p className="text-sm font-semibold text-[#FF3B69]">$175.82</p>
+              <p className="text-sm font-semibold text-[#FF3B69]">${quote?.day?.l?.toFixed(2) || '--'}</p>
             </div>
             <div>
               <p className="text-xs text-gray-500 mb-1">Volume</p>
-              <p className="text-sm font-semibold text-white">45.2M</p>
+              <p className="text-sm font-semibold text-white">
+                {quote?.day?.v ? `${(quote.day.v / 1000000).toFixed(1)}M` : '--'}
+              </p>
             </div>
           </div>
         </Card>

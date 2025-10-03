@@ -3,6 +3,8 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ChartFocus } from '@/components/trader/ChartFocus';
+import { usePortfolioData, useWatchlist, useStockChart, getWebSocketStatus } from '@/hooks/useStockData';
+import { useMarketStatus } from '@/hooks/useMarketStatus';
 import {
   TrendingUp,
   TrendingDown,
@@ -24,10 +26,17 @@ import {
 export default function BentoDashboard() {
   const [focusMode, setFocusMode] = useState(false);
 
-  // Mock data
-  const portfolioValue = 47853.21;
-  const portfolioChange = 2347.89;
-  const portfolioChangePercent = 5.16;
+  // Fetch real data
+  const { data: portfolio } = usePortfolioData();
+  const { data: watchlist: watchlistData } = useWatchlist();
+  const { data: portfolioChart } = useStockChart('SPY', '1M');
+  const { data: marketStatus } = useMarketStatus();
+  const wsConnected = getWebSocketStatus();
+
+  // Use real portfolio data
+  const portfolioValue = portfolio?.totalValue || 0;
+  const portfolioChange = portfolio?.change || 0;
+  const portfolioChangePercent = portfolio?.changePercent || 0;
   const isPositive = portfolioChange >= 0;
 
   const activeAmps = [
@@ -35,17 +44,14 @@ export default function BentoDashboard() {
     { id: 2, name: 'Momentum Pro', status: 'active', pnl: -42.10, pnlPercent: -0.8, allocated: 3000 },
   ];
 
-  const watchlist = [
-    { symbol: 'AAPL', name: 'Apple Inc.', price: 178.45, change: 2.34, changePercent: 1.33 },
-    { symbol: 'TSLA', name: 'Tesla Inc.', price: 242.84, change: -5.21, changePercent: -2.10 },
-    { symbol: 'NVDA', name: 'NVIDIA', price: 485.62, change: 12.48, changePercent: 2.64 },
-  ];
+  // Real watchlist data
+  const watchlist = watchlistData || [];
 
-  // Mock chart data
-  const chartData = Array.from({ length: 30 }, (_, i) => ({
-    time: i,
-    value: 40000 + Math.random() * 10000
-  }));
+  // Real chart data (using SPY as portfolio proxy)
+  const chartData = portfolioChart?.map(bar => ({
+    time: bar.time,
+    value: bar.close * 1000
+  })) || [];
 
   return (
     <div className="min-h-screen bg-[#1F1F1F] p-4 md:p-6">
