@@ -1,33 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { 
   Radio, 
   Wifi, 
-  WifiOff,
-  Menu,
-  BarChart3,
-  Settings,
-  Zap,
-  TrendingUp,
-  BookOpen,
-  Activity,
-  Network,
-  TestTube,
-  Bell,
-  HelpCircle,
-  FileText,
-  Mail,
-  Key,
-  AlertTriangle,
-  Search
+  WifiOff
 } from "lucide-react";
 import vinylLogoWhite from "@/assets/vinyl-logo-white-new.svg";
 import vinylLogoBlack from "@/assets/vinyl-logo-black-new.svg";
@@ -44,44 +21,6 @@ interface TraderHeaderProps {
   showAccountStats?: boolean;
 }
 
-const navigationItems = [
-  { 
-    label: "Dashboard", 
-    path: "/trader", 
-    icon: BarChart3,
-    description: "Main trading dashboard"
-  },
-  { 
-    label: "My Amps", 
-    path: "/trader/amps", 
-    icon: Radio,
-    description: "Manage your trading algorithms"
-  },
-  { 
-    label: "Watchlists", 
-    path: "/trader/watchlists", 
-    icon: Search,
-    description: "Smart watchlists & stock discovery"
-  },
-  { 
-    label: "Performance", 
-    path: "/trader/performance", 
-    icon: TrendingUp,
-    description: "View trading performance"
-  },
-  { 
-    label: "Integrations", 
-    path: "/trader/integrations", 
-    icon: Network,
-    description: "Connect brokers & APIs"
-  },
-  { 
-    label: "Help", 
-    path: "/trader/help", 
-    icon: HelpCircle,
-    description: "Get help & support"
-  }
-];
 
 export const TraderHeader: React.FC<TraderHeaderProps> = ({ 
   accountData,
@@ -128,49 +67,8 @@ export const TraderHeader: React.FC<TraderHeaderProps> = ({
       }}
     >
       <div className="flex items-center justify-between px-4 sm:px-6 h-full relative z-10">
-        {/* Left Side - Logo & Navigation */}
+        {/* Left Side - Logo */}
         <div className="flex items-center space-x-2 sm:space-x-4">
-          {/* Navigation Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className={`h-8 w-8 p-0 ${woodHeaderEnabled ? 'text-white hover:bg-white/10' : ''}`}
-              >
-                <Menu className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent 
-              align="start" 
-              className="w-72 max-h-[600px] overflow-y-auto bg-card/95 backdrop-blur-sm border-border z-50"
-            >
-              <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">
-                Navigation
-              </div>
-              <DropdownMenuSeparator />
-              {navigationItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = currentPath === item.path;
-                return (
-                  <DropdownMenuItem 
-                    key={item.path} 
-                    asChild
-                    className={`cursor-pointer ${isActive ? 'bg-primary/10 text-primary font-medium' : ''}`}
-                  >
-                    <Link to={item.path} className="flex items-start space-x-3 py-2">
-                      <Icon className={`h-4 w-4 mt-0.5 flex-shrink-0 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
-                      <div className="flex-1">
-                        <div className="text-sm font-medium">{item.label}</div>
-                        <div className="text-xs text-muted-foreground">{item.description}</div>
-                      </div>
-                    </Link>
-                  </DropdownMenuItem>
-                );
-              })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
           {/* Logo */}
           <Link to="/trader" className="flex items-center space-x-2 sm:space-x-3">
             {woodHeaderEnabled ? (
@@ -220,18 +118,6 @@ export const TraderHeader: React.FC<TraderHeaderProps> = ({
 
         {/* Right Side Controls */}
         <div className="flex items-center space-x-2 sm:space-x-4">
-          {/* My Amps Button */}
-          <Link to="/trader/amps">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="h-8 px-3 text-xs bg-[#2c2c2c] hover:bg-[#3c3c3c] text-success border-success/30 hover:border-success/50"
-            >
-              <Radio className="h-3 w-3 mr-1" />
-              <span className="hidden sm:inline">My Amps</span>
-            </Button>
-          </Link>
-          
           {/* Profile Dropdown */}
           <ProfileDropdown />
         </div>

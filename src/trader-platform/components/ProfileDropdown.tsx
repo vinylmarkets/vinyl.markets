@@ -12,22 +12,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { 
   ChevronDown, 
   Settings, 
-  Link as LinkIcon, 
   Sun, 
   Moon, 
-  BarChart3,
-  Brain,
-  Bell,
-  Key,
-  HelpCircle,
-  LogOut,
-  AlertCircle,
-  FileText,
-  Mail,
-  Activity,
-  Network,
-  ChevronRight,
-  Lightbulb
+  LogOut
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
@@ -134,18 +121,11 @@ export const ProfileDropdown = () => {
           </p>
         </div>
 
-        {/* Menu items */}
+        {/* Account Settings */}
         <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors">
           <Link to="/trader/settings" className="flex items-center w-full">
             <Settings className="mr-3 h-4 w-4" />
-            <span>Settings</span>
-          </Link>
-        </DropdownMenuItem>
-        
-        <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors">
-          <Link to="/trader/integrations" className="flex items-center w-full">
-            <LinkIcon className="mr-3 h-4 w-4" />
-            <span>Broker Connections</span>
+            <span>Account Settings</span>
           </Link>
         </DropdownMenuItem>
         
@@ -157,129 +137,15 @@ export const ProfileDropdown = () => {
           <span className="ml-3">{getThemeLabel()}</span>
         </DropdownMenuItem>
         
-        <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors">
-          <Link to="/trader/performance" className="flex items-center w-full">
-            <BarChart3 className="mr-3 h-4 w-4" />
-            <span>Performance History</span>
-          </Link>
-        </DropdownMenuItem>
-        
         <DropdownMenuSeparator className="bg-border/50" />
         
-        {/* System Maps Submenu */}
-        <div className="px-2 py-1">
-          <p className="text-xs font-semibold text-muted-foreground px-2 mb-1">System Maps</p>
-          <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors pl-4">
-            <Link to="/trader/system-maps/architecture" className="flex items-center w-full">
-              <Network className="mr-3 h-3 w-3" />
-              <span className="text-sm">Architecture Overview</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors pl-4">
-            <Link to="/trader/system-maps/algorithms" className="flex items-center w-full">
-              <Activity className="mr-3 h-3 w-3" />
-              <span className="text-sm">Algorithm Analysis</span>
-            </Link>
-          </DropdownMenuItem>
-        </div>
-        
-        <DropdownMenuSeparator className="bg-border/50" />
-        
-        {/* Intelligence Submenu */}
-        <div className="px-2 py-1">
-          <p className="text-xs font-semibold text-muted-foreground px-2 mb-1">Intelligence</p>
-          <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors pl-4">
-            <Link to="/trader/intelligence/explorer" className="flex items-center w-full">
-              <Brain className="mr-3 h-3 w-3" />
-              <span className="text-sm">Knowledge Graph</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors pl-4">
-            <Link to="/trader/intelligence/insights" className="flex items-center w-full">
-              <Lightbulb className="mr-3 h-3 w-3" />
-              <span className="text-sm">AI Insights</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors pl-4">
-            <Link to="/trader/testing" className="flex items-center w-full">
-              <Activity className="mr-3 h-3 w-3" />
-              <span className="text-sm">Beta Testing</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors pl-4">
-            <Link to="/trader/forensics" className="flex items-center w-full">
-              <FileText className="mr-3 h-3 w-3" />
-              <span className="text-sm">BBBY Forensics</span>
-            </Link>
-          </DropdownMenuItem>
-        </div>
-        
-        <DropdownMenuSeparator className="bg-border/50" />
-        
-        <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors">
-          <Link to="/trader/strategies" className="flex items-center w-full">
-            <Brain className="mr-3 h-4 w-4" />
-            <span>Strategy Settings</span>
-          </Link>
-        </DropdownMenuItem>
-        
-        <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors">
-          <Link to="/trader/alerts" className="flex items-center w-full">
-            <Bell className="mr-3 h-4 w-4" />
-            <span>Alert Preferences</span>
-          </Link>
-        </DropdownMenuItem>
-        
-        <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors">
-          <Link to="/trader/api-keys" className="flex items-center w-full">
-            <Key className="mr-3 h-4 w-4" />
-            <span>API & Webhooks</span>
-          </Link>
-        </DropdownMenuItem>
-        
-        <DropdownMenuSeparator className="bg-border/50" />
-        
-        <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors">
-          <Link to="/trader/reporting" className="flex items-center w-full">
-            <FileText className="mr-3 h-4 w-4" />
-            <span>Reporting</span>
-          </Link>
-        </DropdownMenuItem>
-        
-        <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors">
-          <Link to="/trader/newsletters" className="flex items-center w-full">
-            <Mail className="mr-3 h-4 w-4" />
-            <span>Newsletters</span>
-          </Link>
-        </DropdownMenuItem>
-        
-        <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors">
-          <Link to="/trader/troubleshooting" className="flex items-center w-full">
-            <AlertCircle className="mr-3 h-4 w-4" />
-            <span>Troubleshooting</span>
-          </Link>
-        </DropdownMenuItem>
-        
-        <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors">
-          <Link to="/trader/diagnostics" className="flex items-center w-full">
-            <Activity className="mr-3 h-4 w-4" />
-            <span>Algorithm Diagnostics</span>
-          </Link>
-        </DropdownMenuItem>
-        
-        <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent/50 transition-colors">
-          <Link to="/trader/help" className="flex items-center w-full">
-            <HelpCircle className="mr-3 h-4 w-4" />
-            <span>Help & Tutorials</span>
-          </Link>
-        </DropdownMenuItem>
-        
+        {/* Logout */}
         <DropdownMenuItem 
           className="cursor-pointer text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors"
           onClick={handleLogout}
         >
           <LogOut className="mr-3 h-4 w-4" />
-          <span>Logout</span>
+          <span>Log Out</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -1,18 +1,30 @@
-import React from "react";
+import React, { useState } from "react";
 import { TraderProtection } from "@/components/trader/TraderProtection";
 import { TraderHeader } from "@/trader-platform/components/TraderHeader";
 import { WatchlistManager } from "@/trader-platform/components/WatchlistManager";
 import { FadeInWrapper } from "@/components/FadeInWrapper";
+import { Sidebar } from "@/components/trader/Sidebar";
+import { ComingSoonModal } from "@/components/trader/ComingSoonModal";
 
 export default function Watchlists() {
+  const [comingSoonOpen, setComingSoonOpen] = useState(false);
+  const [selectedFeature, setSelectedFeature] = useState("");
+
+  const handleComingSoonClick = (feature: string) => {
+    setSelectedFeature(feature);
+    setComingSoonOpen(true);
+  };
+
   return (
     <TraderProtection>
       <div className="min-h-screen relative overflow-hidden">
         {/* Background gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 pointer-events-none" />
         
+        <Sidebar onComingSoonClick={handleComingSoonClick} />
+        
         {/* Content */}
-        <div className="relative z-10">
+        <div className="relative z-10 flex-1 flex flex-col ml-16">
           <TraderHeader showAccountStats={false} />
           
           <FadeInWrapper>
@@ -28,6 +40,12 @@ export default function Watchlists() {
             </main>
           </FadeInWrapper>
         </div>
+
+        <ComingSoonModal
+          open={comingSoonOpen}
+          onOpenChange={setComingSoonOpen}
+          featureName={selectedFeature}
+        />
       </div>
     </TraderProtection>
   );
