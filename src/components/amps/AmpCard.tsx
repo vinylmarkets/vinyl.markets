@@ -6,6 +6,7 @@ import { UserAmp } from '@/types/amps';
 import { Settings, Info, TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
 import { useState } from 'react';
 import { StrategyGuideModal } from './StrategyGuideModal';
+import vintageTubeAmp from '@/assets/vintage-tube-amp.jpg';
 
 interface AmpCardProps {
   amp: UserAmp;
@@ -30,12 +31,25 @@ export function AmpCard({ amp, onToggle, onAllocate, onSettings }: AmpCardProps)
   const pnlColor = (amp.today_pnl || 0) >= 0 ? 'text-green-500' : 'text-red-500';
   const PnlIcon = (amp.today_pnl || 0) >= 0 ? TrendingUp : TrendingDown;
 
+  // Handle image URL - convert /src/assets paths to proper imports
+  const getImageUrl = () => {
+    const imageUrl = amp.catalog?.image_url;
+    if (!imageUrl) return 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&q=80';
+    
+    // Handle /src/assets/ paths
+    if (imageUrl.includes('/src/assets/vintage-tube-amp.jpg')) {
+      return vintageTubeAmp;
+    }
+    
+    return imageUrl;
+  };
+
   return (
     <Card className={`transition-all hover:shadow-md overflow-hidden ${amp.is_active ? 'border-green-500' : 'border-border'}`}>
       {/* Hero Image */}
       <div className="relative h-48">
         <img 
-          src={amp.catalog?.image_url || 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&q=80'} 
+          src={getImageUrl()} 
           alt={amp.name}
           className="w-full h-full object-cover"
         />
