@@ -49,7 +49,7 @@ export default function BentoDashboard() {
 
   // Real chart data (using SPY as portfolio proxy)
   const chartData = portfolioChart?.map(bar => ({
-    time: bar.time,
+    time: new Date(bar.time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
     value: bar.close * 1000
   })) || [];
 
@@ -174,12 +174,16 @@ export default function BentoDashboard() {
                 <XAxis 
                   dataKey="time" 
                   stroke="#2A2A2A"
-                  tick={{ fill: '#666' }}
+                  tick={{ fill: '#666', fontSize: 11 }}
+                  interval="preserveStartEnd"
+                  tickCount={6}
                 />
                 <YAxis 
+                  dataKey="value"
                   stroke="#2A2A2A"
-                  tick={{ fill: '#666' }}
+                  tick={{ fill: '#666', fontSize: 11 }}
                   tickFormatter={(value) => `$${(value/1000).toFixed(0)}k`}
+                  domain={['auto', 'auto']}
                 />
                 <Tooltip 
                   contentStyle={{ 
