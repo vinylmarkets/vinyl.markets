@@ -28,10 +28,23 @@ export default function BentoDashboard() {
   const [focusMode, setFocusMode] = useState(false);
 
   // Fetch real Alpaca data
-  const { data: account, isLoading: accountLoading } = useAlpacaAccount();
-  const { data: positionsData, isLoading: positionsLoading } = useAlpacaPositions();
+  const { data: account, isLoading: accountLoading, error: accountError } = useAlpacaAccount();
+  const { data: positionsData, isLoading: positionsLoading, error: positionsError } = useAlpacaPositions();
   const { data: portfolioChart } = useStockChart('SPY', '1M');
   const { data: marketStatus } = useMarketStatus();
+
+  // Debug logging
+  console.log('🔍 BentoDashboard - Alpaca Account Data:', {
+    account,
+    accountLoading,
+    accountError,
+  });
+  
+  console.log('🔍 BentoDashboard - Alpaca Positions Data:', {
+    positionsData,
+    positionsLoading,
+    positionsError,
+  });
 
   // Use real Alpaca account data
   const portfolioValue = parseFloat(account?.equity || '0');
@@ -68,6 +81,17 @@ export default function BentoDashboard() {
             <div className="animate-pulse">
               <div className="h-12 bg-[#0A0A0A] rounded mb-3" />
               <div className="h-6 bg-[#0A0A0A] rounded w-2/3" />
+            </div>
+          ) : accountError ? (
+            <div className="text-center py-4">
+              <p className="text-red-400 text-sm mb-2">⚠️ Connection Error</p>
+              <p className="text-gray-500 text-xs">Unable to load account data</p>
+              <p className="text-gray-600 text-xs mt-1">{accountError.message}</p>
+            </div>
+          ) : !account ? (
+            <div className="text-center py-4">
+              <p className="text-gray-400 text-sm mb-2">📊 No Account Data</p>
+              <p className="text-gray-500 text-xs">Connect your Alpaca account</p>
             </div>
           ) : (
             <>
@@ -235,7 +259,12 @@ export default function BentoDashboard() {
                 </div>
               ))}
             </div>
-          ) : positions.length === 0 ? (
+          ) : positionsError ? (
+            <div className="text-center py-8">
+              <p className="text-red-400 text-sm mb-1">⚠️ Connection Error</p>
+              <p className="text-gray-500 text-xs">{positionsError.message}</p>
+            </div>
+          ) : !positions || positions.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-500 text-sm">No open positions</p>
               <p className="text-gray-600 text-xs mt-1">Start trading to see positions</p>
@@ -334,7 +363,12 @@ export default function BentoDashboard() {
                 </div>
               ))}
             </div>
-          ) : recentTrades.length === 0 ? (
+          ) : positionsError ? (
+            <div className="text-center py-8">
+              <p className="text-red-400 text-sm mb-1">⚠️ Connection Error</p>
+              <p className="text-gray-500 text-xs">{positionsError.message}</p>
+            </div>
+          ) : !recentTrades || recentTrades.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-500 text-sm">No recent trades</p>
             </div>
