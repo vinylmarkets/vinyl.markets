@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { TradingDashboard } from "@/trader-platform/components/TradingDashboard";
+import BentoDashboard from "@/pages/trader/BentoDashboard";
 import { TraderProtection } from "@/components/trader/TraderProtection";
 import { TraderHeader } from "@/trader-platform/components/TraderHeader";
 import { Sidebar } from "@/components/trader/Sidebar";
@@ -41,7 +41,7 @@ const TraderPage = () => {
         
         <div className="flex-1 flex flex-col ml-16">
           <TraderHeader />
-          <TradingDashboard />
+          <BentoDashboard />
         </div>
 
         <ComingSoonModal
