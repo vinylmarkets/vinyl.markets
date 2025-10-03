@@ -24,6 +24,7 @@ import Settings from "./pages/admin/Settings";
 import BlogList from "./pages/admin/BlogList";
 import BlogEditor from "./pages/admin/BlogEditor";
 import AdminDashboardNew from "./pages/admin/AdminDashboardNew";
+import Financial from "./pages/admin/Financial";
 import Auth from "./pages/Auth";
 import TraderPage from "./pages/trader/TraderPage";
 import TraderAuth from "./pages/trader/TraderAuth";
@@ -73,6 +74,7 @@ const App = () => {
                 <Route path="audit-logs" element={<AuditLogs />} />
                 <Route path="amps" element={<Amps />} />
                 <Route path="amps/:ampId" element={<AmpDetail />} />
+                <Route path="financial" element={<Financial />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="content/blog" element={<BlogList />} />
                 <Route path="content/blog/new" element={<BlogEditor />} />

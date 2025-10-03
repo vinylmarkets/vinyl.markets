@@ -29,8 +29,7 @@ export default function Dashboard() {
           <p className="text-gray-400">Platform overview and key metrics</p>
         </div>
         <Button 
-          variant="outline" 
-          className="border-[#2A2A2A] text-white hover:bg-[#1A1A1A]"
+          variant="admin"
           onClick={() => refetch()}
         >
           Refresh Data
