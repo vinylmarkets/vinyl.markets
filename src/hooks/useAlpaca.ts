@@ -100,3 +100,43 @@ export function useAlpacaPositions() {
     retry: false, // Don't retry on errors to see them immediately
   });
 }
+
+export function useAlpacaPortfolioHistory(period: string = '1M') {
+  return useQuery({
+    queryKey: ['alpaca-portfolio-history', period],
+    queryFn: async () => {
+      console.log('🔍 Calling trader-portfolio-history edge function...');
+      
+      const { data, error } = await supabase.functions.invoke<{ success: boolean; data: any }>('trader-portfolio-history', {
+        body: { period }
+      });
+      
+      console.log('🔍 trader-portfolio-history response:', { data, error });
+      
+      if (error) {
+        console.error('❌ Error fetching portfolio history:', error);
+        throw error;
+      }
+      
+      if (!data || !data.data) {
+        console.warn('⚠️ No data returned from trader-portfolio-history');
+        return [];
+      }
+      
+      // Transform Alpaca format to chart format
+      const timestamps = data.data.timestamp || [];
+      const equity = data.data.equity || [];
+      
+      const chartData = timestamps.map((time: number, i: number) => ({
+        time: time * 1000, // Convert to milliseconds
+        value: parseFloat(equity[i])
+      }));
+      
+      console.log('✅ Portfolio history data received:', chartData.length, 'points');
+      return chartData;
+    },
+    enabled: true,
+    staleTime: 60000,
+    retry: false,
+  });
+}

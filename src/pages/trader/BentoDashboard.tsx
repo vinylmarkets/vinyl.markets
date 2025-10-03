@@ -3,8 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ChartFocus } from '@/components/trader/ChartFocus';
-import { useAlpacaAccount, useAlpacaPositions } from '@/hooks/useAlpaca';
-import { useStockChart } from '@/hooks/useStockData';
+import { useAlpacaAccount, useAlpacaPositions, useAlpacaPortfolioHistory } from '@/hooks/useAlpaca';
 import { useMarketStatus } from '@/hooks/useMarketStatus';
 import {
   TrendingUp,
@@ -30,7 +29,7 @@ export default function BentoDashboard() {
   // Fetch real Alpaca data
   const { data: account, isLoading: accountLoading, error: accountError } = useAlpacaAccount();
   const { data: positionsData, isLoading: positionsLoading, error: positionsError } = useAlpacaPositions();
-  const { data: portfolioChart } = useStockChart('SPY', '1M');
+  const { data: portfolioChart, isLoading: chartLoading } = useAlpacaPortfolioHistory('1M');
   const { data: marketStatus } = useMarketStatus();
 
   // Debug logging
@@ -62,10 +61,10 @@ export default function BentoDashboard() {
     { id: 2, name: 'Momentum Pro', status: 'active', pnl: -42.10, pnlPercent: -0.8, allocated: 3000 },
   ];
 
-  // Real chart data (using SPY as portfolio proxy)
+  // Real chart data from Alpaca portfolio history
   const chartData = portfolioChart?.map(bar => ({
     time: new Date(bar.time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    value: bar.close * 1000
+    value: bar.value
   })) || [];
 
   return (
