@@ -2,13 +2,15 @@ import React, { useState, useEffect } from "react";
 import { TradingDashboard } from "@/trader-platform/components/TradingDashboard";
 import { TraderProtection } from "@/components/trader/TraderProtection";
 import { TraderHeader } from "@/trader-platform/components/TraderHeader";
-import { FadeInWrapper } from "@/components/FadeInWrapper";
 import { Sidebar } from "@/components/trader/Sidebar";
 import { ComingSoonModal } from "@/components/trader/ComingSoonModal";
+import { PageTransition } from "@/components/trader/PageTransition";
+import { PageSkeleton } from "@/components/trader/PageSkeleton";
 
 const TraderPage = () => {
   const [comingSoonOpen, setComingSoonOpen] = useState(false);
   const [selectedFeature, setSelectedFeature] = useState("");
+  const [isPageLoading, setIsPageLoading] = useState(true);
 
   const handleComingSoonClick = (feature: string) => {
     setSelectedFeature(feature);
@@ -34,24 +36,31 @@ const TraderPage = () => {
 
   return (
     <TraderProtection>
-      <FadeInWrapper>
-        <div className="min-h-screen bg-background relative">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 pointer-events-none"></div>
+      <div className="min-h-screen bg-background relative transition-colors duration-500">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 pointer-events-none"></div>
+        
+        {/* Header and Sidebar render immediately - no loading dependency */}
+        <Sidebar onComingSoonClick={handleComingSoonClick} />
+        
+        <div className="flex-1 flex flex-col ml-16">
+          <TraderHeader />
           
-          <Sidebar onComingSoonClick={handleComingSoonClick} />
-          
-          <div className="flex-1 flex flex-col ml-16">
-            <TraderHeader />
-            <TradingDashboard />
-          </div>
-
-          <ComingSoonModal
-            open={comingSoonOpen}
-            onOpenChange={setComingSoonOpen}
-            featureName={selectedFeature}
-          />
+          {/* Main content area waits for data */}
+          {isPageLoading ? (
+            <PageSkeleton />
+          ) : (
+            <PageTransition isLoading={false}>
+              <TradingDashboard onLoadingChange={setIsPageLoading} />
+            </PageTransition>
+          )}
         </div>
-      </FadeInWrapper>
+
+        <ComingSoonModal
+          open={comingSoonOpen}
+          onOpenChange={setComingSoonOpen}
+          featureName={selectedFeature}
+        />
+      </div>
     </TraderProtection>
   );
 };

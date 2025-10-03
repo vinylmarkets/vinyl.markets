@@ -106,7 +106,11 @@ interface RecentTrade {
   pnl?: number;
 }
 
-export const TradingDashboard = () => {
+interface TradingDashboardProps {
+  onLoadingChange?: (isLoading: boolean) => void;
+}
+
+export const TradingDashboard = ({ onLoadingChange }: TradingDashboardProps = {}) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -138,7 +142,20 @@ export const TradingDashboard = () => {
   const [signalStats, setSignalStats] = useState<{ count: number; lastGenerated: string | null }>({ count: 0, lastGenerated: null });
   const [autoTradeEnabled, setAutoTradeEnabled] = useState(false);
   
+  // Loading states for coordinated page rendering
+  const [isLoadingSignals, setIsLoadingSignals] = useState(true);
+  const [isLoadingIntegrations, setIsLoadingIntegrations] = useState(true);
+  const [isLoadingAccount, setIsLoadingAccount] = useState(true);
+  
   const isDevelopment = import.meta.env.DEV;
+  
+  // Expose aggregate loading state for parent components
+  const isPageLoading = isLoadingSignals || isLoadingIntegrations || isLoadingAccount;
+
+  // Notify parent component of loading state changes
+  useEffect(() => {
+    onLoadingChange?.(isPageLoading);
+  }, [isPageLoading, onLoadingChange]);
 
   const [cloudStatus, setCloudStatus] = useState<CloudStatus>({
     isActive: true,
@@ -206,6 +223,7 @@ export const TradingDashboard = () => {
     // Fetch real signals from database
     const fetchSignals = async () => {
       try {
+        setIsLoadingSignals(true);
         const { data, error } = await supabase
           .from('trading_signals')
           .select('*')
@@ -230,6 +248,8 @@ export const TradingDashboard = () => {
         }
       } catch (error) {
         console.error('Error fetching signals:', error);
+      } finally {
+        setIsLoadingSignals(false);
       }
     };
     
@@ -243,10 +263,12 @@ export const TradingDashboard = () => {
       if (!user) {
         console.log('No user found, setting hasIntegrations to false');
         setHasIntegrations(false);
+        setIsLoadingIntegrations(false);
         return;
       }
       
       try {
+        setIsLoadingIntegrations(true);
         console.log('Checking for integrations for user:', user.id);
         
         // First try with RLS
@@ -266,10 +288,12 @@ export const TradingDashboard = () => {
           if (user.id === '008337a6-677b-48f3-a16f-8409920a2513') {
             console.log('Applying temporary fix - setting hasIntegrations to true for known user');
             setHasIntegrations(true);
+            setIsLoadingIntegrations(false);
             return;
           }
           
           setHasIntegrations(false);
+          setIsLoadingIntegrations(false);
           return;
         }
 
@@ -280,6 +304,8 @@ export const TradingDashboard = () => {
       } catch (error) {
         console.error('Error checking integrations:', error);
         setHasIntegrations(false);
+      } finally {
+        setIsLoadingIntegrations(false);
       }
     };
 
@@ -299,12 +325,13 @@ export const TradingDashboard = () => {
       console.log('Calling fetchAccountData and fetchPositionsData because hasIntegrations is true');
       // Call both account and positions functions
       (async () => {
-        // Fetch account data
-        console.log('fetchAccountData: Fetching account data...');
-        
         try {
-          // Use fetch with GET method instead of supabase.functions.invoke (which defaults to POST)
-          const response = await fetch(`https://jhxjvpbwkdzjufjyqanq.supabase.co/functions/v1/trader-account`, {
+          setIsLoadingAccount(true);
+          
+          // Fetch account data
+          console.log('fetchAccountData: Fetching account data...');
+          
+          const accountResponse = await fetch(`https://jhxjvpbwkdzjufjyqanq.supabase.co/functions/v1/trader-account`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
@@ -313,24 +340,20 @@ export const TradingDashboard = () => {
             }
           });
           
-          const data = await response.json();
-          console.log('fetchAccountData response:', { data, status: response.status });
+          const accountData = await accountResponse.json();
+          console.log('fetchAccountData response:', { data: accountData, status: accountResponse.status });
           
-          if (!response.ok || !data?.success) {
-            console.error('Account data error:', data);
+          if (!accountResponse.ok || !accountData?.success) {
+            console.error('Account data error:', accountData);
           } else {
-            console.log('Setting account data:', data.data);
-            setAccountData(data.data);
+            console.log('Setting account data:', accountData.data);
+            setAccountData(accountData.data);
           }
-        } catch (error) {
-          console.error('Failed to fetch account data:', error);
-        }
 
-        // Fetch positions data
-        console.log('fetchPositionsData: Fetching positions data...');
-        
-        try {
-          const response = await fetch(`https://jhxjvpbwkdzjufjyqanq.supabase.co/functions/v1/trader-positions`, {
+          // Fetch positions data
+          console.log('fetchPositionsData: Fetching positions data...');
+          
+          const positionsResponse = await fetch(`https://jhxjvpbwkdzjufjyqanq.supabase.co/functions/v1/trader-positions`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
@@ -339,24 +362,29 @@ export const TradingDashboard = () => {
             }
           });
           
-          const data = await response.json();
-          console.log('fetchPositionsData response:', { data, status: response.status });
+          const positionsData = await positionsResponse.json();
+          console.log('fetchPositionsData response:', { data: positionsData, status: positionsResponse.status });
           
-          if (!response.ok || !data?.success) {
-            console.error('Positions data error:', data);
+          if (!positionsResponse.ok || !positionsData?.success) {
+            console.error('Positions data error:', positionsData);
           } else {
-            console.log('Setting positions data:', data.data);
-            if (data.data.positions) {
-              setPositions(data.data.positions);
+            console.log('Setting positions data:', positionsData.data);
+            if (positionsData.data.positions) {
+              setPositions(positionsData.data.positions);
             }
-            if (data.data.recentTrades) {
-              setRecentTrades(data.data.recentTrades);
+            if (positionsData.data.recentTrades) {
+              setRecentTrades(positionsData.data.recentTrades);
             }
           }
         } catch (error) {
-          console.error('Failed to fetch positions data:', error);
+          console.error('Failed to fetch account/positions data:', error);
+        } finally {
+          setIsLoadingAccount(false);
         }
       })();
+    } else {
+      // No integrations, mark account loading as complete
+      setIsLoadingAccount(false);
     }
   }, [hasIntegrations]);
 
@@ -584,8 +612,8 @@ export const TradingDashboard = () => {
     <div className="min-h-screen bg-background">
       {/* Top Header Bar removed - now using TraderHeader from parent */}
 
-      {/* Broker Integration Status - Only show if no integrations */}
-      {!hasIntegrations && (
+      {/* Broker Integration Status - Only show if no integrations and page has loaded */}
+      {!hasIntegrations && !isPageLoading && (
         <div className="p-2 sm:p-4 relative z-10">
           <Card className="border-yellow-200 bg-yellow-50 border-l-4 border-l-yellow-500">
             <CardContent className="p-3 sm:p-4">
