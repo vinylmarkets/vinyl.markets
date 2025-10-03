@@ -61,6 +61,36 @@ export default function AdminLogin() {
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (!email) {
+      toast({
+        title: 'Email required',
+        description: 'Please enter your email address first',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/admin/login`
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Check your email',
+        description: 'Password reset link has been sent to your email',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Reset failed',
+        description: error.message,
+        variant: 'destructive'
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-[#1A1A1A] border-[#2A2A2A] p-8">
@@ -105,6 +135,14 @@ export default function AdminLogin() {
           >
             {isLoading ? 'Signing in...' : 'Sign In'}
           </Button>
+
+          <button
+            type="button"
+            onClick={handleForgotPassword}
+            className="w-full text-sm text-gray-400 hover:text-gray-300 transition-colors mt-2"
+          >
+            Forgot Password?
+          </button>
         </form>
 
         <p className="text-xs text-gray-500 text-center mt-6">
