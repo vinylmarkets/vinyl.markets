@@ -45,19 +45,7 @@ export default function BentoDashboard() {
   }));
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] p-4 md:p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-white mb-1">Trading Dashboard</h1>
-          <p className="text-gray-400">Monitor your portfolio and active algorithms</p>
-        </div>
-        <Button className="bg-gradient-to-r from-[#0AEF80] to-[#00C766] text-black font-semibold hover:opacity-90">
-          <Plus size={16} className="mr-2" />
-          New Trade
-        </Button>
-      </div>
-
+    <div className="min-h-screen bg-[#2D2D2D] p-4 md:p-6">
       {/* Bento Grid Layout */}
       <div className="grid grid-cols-12 gap-3 md:gap-4">
         
