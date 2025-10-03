@@ -153,118 +153,115 @@ export default function MyAmps() {
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 pointer-events-none"></div>
           <TraderHeader showAccountStats={false} />
           <div className="container mx-auto p-6 relative z-10">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold">Amps - My Trading Algorithms</h1>
+        <div className="flex items-start justify-between gap-6 mb-6">
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-2">
+              <h1 className="text-3xl font-bold">Amps - My Trading Algorithms</h1>
+              <Button onClick={() => setShowAddModal(true)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Add Algorithm
+              </Button>
+            </div>
             <p className="text-muted-foreground">Manage your active trading strategies</p>
           </div>
-          <Button onClick={() => setShowAddModal(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Algorithm
-          </Button>
+          
+          {/* Trading Control Card */}
+          <Card className="w-72 shrink-0">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center space-x-2 text-sm">
+                <Zap className="h-4 w-4" style={{ color: '#5a3a1a' }} />
+                <span>Trading Control</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {/* Status */}
+              <div className="text-xs space-y-1 p-2 bg-muted/50 rounded">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Active Signals:</span>
+                  <span className="font-medium">{signalStats.count}</span>
+                </div>
+                {signalStats.lastGenerated && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Last Generated:</span>
+                    <span className="font-medium">
+                      {new Date(signalStats.lastGenerated).toLocaleTimeString()}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Auto-Trading Toggle */}
+              <div className="flex items-center justify-between p-2 bg-muted/30 rounded-lg border">
+                <div className="space-y-0.5">
+                  <div className="flex items-center space-x-2">
+                    <Zap className="h-3 w-3 text-accent" />
+                    <span className="font-medium text-xs">Auto-Trading</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {autoTradeEnabled ? "Enabled" : "Disabled"}
+                  </p>
+                </div>
+                <Switch
+                  checked={autoTradeEnabled}
+                  onCheckedChange={handleAutoTradeToggle}
+                />
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <DollarSign className="w-5 h-5 text-primary" />
+        {/* Summary Cards - Compact */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
+        <Card className="p-3">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-primary/10 rounded">
+              <DollarSign className="w-4 h-4 text-primary" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Total Allocated</p>
-              <p className="text-xl font-bold">
+              <p className="text-xs text-muted-foreground">Total Allocated</p>
+              <p className="text-base font-bold">
                 ${summary.total_allocated.toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </p>
             </div>
           </div>
         </Card>
 
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-500/10 rounded-lg">
-              <TrendingUp className="w-5 h-5 text-green-500" />
+        <Card className="p-3">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-green-500/10 rounded">
+              <TrendingUp className="w-4 h-4 text-green-500" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Available Capital</p>
-              <p className="text-xl font-bold">
+              <p className="text-xs text-muted-foreground">Available Capital</p>
+              <p className="text-base font-bold">
                 ${summary.available_capital.toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </p>
             </div>
           </div>
         </Card>
 
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-500/10 rounded-lg">
-              <Zap className="w-5 h-5 text-blue-500" />
+        <Card className="p-3">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-blue-500/10 rounded">
+              <Zap className="w-4 h-4 text-blue-500" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Total Algorithms</p>
-              <p className="text-xl font-bold">{summary.total_amps}</p>
+              <p className="text-xs text-muted-foreground">Total Algorithms</p>
+              <p className="text-base font-bold">{summary.total_amps}</p>
             </div>
           </div>
         </Card>
 
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-500/10 rounded-lg">
-              <Activity className="w-5 h-5 text-purple-500" />
+        <Card className="p-3">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-purple-500/10 rounded">
+              <Activity className="w-4 h-4 text-purple-500" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Active Algorithms</p>
-              <p className="text-xl font-bold">{summary.active_amps}</p>
+              <p className="text-xs text-muted-foreground">Active Algorithms</p>
+              <p className="text-base font-bold">{summary.active_amps}</p>
             </div>
           </div>
-        </Card>
-
-        {/* Trading Control Card */}
-        <Card className="p-4">
-          <CardHeader className="p-0 pb-2">
-            <CardTitle className="flex items-center justify-between text-sm">
-              <div className="flex items-center space-x-2">
-                <Zap className="h-4 w-4" style={{ color: '#5a3a1a' }} />
-                <span>Trading Control</span>
-              </div>
-              <Badge variant={signalStats.count > 0 ? "default" : "secondary"} className="text-xs">
-                {signalStats.count}
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-0 pt-3 space-y-3">
-            {/* Status */}
-            <div className="text-xs space-y-1 p-2 bg-muted/50 rounded">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Active Signals:</span>
-                <span className="font-medium">{signalStats.count}</span>
-              </div>
-              {signalStats.lastGenerated && (
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Last Generated:</span>
-                  <span className="font-medium">
-                    {new Date(signalStats.lastGenerated).toLocaleTimeString()}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Auto-Trading Toggle */}
-            <div className="flex items-center justify-between p-2 bg-muted/30 rounded-lg border">
-              <div className="space-y-0.5">
-                <div className="flex items-center space-x-2">
-                  <Zap className="h-3 w-3 text-accent" />
-                  <span className="font-medium text-xs">Auto-Trading</span>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {autoTradeEnabled ? "Enabled" : "Disabled"}
-                </p>
-              </div>
-              <Switch
-                checked={autoTradeEnabled}
-                onCheckedChange={handleAutoTradeToggle}
-              />
-            </div>
-          </CardContent>
         </Card>
         </div>
 
