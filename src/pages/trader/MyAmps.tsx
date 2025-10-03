@@ -153,37 +153,27 @@ export default function MyAmps() {
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 pointer-events-none"></div>
           <TraderHeader showAccountStats={false} />
           <div className="container mx-auto p-6 relative z-10">
-        <div className="flex items-start justify-between gap-6 mb-6">
-          <div className="flex-1">
-            <div className="flex items-center justify-between mb-2">
-              <h1 className="text-3xl font-bold">Amps - My Trading Algorithms</h1>
-              <Button onClick={() => setShowAddModal(true)}>
-                <Plus className="w-4 h-4 mr-2" />
-                Add Algorithm
-              </Button>
-            </div>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-bold">Amps - My Trading Algorithms</h1>
             <p className="text-muted-foreground">Manage your active trading strategies</p>
           </div>
           
-          {/* Trading Control Card */}
-          <Card className="w-64 shrink-0">
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center justify-between text-sm">
-                <div className="flex items-center space-x-2">
-                  <Zap className="h-4 w-4" style={{ color: '#5a3a1a' }} />
-                  <span>Trading Control</span>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {/* Status */}
-              <div className="text-xs space-y-1 p-2 bg-muted/50 rounded">
-                <div className="flex justify-between">
+          {/* Trading Control Card - Horizontal */}
+          <Card className="px-4 py-2">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center space-x-2">
+                <Zap className="h-4 w-4" style={{ color: '#5a3a1a' }} />
+                <span className="text-sm font-medium">Trading Control</span>
+              </div>
+              
+              <div className="flex items-center gap-4 text-xs">
+                <div className="flex items-center gap-2">
                   <span className="text-muted-foreground">Active Signals:</span>
                   <span className="font-medium">{signalStats.count}</span>
                 </div>
                 {signalStats.lastGenerated && (
-                  <div className="flex justify-between">
+                  <div className="flex items-center gap-2">
                     <span className="text-muted-foreground">Last Generated:</span>
                     <span className="font-medium">
                       {new Date(signalStats.lastGenerated).toLocaleTimeString()}
@@ -191,17 +181,21 @@ export default function MyAmps() {
                   </div>
                 )}
               </div>
-
-              {/* Auto-Trading Toggle */}
-              <div className="flex items-center justify-between pt-1">
+              
+              <div className="flex items-center gap-2 pl-4 border-l">
                 <span className="text-xs font-medium">Auto-Trading</span>
                 <Switch
                   checked={autoTradeEnabled}
                   onCheckedChange={handleAutoTradeToggle}
                 />
               </div>
-            </CardContent>
+            </div>
           </Card>
+
+          <Button onClick={() => setShowAddModal(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Algorithm
+          </Button>
         </div>
 
         {/* Summary Cards - Compact */}
