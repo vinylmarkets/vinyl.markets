@@ -167,19 +167,16 @@ export default function MyAmps() {
                 <span className="text-sm font-medium">Trading Control</span>
               </div>
               
-              <div className="flex items-center gap-4 text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">Active Signals:</span>
-                  <span className="font-medium">{signalStats.count}</span>
-                </div>
-                {signalStats.lastGenerated && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground">Last Generated:</span>
-                    <span className="font-medium">
-                      {new Date(signalStats.lastGenerated).toLocaleTimeString()}
-                    </span>
-                  </div>
-                )}
+              <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-xs">
+                <span className="text-muted-foreground">Active Signals</span>
+                <span className="text-muted-foreground">Last Generated</span>
+                <span className="font-medium">{signalStats.count}</span>
+                <span className="font-medium">
+                  {signalStats.lastGenerated 
+                    ? new Date(signalStats.lastGenerated).toLocaleTimeString()
+                    : 'N/A'
+                  }
+                </span>
               </div>
               
               <div className="flex items-center gap-2 pl-4 border-l">
