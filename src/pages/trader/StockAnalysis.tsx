@@ -1,565 +1,381 @@
-import React, { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { TraderProtection } from '@/components/trader/TraderProtection';
-import { TraderHeader } from '@/trader-platform/components/TraderHeader';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { 
+  useStockQuote, 
+  useStockDetails, 
+  useStockChart, 
+  useStockNews,
+  calculateRSI,
+  calculateSMA
+} from '@/hooks/useStockData';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
-import { AlertCircle, TrendingUp, TrendingDown, Share2, Plus, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import { 
-  useTickerDetails, 
-  useTickerSnapshot, 
-  useAggregates, 
-  useTickerNews,
-  formatMarketCap,
-  getMarketStatus,
-  getTimeRangeDates,
-  calculateMA,
-  calculateRSI,
-} from '@/hooks/usePolygonData';
-import Plot from 'react-plotly.js';
-import { darkPlotlyTheme } from '@/lib/plotly-themes';
+  ArrowLeft, 
+  TrendingUp, 
+  TrendingDown,
+  Plus,
+  ExternalLink
+} from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  Tooltip, 
+  ResponsiveContainer,
+  Area,
+  AreaChart
+} from 'recharts';
+import { format } from 'date-fns';
 
-const StockAnalysis = () => {
-  const { symbol } = useParams<{ symbol: string }>();
+export default function StockAnalysis() {
+  const { symbol } = useParams();
   const navigate = useNavigate();
-  const [timeRange, setTimeRange] = useState('1Y');
-  const [chartType, setChartType] = useState<'line' | 'candlestick'>('candlestick');
-  const [showMA, setShowMA] = useState(true);
-  const [companyExpanded, setCompanyExpanded] = useState(false);
-  
-  const upperSymbol = symbol?.toUpperCase() || '';
-  const { from, to } = getTimeRangeDates(timeRange);
-  
-  const { data: details, isLoading: detailsLoading, error: detailsError } = useTickerDetails(upperSymbol);
-  const { data: snapshot, isLoading: snapshotLoading } = useTickerSnapshot(upperSymbol);
-  const { data: aggregates, isLoading: aggregatesLoading } = useAggregates(upperSymbol, 1, 'day', from, to);
-  const { data: news, isLoading: newsLoading } = useTickerNews(upperSymbol, 10);
+  const [timeframe, setTimeframe] = useState('1D');
 
-  // Calculate technical indicators
-  const technicalData = useMemo(() => {
-    if (!aggregates || aggregates.length === 0) return null;
-    
-    const ma20 = calculateMA(aggregates, 20);
-    const ma50 = calculateMA(aggregates, 50);
-    const ma200 = calculateMA(aggregates, 200);
-    const rsi = calculateRSI(aggregates, 14);
-    
-    return { ma20, ma50, ma200, rsi };
-  }, [aggregates]);
+  const { data: quote, isLoading: quoteLoading } = useStockQuote(symbol!);
+  const { data: details, isLoading: detailsLoading } = useStockDetails(symbol!);
+  const { data: chartData, isLoading: chartLoading } = useStockChart(symbol!, timeframe);
+  const { data: news, isLoading: newsLoading } = useStockNews(symbol!);
 
-  const currentPrice = snapshot?.day?.c || snapshot?.prevDay?.c || details?.market_cap ? (details.market_cap / (details.weighted_shares_outstanding || 1)) : 0;
-  const priceChange = snapshot?.todaysChange || 0;
-  const priceChangePercent = snapshot?.todaysChangePerc || 0;
-  const isPositive = priceChange >= 0;
+  if (quoteLoading || detailsLoading) {
+    return <StockAnalysisSkeleton />;
+  }
 
-  // Error state
-  if (detailsError) {
+  if (!quote) {
     return (
-      <TraderProtection>
-        <div className="min-h-screen bg-background">
-          <TraderHeader />
-          <div className="container mx-auto px-4 py-8">
-            <Card className="border-destructive">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-destructive">
-                  <AlertCircle className="h-5 w-5" />
-                  Symbol Not Found
-                </CardTitle>
-                <CardDescription>
-                  Unable to find stock information for "{upperSymbol}". Please check the symbol and try again.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button onClick={() => navigate('/trader')}>
-                  Return to Dashboard
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+      <div className="p-6">
+        <Button variant="ghost" onClick={() => navigate('/trader')}>
+          <ArrowLeft size={16} className="mr-2" />
+          Back
+        </Button>
+        <div className="text-center py-12">
+          <p className="text-white text-xl mb-2">Symbol not found</p>
+          <p className="text-gray-400">"{symbol}" doesn't exist or data is unavailable</p>
         </div>
-      </TraderProtection>
+      </div>
     );
   }
 
-  return (
-    <TraderProtection>
-      <div className="min-h-screen bg-background">
-        <TraderHeader />
-        
-        <div className="container mx-auto px-4 py-6 space-y-6">
-          {/* Header Section - Sticky */}
-          <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pb-4 border-b">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-              <div className="space-y-2">
-                <div className="flex items-center gap-3">
-                  <h1 className="text-3xl font-bold">{upperSymbol}</h1>
-                  {detailsLoading ? (
-                    <Skeleton className="h-6 w-48" />
-                  ) : (
-                    <span className="text-lg text-muted-foreground">{details?.name}</span>
-                  )}
-                </div>
-                
-                <div className="flex items-center gap-4 flex-wrap">
-                  {snapshotLoading ? (
-                    <>
-                      <Skeleton className="h-8 w-24" />
-                      <Skeleton className="h-6 w-20" />
-                    </>
-                  ) : (
-                    <>
-                      <div className="text-3xl font-bold">
-                        ${currentPrice.toFixed(2)}
-                      </div>
-                      <div className={`flex items-center gap-1 text-lg ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
-                        {isPositive ? <TrendingUp className="h-5 w-5" /> : <TrendingDown className="h-5 w-5" />}
-                        <span>{isPositive ? '+' : ''}{priceChange.toFixed(2)}</span>
-                        <span>({isPositive ? '+' : ''}{priceChangePercent.toFixed(2)}%)</span>
-                      </div>
-                      <Badge variant={getMarketStatus(snapshot?.updated) === 'Open' ? 'default' : 'secondary'}>
-                        {getMarketStatus(snapshot?.updated)}
-                      </Badge>
-                      {!snapshotLoading && snapshot && (
-                        <span className="text-xs text-muted-foreground">
-                          Previous day's close
-                        </span>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add to Watchlist
-                </Button>
-                <Button size="sm">
-                  Quick Trade
-                </Button>
-                <Button variant="ghost" size="sm">
-                  <Share2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
+  const currentPrice = quote.day?.c || quote.prevDay?.c || 0;
+  const previousClose = quote.prevDay?.c || 0;
+  const change = currentPrice - previousClose;
+  const changePercent = previousClose ? (change / previousClose) * 100 : 0;
+  const isPositive = change >= 0;
 
-          {/* Price Chart */}
-          <Card>
-            <CardHeader>
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                <CardTitle>Price Chart</CardTitle>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <div className="flex gap-1">
-                    {['1D', '5D', '1M', '3M', '6M', '1Y', '5Y'].map((range) => (
-                      <Button
-                        key={range}
-                        variant={timeRange === range ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setTimeRange(range)}
-                      >
-                        {range}
-                      </Button>
-                    ))}
-                  </div>
-                  <div className="flex gap-1">
-                    <Button
-                      variant={chartType === 'line' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setChartType('line')}
-                    >
-                      Line
-                    </Button>
-                    <Button
-                      variant={chartType === 'candlestick' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setChartType('candlestick')}
-                    >
-                      Candles
-                    </Button>
-                  </div>
-                  <Button
-                    variant={showMA ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setShowMA(!showMA)}
-                  >
-                    MA
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {aggregatesLoading ? (
-                <Skeleton className="h-[400px] w-full" />
-              ) : !aggregates || aggregates.length === 0 ? (
-                <div className="h-[400px] flex flex-col items-center justify-center text-muted-foreground space-y-4">
-                  <AlertCircle className="h-12 w-12" />
-                  <div className="text-center space-y-2">
-                    <p className="font-medium">Chart data temporarily unavailable</p>
-                    <p className="text-sm">API rate limit reached. Please wait a moment and refresh.</p>
-                  </div>
-                </div>
+  // Calculate technical indicators
+  const closes = chartData?.map((d: any) => d.c) || [];
+  const rsi = calculateRSI(closes);
+  const sma20 = calculateSMA(closes, 20);
+  const sma50 = calculateSMA(closes, 50);
+
+  return (
+    <div className="p-6 space-y-6 bg-background min-h-screen">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate('/trader')}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft size={16} className="mr-2" />
+          Back to Dashboard
+        </Button>
+        <Button className="bg-blue-600 hover:bg-blue-700">
+          <Plus size={16} className="mr-2" />
+          Add to Watchlist
+        </Button>
+      </div>
+
+      {/* Stock Header */}
+      <Card className="bg-card border-border p-6">
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="text-3xl font-bold text-foreground">{symbol?.toUpperCase()}</h1>
+              <Badge variant={quote.ticker?.market === 'stocks' ? 'default' : 'secondary'}>
+                {quote.ticker?.market || 'Stock'}
+              </Badge>
+            </div>
+            <p className="text-muted-foreground">{details?.name || 'Loading...'}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-4xl font-bold text-foreground mb-1">
+              ${currentPrice.toFixed(2)}
+            </p>
+            <div className="flex items-center justify-end gap-2">
+              {isPositive ? (
+                <TrendingUp className="w-5 h-5 text-green-500" />
               ) : (
-                <Plot
-                  data={[
-                    chartType === 'candlestick' ? {
-                      type: 'candlestick',
-                      x: aggregates.map(d => new Date(d.t)),
-                      open: aggregates.map(d => d.o),
-                      high: aggregates.map(d => d.h),
-                      low: aggregates.map(d => d.l),
-                      close: aggregates.map(d => d.c),
-                      name: upperSymbol,
-                      increasing: { line: { color: '#00ff88' } },
-                      decreasing: { line: { color: '#ff6b6b' } },
-                    } : {
-                      type: 'scatter',
-                      mode: 'lines',
-                      x: aggregates.map(d => new Date(d.t)),
-                      y: aggregates.map(d => d.c),
-                      name: upperSymbol,
-                      line: { color: '#00ff88', width: 2 },
-                    },
-                    ...(showMA && technicalData ? [
-                      {
-                        type: 'scatter',
-                        mode: 'lines',
-                        x: aggregates.map(d => new Date(d.t)),
-                        y: technicalData.ma20,
-                        name: 'MA 20',
-                        line: { color: '#00ffff', width: 1 },
-                      },
-                      {
-                        type: 'scatter',
-                        mode: 'lines',
-                        x: aggregates.map(d => new Date(d.t)),
-                        y: technicalData.ma50,
-                        name: 'MA 50',
-                        line: { color: '#ff00ff', width: 1 },
-                      },
-                      {
-                        type: 'scatter',
-                        mode: 'lines',
-                        x: aggregates.map(d => new Date(d.t)),
-                        y: technicalData.ma200,
-                        name: 'MA 200',
-                        line: { color: '#ffff00', width: 1 },
-                      },
-                    ] : []),
-                  ]}
-                  layout={{
-                    ...darkPlotlyTheme.layout,
-                    height: 400,
-                    margin: { l: 50, r: 50, t: 20, b: 50 },
-                    xaxis: { 
-                      ...darkPlotlyTheme.layout.xaxis,
-                      rangeslider: { visible: false },
-                    },
-                    yaxis: {
-                      ...darkPlotlyTheme.layout.yaxis,
-                      title: 'Price ($)',
-                    },
-                    showlegend: true,
-                    legend: {
-                      orientation: 'h',
-                      y: -0.2,
-                    },
-                  }}
-                  config={{ responsive: true, displayModeBar: false }}
-                  style={{ width: '100%' }}
-                />
+                <TrendingDown className="w-5 h-5 text-red-500" />
               )}
-            </CardContent>
-          </Card>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column - Main Content */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Key Metrics */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Key Metrics</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {detailsLoading ? (
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      {[...Array(9)].map((_, i) => (
-                        <Skeleton key={i} className="h-16" />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      <MetricCard label="Market Cap" value={formatMarketCap(details?.market_cap)} />
-                      <MetricCard label="52W High" value={snapshot?.day?.h ? `$${snapshot.day.h.toFixed(2)}` : 'N/A'} />
-                      <MetricCard label="52W Low" value={snapshot?.day?.l ? `$${snapshot.day.l.toFixed(2)}` : 'N/A'} />
-                      <MetricCard label="Volume" value={snapshot?.day?.v ? snapshot.day.v.toLocaleString() : 'N/A'} />
-                      <MetricCard label="Avg Volume" value={snapshot?.prevDay?.v ? snapshot.prevDay.v.toLocaleString() : 'N/A'} />
-                      <MetricCard label="Prev Close" value={snapshot?.prevDay?.c ? `$${snapshot.prevDay.c.toFixed(2)}` : 'N/A'} />
-                      <MetricCard label="Open" value={snapshot?.day?.o ? `$${snapshot.day.o.toFixed(2)}` : 'N/A'} />
-                      <MetricCard label="Day High" value={snapshot?.day?.h ? `$${snapshot.day.h.toFixed(2)}` : 'N/A'} />
-                      <MetricCard label="Day Low" value={snapshot?.day?.l ? `$${snapshot.day.l.toFixed(2)}` : 'N/A'} />
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Company Info */}
-              <Card>
-                <CardHeader>
-                  <div 
-                    className="flex items-center justify-between cursor-pointer"
-                    onClick={() => setCompanyExpanded(!companyExpanded)}
-                  >
-                    <CardTitle>Company Information</CardTitle>
-                    {companyExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
-                  </div>
-                </CardHeader>
-                {companyExpanded && (
-                  <CardContent className="space-y-4">
-                    {detailsLoading ? (
-                      <Skeleton className="h-32" />
-                    ) : (
-                      <>
-                        {details?.description && (
-                          <p className="text-sm text-muted-foreground">{details.description}</p>
-                        )}
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <span className="text-muted-foreground">Industry:</span>
-                            <p className="font-medium">{details?.sic_description || 'N/A'}</p>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Employees:</span>
-                            <p className="font-medium">{details?.total_employees?.toLocaleString() || 'N/A'}</p>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Location:</span>
-                            <p className="font-medium">
-                              {details?.address?.city && details?.address?.state 
-                                ? `${details.address.city}, ${details.address.state}`
-                                : 'N/A'}
-                            </p>
-                          </div>
-                          {details?.homepage_url && (
-                            <div>
-                              <span className="text-muted-foreground">Website:</span>
-                              <a 
-                                href={details.homepage_url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="font-medium text-primary hover:underline flex items-center gap-1"
-                              >
-                                Visit <ExternalLink className="h-3 w-3" />
-                              </a>
-                            </div>
-                          )}
-                        </div>
-                      </>
-                    )}
-                  </CardContent>
-                )}
-              </Card>
-
-              {/* Technical Indicators */}
-              {technicalData && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Technical Indicators</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <IndicatorCard 
-                        label="RSI (14)" 
-                        value={technicalData.rsi[technicalData.rsi.length - 1]?.toFixed(2) || 'N/A'}
-                        signal={getRSISignal(technicalData.rsi[technicalData.rsi.length - 1])}
-                      />
-                      <IndicatorCard 
-                        label="MA 20" 
-                        value={technicalData.ma20[technicalData.ma20.length - 1] ? `$${technicalData.ma20[technicalData.ma20.length - 1].toFixed(2)}` : 'N/A'}
-                      />
-                      <IndicatorCard 
-                        label="MA 50" 
-                        value={technicalData.ma50[technicalData.ma50.length - 1] ? `$${technicalData.ma50[technicalData.ma50.length - 1].toFixed(2)}` : 'N/A'}
-                      />
-                      <IndicatorCard 
-                        label="MA 200" 
-                        value={technicalData.ma200[technicalData.ma200.length - 1] ? `$${technicalData.ma200[technicalData.ma200.length - 1].toFixed(2)}` : 'N/A'}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Price Statistics */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Price Statistics</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {snapshotLoading ? (
-                    <Skeleton className="h-64" />
-                  ) : (
-                    <Table>
-                      <TableBody>
-                        <TableRow>
-                          <TableCell className="font-medium">Open</TableCell>
-                          <TableCell className="text-right">${snapshot?.day?.o?.toFixed(2) || 'N/A'}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell className="font-medium">High</TableCell>
-                          <TableCell className="text-right">${snapshot?.day?.h?.toFixed(2) || 'N/A'}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell className="font-medium">Low</TableCell>
-                          <TableCell className="text-right">${snapshot?.day?.l?.toFixed(2) || 'N/A'}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell className="font-medium">Previous Close</TableCell>
-                          <TableCell className="text-right">${snapshot?.prevDay?.c?.toFixed(2) || 'N/A'}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell className="font-medium">Volume</TableCell>
-                          <TableCell className="text-right">{snapshot?.day?.v?.toLocaleString() || 'N/A'}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell className="font-medium">Average Volume</TableCell>
-                          <TableCell className="text-right">{snapshot?.prevDay?.v?.toLocaleString() || 'N/A'}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell className="font-medium">Market Cap</TableCell>
-                          <TableCell className="text-right">{formatMarketCap(details?.market_cap)}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell className="font-medium">Shares Outstanding</TableCell>
-                          <TableCell className="text-right">
-                            {details?.weighted_shares_outstanding 
-                              ? (details.weighted_shares_outstanding / 1e6).toFixed(2) + 'M'
-                              : 'N/A'}
-                          </TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  )}
-                </CardContent>
-              </Card>
+              <span className={`text-lg font-semibold ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                {isPositive ? '+' : ''}{change.toFixed(2)} ({isPositive ? '+' : ''}{changePercent.toFixed(2)}%)
+              </span>
             </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Previous Close: ${previousClose.toFixed(2)}
+            </p>
+          </div>
+        </div>
 
-            {/* Right Column - News */}
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Recent News</CardTitle>
-                  <CardDescription className="text-xs">
-                    News provided by Polygon.io for informational purposes only
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {newsLoading ? (
-                    [...Array(5)].map((_, i) => (
-                      <div key={i} className="space-y-2">
-                        <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-3 w-3/4" />
-                      </div>
-                    ))
-                  ) : news && news.length > 0 ? (
-                    news.map((article) => (
-                      <NewsCard key={article.id} article={article} />
-                    ))
-                  ) : (
-                    <p className="text-sm text-muted-foreground">No recent news available</p>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
+        {/* Key Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-border">
+          <StatItem label="Open" value={`$${quote.day?.o?.toFixed(2) || 'N/A'}`} />
+          <StatItem label="High" value={`$${quote.day?.h?.toFixed(2) || 'N/A'}`} />
+          <StatItem label="Low" value={`$${quote.day?.l?.toFixed(2) || 'N/A'}`} />
+          <StatItem label="Volume" value={quote.day?.v?.toLocaleString() || 'N/A'} />
+        </div>
+      </Card>
+
+      {/* Chart */}
+      <Card className="bg-card border-border p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold text-foreground">Price Chart</h2>
+          <div className="flex gap-2">
+            {['1D', '5D', '1M', '3M', '1Y'].map((tf) => (
+              <Button
+                key={tf}
+                variant={timeframe === tf ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setTimeframe(tf)}
+                className={timeframe === tf ? '' : 'border-border text-muted-foreground'}
+              >
+                {tf}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {chartLoading ? (
+          <Skeleton className="h-80 bg-muted" />
+        ) : (
+          <ResponsiveContainer width="100%" height={400}>
+            <AreaChart data={chartData?.map((d: any) => ({
+              time: d.t,
+              price: d.c,
+              volume: d.v
+            }))}>
+              <defs>
+                <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#0EA5E9" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#0EA5E9" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <XAxis 
+                dataKey="time" 
+                tickFormatter={(time) => {
+                  const date = new Date(time);
+                  return timeframe === '1D' 
+                    ? format(date, 'HH:mm')
+                    : format(date, 'MMM dd');
+                }}
+                stroke="hsl(var(--muted-foreground))"
+              />
+              <YAxis 
+                domain={['dataMin - 1', 'dataMax + 1']}
+                tickFormatter={(value) => `$${value.toFixed(2)}`}
+                stroke="hsl(var(--muted-foreground))"
+              />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'hsl(var(--card))', 
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '8px',
+                  color: 'hsl(var(--foreground))'
+                }}
+                labelFormatter={(time) => format(new Date(time), 'MMM dd, HH:mm')}
+                formatter={(value: any) => [`$${value.toFixed(2)}`, 'Price']}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="price" 
+                stroke="#0EA5E9" 
+                strokeWidth={2}
+                fill="url(#colorPrice)"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
+      </Card>
+
+      {/* Tabs */}
+      <Tabs defaultValue="indicators" className="space-y-4">
+        <TabsList className="bg-muted border border-border">
+          <TabsTrigger value="indicators">Technical Indicators</TabsTrigger>
+          <TabsTrigger value="company">Company Info</TabsTrigger>
+          <TabsTrigger value="news">Recent News</TabsTrigger>
+        </TabsList>
+
+        {/* Technical Indicators */}
+        <TabsContent value="indicators">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="bg-card border-border p-6">
+              <p className="text-sm text-muted-foreground mb-2">RSI (14)</p>
+              <p className="text-3xl font-bold text-foreground mb-2">{rsi.toFixed(2)}</p>
+              <Badge variant={
+                rsi > 70 ? 'destructive' : 
+                rsi < 30 ? 'default' : 
+                'secondary'
+              }>
+                {rsi > 70 ? 'Overbought' : rsi < 30 ? 'Oversold' : 'Neutral'}
+              </Badge>
+            </Card>
+
+            <Card className="bg-card border-border p-6">
+              <p className="text-sm text-muted-foreground mb-2">SMA (20)</p>
+              <p className="text-3xl font-bold text-foreground mb-2">${sma20.toFixed(2)}</p>
+              <p className="text-xs text-muted-foreground">
+                {currentPrice > sma20 ? 'Above' : 'Below'} moving average
+              </p>
+            </Card>
+
+            <Card className="bg-card border-border p-6">
+              <p className="text-sm text-muted-foreground mb-2">SMA (50)</p>
+              <p className="text-3xl font-bold text-foreground mb-2">${sma50.toFixed(2)}</p>
+              <p className="text-xs text-muted-foreground">
+                {currentPrice > sma50 ? 'Above' : 'Below'} moving average
+              </p>
+            </Card>
           </div>
 
-          {/* Disclaimer */}
-          <Card className="border-muted">
-            <CardContent className="pt-6">
-              <p className="text-xs text-muted-foreground text-center">
-                Data for informational purposes only. Not investment advice. Verify all information before making trading decisions.
-              </p>
-            </CardContent>
+          <Card className="bg-card border-border p-6 mt-4">
+            <p className="text-xs text-muted-foreground">
+              <strong className="text-foreground">Educational Note:</strong> Technical indicators are mathematical calculations based on historical price data. 
+              RSI measures momentum, SMAs show trend direction. These are tools for analysis, not trading recommendations.
+            </p>
           </Card>
-        </div>
-      </div>
-    </TraderProtection>
+        </TabsContent>
+
+        {/* Company Info */}
+        <TabsContent value="company">
+          <Card className="bg-card border-border p-6">
+            {detailsLoading ? (
+              <div className="space-y-3">
+                <Skeleton className="h-6 w-3/4 bg-muted" />
+                <Skeleton className="h-20 bg-muted" />
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">About</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {details?.description || 'No description available'}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  <CompanyStatItem label="Market Cap" value={details?.market_cap ? `$${(details.market_cap / 1e9).toFixed(2)}B` : 'N/A'} />
+                  <CompanyStatItem label="Industry" value={details?.sic_description || 'N/A'} />
+                  <CompanyStatItem label="Employees" value={details?.total_employees?.toLocaleString() || 'N/A'} />
+                  <CompanyStatItem label="HQ" value={details?.address?.city ? `${details.address.city}, ${details.address.state}` : 'N/A'} />
+                </div>
+
+                {details?.homepage_url && (
+                  <a 
+                    href={details.homepage_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300"
+                  >
+                    Visit Website <ExternalLink size={14} />
+                  </a>
+                )}
+              </div>
+            )}
+          </Card>
+        </TabsContent>
+
+        {/* News */}
+        <TabsContent value="news">
+          <Card className="bg-card border-border p-6">
+            <h3 className="text-lg font-semibold text-foreground mb-4">Recent News</h3>
+            {newsLoading ? (
+              <div className="space-y-4">
+                {[1,2,3].map(i => (
+                  <Skeleton key={i} className="h-24 bg-muted" />
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {news?.map((article: any) => (
+                  <a
+                    key={article.id}
+                    href={article.article_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block p-4 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+                  >
+                    <div className="flex gap-4">
+                      {article.image_url && (
+                        <img 
+                          src={article.image_url} 
+                          alt=""
+                          className="w-24 h-24 object-cover rounded"
+                        />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-foreground font-medium mb-1 line-clamp-2">
+                          {article.title}
+                        </h4>
+                        <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
+                          {article.description}
+                        </p>
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                          <span>{article.publisher?.name}</span>
+                          <span>•</span>
+                          <span>{new Date(article.published_utc).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                ))}
+
+                {news?.length === 0 && (
+                  <p className="text-center text-muted-foreground py-8">No recent news</p>
+                )}
+              </div>
+            )}
+
+            <p className="text-xs text-muted-foreground mt-6 pt-4 border-t border-border">
+              News provided by Polygon.io for informational purposes only. Not investment advice.
+            </p>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
-};
+}
 
-const MetricCard = ({ label, value }: { label: string; value: string }) => (
-  <div className="space-y-1">
-    <p className="text-xs text-muted-foreground">{label}</p>
-    <p className="text-lg font-semibold">{value}</p>
-  </div>
-);
-
-const IndicatorCard = ({ 
-  label, 
-  value, 
-  signal 
-}: { 
-  label: string; 
-  value: string; 
-  signal?: string;
-}) => (
-  <div className="space-y-1">
-    <p className="text-xs text-muted-foreground">{label}</p>
-    <p className="text-lg font-semibold">{value}</p>
-    {signal && (
-      <Badge variant="outline" className="text-xs">
-        {signal}
-      </Badge>
-    )}
-  </div>
-);
-
-const NewsCard = ({ article }: { article: any }) => {
-  const getTimeAgo = (timestamp: string) => {
-    const now = new Date();
-    const published = new Date(timestamp);
-    const diff = Math.floor((now.getTime() - published.getTime()) / 1000);
-    
-    if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
-    return `${Math.floor(diff / 86400)} days ago`;
-  };
-
+function StatItem({ label, value }: { label: string; value: string }) {
   return (
-    <a
-      href={article.article_url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="block space-y-2 hover:bg-accent/50 p-2 rounded-md transition-colors"
-    >
-      {article.image_url && (
-        <img 
-          src={article.image_url} 
-          alt="" 
-          className="w-full h-32 object-cover rounded"
-          loading="lazy"
-        />
-      )}
-      <h4 className="text-sm font-medium line-clamp-2 hover:text-primary">
-        {article.title}
-      </h4>
-      <div className="flex items-center justify-between text-xs text-muted-foreground">
-        <span>{article.publisher.name}</span>
-        <span>{getTimeAgo(article.published_utc)}</span>
-      </div>
-    </a>
+    <div>
+      <p className="text-xs text-muted-foreground mb-1">{label}</p>
+      <p className="text-sm font-semibold text-foreground">{value}</p>
+    </div>
   );
-};
+}
 
-const getRSISignal = (rsi: number): string => {
-  if (isNaN(rsi)) return 'N/A';
-  if (rsi > 70) return 'Overbought';
-  if (rsi < 30) return 'Oversold';
-  return 'Neutral';
-};
+function CompanyStatItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-xs text-muted-foreground mb-1">{label}</p>
+      <p className="text-sm font-medium text-foreground">{value}</p>
+    </div>
+  );
+}
 
-export default StockAnalysis;
+function StockAnalysisSkeleton() {
+  return (
+    <div className="p-6 space-y-6 bg-background min-h-screen">
+      <Skeleton className="h-10 w-32 bg-muted" />
+      <Skeleton className="h-48 bg-muted rounded-2xl" />
+      <Skeleton className="h-96 bg-muted rounded-2xl" />
+      <Skeleton className="h-64 bg-muted rounded-2xl" />
+    </div>
+  );
+}
