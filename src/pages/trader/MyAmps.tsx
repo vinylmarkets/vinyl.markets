@@ -166,14 +166,16 @@ export default function MyAmps() {
           </div>
           
           {/* Trading Control Card */}
-          <Card className="w-72 shrink-0">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center space-x-2 text-sm">
-                <Zap className="h-4 w-4" style={{ color: '#5a3a1a' }} />
-                <span>Trading Control</span>
+          <Card className="w-64 shrink-0">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center justify-between text-sm">
+                <div className="flex items-center space-x-2">
+                  <Zap className="h-4 w-4" style={{ color: '#5a3a1a' }} />
+                  <span>Trading Control</span>
+                </div>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-2">
               {/* Status */}
               <div className="text-xs space-y-1 p-2 bg-muted/50 rounded">
                 <div className="flex justify-between">
@@ -191,16 +193,8 @@ export default function MyAmps() {
               </div>
 
               {/* Auto-Trading Toggle */}
-              <div className="flex items-center justify-between p-2 bg-muted/30 rounded-lg border">
-                <div className="space-y-0.5">
-                  <div className="flex items-center space-x-2">
-                    <Zap className="h-3 w-3 text-accent" />
-                    <span className="font-medium text-xs">Auto-Trading</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {autoTradeEnabled ? "Enabled" : "Disabled"}
-                  </p>
-                </div>
+              <div className="flex items-center justify-between pt-1">
+                <span className="text-xs font-medium">Auto-Trading</span>
                 <Switch
                   checked={autoTradeEnabled}
                   onCheckedChange={handleAutoTradeToggle}
