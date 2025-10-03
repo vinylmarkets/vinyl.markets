@@ -2,6 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
+// Check if Polygon API key is accessible
+console.log('🔑 Polygon API Key check:', {
+  exists: !!import.meta.env.VITE_POLYGON_API_KEY,
+  firstChars: import.meta.env.VITE_POLYGON_API_KEY?.substring(0, 10)
+});
+
 // WebSocket connection for real-time data
 let websocket: WebSocket | null = null;
 const subscribers = new Map<string, Set<(data: any) => void>>();
