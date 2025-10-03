@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ChartFocus } from '@/components/trader/ChartFocus';
-import { useAlpacaAccount, useAlpacaPositions, useAlpacaPortfolioHistory } from '@/hooks/useAlpaca';
+import { useAlpacaAccount, useAlpacaPositions, useAlpacaPortfolioHistory } from '@/integrations/alpaca/hooks';
 import { useMarketStatus } from '@/hooks/useMarketStatus';
 import {
   TrendingUp,
@@ -25,11 +25,12 @@ import {
 
 export default function BentoDashboard() {
   const [focusMode, setFocusMode] = useState(false);
+  const [chartTimeframe, setChartTimeframe] = useState('1M');
 
   // Fetch real Alpaca data
   const { data: account, isLoading: accountLoading, error: accountError } = useAlpacaAccount();
   const { data: positionsData, isLoading: positionsLoading, error: positionsError } = useAlpacaPositions();
-  const { data: portfolioChart, isLoading: chartLoading } = useAlpacaPortfolioHistory('1M');
+  const { data: portfolioChart, isLoading: chartLoading } = useAlpacaPortfolioHistory(chartTimeframe, '1D');
   const { data: marketStatus } = useMarketStatus();
 
   // Debug logging
@@ -185,14 +186,15 @@ export default function BentoDashboard() {
 
           <div className="px-6 pb-6">
             <div className="flex gap-2 mb-4">
-              {['1D', '1W', '1M', '3M', '1Y', 'ALL'].map(period => (
+              {['1D', '5D', '1M', '3M', '1Y', 'ALL'].map(tf => (
                 <Button
-                  key={period}
-                  variant="ghost"
+                  key={tf}
+                  variant={chartTimeframe === tf ? 'default' : 'outline'}
                   size="sm"
-                  className={period === '1M' ? 'bg-[#9540FF] text-white' : 'text-gray-400'}
+                  onClick={() => setChartTimeframe(tf)}
+                  className={chartTimeframe === tf ? 'bg-[#9540FF]' : 'border-[#2A2A2A] text-gray-400'}
                 >
-                  {period}
+                  {tf}
                 </Button>
               ))}
             </div>
