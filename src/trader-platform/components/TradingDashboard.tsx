@@ -217,9 +217,13 @@ export const TradingDashboard = ({ onLoadingChange }: TradingDashboardProps = {}
 
   // Mock data and integrations check
   useEffect(() => {
-    console.log('TradingDashboard effect triggered');
+    console.log('TradingDashboard effect triggered, user:', user?.id);
     
     if (!user) {
+      console.log('No user, marking all loading as complete and redirecting');
+      setIsLoadingSignals(false);
+      setIsLoadingIntegrations(false);
+      setIsLoadingAccount(false);
       navigate('/trader-auth');
       return;
     }
