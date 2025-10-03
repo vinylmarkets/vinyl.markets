@@ -340,7 +340,7 @@ export default function AdminDashboard() {
                 Last updated: {new Date().toLocaleTimeString()}
               </Badge>
               <Link to="/dashboard">
-                <Button variant="outline" size="sm">
+                <Button variant="admin" size="sm">
                   <Users className="h-4 w-4 mr-2" />
                   User Dashboard
                 </Button>
@@ -421,7 +421,8 @@ export default function AdminDashboard() {
                       <Button 
                         onClick={section.actionHandler} 
                         disabled={generatingPredictions}
-                        className="w-full group-hover:bg-primary/90 transition-colors"
+                        variant="admin"
+                        className="w-full"
                       >
                         {generatingPredictions ? (
                           <>
@@ -437,7 +438,7 @@ export default function AdminDashboard() {
                       </Button>
                     ) : (
                       <Link to={section.href}>
-                        <Button className="w-full group-hover:bg-primary/90 transition-colors">
+                        <Button variant="admin" className="w-full">
                           View Dashboard
                           <TrendingUp className="h-4 w-4 ml-2" />
                         </Button>

@@ -19,6 +19,7 @@ const buttonVariants = cva(
         warning: "bg-warning text-warning-foreground hover:bg-warning/90 shadow-md hover:shadow-lg",
         info: "bg-info text-info-foreground hover:bg-info/90 shadow-md hover:shadow-lg",
         active: "bg-success text-[hsl(0_0%_15%)] hover:bg-success/90 shadow-md hover:shadow-lg dark:text-[hsl(0_0%_15%)]",
+        admin: "bg-gradient-admin text-white shadow-lg hover:shadow-xl hover:opacity-90",
       },
       size: {
         default: "h-10 px-4 py-2",

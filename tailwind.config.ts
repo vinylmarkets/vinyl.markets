@@ -94,6 +94,7 @@ export default {
         'gradient-secondary': 'var(--gradient-secondary)',
         'gradient-accent': 'var(--gradient-accent)',
         'gradient-card': 'var(--gradient-card)',
+        'gradient-admin': 'var(--gradient-admin)',
       },
       fontFamily: {
         sans: 'var(--font-sans)', /* Inter for body text */
