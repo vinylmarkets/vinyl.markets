@@ -34,9 +34,10 @@ export default function BentoDashboard() {
   const { data: marketStatus } = useMarketStatus();
 
   // Use real Alpaca account data
-  const portfolioValue = account?.portfolioValue || 0;
-  const portfolioChange = account?.dailyPnL || 0;
-  const portfolioChangePercent = account?.dailyPnLPercent || 0;
+  const portfolioValue = parseFloat(account?.equity || '0');
+  const previousValue = parseFloat(account?.last_equity || '0');
+  const portfolioChange = portfolioValue - previousValue;
+  const portfolioChangePercent = previousValue ? (portfolioChange / previousValue) * 100 : 0;
   const isPositive = portfolioChange >= 0;
 
   // Get positions
@@ -242,7 +243,7 @@ export default function BentoDashboard() {
           ) : (
             <div className="space-y-3">
               {positions.map(position => {
-                const isProfit = position.unrealizedPnL >= 0;
+                const isProfit = parseFloat(position.unrealized_plpc) >= 0;
                 return (
                   <div 
                     key={position.symbol}
@@ -251,7 +252,7 @@ export default function BentoDashboard() {
                     <div className="flex items-start justify-between mb-2">
                       <div>
                         <p className="text-white font-semibold">{position.symbol}</p>
-                        <p className="text-xs text-gray-500">{position.quantity} shares @ ${position.averageCost.toFixed(2)}</p>
+                        <p className="text-xs text-gray-500">{position.qty} shares @ ${parseFloat(position.avg_entry_price).toFixed(2)}</p>
                       </div>
                       {isProfit ? (
                         <TrendingUp className="w-4 h-4 text-[#0AEF80]" />
@@ -262,14 +263,14 @@ export default function BentoDashboard() {
                     
                     <div className="flex items-center justify-between">
                       <span className="text-lg font-mono font-semibold text-white">
-                        ${position.currentPrice.toFixed(2)}
+                        ${parseFloat(position.current_price).toFixed(2)}
                       </span>
                       <div className="text-right">
                         <p className={`text-sm font-semibold ${isProfit ? 'text-[#0AEF80]' : 'text-[#FF3B69]'}`}>
-                          {isProfit ? '+' : ''}${Math.abs(position.unrealizedPnL).toFixed(2)}
+                          {isProfit ? '+' : ''}${Math.abs(parseFloat(position.unrealized_pl)).toFixed(2)}
                         </p>
                         <p className={`text-xs ${isProfit ? 'text-[#0AEF80]' : 'text-[#FF3B69]'}`}>
-                          {isProfit ? '+' : ''}{position.unrealizedPnLPercent.toFixed(2)}%
+                          {isProfit ? '+' : ''}{(parseFloat(position.unrealized_plpc) * 100).toFixed(2)}%
                         </p>
                       </div>
                     </div>

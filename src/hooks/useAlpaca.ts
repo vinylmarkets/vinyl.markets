@@ -2,29 +2,38 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 interface AccountData {
-  portfolioValue: number;
-  dailyPnL: number;
-  dailyPnLPercent: number;
-  buyingPower: number;
-  totalEquity: number;
-  marginUsed: number;
-  dayTradesUsed: number;
-  accountStatus: string;
-  lastUpdated: string;
+  equity: string;
+  last_equity: string;
+  buying_power: string;
+  cash: string;
+  portfolio_value: string;
+  pattern_day_trader: boolean;
+  trading_blocked: boolean;
+  transfers_blocked: boolean;
+  account_blocked: boolean;
+  created_at: string;
+  trade_suspended_by_user: boolean;
+  multiplier: string;
+  shorting_enabled: boolean;
+  long_market_value: string;
+  short_market_value: string;
+  position_market_value: string;
+  daytrade_count: number;
+  balance_asof: string;
 }
 
 interface Position {
   symbol: string;
-  quantity: number;
-  averageCost: number;
-  currentPrice: number;
-  marketValue: number;
-  unrealizedPnL: number;
-  unrealizedPnLPercent: number;
+  qty: string;
+  avg_entry_price: string;
+  current_price: string;
+  market_value: string;
+  unrealized_pl: string;
+  unrealized_plpc: string;
   side: 'long' | 'short';
-  assetType: 'stock' | 'option' | 'crypto';
-  broker?: string;
-  accountLast4?: string;
+  asset_class: string;
+  exchange: string;
+  qty_available: string;
 }
 
 interface RecentTrade {
