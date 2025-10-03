@@ -33,8 +33,7 @@ const TraderPage = () => {
 
   return (
     <TraderProtection>
-      <div className="min-h-screen bg-background relative transition-colors duration-500">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 pointer-events-none"></div>
+      <div className="min-h-screen bg-[#1F1F1F] relative transition-colors duration-500">
         
         {/* Header and Sidebar render immediately */}
         <Sidebar onComingSoonClick={handleComingSoonClick} />

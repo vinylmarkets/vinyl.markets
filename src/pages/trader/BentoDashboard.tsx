@@ -45,7 +45,7 @@ export default function BentoDashboard() {
   }));
 
   return (
-    <div className="min-h-screen bg-[#2D2D2D] p-4 md:p-6">
+    <div className="min-h-screen bg-[#1F1F1F] p-4 md:p-6">
       {/* Bento Grid Layout */}
       <div className="grid grid-cols-12 gap-3 md:gap-4">
         
