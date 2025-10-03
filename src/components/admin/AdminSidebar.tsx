@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, Users, DollarSign, Settings, FileText, BarChart3, Newspaper } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
+import vinylLogo from '@/assets/vinyl-logo-white-new.svg';
 
 interface NavItem {
   label: string;
@@ -33,8 +34,8 @@ export function Sidebar({ adminUser }: { adminUser: any }) {
     <aside className="w-60 bg-[#1A1A1A] border-r border-[#2A2A2A] fixed h-screen flex flex-col">
       {/* Logo */}
       <div className="p-6 border-b border-[#2A2A2A]">
-        <h1 className="text-2xl font-bold text-white">Vinyl</h1>
-        <p className="text-xs text-gray-500 mt-1">Admin Dashboard</p>
+        <img src={vinylLogo} alt="Vinyl" className="h-8 w-auto mb-2" />
+        <p className="text-xs text-gray-500">Admin Dashboard</p>
       </div>
 
       {/* Navigation */}
