@@ -1,155 +1,146 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { corsHeaders } from '../_shared/cors.ts'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+const POLYGON_API_KEY = Deno.env.get('POLYGON_API_KEY')!
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const body = await req.json();
-    const requestedSymbol = body?.symbol;
-    
-    // If specific symbol requested, fetch just that one
-    const symbols = requestedSymbol ? [requestedSymbol.toUpperCase()] : ['AAPL', 'MSFT', 'GOOGL', 'NVDA', 'TSLA', 'META', 'AMZN'];
-    const marketData = []
+    const { action, symbol, symbols, timeframe } = await req.json()
 
-    console.log('Fetching market data for symbols:', symbols);
-
-    for (const symbol of symbols) {
-      try {
-        // Fetch from Yahoo Finance API
-        const response = await fetch(
-          `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`,
-          {
-            headers: {
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-            }
-          }
-        )
-        
-        if (!response.ok) {
-          console.warn(`Failed to fetch data for ${symbol}: ${response.status}`);
-          continue;
-        }
-
-        const data = await response.json()
-        
-        if (!data.chart?.result?.[0]) {
-          console.warn(`No data returned for ${symbol}`);
-          continue;
-        }
-
-        const quote = data.chart.result[0].meta
-        const indicators = data.chart.result[0].indicators.quote[0]
-        
-        const changePercent = ((quote.regularMarketPrice - quote.previousClose) / quote.previousClose) * 100;
-        const change = quote.regularMarketPrice - quote.previousClose;
-        
-        const stockData = {
-          symbol,
-          price: quote.regularMarketPrice,
-          change: change,
-          changePercent: changePercent,
-          current_price: quote.regularMarketPrice,
-          volume: quote.regularMarketVolume,
-          previous_close: quote.previousClose,
-          change_percent: changePercent
-        };
-        
-        marketData.push(stockData)
-
-        console.log(`Successfully fetched data for ${symbol}: $${quote.regularMarketPrice}`);
-        
-      } catch (error) {
-        console.error(`Error fetching data for ${symbol}:`, error);
-        // Continue with other symbols even if one fails
-      }
-    }
-
-    if (marketData.length === 0) {
-      throw new Error('No market data could be fetched');
-    }
-
-    // If single symbol requested, return just that data
-    if (requestedSymbol && marketData.length > 0) {
+    // Get WebSocket key
+    if (action === 'get-websocket-key') {
       return new Response(
-        JSON.stringify({ 
-          success: true, 
-          data: marketData[0],
-          timestamp: new Date().toISOString()
-        }), 
-        {
-          headers: { 
-            ...corsHeaders,
-            'Content-Type': 'application/json' 
+        JSON.stringify({ key: POLYGON_API_KEY }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Get quote
+    if (action === 'get-quote') {
+      const response = await fetch(
+        `https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers/${symbol}?apiKey=${POLYGON_API_KEY}`
+      )
+      const data = await response.json()
+      
+      return new Response(
+        JSON.stringify(data.ticker),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Get company details
+    if (action === 'get-details') {
+      const response = await fetch(
+        `https://api.polygon.io/v3/reference/tickers/${symbol}?apiKey=${POLYGON_API_KEY}`
+      )
+      const data = await response.json()
+      
+      return new Response(
+        JSON.stringify(data.results),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Get chart data
+    if (action === 'get-chart') {
+      const now = new Date()
+      const timeframes: Record<string, { multiplier: number; timespan: string; from: Date }> = {
+        '1m': { multiplier: 1, timespan: 'minute', from: new Date(now.getTime() - 60 * 60 * 1000) },
+        '5m': { multiplier: 5, timespan: 'minute', from: new Date(now.getTime() - 6 * 60 * 60 * 1000) },
+        '15m': { multiplier: 15, timespan: 'minute', from: new Date(now.getTime() - 24 * 60 * 60 * 1000) },
+        '1H': { multiplier: 1, timespan: 'hour', from: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000) },
+        '4H': { multiplier: 4, timespan: 'hour', from: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) },
+        '1D': { multiplier: 1, timespan: 'day', from: new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000) },
+        '1W': { multiplier: 1, timespan: 'week', from: new Date(now.getTime() - 3 * 365 * 24 * 60 * 60 * 1000) },
+        '1M': { multiplier: 1, timespan: 'month', from: new Date(now.getTime() - 5 * 365 * 24 * 60 * 60 * 1000) },
+      }
+
+      const config = timeframes[timeframe] || timeframes['1D']
+      const fromDate = config.from.toISOString().split('T')[0]
+      const toDate = now.toISOString().split('T')[0]
+
+      const response = await fetch(
+        `https://api.polygon.io/v2/aggs/ticker/${symbol}/range/${config.multiplier}/${config.timespan}/${fromDate}/${toDate}?adjusted=true&sort=asc&limit=50000&apiKey=${POLYGON_API_KEY}`
+      )
+      const data = await response.json()
+      
+      return new Response(
+        JSON.stringify(data),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Get news
+    if (action === 'get-news') {
+      const response = await fetch(
+        `https://api.polygon.io/v2/reference/news?ticker=${symbol}&limit=10&apiKey=${POLYGON_API_KEY}`
+      )
+      const data = await response.json()
+      
+      return new Response(
+        JSON.stringify(data),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Get watchlist quotes
+    if (action === 'get-watchlist') {
+      const quotes = await Promise.all(
+        symbols.map(async (sym: string) => {
+          try {
+            const response = await fetch(
+              `https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers/${sym}?apiKey=${POLYGON_API_KEY}`
+            )
+            const data = await response.json()
+            const ticker = data.ticker
+            
+            return {
+              symbol: sym,
+              name: ticker.name || sym,
+              price: ticker.day?.c || ticker.prevDay?.c || 0,
+              change: (ticker.day?.c || 0) - (ticker.prevDay?.c || 0),
+              changePercent: ticker.todaysChangePerc || 0,
+            }
+          } catch (error) {
+            console.error(`Failed to fetch ${sym}:`, error)
+            return null
           }
-        }
-      );
+        })
+      )
+
+      return new Response(
+        JSON.stringify({ quotes: quotes.filter(Boolean) }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
     }
 
-    // Store in Supabase for batch requests
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    )
-
-    console.log(`Storing ${marketData.length} market data records in database`);
-
-    const { error: insertError } = await supabase
-      .from('market_data')
-      .insert(marketData.map(item => ({
-        symbol: item.symbol,
-        close_price: item.current_price,
-        volume: item.volume,
-        timestamp: new Date().toISOString(),
-        data_source: 'yahoo_finance'
-      })))
-
-    if (insertError) {
-      console.error('Database insert error:', insertError);
-      // Don't throw error for storage issues, still return the data
+    // Get market status
+    if (action === 'get-market-status') {
+      const response = await fetch(
+        `https://api.polygon.io/v1/marketstatus/now?apiKey=${POLYGON_API_KEY}`
+      )
+      const data = await response.json()
+      
+      return new Response(
+        JSON.stringify(data),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
     }
-
-    console.log('Successfully stored market data in database');
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        data: marketData,
-        timestamp: new Date().toISOString(),
-        symbolsProcessed: marketData.length
-      }), 
-      {
-        headers: { 
-          ...corsHeaders,
-          'Content-Type': 'application/json' 
-        }
-      }
+      JSON.stringify({ error: 'Invalid action' }),
+      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
 
   } catch (error) {
-    console.error('Market data function error:', error);
-    
+    console.error('Error:', error)
     return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
-      }),
-      { 
-        status: 500,
-        headers: { 
-          ...corsHeaders,
-          'Content-Type': 'application/json' 
-        }
-      }
-    );
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
   }
 })

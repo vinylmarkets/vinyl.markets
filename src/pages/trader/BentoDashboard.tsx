@@ -28,7 +28,7 @@ export default function BentoDashboard() {
 
   // Fetch real data
   const { data: portfolio } = usePortfolioData();
-  const { data: watchlist: watchlistData } = useWatchlist();
+  const { data: watchlistData } = useWatchlist();
   const { data: portfolioChart } = useStockChart('SPY', '1M');
   const { data: marketStatus } = useMarketStatus();
   const wsConnected = getWebSocketStatus();
