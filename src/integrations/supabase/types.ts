@@ -5628,8 +5628,16 @@ export type Database = {
           watchlist_type: string
         }[]
       }
+      is_admin: {
+        Args: { user_uuid: string }
+        Returns: boolean
+      }
       is_current_user_admin: {
         Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_full_admin: {
+        Args: { user_uuid: string }
         Returns: boolean
       }
       is_trader_by_user_id: {
