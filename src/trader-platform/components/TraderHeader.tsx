@@ -9,7 +9,7 @@ import {
 import vinylLogoWhite from "@/assets/vinyl-logo-white-new.svg";
 import vinylLogoBlack from "@/assets/vinyl-logo-black-new.svg";
 import { ProfileDropdown } from "./ProfileDropdown";
-import { GlobalSearch } from "@/components/trader/GlobalSearch";
+import { TickerSearch } from "@/components/trader/TickerSearch";
 
 interface TraderHeaderProps {
   accountData?: {
@@ -111,9 +111,9 @@ export const TraderHeader: React.FC<TraderHeaderProps> = ({
           )}
         </div>
 
-        {/* Center Section - Global Search */}
+        {/* Center Section - Ticker Search */}
         <div className="flex-1 flex justify-center px-4 max-w-2xl mx-auto">
-          <GlobalSearch className="w-full text-muted-foreground placeholder:text-muted-foreground/60" />
+          <TickerSearch />
         </div>
 
         {/* Right Side Controls */}
