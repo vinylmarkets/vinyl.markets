@@ -107,10 +107,10 @@ interface RecentTrade {
 }
 
 interface TradingDashboardProps {
-  onLoadingChange?: (isLoading: boolean) => void;
+  // Remove onLoadingChange - not needed anymore
 }
 
-export const TradingDashboard = ({ onLoadingChange }: TradingDashboardProps = {}) => {
+export const TradingDashboard = ({}: TradingDashboardProps = {}) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -142,26 +142,7 @@ export const TradingDashboard = ({ onLoadingChange }: TradingDashboardProps = {}
   const [signalStats, setSignalStats] = useState<{ count: number; lastGenerated: string | null }>({ count: 0, lastGenerated: null });
   const [autoTradeEnabled, setAutoTradeEnabled] = useState(false);
   
-  // Loading states for coordinated page rendering
-  const [isLoadingSignals, setIsLoadingSignals] = useState(true);
-  const [isLoadingIntegrations, setIsLoadingIntegrations] = useState(true);
-  const [isLoadingAccount, setIsLoadingAccount] = useState(true);
-  
   const isDevelopment = import.meta.env.DEV;
-  
-  // Expose aggregate loading state for parent components
-  const isPageLoading = isLoadingSignals || isLoadingIntegrations || isLoadingAccount;
-
-  // Debug logging for loading states
-  useEffect(() => {
-    console.log('Loading states:', { isLoadingSignals, isLoadingIntegrations, isLoadingAccount, isPageLoading });
-  }, [isLoadingSignals, isLoadingIntegrations, isLoadingAccount, isPageLoading]);
-
-  // Notify parent component of loading state changes
-  useEffect(() => {
-    console.log('Notifying parent of loading state:', isPageLoading);
-    onLoadingChange?.(isPageLoading);
-  }, [isPageLoading, onLoadingChange]);
 
   const [cloudStatus, setCloudStatus] = useState<CloudStatus>({
     isActive: true,
@@ -220,10 +201,7 @@ export const TradingDashboard = ({ onLoadingChange }: TradingDashboardProps = {}
     console.log('TradingDashboard effect triggered, user:', user?.id);
     
     if (!user) {
-      console.log('No user, marking all loading as complete and redirecting');
-      setIsLoadingSignals(false);
-      setIsLoadingIntegrations(false);
-      setIsLoadingAccount(false);
+      console.log('No user, redirecting to auth');
       navigate('/trader-auth');
       return;
     }
@@ -233,7 +211,6 @@ export const TradingDashboard = ({ onLoadingChange }: TradingDashboardProps = {}
     // Fetch real signals from database
     const fetchSignals = async () => {
       try {
-        setIsLoadingSignals(true);
         const { data, error } = await supabase
           .from('trading_signals')
           .select('*')
@@ -258,8 +235,6 @@ export const TradingDashboard = ({ onLoadingChange }: TradingDashboardProps = {}
         }
       } catch (error) {
         console.error('Error fetching signals:', error);
-      } finally {
-        setIsLoadingSignals(false);
       }
     };
     
@@ -273,12 +248,10 @@ export const TradingDashboard = ({ onLoadingChange }: TradingDashboardProps = {}
       if (!user) {
         console.log('No user found, setting hasIntegrations to false');
         setHasIntegrations(false);
-        setIsLoadingIntegrations(false);
         return;
       }
       
       try {
-        setIsLoadingIntegrations(true);
         console.log('Checking for integrations for user:', user.id);
         
         // First try with RLS
@@ -298,12 +271,10 @@ export const TradingDashboard = ({ onLoadingChange }: TradingDashboardProps = {}
           if (user.id === '008337a6-677b-48f3-a16f-8409920a2513') {
             console.log('Applying temporary fix - setting hasIntegrations to true for known user');
             setHasIntegrations(true);
-            setIsLoadingIntegrations(false);
             return;
           }
           
           setHasIntegrations(false);
-          setIsLoadingIntegrations(false);
           return;
         }
 
@@ -314,8 +285,6 @@ export const TradingDashboard = ({ onLoadingChange }: TradingDashboardProps = {}
       } catch (error) {
         console.error('Error checking integrations:', error);
         setHasIntegrations(false);
-      } finally {
-        setIsLoadingIntegrations(false);
       }
     };
 
@@ -330,21 +299,13 @@ export const TradingDashboard = ({ onLoadingChange }: TradingDashboardProps = {}
 
   // Fetch account data when integrations are detected
   useEffect(() => {
-    console.log('hasIntegrations changed to:', hasIntegrations, 'isLoadingIntegrations:', isLoadingIntegrations);
-    
-    // If integrations check is still loading, wait for it
-    if (isLoadingIntegrations) {
-      console.log('Still checking integrations, waiting...');
-      return;
-    }
+    console.log('hasIntegrations changed to:', hasIntegrations);
     
     if (hasIntegrations) {
       console.log('Calling fetchAccountData and fetchPositionsData because hasIntegrations is true');
       // Call both account and positions functions
       (async () => {
         try {
-          setIsLoadingAccount(true);
-          
           // Fetch account data
           console.log('fetchAccountData: Fetching account data...');
           
@@ -395,17 +356,10 @@ export const TradingDashboard = ({ onLoadingChange }: TradingDashboardProps = {}
           }
         } catch (error) {
           console.error('Failed to fetch account/positions data:', error);
-        } finally {
-          console.log('Account data fetch complete, setting isLoadingAccount to false');
-          setIsLoadingAccount(false);
         }
       })();
-    } else {
-      // No integrations, mark account loading as complete
-      console.log('No integrations detected, setting isLoadingAccount to false');
-      setIsLoadingAccount(false);
     }
-  }, [hasIntegrations, isLoadingIntegrations]);
+  }, [hasIntegrations]);
 
   const handleLogout = async () => {
     try {
@@ -631,8 +585,8 @@ export const TradingDashboard = ({ onLoadingChange }: TradingDashboardProps = {}
     <div className="min-h-screen bg-background">
       {/* Top Header Bar removed - now using TraderHeader from parent */}
 
-      {/* Broker Integration Status - Only show if no integrations and page has loaded */}
-      {!hasIntegrations && !isPageLoading && (
+      {/* Broker Integration Status - Only show if no integrations and not loading */}
+      {!hasIntegrations && (
         <div className="p-2 sm:p-4 relative z-10">
           <Card className="border-yellow-200 bg-yellow-50 border-l-4 border-l-yellow-500">
             <CardContent className="p-3 sm:p-4">
