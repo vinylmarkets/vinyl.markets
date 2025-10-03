@@ -47,11 +47,10 @@ export default function BentoDashboard() {
   });
 
   // Use real Alpaca account data
-  const portfolioValue = parseFloat(account?.equity || '0');
-  const previousValue = parseFloat(account?.last_equity || '0');
-  const portfolioChange = portfolioValue - previousValue;
-  const portfolioChangePercent = previousValue ? (portfolioChange / previousValue) * 100 : 0;
-  const isPositive = portfolioChange >= 0;
+  const portfolioValue = account?.portfolioValue || 0;
+  const dailyPnL = account?.dailyPnL || 0;
+  const dailyPnLPercent = account?.dailyPnLPercent || 0;
+  const isPositive = dailyPnL >= 0;
 
   // Get positions
   const positions = positionsData?.positions || [];
@@ -105,7 +104,7 @@ export default function BentoDashboard() {
                   <TrendingDown className="w-5 h-5 text-[#FF3B69]" />
                 )}
                 <span className={`text-lg font-semibold ${isPositive ? 'text-[#0AEF80]' : 'text-[#FF3B69]'}`}>
-                  {isPositive ? '+' : ''}${Math.abs(portfolioChange).toFixed(2)} ({isPositive ? '+' : ''}{portfolioChangePercent.toFixed(2)}%)
+                  {isPositive ? '+' : ''}${Math.abs(dailyPnL).toFixed(2)} ({isPositive ? '+' : ''}{dailyPnLPercent.toFixed(2)}%)
                 </span>
               </div>
               <p className="text-xs text-gray-500 mt-2">Today's change</p>
@@ -272,7 +271,7 @@ export default function BentoDashboard() {
           ) : (
             <div className="space-y-3">
               {positions.map(position => {
-                const isProfit = parseFloat(position.unrealized_plpc) >= 0;
+                const isProfit = position.unrealizedPnL >= 0;
                 return (
                   <div 
                     key={position.symbol}
@@ -281,7 +280,7 @@ export default function BentoDashboard() {
                     <div className="flex items-start justify-between mb-2">
                       <div>
                         <p className="text-white font-semibold">{position.symbol}</p>
-                        <p className="text-xs text-gray-500">{position.qty} shares @ ${parseFloat(position.avg_entry_price).toFixed(2)}</p>
+                        <p className="text-xs text-gray-500">{position.quantity} shares @ ${position.averageCost.toFixed(2)}</p>
                       </div>
                       {isProfit ? (
                         <TrendingUp className="w-4 h-4 text-[#0AEF80]" />
@@ -292,14 +291,14 @@ export default function BentoDashboard() {
                     
                     <div className="flex items-center justify-between">
                       <span className="text-lg font-mono font-semibold text-white">
-                        ${parseFloat(position.current_price).toFixed(2)}
+                        ${position.currentPrice.toFixed(2)}
                       </span>
                       <div className="text-right">
                         <p className={`text-sm font-semibold ${isProfit ? 'text-[#0AEF80]' : 'text-[#FF3B69]'}`}>
-                          {isProfit ? '+' : ''}${Math.abs(parseFloat(position.unrealized_pl)).toFixed(2)}
+                          {isProfit ? '+' : ''}${Math.abs(position.unrealizedPnL).toFixed(2)}
                         </p>
                         <p className={`text-xs ${isProfit ? 'text-[#0AEF80]' : 'text-[#FF3B69]'}`}>
-                          {isProfit ? '+' : ''}{(parseFloat(position.unrealized_plpc) * 100).toFixed(2)}%
+                          {isProfit ? '+' : ''}{position.unrealizedPnLPercent.toFixed(2)}%
                         </p>
                       </div>
                     </div>
