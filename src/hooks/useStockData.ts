@@ -10,17 +10,49 @@ export function useStockQuote(symbol: string) {
     queryFn: async () => {
       if (!POLYGON_API_KEY) throw new Error('API key not configured');
       
-      const response = await fetch(
-        `https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers/${symbol.toUpperCase()}?apiKey=${POLYGON_API_KEY}`
-      );
+      console.log('🔍 Fetching quote data using aggregates endpoint (free tier compatible)');
+      
+      // Use last 2 days of 5-minute bars to get latest price
+      const now = new Date();
+      const yesterday = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
+      const fromDate = yesterday.toISOString().split('T')[0];
+      const toDate = now.toISOString().split('T')[0];
+      
+      const url = `https://api.polygon.io/v2/aggs/ticker/${symbol.toUpperCase()}/range/5/minute/${fromDate}/${toDate}?adjusted=true&sort=desc&limit=50&apiKey=${POLYGON_API_KEY}`;
+      console.log('📡 Aggregates URL:', url);
+      
+      const response = await fetch(url);
       
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to fetch quote');
+        console.error('❌ API Error:', error);
+        throw new Error(error.message || 'Failed to fetch quote');
       }
       
       const data = await response.json();
-      return data.ticker;
+      console.log('✅ Received data:', data);
+      
+      if (!data.results || data.results.length === 0) {
+        throw new Error('No data available for this symbol');
+      }
+      
+      // Get the most recent bar and previous bar for change calculation
+      const latestBar = data.results[0];
+      const previousBar = data.results[data.results.length - 1];
+      
+      // Construct a snapshot-like object from aggregates data
+      return {
+        day: {
+          c: latestBar.c,
+          o: latestBar.o,
+          h: latestBar.h,
+          l: latestBar.l,
+          v: latestBar.v
+        },
+        prevDay: {
+          c: previousBar.c
+        }
+      };
     },
     enabled: !!symbol && !!POLYGON_API_KEY,
     retry: 1,
