@@ -12,10 +12,6 @@ import { AddAmpModal } from '@/components/amps/AddAmpModal';
 import { AllocateCapitalModal } from '@/components/amps/AllocateCapitalModal';
 import { AmpSettingsModal } from '@/components/amps/AmpSettingsModal';
 import { UserAmp } from '@/types/amps';
-import { TraderHeader } from '@/trader-platform/components/TraderHeader';
-import { TraderProtection } from '@/components/trader/TraderProtection';
-import { Sidebar } from '@/components/trader/Sidebar';
-import { ComingSoonModal } from '@/components/trader/ComingSoonModal';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useToast } from '@/hooks/use-toast';
@@ -30,7 +26,6 @@ export default function MyAmps() {
   const [selectedAmp, setSelectedAmp] = useState<UserAmp | null>(null);
   const [signalStats, setSignalStats] = useState<{ count: number; lastGenerated: string | null }>({ count: 0, lastGenerated: null });
   const [autoTradeEnabled, setAutoTradeEnabled] = useState(false);
-  const [comingSoonFeature, setComingSoonFeature] = useState<string | null>(null);
 
   const handleAllocateClick = (ampId: string) => {
     const amp = amps.find(a => a.id === ampId);
@@ -123,36 +118,24 @@ export default function MyAmps() {
 
   if (isLoading) {
     return (
-      <TraderProtection>
-        <div className="min-h-screen bg-background relative">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 pointer-events-none"></div>
-          <TraderHeader showAccountStats={false} />
-          <div className="container mx-auto p-6 space-y-6 relative z-10">
-            <Skeleton className="h-12 w-64" />
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {[...Array(4)].map((_, i) => (
-                <Skeleton key={i} className="h-24" />
-              ))}
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[...Array(3)].map((_, i) => (
-                <Skeleton key={i} className="h-64" />
-              ))}
-            </div>
-          </div>
+      <div className="container mx-auto p-6 space-y-6">
+        <Skeleton className="h-12 w-64" />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-24" />
+          ))}
         </div>
-      </TraderProtection>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[...Array(3)].map((_, i) => (
+            <Skeleton key={i} className="h-64" />
+          ))}
+        </div>
+      </div>
     );
   }
 
   return (
-    <TraderProtection>
-      <div className="min-h-screen bg-background relative flex">
-        <Sidebar onComingSoonClick={setComingSoonFeature} />
-        <div className="flex-1 ml-16">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 pointer-events-none"></div>
-          <TraderHeader showAccountStats={false} />
-          <div className="container mx-auto p-6 relative z-10">
+    <div className="container mx-auto p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold">Amps - My Trading Algorithms</h1>
@@ -307,14 +290,6 @@ export default function MyAmps() {
           amp={selectedAmp}
           onSave={updateSettings}
         />
-          </div>
-        </div>
-        <ComingSoonModal
-          open={comingSoonFeature !== null}
-          onOpenChange={(open) => !open && setComingSoonFeature(null)}
-          featureName={comingSoonFeature || ""}
-        />
-      </div>
-    </TraderProtection>
+    </div>
   );
 }
