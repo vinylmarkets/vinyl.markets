@@ -48,6 +48,7 @@ import BentoDashboard from "./pages/trader/BentoDashboard";
 import TraderAmpDetail from "./pages/trader/AmpDetail";
 import AdminAmpDetail from "./pages/admin/AmpDetail";
 import BacktestPage from "./pages/trader/BacktestPage";
+import { AmpCatalog } from "./pages/marketplace/AmpCatalog";
 
 const queryClient = new QueryClient();
 
@@ -108,6 +109,7 @@ const App = () => {
                 <Route path="watchlists" element={<Watchlists />} />
                 <Route path="stock/:symbol" element={<StockAnalysis />} />
                 <Route path="backtest" element={<BacktestPage />} />
+                <Route path="marketplace" element={<AmpCatalog />} />
               </Route>
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
