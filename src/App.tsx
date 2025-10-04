@@ -49,7 +49,8 @@ import TraderAmpDetail from "./pages/trader/AmpDetail";
 import AdminAmpDetail from "./pages/admin/AmpDetail";
 import BacktestPage from "./pages/trader/BacktestPage";
 import { AmpCatalog } from "./pages/marketplace/AmpCatalog";
-
+import CreatorLayout from "./pages/creator/CreatorLayout";
+import CreatorDashboard from "./pages/creator/CreatorDashboard";
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -110,6 +111,11 @@ const App = () => {
                 <Route path="stock/:symbol" element={<StockAnalysis />} />
                 <Route path="backtest" element={<BacktestPage />} />
                 <Route path="marketplace" element={<AmpCatalog />} />
+              </Route>
+              
+              {/* Creator Studio Routes */}
+              <Route path="/creator" element={<CreatorLayout />}>
+                <Route index element={<CreatorDashboard />} />
               </Route>
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
