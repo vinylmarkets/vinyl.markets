@@ -18,10 +18,6 @@ import {
   Monitor, 
   Save
 } from "lucide-react";
-import { TraderProtection } from "@/components/trader/TraderProtection";
-import { TraderHeader } from "@/trader-platform/components/TraderHeader";
-import { Sidebar } from "@/components/trader/Sidebar";
-import { ComingSoonModal } from "@/components/trader/ComingSoonModal";
 import { FadeInWrapper } from "@/components/FadeInWrapper";
 
 interface TradingSettings {
@@ -44,7 +40,6 @@ interface TradingSettings {
 const TraderSettings = () => {
   const { toast } = useToast();
   const { user } = useAuth();
-  const [comingSoonFeature, setComingSoonFeature] = useState<string | null>(null);
   const [settings, setSettings] = useState<TradingSettings>({
     defaultPositionSize: 1000,
     riskTolerance: 3,
@@ -148,16 +143,8 @@ const TraderSettings = () => {
   ];
 
   return (
-    <TraderProtection>
-      <div className="min-h-screen bg-background relative flex">
-        <Sidebar onComingSoonClick={setComingSoonFeature} />
-        <div className="flex-1 ml-16">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 pointer-events-none"></div>
-          <TraderHeader showAccountStats={false} />
-
-          {/* Settings Content */}
-          <FadeInWrapper>
-            <div className="p-6 max-w-4xl mx-auto space-y-6 relative z-10">
+    <FadeInWrapper>
+      <div className="p-6 max-w-4xl mx-auto space-y-6">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h1 className="text-3xl font-bold">Settings</h1>
@@ -444,16 +431,8 @@ const TraderSettings = () => {
               <span>Save All Settings</span>
             </Button>
           </div>
-            </div>
-          </FadeInWrapper>
-        </div>
-        <ComingSoonModal
-          open={comingSoonFeature !== null}
-          onOpenChange={(open) => !open && setComingSoonFeature(null)}
-          featureName={comingSoonFeature || ""}
-        />
       </div>
-    </TraderProtection>
+    </FadeInWrapper>
   );
 };
 
