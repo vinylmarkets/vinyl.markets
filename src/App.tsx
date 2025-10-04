@@ -29,7 +29,7 @@ import Auth from "./pages/Auth";
 import TraderLayout from "./pages/trader/TraderLayout";
 import { LayerDashboard } from "./components/layers/LayerDashboard";
 import { LayerBuilder } from "./components/layers/LayerBuilder";
-import { LayerAnalytics } from "./components/layers/LayerAnalytics";
+import { LayerAnalyticsDashboard } from "./components/layers/LayerAnalyticsDashboard";
 import TraderAuth from "./pages/trader/TraderAuth";
 import Integrations from "./pages/trader/Integrations";
 import TraderSettings from "./pages/trader/TraderSettings";
@@ -117,7 +117,7 @@ const App = () => {
                 <Route path="layers" element={<LayerDashboard />} />
                 <Route path="layers/new" element={<LayerBuilder />} />
                 <Route path="layers/:layerId/edit" element={<LayerBuilder />} />
-                <Route path="layers/:layerId/analytics" element={<LayerAnalytics />} />
+                <Route path="layers/:layerId/analytics" element={<LayerAnalyticsDashboard />} />
               </Route>
               
               {/* Creator Studio Routes */}
