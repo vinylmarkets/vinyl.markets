@@ -2328,6 +2328,50 @@ export type Database = {
           },
         ]
       }
+      layer_amp_performance: {
+        Row: {
+          amp_id: string
+          conflicts_won: number | null
+          created_at: string | null
+          date: string
+          id: string
+          layer_id: string
+          pnl: number | null
+          signals_generated: number | null
+          trades_executed: number | null
+        }
+        Insert: {
+          amp_id: string
+          conflicts_won?: number | null
+          created_at?: string | null
+          date: string
+          id?: string
+          layer_id: string
+          pnl?: number | null
+          signals_generated?: number | null
+          trades_executed?: number | null
+        }
+        Update: {
+          amp_id?: string
+          conflicts_won?: number | null
+          created_at?: string | null
+          date?: string
+          id?: string
+          layer_id?: string
+          pnl?: number | null
+          signals_generated?: number | null
+          trades_executed?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "layer_amp_performance_layer_id_fkey"
+            columns: ["layer_id"]
+            isOneToOne: false
+            referencedRelation: "amp_layers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       layer_amps: {
         Row: {
           amp_id: string
@@ -2362,6 +2406,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "layer_amps_layer_id_fkey"
+            columns: ["layer_id"]
+            isOneToOne: false
+            referencedRelation: "amp_layers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      layer_conflicts: {
+        Row: {
+          contributing_amps: Json | null
+          final_action: string | null
+          had_conflict: boolean | null
+          id: string
+          layer_id: string
+          resolution_method: string | null
+          symbol: string
+          timestamp: string | null
+        }
+        Insert: {
+          contributing_amps?: Json | null
+          final_action?: string | null
+          had_conflict?: boolean | null
+          id?: string
+          layer_id: string
+          resolution_method?: string | null
+          symbol: string
+          timestamp?: string | null
+        }
+        Update: {
+          contributing_amps?: Json | null
+          final_action?: string | null
+          had_conflict?: boolean | null
+          id?: string
+          layer_id?: string
+          resolution_method?: string | null
+          symbol?: string
+          timestamp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "layer_conflicts_layer_id_fkey"
             columns: ["layer_id"]
             isOneToOne: false
             referencedRelation: "amp_layers"

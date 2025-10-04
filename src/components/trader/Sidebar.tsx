@@ -19,6 +19,7 @@ import {
   TestTube,
   ChevronLeft,
   ChevronRight,
+  Layers,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -48,6 +49,7 @@ const menuGroups: MenuGroup[] = [
     items: [
       { label: "Dashboard", icon: Home, path: "/trader" },
       { label: "Amps", icon: Music, path: "/trader/amps" },
+      { label: "Layers", icon: Layers, path: "/trader/layers" },
       { label: "Performance", icon: TrendingUp, path: "/trader/performance" },
       { label: "Positions", icon: Briefcase, path: "/trader/positions", comingSoon: true },
       { label: "Orders", icon: ClipboardList, path: "/trader/orders", comingSoon: true },

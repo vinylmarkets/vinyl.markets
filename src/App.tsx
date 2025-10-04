@@ -27,6 +27,9 @@ import AdminDashboardNew from "./pages/admin/AdminDashboardNew";
 import Financial from "./pages/admin/Financial";
 import Auth from "./pages/Auth";
 import TraderLayout from "./pages/trader/TraderLayout";
+import { LayerDashboard } from "./components/layers/LayerDashboard";
+import { LayerBuilder } from "./components/layers/LayerBuilder";
+import { LayerAnalytics } from "./components/layers/LayerAnalytics";
 import TraderAuth from "./pages/trader/TraderAuth";
 import Integrations from "./pages/trader/Integrations";
 import TraderSettings from "./pages/trader/TraderSettings";
@@ -111,6 +114,10 @@ const App = () => {
                 <Route path="stock/:symbol" element={<StockAnalysis />} />
                 <Route path="backtest" element={<BacktestPage />} />
                 <Route path="marketplace" element={<AmpCatalog />} />
+                <Route path="layers" element={<LayerDashboard />} />
+                <Route path="layers/new" element={<LayerBuilder />} />
+                <Route path="layers/:layerId/edit" element={<LayerBuilder />} />
+                <Route path="layers/:layerId/analytics" element={<LayerAnalytics />} />
               </Route>
               
               {/* Creator Studio Routes */}
