@@ -18,6 +18,8 @@ export interface StrategySignal {
   quantity: number;
   confidence: number;
   reason: string;
+  stopLoss?: number;
+  takeProfit?: number;
 }
 
 /**

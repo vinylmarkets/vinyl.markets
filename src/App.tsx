@@ -47,6 +47,7 @@ import DeployAmp from "./pages/trader/DeployAmp";
 import BentoDashboard from "./pages/trader/BentoDashboard";
 import TraderAmpDetail from "./pages/trader/AmpDetail";
 import AdminAmpDetail from "./pages/admin/AmpDetail";
+import BacktestPage from "./pages/trader/BacktestPage";
 
 const queryClient = new QueryClient();
 
@@ -106,6 +107,7 @@ const App = () => {
                 <Route path="system-maps/algorithms" element={<AlgorithmAnalysis />} />
                 <Route path="watchlists" element={<Watchlists />} />
                 <Route path="stock/:symbol" element={<StockAnalysis />} />
+                <Route path="backtest" element={<BacktestPage />} />
               </Route>
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
