@@ -423,6 +423,36 @@ export type Database = {
         }
         Relationships: []
       }
+      amp_layers: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       amp_reviews: {
         Row: {
           amp_id: string
@@ -1235,6 +1265,59 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      coordinated_signals: {
+        Row: {
+          action: string | null
+          confidence: number | null
+          contributing_amps: Json | null
+          created_at: string | null
+          executed: boolean | null
+          had_conflicts: boolean | null
+          id: string
+          layer_id: string
+          quantity: number | null
+          reasoning: string | null
+          resolution_method: string | null
+          symbol: string
+        }
+        Insert: {
+          action?: string | null
+          confidence?: number | null
+          contributing_amps?: Json | null
+          created_at?: string | null
+          executed?: boolean | null
+          had_conflicts?: boolean | null
+          id?: string
+          layer_id: string
+          quantity?: number | null
+          reasoning?: string | null
+          resolution_method?: string | null
+          symbol: string
+        }
+        Update: {
+          action?: string | null
+          confidence?: number | null
+          contributing_amps?: Json | null
+          created_at?: string | null
+          executed?: boolean | null
+          had_conflicts?: boolean | null
+          id?: string
+          layer_id?: string
+          quantity?: number | null
+          reasoning?: string | null
+          resolution_method?: string | null
+          symbol?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coordinated_signals_layer_id_fkey"
+            columns: ["layer_id"]
+            isOneToOne: false
+            referencedRelation: "amp_layers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       cron_job_logs: {
         Row: {
@@ -2241,6 +2324,135 @@ export type Database = {
             columns: ["parent_page_id"]
             isOneToOne: false
             referencedRelation: "launch_checklist_pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      layer_amps: {
+        Row: {
+          amp_id: string
+          capital_allocation: number | null
+          created_at: string | null
+          id: string
+          is_enabled: boolean | null
+          layer_id: string
+          priority: number | null
+          settings: Json | null
+        }
+        Insert: {
+          amp_id: string
+          capital_allocation?: number | null
+          created_at?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          layer_id: string
+          priority?: number | null
+          settings?: Json | null
+        }
+        Update: {
+          amp_id?: string
+          capital_allocation?: number | null
+          created_at?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          layer_id?: string
+          priority?: number | null
+          settings?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "layer_amps_layer_id_fkey"
+            columns: ["layer_id"]
+            isOneToOne: false
+            referencedRelation: "amp_layers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      layer_performance: {
+        Row: {
+          created_at: string | null
+          date: string
+          ending_value: number | null
+          id: string
+          layer_id: string
+          losses: number | null
+          pnl: number | null
+          pnl_percentage: number | null
+          starting_value: number | null
+          trades_count: number | null
+          wins: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          ending_value?: number | null
+          id?: string
+          layer_id: string
+          losses?: number | null
+          pnl?: number | null
+          pnl_percentage?: number | null
+          starting_value?: number | null
+          trades_count?: number | null
+          wins?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          ending_value?: number | null
+          id?: string
+          layer_id?: string
+          losses?: number | null
+          pnl?: number | null
+          pnl_percentage?: number | null
+          starting_value?: number | null
+          trades_count?: number | null
+          wins?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "layer_performance_layer_id_fkey"
+            columns: ["layer_id"]
+            isOneToOne: false
+            referencedRelation: "amp_layers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      layer_settings: {
+        Row: {
+          capital_strategy: string | null
+          conflict_resolution: string | null
+          id: string
+          layer_id: string
+          max_exposure: number | null
+          max_positions: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          capital_strategy?: string | null
+          conflict_resolution?: string | null
+          id?: string
+          layer_id: string
+          max_exposure?: number | null
+          max_positions?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          capital_strategy?: string | null
+          conflict_resolution?: string | null
+          id?: string
+          layer_id?: string
+          max_exposure?: number | null
+          max_positions?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "layer_settings_layer_id_fkey"
+            columns: ["layer_id"]
+            isOneToOne: true
+            referencedRelation: "amp_layers"
             referencedColumns: ["id"]
           },
         ]
