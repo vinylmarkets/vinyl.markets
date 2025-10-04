@@ -344,6 +344,7 @@ export type Database = {
       }
       amp_catalog: {
         Row: {
+          average_rating: number | null
           category: string | null
           created_at: string | null
           default_settings: Json | null
@@ -352,9 +353,11 @@ export type Database = {
           image_url: string | null
           name: string
           parameter_schema: Json | null
+          total_reviews: number | null
           version: string | null
         }
         Insert: {
+          average_rating?: number | null
           category?: string | null
           created_at?: string | null
           default_settings?: Json | null
@@ -363,9 +366,11 @@ export type Database = {
           image_url?: string | null
           name: string
           parameter_schema?: Json | null
+          total_reviews?: number | null
           version?: string | null
         }
         Update: {
+          average_rating?: number | null
           category?: string | null
           created_at?: string | null
           default_settings?: Json | null
@@ -374,6 +379,7 @@ export type Database = {
           image_url?: string | null
           name?: string
           parameter_schema?: Json | null
+          total_reviews?: number | null
           version?: string | null
         }
         Relationships: []
@@ -416,6 +422,53 @@ export type Database = {
           style_era?: string | null
         }
         Relationships: []
+      }
+      amp_reviews: {
+        Row: {
+          amp_id: string
+          created_at: string | null
+          helpful_count: number | null
+          id: string
+          rating: number
+          review_text: string
+          review_title: string
+          updated_at: string | null
+          user_id: string
+          verified_purchase: boolean | null
+        }
+        Insert: {
+          amp_id: string
+          created_at?: string | null
+          helpful_count?: number | null
+          id?: string
+          rating: number
+          review_text: string
+          review_title: string
+          updated_at?: string | null
+          user_id: string
+          verified_purchase?: boolean | null
+        }
+        Update: {
+          amp_id?: string
+          created_at?: string | null
+          helpful_count?: number | null
+          id?: string
+          rating?: number
+          review_text?: string
+          review_title?: string
+          updated_at?: string | null
+          user_id?: string
+          verified_purchase?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "amp_reviews_amp_id_fkey"
+            columns: ["amp_id"]
+            isOneToOne: false
+            referencedRelation: "amp_catalog"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       amp_trades: {
         Row: {
@@ -4180,6 +4233,35 @@ export type Database = {
         }
         Relationships: []
       }
+      review_helpful_votes: {
+        Row: {
+          created_at: string | null
+          id: string
+          review_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          review_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          review_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_helpful_votes_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "amp_reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       risk_settings: {
         Row: {
           created_at: string | null
@@ -5543,6 +5625,10 @@ export type Database = {
           symbol_count: number
           watchlist_type: string
         }[]
+      }
+      increment_review_helpful_count: {
+        Args: { review_id: string }
+        Returns: undefined
       }
       is_admin: {
         Args: { user_uuid: string }
