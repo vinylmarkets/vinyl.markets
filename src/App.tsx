@@ -27,9 +27,6 @@ import AdminDashboardNew from "./pages/admin/AdminDashboardNew";
 import Financial from "./pages/admin/Financial";
 import Auth from "./pages/Auth";
 import TraderLayout from "./pages/trader/TraderLayout";
-import { LayerDashboard } from "./components/layers/LayerDashboard";
-import { LayerBuilder } from "./components/layers/LayerBuilder";
-import { LayerAnalyticsDashboard } from "./components/layers/LayerAnalyticsDashboard";
 import TraderAuth from "./pages/trader/TraderAuth";
 import Integrations from "./pages/trader/Integrations";
 import TraderSettings from "./pages/trader/TraderSettings";
@@ -54,6 +51,11 @@ import BacktestPage from "./pages/trader/BacktestPage";
 import { AmpCatalog } from "./pages/marketplace/AmpCatalog";
 import CreatorLayout from "./pages/creator/CreatorLayout";
 import CreatorDashboard from "./pages/creator/CreatorDashboard";
+import { LayerBuilder } from "./components/layers/LayerBuilder";
+import { LayerDashboard } from "./components/layers/LayerDashboard";
+import { LayerAnalyticsDashboard } from "./components/layers/LayerAnalyticsDashboard";
+import { TemplateGallery } from "./components/layers/TemplateGallery";
+import { CommunityLayers } from "./components/layers/CommunityLayers";
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -118,6 +120,8 @@ const App = () => {
                 <Route path="layers/new" element={<LayerBuilder />} />
                 <Route path="layers/:layerId/edit" element={<LayerBuilder />} />
                 <Route path="layers/:layerId/analytics" element={<LayerAnalyticsDashboard />} />
+                <Route path="layers/templates" element={<TemplateGallery />} />
+                <Route path="layers/community" element={<CommunityLayers />} />
               </Route>
               
               {/* Creator Studio Routes */}

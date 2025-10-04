@@ -6,7 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Plus, Settings, Trash2, Play, Pause, TrendingUp, TrendingDown,
-  AlertCircle, Layers as LayersIcon
+  AlertCircle, Layers as LayersIcon, BookTemplate, Share2
 } from 'lucide-react';
 import { LayerConfigService } from '@/lib/ampLayering/layerConfigService';
 import type { AmpLayer } from '@/types/ampLayers';
@@ -110,10 +110,20 @@ export function LayerDashboard() {
             Combine multiple amps into sophisticated trading strategies
           </p>
         </div>
-        <Button onClick={() => navigate('/trader/layers/new')} className="gap-2">
-          <Plus className="h-4 w-4" />
-          New Layer
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => navigate('/trader/layers/templates')}>
+            <BookTemplate className="h-4 w-4 mr-2" />
+            Templates
+          </Button>
+          <Button variant="outline" onClick={() => navigate('/trader/layers/community')}>
+            <Share2 className="h-4 w-4 mr-2" />
+            Community
+          </Button>
+          <Button onClick={() => navigate('/trader/layers/new')} className="gap-2">
+            <Plus className="h-4 w-4" />
+            New Layer
+          </Button>
+        </div>
       </div>
 
       {layers.length === 0 ? (

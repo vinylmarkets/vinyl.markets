@@ -2504,6 +2504,41 @@ export type Database = {
           },
         ]
       }
+      layer_ratings: {
+        Row: {
+          created_at: string | null
+          id: string
+          rating: number
+          review: string | null
+          shared_layer_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          rating: number
+          review?: string | null
+          shared_layer_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          rating?: number
+          review?: string | null
+          shared_layer_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "layer_ratings_shared_layer_id_fkey"
+            columns: ["shared_layer_id"]
+            isOneToOne: false
+            referencedRelation: "shared_layers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       layer_settings: {
         Row: {
           capital_strategy: string | null
@@ -2541,6 +2576,57 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      layer_templates: {
+        Row: {
+          avg_rating: number | null
+          configuration: Json
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_official: boolean | null
+          is_public: boolean | null
+          name: string
+          risk_profile: string
+          strategy_type: string
+          total_ratings: number | null
+          updated_at: string | null
+          usage_count: number | null
+        }
+        Insert: {
+          avg_rating?: number | null
+          configuration: Json
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_official?: boolean | null
+          is_public?: boolean | null
+          name: string
+          risk_profile: string
+          strategy_type: string
+          total_ratings?: number | null
+          updated_at?: string | null
+          usage_count?: number | null
+        }
+        Update: {
+          avg_rating?: number | null
+          configuration?: Json
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_official?: boolean | null
+          is_public?: boolean | null
+          name?: string
+          risk_profile?: string
+          strategy_type?: string
+          total_ratings?: number | null
+          updated_at?: string | null
+          usage_count?: number | null
+        }
+        Relationships: []
       }
       market_data: {
         Row: {
@@ -4530,6 +4616,44 @@ export type Database = {
         }
         Relationships: []
       }
+      rebalancing_history: {
+        Row: {
+          executed_at: string | null
+          id: string
+          layer_id: string
+          new_allocations: Json
+          old_allocations: Json
+          reason: string | null
+          rebalance_type: string
+        }
+        Insert: {
+          executed_at?: string | null
+          id?: string
+          layer_id: string
+          new_allocations: Json
+          old_allocations: Json
+          reason?: string | null
+          rebalance_type: string
+        }
+        Update: {
+          executed_at?: string | null
+          id?: string
+          layer_id?: string
+          new_allocations?: Json
+          old_allocations?: Json
+          reason?: string | null
+          rebalance_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rebalancing_history_layer_id_fkey"
+            columns: ["layer_id"]
+            isOneToOne: false
+            referencedRelation: "amp_layers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       review_helpful_votes: {
         Row: {
           created_at: string | null
@@ -4603,6 +4727,59 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      shared_layers: {
+        Row: {
+          clone_count: number | null
+          created_at: string | null
+          description: string | null
+          id: string
+          is_public: boolean | null
+          layer_id: string
+          performance_summary: Json | null
+          shared_by: string
+          strategy_tags: string[] | null
+          title: string
+          updated_at: string | null
+          view_count: number | null
+        }
+        Insert: {
+          clone_count?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          layer_id: string
+          performance_summary?: Json | null
+          shared_by: string
+          strategy_tags?: string[] | null
+          title: string
+          updated_at?: string | null
+          view_count?: number | null
+        }
+        Update: {
+          clone_count?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          layer_id?: string
+          performance_summary?: Json | null
+          shared_by?: string
+          strategy_tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shared_layers_layer_id_fkey"
+            columns: ["layer_id"]
+            isOneToOne: false
+            referencedRelation: "amp_layers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       stock_analysis_cache: {
         Row: {
