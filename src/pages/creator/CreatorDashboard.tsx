@@ -64,23 +64,16 @@ export default function CreatorDashboard() {
     try {
       setLoading(true);
 
-      // Load creator's amps
-      const { data: ampsData, error: ampsError } = await supabase
-        .from('amp_catalog')
-        .select('id, name, category, version, average_rating, total_reviews, created_at, description, image_url')
-        .eq('creator_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (ampsError) throw ampsError;
-
-      setAmps(ampsData || []);
+      // Mock data for now - creator_id doesn't exist in amp_catalog yet
+      const ampsData: CreatorAmp[] = [];
+      setAmps(ampsData);
 
       // Calculate stats
-      const totalAmps = ampsData?.length || 0;
+      const totalAmps = ampsData.length || 0;
       const activeAmps = totalAmps; // All amps active for now
-      const totalReviews = ampsData?.reduce((sum, a) => sum + (a.total_reviews || 0), 0) || 0;
+      const totalReviews = ampsData.reduce((sum, a) => sum + (a.total_reviews || 0), 0) || 0;
       const avgRating = totalReviews > 0
-        ? ampsData?.reduce((sum, a) => sum + (a.average_rating || 0) * (a.total_reviews || 0), 0) / totalReviews
+        ? ampsData.reduce((sum, a) => sum + (a.average_rating || 0) * (a.total_reviews || 0), 0) / totalReviews
         : 0;
 
       // Get earnings data (mock for now - will be real in production)
