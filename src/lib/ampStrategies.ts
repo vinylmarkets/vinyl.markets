@@ -7,6 +7,7 @@ import {
   calculateBollingerBands,
   calculateZScore,
   calculateVolumeProfile,
+  calculateATR,
   PriceBar,
   BollingerBands
 } from './indicators';
@@ -274,14 +275,168 @@ function calculateBBConfidence(currentPrice: number, bb: BollingerBands): number
 
 /**
  * BREAKOUT STRATEGY
- * Placeholder for future implementation
+ * Trades volatility expansion and price breakouts using Donchian Channels
  */
 export async function runBreakoutStrategy(
   ampId: string,
-  allocatedCapital: number
+  allocatedCapital: number,
+  settings: {
+    donchianPeriod?: number;
+    volumeMultiplier?: number;
+    atrPeriod?: number;
+    atrMultiplier?: number;
+    symbols?: string[];
+  } = {}
 ): Promise<StrategySignal[]> {
-  console.log('📈 Breakout strategy not yet implemented');
-  return [];
+  console.log('💥 Running breakout strategy for amp:', ampId);
+  
+  const signals: StrategySignal[] = [];
+  const symbols = settings.symbols || ['NVDA', 'TSLA', 'AMD', 'COIN'];
+  
+  const donchianPeriod = settings.donchianPeriod || 20;
+  const volumeMultiplier = settings.volumeMultiplier || 2.0;
+  const atrPeriod = settings.atrPeriod || 14;
+
+  for (const symbol of symbols) {
+    try {
+      const marketData = await fetchMarketData(symbol, 30);
+      
+      if (marketData.length < donchianPeriod) {
+        console.log(`⚠️ Insufficient data for ${symbol}`);
+        continue;
+      }
+
+      const currentPrice = marketData[marketData.length - 1].close;
+
+      // Calculate indicators
+      const donchian = calculateDonchianChannels(marketData, donchianPeriod);
+      const atr = calculateATR(marketData, atrPeriod);
+      
+      // Calculate ATR moving average
+      const atrValues: number[] = [];
+      for (let i = atrPeriod; i < marketData.length; i++) {
+        const slice = marketData.slice(i - atrPeriod, i);
+        atrValues.push(calculateATR(slice, atrPeriod));
+      }
+      const atrMA = calculateSMA(atrValues, Math.min(14, atrValues.length));
+      
+      const volumeProfile = calculateVolumeProfile(marketData, 20);
+
+      // Upside breakout
+      if (currentPrice > donchian.upper && 
+          volumeProfile.volumeRatio > volumeMultiplier &&
+          atr > atrMA * 1.5) {
+        
+        const confidence = calculateBreakoutConfidence(
+          'buy',
+          currentPrice,
+          donchian,
+          volumeProfile,
+          atr,
+          atrMA
+        );
+        
+        if (confidence > 0.6) { // Higher threshold for breakouts
+          const positionValue = allocatedCapital * 0.20;
+          const shares = Math.floor(positionValue / currentPrice);
+
+          signals.push({
+            action: 'buy',
+            symbol,
+            quantity: shares,
+            confidence,
+            reason: `Upside breakout: New ${donchianPeriod}-day high, Volume ${volumeProfile.volumeRatio.toFixed(1)}x, ATR expanding`
+          });
+
+          console.log(`✅ BUY (breakout) signal for ${symbol}: Confidence ${(confidence * 100).toFixed(1)}%`);
+        }
+      }
+
+      // Downside breakout (for shorting or avoiding longs)
+      if (currentPrice < donchian.lower && 
+          volumeProfile.volumeRatio > volumeMultiplier) {
+        
+        const confidence = calculateBreakoutConfidence(
+          'sell',
+          currentPrice,
+          donchian,
+          volumeProfile,
+          atr,
+          atrMA
+        );
+        
+        if (confidence > 0.6) {
+          signals.push({
+            action: 'sell',
+            symbol,
+            quantity: 0, // Will calculate from position
+            confidence,
+            reason: `Downside breakout: New ${donchianPeriod}-day low, Volume ${volumeProfile.volumeRatio.toFixed(1)}x`
+          });
+
+          console.log(`✅ SELL (breakout) signal for ${symbol}: Confidence ${(confidence * 100).toFixed(1)}%`);
+        }
+      }
+
+    } catch (error) {
+      console.error(`Error in breakout strategy for ${symbol}:`, error);
+      continue;
+    }
+  }
+
+  return signals;
+}
+
+/**
+ * Helper: Calculate Donchian Channels
+ */
+function calculateDonchianChannels(
+  bars: PriceBar[], 
+  period: number = 20
+): { upper: number; lower: number; middle: number } {
+  const recentBars = bars.slice(-period);
+  const highs = recentBars.map(b => b.high);
+  const lows = recentBars.map(b => b.low);
+  
+  const upper = Math.max(...highs);
+  const lower = Math.min(...lows);
+  
+  return {
+    upper,
+    lower,
+    middle: (upper + lower) / 2
+  };
+}
+
+/**
+ * Helper: Calculate breakout confidence
+ */
+function calculateBreakoutConfidence(
+  direction: 'buy' | 'sell',
+  currentPrice: number,
+  donchian: { upper: number; lower: number; middle: number },
+  volumeProfile: { volumeRatio: number },
+  atr: number,
+  atrMA: number
+): number {
+  // Volume component (0-0.4)
+  const volumeConf = Math.min((volumeProfile.volumeRatio - 1) * 0.2, 0.4);
+  
+  // ATR expansion component (0-0.3)
+  const atrExpansion = atr / atrMA;
+  const atrConf = atrExpansion > 1.5 ? 0.3 : Math.max((atrExpansion - 1) * 0.6, 0);
+  
+  // Breakout strength component (0-0.3)
+  let breakoutConf = 0;
+  if (direction === 'buy') {
+    const breakoutPct = (currentPrice - donchian.upper) / donchian.upper;
+    breakoutConf = Math.min(breakoutPct * 15, 0.3); // 2% breakout = max confidence
+  } else {
+    const breakoutPct = (donchian.lower - currentPrice) / donchian.lower;
+    breakoutConf = Math.min(breakoutPct * 15, 0.3);
+  }
+  
+  return volumeConf + atrConf + breakoutConf;
 }
 
 export async function executeStrategy(ampId: string) {
