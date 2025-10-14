@@ -21,55 +21,64 @@ const TraderAuth = () => {
 
   // Check if user is already authenticated as a trader
   React.useEffect(() => {
+    console.log('[TraderAuth] useEffect triggered', { 
+      hasUser: !!user, 
+      userEmail: user?.email 
+    });
+    
     let mounted = true;
     
     const checkTraderAccess = async () => {
       if (!user?.email) {
-        console.log('TraderAuth: No user email, skipping check');
+        console.log('[TraderAuth] No user email, skipping check');
         return;
       }
 
-      console.log('TraderAuth: Checking trader access for:', user.email);
+      console.log('[TraderAuth] Starting trader access check for:', user.email);
 
       try {
+        console.log('[TraderAuth] Making RPC call to is_whitelisted_trader');
         const { data, error } = await supabase.rpc('is_whitelisted_trader', {
           user_email: user.email
         });
 
         if (!mounted) {
-          console.log('TraderAuth: Component unmounted, aborting');
+          console.log('[TraderAuth] Component unmounted, aborting');
           return;
         }
 
+        console.log('[TraderAuth] RPC response:', { data, error });
+
         if (error) {
-          console.error('TraderAuth: Error checking whitelist:', error);
+          console.error('[TraderAuth] Error checking whitelist:', error);
           // For beta testing, allow access even if whitelist check fails
-          console.log('TraderAuth: Beta mode - allowing access despite error');
-          navigate('/trader');
+          console.log('[TraderAuth] Beta mode - allowing access despite error');
+          navigate('/trader', { replace: true });
           return;
         }
 
         if (data) {
-          console.log('TraderAuth: User is whitelisted, updating last login');
+          console.log('[TraderAuth] User is whitelisted, updating last login');
           // Update last login
           await supabase.rpc('update_trader_last_login', {
             user_email: user.email
           });
+          console.log('[TraderAuth] Last login updated');
         } else {
-          console.log('TraderAuth: User not whitelisted, but allowing access for beta');
+          console.log('[TraderAuth] User not whitelisted, but allowing access for beta');
         }
 
         // For beta testing, redirect all authenticated users
         if (mounted) {
-          console.log('TraderAuth: Redirecting to /trader');
-          navigate('/trader');
+          console.log('[TraderAuth] Redirecting to /trader with replace:true');
+          navigate('/trader', { replace: true });
         }
       } catch (error) {
-        console.error('TraderAuth: Exception during access check:', error);
+        console.error('[TraderAuth] Exception during access check:', error);
         // For beta testing, allow access even on error
         if (mounted) {
-          console.log('TraderAuth: Beta mode - allowing access despite exception');
-          navigate('/trader');
+          console.log('[TraderAuth] Beta mode - allowing access despite exception');
+          navigate('/trader', { replace: true });
         }
       }
     };
@@ -80,10 +89,16 @@ const TraderAuth = () => {
     }
 
     return () => {
-      console.log('TraderAuth: Cleanup - component unmounting');
+      console.log('[TraderAuth] Cleanup - component unmounting');
       mounted = false;
     };
   }, [user, navigate]);
+
+  console.log('[TraderAuth] Render state:', { 
+    hasUser: !!user, 
+    userEmail: user?.email,
+    loading 
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,18 +176,19 @@ const TraderAuth = () => {
     }
   };
 
-  // If already authenticated and whitelisted, redirect
+  // If already authenticated, show loading while checking access
+  // The useEffect will handle the redirect
   if (user) {
-    console.log('TraderAuth: User is authenticated, showing debug info instead of redirecting');
-    return <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center space-y-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-        <p>Already logged in as: {user.email}</p>
-        <p>Checking trader access...</p>
-        <Button onClick={() => navigate('/trader')}>Go to Trader Dashboard</Button>
-        <Button variant="outline" onClick={() => supabase.auth.signOut()}>Logout to see login form</Button>
+    console.log('[TraderAuth] User is authenticated, useEffect will handle redirect');
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Verifying access for {user.email}...</p>
+          <p className="text-sm text-muted-foreground">This should only take a moment</p>
+        </div>
       </div>
-    </div>;
+    );
   }
 
   return (
