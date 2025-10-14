@@ -26,81 +26,15 @@ const TraderAuth = () => {
       userEmail: user?.email 
     });
     
-    let mounted = true;
-    
-    const checkTraderAccess = async () => {
-      if (!user?.email) {
-        console.log('[TraderAuth] No user email, skipping check');
-        return;
-      }
-
-      console.log('[TraderAuth] Starting trader access check for:', user.email);
-
-      try {
-        console.log('[TraderAuth] Making RPC call to is_whitelisted_trader with 5s timeout');
-        
-        // Create timeout promise (5 seconds)
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("RPC call timed out after 5 seconds")), 5000)
-        );
-
-        // Race between RPC call and timeout
-        const rpcPromise = supabase.rpc('is_whitelisted_trader', {
-          user_email: user.email
-        });
-
-        const { data, error } = await Promise.race([rpcPromise, timeoutPromise]) as any;
-
-        if (!mounted) {
-          console.log('[TraderAuth] Component unmounted, aborting');
-          return;
-        }
-
-        console.log('[TraderAuth] RPC response:', { data, error });
-
-        if (error) {
-          console.error('[TraderAuth] Error checking whitelist:', error);
-          // For beta testing, allow access even if whitelist check fails
-          console.log('[TraderAuth] Beta mode - allowing access despite error');
-          navigate('/trader', { replace: true });
-          return;
-        }
-
-        if (data) {
-          console.log('[TraderAuth] User is whitelisted, updating last login');
-          // Update last login
-          await supabase.rpc('update_trader_last_login', {
-            user_email: user.email
-          });
-          console.log('[TraderAuth] Last login updated');
-        } else {
-          console.log('[TraderAuth] User not whitelisted, but allowing access for beta');
-        }
-
-        // For beta testing, redirect all authenticated users
-        if (mounted) {
-          console.log('[TraderAuth] Redirecting to /trader with replace:true');
-          navigate('/trader', { replace: true });
-        }
-      } catch (error) {
-        console.error('[TraderAuth] Exception during access check:', error);
-        // For beta testing, allow access even on error or timeout
-        if (mounted) {
-          console.log('[TraderAuth] Beta mode - allowing access despite exception/timeout');
-          navigate('/trader', { replace: true });
-        }
-      }
-    };
-
+    // If user is logged in, redirect to trader dashboard immediately
+    // All whitelist/access checks removed for beta testing
     if (user) {
-      console.log('TraderAuth: User authenticated, starting access check');
-      checkTraderAccess();
+      console.log('[TraderAuth] User authenticated, redirecting to /trader');
+      // Small delay to ensure auth state is fully loaded
+      setTimeout(() => {
+        navigate('/trader', { replace: true });
+      }, 100);
     }
-
-    return () => {
-      console.log('[TraderAuth] Cleanup - component unmounting');
-      mounted = false;
-    };
   }, [user, navigate]);
 
   console.log('[TraderAuth] Render state:', { 
