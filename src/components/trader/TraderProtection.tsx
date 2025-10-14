@@ -32,47 +32,18 @@ export const TraderProtection: React.FC<TraderProtectionProps> = ({ children }) 
   const checkTraderAccess = async () => {
     console.log('[TraderProtection] checkTraderAccess called', { hasUser: !!user, userEmail: user?.email });
     
-    if (!user?.email) {
-      console.log('[TraderProtection] No user email, setting authenticated=false');
+    // Simply check if user is logged in - no RPC call needed
+    if (!user) {
+      console.log('[TraderProtection] No user, setting authenticated=false');
       setIsAuthenticated(false);
       setLoading(false);
       return;
     }
 
-    try {
-      console.log('[TraderProtection] Making RPC call to is_whitelisted_trader with 5s timeout');
-      
-      // Create timeout promise (5 seconds)
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("RPC call timed out after 5 seconds")), 5000)
-      );
-
-      // Race between RPC call and timeout
-      const rpcPromise = supabase.rpc('is_whitelisted_trader', {
-        user_email: user.email
-      });
-
-      const { data, error } = await Promise.race([rpcPromise, timeoutPromise]) as any;
-
-      console.log('[TraderProtection] RPC response:', { data, error });
-
-      if (error) {
-        console.error('[TraderProtection] Error checking trader access:', error);
-        console.log('[TraderProtection] Beta mode - allowing access despite error');
-        setIsAuthenticated(true);
-      } else {
-        console.log('[TraderProtection] Whitelist status:', data);
-        console.log('[TraderProtection] Beta mode - allowing all authenticated users');
-        setIsAuthenticated(true);
-      }
-    } catch (error) {
-      console.error('[TraderProtection] Exception in trader access check:', error);
-      console.log('[TraderProtection] Beta mode - allowing access despite exception/timeout');
-      setIsAuthenticated(true);
-    } finally {
-      console.log('[TraderProtection] Setting loading to false');
-      setLoading(false);
-    }
+    // User is logged in - grant access
+    console.log('[TraderProtection] User is logged in, granting access');
+    setIsAuthenticated(true);
+    setLoading(false);
   };
 
   // Redirect to 404 if trading is disabled
