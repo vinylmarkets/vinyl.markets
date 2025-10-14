@@ -49,14 +49,17 @@ export const TraderProtection: React.FC<TraderProtectionProps> = ({ children }) 
 
       if (error) {
         console.error('[TraderProtection] Error checking trader access:', error);
-        setIsAuthenticated(false);
+        console.log('[TraderProtection] Beta mode - allowing access despite error');
+        setIsAuthenticated(true);
       } else {
-        console.log('[TraderProtection] Setting authenticated to:', data || false);
-        setIsAuthenticated(data || false);
+        console.log('[TraderProtection] Whitelist status:', data);
+        console.log('[TraderProtection] Beta mode - allowing all authenticated users');
+        setIsAuthenticated(true);
       }
     } catch (error) {
       console.error('[TraderProtection] Exception in trader access check:', error);
-      setIsAuthenticated(false);
+      console.log('[TraderProtection] Beta mode - allowing access despite exception');
+      setIsAuthenticated(true);
     } finally {
       console.log('[TraderProtection] Setting loading to false');
       setLoading(false);
