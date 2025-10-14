@@ -21,37 +21,69 @@ const TraderAuth = () => {
 
   // Check if user is already authenticated as a trader
   React.useEffect(() => {
-    console.log('TraderAuth: useEffect running, user:', user);
-    if (user) {
-      console.log('TraderAuth: User found, checking trader access');
-      checkTraderAccess();
-    }
-  }, [user]);
-
-  const checkTraderAccess = async () => {
-    if (!user?.email) return;
-
-    try {
-      const { data, error } = await supabase.rpc('is_whitelisted_trader', {
-        user_email: user.email
-      });
-
-      if (error) {
-        console.error('Error checking trader access:', error);
+    let mounted = true;
+    
+    const checkTraderAccess = async () => {
+      if (!user?.email) {
+        console.log('TraderAuth: No user email, skipping check');
         return;
       }
 
-      if (data) {
-        // Update last login
-        await supabase.rpc('update_trader_last_login', {
+      console.log('TraderAuth: Checking trader access for:', user.email);
+
+      try {
+        const { data, error } = await supabase.rpc('is_whitelisted_trader', {
           user_email: user.email
         });
-        navigate('/trader');
+
+        if (!mounted) {
+          console.log('TraderAuth: Component unmounted, aborting');
+          return;
+        }
+
+        if (error) {
+          console.error('TraderAuth: Error checking whitelist:', error);
+          // For beta testing, allow access even if whitelist check fails
+          console.log('TraderAuth: Beta mode - allowing access despite error');
+          navigate('/trader');
+          return;
+        }
+
+        if (data) {
+          console.log('TraderAuth: User is whitelisted, updating last login');
+          // Update last login
+          await supabase.rpc('update_trader_last_login', {
+            user_email: user.email
+          });
+        } else {
+          console.log('TraderAuth: User not whitelisted, but allowing access for beta');
+        }
+
+        // For beta testing, redirect all authenticated users
+        if (mounted) {
+          console.log('TraderAuth: Redirecting to /trader');
+          navigate('/trader');
+        }
+      } catch (error) {
+        console.error('TraderAuth: Exception during access check:', error);
+        // For beta testing, allow access even on error
+        if (mounted) {
+          console.log('TraderAuth: Beta mode - allowing access despite exception');
+          navigate('/trader');
+        }
       }
-    } catch (error) {
-      console.error('Error in trader access check:', error);
+    };
+
+    if (user) {
+      console.log('TraderAuth: User authenticated, starting access check');
+      checkTraderAccess();
     }
-  };
+
+    return () => {
+      console.log('TraderAuth: Cleanup - component unmounting');
+      mounted = false;
+    };
+  }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
