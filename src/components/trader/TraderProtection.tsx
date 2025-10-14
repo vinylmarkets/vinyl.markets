@@ -8,47 +8,45 @@ interface TraderProtectionProps {
 
 export const TraderProtection: React.FC<TraderProtectionProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+  const [checking, setChecking] = useState(true);
+  const { user, loading: authLoading } = useAuth();
 
-  // Check environment variable
   const isEnabled = true;
   
-  // CRITICAL FIX: Wrap in useCallback to prevent function recreation
   const checkTraderAccess = useCallback(() => {
-    console.log('[TraderProtection] Checking access for:', user?.email);
+    console.log('[TraderProtection] Checking', { authLoading, user: !!user });
     
-    if (!user) {
-      console.log('[TraderProtection] No user - blocking access');
-      setIsAuthenticated(false);
-      setLoading(false);
+    if (authLoading) {
+      console.log('[TraderProtection] Waiting for auth...');
       return;
     }
 
-    // User exists - grant access
-    console.log('[TraderProtection] User authenticated - granting access');
+    if (!user) {
+      console.log('[TraderProtection] No user - redirect to auth');
+      setIsAuthenticated(false);
+      setChecking(false);
+      return;
+    }
+
+    console.log('[TraderProtection] User OK:', user.email);
     setIsAuthenticated(true);
-    setLoading(false);
-  }, [user]); // Only recreate when user changes
+    setChecking(false);
+  }, [user, authLoading]);
 
   useEffect(() => {
-    console.log('[TraderProtection] Running access check');
     checkTraderAccess();
-  }, [checkTraderAccess]); // Now properly depends on the memoized function
+  }, [checkTraderAccess]);
 
   if (!isEnabled) {
     return <Navigate to="/404" replace />;
   }
 
-  if (loading) {
+  if (authLoading || checking) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Checking trader access...</p>
-          <p className="text-xs text-muted-foreground mt-2">
-            {user?.email || 'Verifying authentication...'}
-          </p>
+          <p>{authLoading ? 'Checking authentication...' : 'Verifying access...'}</p>
         </div>
       </div>
     );
