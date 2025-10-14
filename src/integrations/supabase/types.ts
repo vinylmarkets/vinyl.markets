@@ -5054,7 +5054,7 @@ export type Database = {
           take_profit_price: number | null
           target_price: number | null
           updated_at: string
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           confidence_score: number
@@ -5072,7 +5072,7 @@ export type Database = {
           take_profit_price?: number | null
           target_price?: number | null
           updated_at?: string
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           confidence_score?: number
@@ -5090,7 +5090,7 @@ export type Database = {
           take_profit_price?: number | null
           target_price?: number | null
           updated_at?: string
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }

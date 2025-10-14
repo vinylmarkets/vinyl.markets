@@ -1,16 +1,17 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface QueryRequest {
-  question: string;
-  maxResults?: number;
-}
+const QueryRequestSchema = z.object({
+  question: z.string().min(1, 'Question is required').max(1000, 'Question must be less than 1000 characters'),
+  maxResults: z.number().int().min(1).max(20).optional().default(5)
+});
 
 interface KnowledgeItem {
   id: string;
@@ -54,11 +55,22 @@ serve(async (req) => {
       throw new Error('Invalid user');
     }
 
-    const { question, maxResults = 5 }: QueryRequest = await req.json();
-
-    if (!question?.trim()) {
-      throw new Error('Question is required');
+    const body = await req.json();
+    
+    // Validate input with Zod
+    const validation = QueryRequestSchema.safeParse(body);
+    if (!validation.success) {
+      return new Response(
+        JSON.stringify({ 
+          success: false,
+          error: 'Invalid input', 
+          details: validation.error.format() 
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
+    
+    const { question, maxResults } = validation.data;
 
     console.log('AI Query:', question);
 

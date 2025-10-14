@@ -1,5 +1,11 @@
 import { corsHeaders } from '../_shared/cors.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4'
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts'
+
+const AllocateCapitalSchema = z.object({
+  user_amp_id: z.string().uuid('Invalid amp ID'),
+  allocated_capital: z.number().min(0, 'Capital must be non-negative').max(1000000, 'Capital cannot exceed $1M')
+});
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -29,21 +35,21 @@ Deno.serve(async (req) => {
       );
     }
 
-    const { user_amp_id, allocated_capital } = await req.json();
-
-    if (!user_amp_id || allocated_capital === undefined) {
+    const body = await req.json();
+    
+    // Validate input with Zod
+    const validation = AllocateCapitalSchema.safeParse(body);
+    if (!validation.success) {
       return new Response(
-        JSON.stringify({ error: 'Missing required fields: user_amp_id, allocated_capital' }),
+        JSON.stringify({ 
+          error: 'Invalid input', 
+          details: validation.error.format() 
+        }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-
-    if (allocated_capital < 0) {
-      return new Response(
-        JSON.stringify({ error: 'Capital must be non-negative' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    
+    const { user_amp_id, allocated_capital } = validation.data;
 
     // Verify ownership
     const { data: amp, error: ampError } = await supabase

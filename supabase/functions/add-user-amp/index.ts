@@ -1,5 +1,12 @@
 import { corsHeaders } from '../_shared/cors.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4'
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts'
+
+const AddAmpSchema = z.object({
+  amp_id: z.string().min(1, 'Amp ID is required'),
+  name: z.string().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
+  allocated_capital: z.number().min(0, 'Capital must be non-negative').max(1000000, 'Capital cannot exceed $1M')
+});
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -29,15 +36,21 @@ Deno.serve(async (req) => {
       );
     }
 
-    const { amp_id, name, allocated_capital } = await req.json();
-
-    // Validate input
-    if (!amp_id || !name || allocated_capital === undefined) {
+    const body = await req.json();
+    
+    // Validate input with Zod
+    const validation = AddAmpSchema.safeParse(body);
+    if (!validation.success) {
       return new Response(
-        JSON.stringify({ error: 'Missing required fields: amp_id, name, allocated_capital' }),
+        JSON.stringify({ 
+          error: 'Invalid input', 
+          details: validation.error.format() 
+        }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+    
+    const { amp_id, name, allocated_capital } = validation.data;
 
     // Validate amp exists in catalog
     const { data: catalogAmp, error: catalogError } = await supabase
