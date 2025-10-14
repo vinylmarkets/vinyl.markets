@@ -17,25 +17,28 @@ const TraderAuth = () => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   // Check if user is already authenticated as a trader
   React.useEffect(() => {
     console.log('[TraderAuth] useEffect triggered', { 
       hasUser: !!user, 
-      userEmail: user?.email 
+      userEmail: user?.email,
+      authLoading
     });
     
-    // If user is logged in, redirect to trader dashboard immediately
-    // All whitelist/access checks removed for beta testing
-    if (user) {
-      console.log('[TraderAuth] User authenticated, redirecting to /trader');
-      // Small delay to ensure auth state is fully loaded
-      setTimeout(() => {
-        navigate('/trader', { replace: true });
-      }, 100);
+    // Wait for auth to fully load before redirecting
+    if (authLoading) {
+      console.log('[TraderAuth] Auth still loading, waiting...');
+      return;
     }
-  }, [user, navigate]);
+    
+    // If user is logged in AND auth finished loading, redirect
+    if (user) {
+      console.log('[TraderAuth] User authenticated and auth loaded, redirecting to /trader');
+      navigate('/trader', { replace: true });
+    }
+  }, [user, authLoading, navigate]);
 
   console.log('[TraderAuth] Render state:', { 
     hasUser: !!user, 
@@ -121,7 +124,7 @@ const TraderAuth = () => {
 
   // If already authenticated, show loading while checking access
   // The useEffect will handle the redirect
-  if (user) {
+  if (authLoading || user) {
     console.log('[TraderAuth] User is authenticated, useEffect will handle redirect');
     return (
       <div className="flex items-center justify-center min-h-screen">
