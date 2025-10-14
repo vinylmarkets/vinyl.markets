@@ -61,8 +61,10 @@ const TraderAuth = () => {
     setLoading(true);
 
     try {
-      // Check whitelist if enabled (controlled by environment variable)
-      if (import.meta.env.VITE_ENABLE_WHITELIST === 'true') {
+      // Only check whitelist if explicitly enabled (defaults to disabled for development)
+      const whitelistEnabled = import.meta.env.VITE_ENABLE_WHITELIST === 'true';
+      
+      if (whitelistEnabled) {
         const { data: isWhitelisted, error: whitelistError } = await supabase.rpc('is_whitelisted_trader', {
           user_email: email
         });
