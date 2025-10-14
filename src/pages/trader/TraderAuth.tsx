@@ -37,10 +37,19 @@ const TraderAuth = () => {
       console.log('[TraderAuth] Starting trader access check for:', user.email);
 
       try {
-        console.log('[TraderAuth] Making RPC call to is_whitelisted_trader');
-        const { data, error } = await supabase.rpc('is_whitelisted_trader', {
+        console.log('[TraderAuth] Making RPC call to is_whitelisted_trader with 5s timeout');
+        
+        // Create timeout promise (5 seconds)
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("RPC call timed out after 5 seconds")), 5000)
+        );
+
+        // Race between RPC call and timeout
+        const rpcPromise = supabase.rpc('is_whitelisted_trader', {
           user_email: user.email
         });
+
+        const { data, error } = await Promise.race([rpcPromise, timeoutPromise]) as any;
 
         if (!mounted) {
           console.log('[TraderAuth] Component unmounted, aborting');
@@ -75,9 +84,9 @@ const TraderAuth = () => {
         }
       } catch (error) {
         console.error('[TraderAuth] Exception during access check:', error);
-        // For beta testing, allow access even on error
+        // For beta testing, allow access even on error or timeout
         if (mounted) {
-          console.log('[TraderAuth] Beta mode - allowing access despite exception');
+          console.log('[TraderAuth] Beta mode - allowing access despite exception/timeout');
           navigate('/trader', { replace: true });
         }
       }

@@ -40,10 +40,19 @@ export const TraderProtection: React.FC<TraderProtectionProps> = ({ children }) 
     }
 
     try {
-      console.log('[TraderProtection] Making RPC call to is_whitelisted_trader');
-      const { data, error } = await supabase.rpc('is_whitelisted_trader', {
+      console.log('[TraderProtection] Making RPC call to is_whitelisted_trader with 5s timeout');
+      
+      // Create timeout promise (5 seconds)
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("RPC call timed out after 5 seconds")), 5000)
+      );
+
+      // Race between RPC call and timeout
+      const rpcPromise = supabase.rpc('is_whitelisted_trader', {
         user_email: user.email
       });
+
+      const { data, error } = await Promise.race([rpcPromise, timeoutPromise]) as any;
 
       console.log('[TraderProtection] RPC response:', { data, error });
 
@@ -58,7 +67,7 @@ export const TraderProtection: React.FC<TraderProtectionProps> = ({ children }) 
       }
     } catch (error) {
       console.error('[TraderProtection] Exception in trader access check:', error);
-      console.log('[TraderProtection] Beta mode - allowing access despite exception');
+      console.log('[TraderProtection] Beta mode - allowing access despite exception/timeout');
       setIsAuthenticated(true);
     } finally {
       console.log('[TraderProtection] Setting loading to false');
