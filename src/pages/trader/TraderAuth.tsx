@@ -27,16 +27,19 @@ const TraderAuth = () => {
       authLoading
     });
     
-    // Wait for auth to fully load before redirecting
+    // Don't redirect if auth is still loading
     if (authLoading) {
       console.log('[TraderAuth] Auth still loading, waiting...');
       return;
     }
     
-    // If user is logged in AND auth finished loading, redirect
+    // Whitelist check disabled during development - just redirect if logged in
     if (user) {
-      console.log('[TraderAuth] User authenticated and auth loaded, redirecting to /trader');
-      navigate('/trader', { replace: true });
+      console.log('[TraderAuth] User authenticated, redirecting to /trader');
+      // Use a timeout to ensure state updates are processed
+      setTimeout(() => {
+        navigate('/trader', { replace: true });
+      }, 100);
     }
   }, [user, authLoading, navigate]);
 
