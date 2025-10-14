@@ -61,23 +61,25 @@ const TraderAuth = () => {
     setLoading(true);
 
     try {
-      // First check if email is whitelisted
-      const { data: isWhitelisted, error: whitelistError } = await supabase.rpc('is_whitelisted_trader', {
-        user_email: email
-      });
-
-      if (whitelistError) {
-        throw whitelistError;
-      }
-
-      if (!isWhitelisted) {
-        toast({
-          title: "Access Denied",
-          description: "Your email is not authorized for trader access.",
-          variant: "destructive",
+      // Check whitelist if enabled (controlled by environment variable)
+      if (import.meta.env.VITE_ENABLE_WHITELIST === 'true') {
+        const { data: isWhitelisted, error: whitelistError } = await supabase.rpc('is_whitelisted_trader', {
+          user_email: email
         });
-        setLoading(false);
-        return;
+
+        if (whitelistError) {
+          throw whitelistError;
+        }
+
+        if (!isWhitelisted) {
+          toast({
+            title: "Access Denied",
+            description: "Your email is not authorized for trader access.",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
       }
 
       // Attempt to sign in with Supabase
