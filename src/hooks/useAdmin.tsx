@@ -16,18 +16,18 @@ export function useAdmin() {
       }
 
       try {
-        // Check if user exists in users table and has admin role
+        // Check if user has admin role using the secure has_role function
         const { data, error } = await supabase
-          .from('users')
-          .select('role')
-          .eq('id', user.id)
-          .single();
+          .rpc('has_role', {
+            _user_id: user.id,
+            _role: 'admin'
+          });
 
         if (error) {
           console.error('Error checking admin status:', error);
           setIsAdmin(false);
         } else {
-          setIsAdmin(data?.role === 'admin');
+          setIsAdmin(data === true);
         }
       } catch (error) {
         console.error('Error in admin check:', error);
