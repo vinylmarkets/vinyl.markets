@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Users, DollarSign, Settings, FileText, BarChart3, Newspaper } from 'lucide-react';
+import { Home, Users, DollarSign, Settings, FileText, BarChart3, Newspaper, Ticket } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import vinylLogo from '@/assets/vinyl-logo-white-new.svg';
@@ -17,6 +17,7 @@ const navItems: NavItem[] = [
   { label: 'Amps', icon: BarChart3, path: '/admin/amps' },
   { label: 'Content', icon: Newspaper, path: '/admin/content/blog', permission: 'content' },
   { label: 'Financial', icon: DollarSign, path: '/admin/financial', permission: 'financial' },
+  { label: 'Promo Codes', icon: Ticket, path: '/admin/promo-codes' },
   { label: 'Audit Logs', icon: FileText, path: '/admin/audit-logs' },
   { label: 'Settings', icon: Settings, path: '/admin/settings' },
 ];
