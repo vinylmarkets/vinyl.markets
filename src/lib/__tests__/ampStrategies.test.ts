@@ -11,18 +11,22 @@ vi.mock('@/integrations/supabase/client', () => ({
   }
 }));
 
+beforeEach(() => {
+  vi.clearAllMocks();
+});
+
 describe('Momentum Strategy Tests', () => {
   
   describe('Signal Generation - Perfect Conditions', () => {
     it('should generate BUY signal when all momentum conditions met', async () => {
-      // Mock market data with strong momentum
+      // Mock VERY STRONG momentum with steep uptrend
       const mockData = {
         bars: Array.from({ length: 50 }, (_, i) => ({
-          o: 100 + i,
-          h: 105 + i,
-          l: 95 + i,
-          c: 102 + i,
-          v: 1000000,
+          o: 100 + i * 4,      // Changed from i to i*4 for steeper trend
+          h: 108 + i * 4,      // Changed from 105+i to 108+i*4
+          l: 95 + i * 4,       // Changed from 95+i to 95+i*4
+          c: 105 + i * 4,      // Changed from 102+i to 105+i*4 (stronger closes)
+          v: 2000000,          // Increased volume
           t: new Date(Date.now() - (50-i) * 86400000).toISOString()
         }))
       };
@@ -417,16 +421,16 @@ describe('Momentum Strategy Tests', () => {
   
     describe('BUY Signals - Oversold Conditions', () => {
       it('should generate BUY signal when price below BB lower band', async () => {
-        // Simulate price drop to oversold
+        // Simulate EXTREME price drop to deeply oversold
         const mockData = {
           bars: Array.from({ length: 30 }, (_, i) => {
-            const drop = i < 25 ? 0 : (i - 24) * 5;
+            const drop = i < 20 ? 0 : (i - 19) * 12;  // Changed from 25/5 to 20/12 - steeper drop
             return {
               o: 120 - drop,
               h: 125 - drop,
               l: 115 - drop,
               c: 120 - drop,
-              v: 2500000,
+              v: 3500000,      // Increased volume from 2500000
               t: new Date(Date.now() - (30-i) * 86400000).toISOString()
             };
           })
@@ -534,16 +538,16 @@ describe('Momentum Strategy Tests', () => {
 
     describe('SELL Signals - Overbought Conditions', () => {
       it('should generate SELL signal when price above BB upper band', async () => {
-        // Simulate price spike to overbought
+        // Simulate EXTREME price spike to deeply overbought
         const mockData = {
           bars: Array.from({ length: 30 }, (_, i) => {
-            const spike = i < 25 ? 0 : (i - 24) * 5;
+            const spike = i < 20 ? 0 : (i - 19) * 12;  // Changed from 25/5 to 20/12 - steeper spike
             return {
               o: 100 + spike,
               h: 105 + spike,
               l: 95 + spike,
               c: 100 + spike,
-              v: 2500000,
+              v: 3500000,      // Increased volume from 2500000
               t: new Date(Date.now() - (30-i) * 86400000).toISOString()
             };
           })
