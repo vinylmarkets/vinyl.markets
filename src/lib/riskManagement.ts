@@ -343,7 +343,7 @@ function calculateConfidenceSize(params: {
   atr?: number;
 }): number {
   
-  const confidence = params.signal?.confidence || 0.5;
+  const confidence = params.signal?.confidence ?? 0.5;
   const atr = params.atr || params.currentPrice * 0.02;
   
   // Base allocation: 2% of capital
