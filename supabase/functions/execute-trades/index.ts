@@ -8,6 +8,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
 interface TradingSignal {
   id: string;
+  user_id: string;
   symbol: string;
   signal_type: 'BUY' | 'SELL' | 'HOLD';
   confidence_score: number;
@@ -47,11 +48,12 @@ interface AlpacaOrder {
   filled_avg_price?: string;
 }
 
-async function getRiskSettings(): Promise<RiskSettings> {
+async function getRiskSettings(userId: string): Promise<RiskSettings> {
   // Get user's trading settings from user_settings table
   const { data: userSettings, error: userError } = await supabase
     .from('user_settings')
     .select('settings')
+    .eq('user_id', userId)
     .single();
     
   if (userError || !userSettings?.settings) {
@@ -81,10 +83,11 @@ async function getRiskSettings(): Promise<RiskSettings> {
   };
 }
 
-async function getExecutableSignals(minConfidence: number): Promise<TradingSignal[]> {
+async function getExecutableSignals(minConfidence: number, userId: string): Promise<TradingSignal[]> {
   const { data, error } = await supabase
     .from('trading_signals')
     .select('*')
+    .eq('user_id', userId)
     .eq('status', 'active')
     .gte('confidence_score', minConfidence)
     .gt('expires_at', new Date().toISOString())
@@ -99,10 +102,11 @@ async function getExecutableSignals(minConfidence: number): Promise<TradingSigna
   return data || [];
 }
 
-async function getCurrentPositions() {
+async function getCurrentPositions(userId: string) {
   const { data, error } = await supabase
     .from('trading_positions')
     .select('*')
+    .eq('user_id', userId)
     .eq('status', 'open');
     
   if (error) {
@@ -113,12 +117,13 @@ async function getCurrentPositions() {
   return data || [];
 }
 
-async function getTodaysPnL(): Promise<number> {
+async function getTodaysPnL(userId: string): Promise<number> {
   const today = new Date().toISOString().split('T')[0];
   
   const { data, error } = await supabase
     .from('trading.daily_performance')
     .select('net_pnl')
+    .eq('user_id', userId)
     .eq('trading_date', today)
     .single();
     
@@ -198,12 +203,12 @@ async function executeAlpacaOrder(
   return order;
 }
 
-async function createPosition(signal: TradingSignal, order: AlpacaOrder, quantity: number) {
+async function createPosition(signal: TradingSignal, order: AlpacaOrder, quantity: number, userId: string) {
   const side = signal.signal_type === 'BUY' ? 'long' : 'short';
   const entryPrice = signal.target_price || 100; // Use target_price as entry price
   
   const position = {
-    user_id: null, // Will be set by RLS policies
+    user_id: userId,
     symbol: signal.symbol,
     side,
     quantity,
@@ -263,101 +268,184 @@ Deno.serve(async (req) => {
   try {
     console.log('Execute trades function starting...');
     
-    // Get risk settings
-    const riskSettings = await getRiskSettings();
-    console.log('Risk settings loaded:', riskSettings);
+    // Fetch all active users who have auto-trading enabled
+    const { data: activeTraders, error: tradersError } = await supabase
+      .from('user_amps')
+      .select('user_id')
+      .eq('is_active', true);
     
-    // Get current positions and today's P&L
-    const [openPositions, todaysPnL] = await Promise.all([
-      getCurrentPositions(),
-      getTodaysPnL()
-    ]);
+    if (tradersError) {
+      throw new Error(`Failed to fetch active traders: ${tradersError.message}`);
+    }
     
-    // Check risk limits
-    const riskCheck = await checkRiskLimits(riskSettings, openPositions, todaysPnL);
-    if (!riskCheck.canTrade) {
-      console.log('Risk check failed:', riskCheck.reason);
+    if (!activeTraders || activeTraders.length === 0) {
+      console.log('No active traders found');
       return new Response(
         JSON.stringify({ 
           success: true, 
-          message: riskCheck.reason,
-          tradesExecuted: 0,
-          riskStatus: 'blocked'
+          message: 'No active traders found',
+          totalTradesExecuted: 0,
+          userResults: []
         }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
     
-    // Get executable signals
-    const signals = await getExecutableSignals(riskSettings.min_confidence_score);
-    console.log(`Found ${signals.length} executable signals`);
+    // Get unique user IDs
+    const uniqueUserIds = [...new Set(activeTraders.map(t => t.user_id))];
+    console.log(`Processing trades for ${uniqueUserIds.length} unique users`);
     
-    if (signals.length === 0) {
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: 'No signals meet execution criteria',
-          tradesExecuted: 0,
-          riskStatus: 'clear'
-        }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    const userResults = [];
+    let totalTradesExecuted = 0;
     
-    const executedTrades = [];
-    const availableSlots = riskSettings.max_open_positions - openPositions.length;
-    const signalsToExecute = signals.slice(0, availableSlots);
-    
-    for (const signal of signalsToExecute) {
+    // Loop through each user
+    for (const userId of uniqueUserIds) {
+      console.log(`\n=== Processing trades for user: ${userId} ===`);
+      
       try {
-        if (signal.signal_type === 'HOLD') continue;
+        // Get user's risk settings
+        const riskSettings = await getRiskSettings(userId);
+        console.log(`User ${userId} risk settings:`, {
+          tradingEnabled: riskSettings.trading_enabled,
+          minConfidence: riskSettings.min_confidence_score,
+          maxPositions: riskSettings.max_open_positions
+        });
         
-        // Calculate position size
-        const quantity = signal.quantity || calculatePositionSize(signal, riskSettings);
-        if (quantity <= 0) {
-          console.log(`Skipping ${signal.symbol}: position size too small`);
+        // Skip if trading is disabled for this user
+        if (!riskSettings.trading_enabled) {
+          console.log(`User ${userId}: Trading disabled, skipping`);
+          userResults.push({
+            userId,
+            success: true,
+            message: 'Trading disabled',
+            tradesExecuted: 0
+          });
           continue;
         }
         
-        // Execute order with Alpaca
-        const side = signal.signal_type === 'BUY' ? 'buy' : 'sell';
-        const order = await executeAlpacaOrder(signal.symbol, side, quantity);
+        // Get current positions and today's P&L for this user
+        const [openPositions, todaysPnL] = await Promise.all([
+          getCurrentPositions(userId),
+          getTodaysPnL(userId)
+        ]);
         
-        // Create position record
-        await createPosition(signal, order, quantity);
-        
-        executedTrades.push({
-          symbol: signal.symbol,
-          side: signal.signal_type,
-          quantity,
-          price: signal.target_price || 100,
-          confidence: signal.confidence_score,
-          orderId: order.id
+        console.log(`User ${userId} current state:`, {
+          openPositions: openPositions.length,
+          todaysPnL
         });
         
-        console.log(`Executed ${signal.signal_type} ${quantity} ${signal.symbol} @ ${signal.target_price || 'market'}`);
+        // Check risk limits
+        const riskCheck = await checkRiskLimits(riskSettings, openPositions, todaysPnL);
+        if (!riskCheck.canTrade) {
+          console.log(`User ${userId}: Risk check failed - ${riskCheck.reason}`);
+          userResults.push({
+            userId,
+            success: true,
+            message: riskCheck.reason,
+            tradesExecuted: 0,
+            riskStatus: 'blocked'
+          });
+          continue;
+        }
         
-      } catch (error) {
-        console.error(`Failed to execute trade for ${signal.symbol}:`, error);
+        // Get executable signals for this user
+        const signals = await getExecutableSignals(riskSettings.min_confidence_score, userId);
+        console.log(`User ${userId}: Found ${signals.length} executable signals`);
+        
+        if (signals.length === 0) {
+          userResults.push({
+            userId,
+            success: true,
+            message: 'No signals meet execution criteria',
+            tradesExecuted: 0,
+            riskStatus: 'clear'
+          });
+          continue;
+        }
+        
+        const executedTrades = [];
+        const availableSlots = riskSettings.max_open_positions - openPositions.length;
+        const signalsToExecute = signals.slice(0, availableSlots);
+        
+        console.log(`User ${userId}: Attempting to execute ${signalsToExecute.length} signals`);
+        
+        for (const signal of signalsToExecute) {
+          try {
+            if (signal.signal_type === 'HOLD') continue;
+            
+            // Calculate position size
+            const quantity = signal.quantity || calculatePositionSize(signal, riskSettings);
+            if (quantity <= 0) {
+              console.log(`User ${userId}: Skipping ${signal.symbol} - position size too small`);
+              continue;
+            }
+            
+            // Execute order with Alpaca
+            const side = signal.signal_type === 'BUY' ? 'buy' : 'sell';
+            console.log(`User ${userId}: Executing ${side} ${quantity} ${signal.symbol}`);
+            const order = await executeAlpacaOrder(signal.symbol, side, quantity);
+            
+            // Create position record
+            await createPosition(signal, order, quantity, userId);
+            
+            executedTrades.push({
+              symbol: signal.symbol,
+              side: signal.signal_type,
+              quantity,
+              price: signal.target_price || 100,
+              confidence: signal.confidence_score,
+              orderId: order.id
+            });
+            
+            console.log(`User ${userId}: ✅ Executed ${signal.signal_type} ${quantity} ${signal.symbol} @ ${signal.target_price || 'market'}`);
+            
+          } catch (error) {
+            console.error(`User ${userId}: Failed to execute trade for ${signal.symbol}:`, error);
+          }
+        }
+        
+        totalTradesExecuted += executedTrades.length;
+        
+        userResults.push({
+          userId,
+          success: true,
+          message: `Executed ${executedTrades.length} trades`,
+          tradesExecuted: executedTrades.length,
+          riskStatus: 'clear',
+          trades: executedTrades,
+          riskSummary: {
+            openPositions: openPositions.length,
+            maxPositions: riskSettings.max_open_positions,
+            todaysPnL,
+            dailyLossLimit: riskSettings.daily_loss_limit
+          }
+        });
+        
+        console.log(`User ${userId}: Completed with ${executedTrades.length} trades executed`);
+        
+      } catch (userError) {
+        console.error(`User ${userId}: Error processing trades:`, userError);
+        userResults.push({
+          userId,
+          success: false,
+          message: userError instanceof Error ? userError.message : 'Unknown error',
+          tradesExecuted: 0
+        });
       }
     }
     
     const response = {
       success: true,
-      message: `Executed ${executedTrades.length} trades`,
-      tradesExecuted: executedTrades.length,
-      riskStatus: 'clear',
+      message: `Processed ${uniqueUserIds.length} users, executed ${totalTradesExecuted} total trades`,
+      totalTradesExecuted,
+      usersProcessed: uniqueUserIds.length,
       timestamp: new Date().toISOString(),
-      trades: executedTrades,
-      riskSummary: {
-        openPositions: openPositions.length,
-        maxPositions: riskSettings.max_open_positions,
-        todaysPnL,
-        dailyLossLimit: riskSettings.daily_loss_limit
-      }
+      userResults
     };
 
-    console.log(`Trade execution completed: ${executedTrades.length} trades executed`);
+    console.log(`\n=== Trade execution completed ===`);
+    console.log(`Total users processed: ${uniqueUserIds.length}`);
+    console.log(`Total trades executed: ${totalTradesExecuted}`);
 
     return new Response(
       JSON.stringify(response),
