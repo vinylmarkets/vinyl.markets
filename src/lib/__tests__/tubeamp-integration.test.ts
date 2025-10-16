@@ -296,7 +296,7 @@ describe('TubeAmpIntegrator - Signal Aggregation', () => {
 
     const signal = integrator.generateAggregatedSignal(
       'AAPL',
-      168, // Breakout: BUY
+      136, // Price below lower band (140) for mean reversion BUY, above lower Donchian for breakout BUY
       2500000,
       indicators,
       20
@@ -344,7 +344,7 @@ describe('TubeAmpIntegrator - Signal Aggregation', () => {
 
     const signal = integrator.generateAggregatedSignal(
       'AAPL',
-      168, // Breakout: BUY
+      162, // Price above upper band (160) for mean reversion SELL, above upper Donchian for breakout BUY
       2500000,
       indicators
     );
