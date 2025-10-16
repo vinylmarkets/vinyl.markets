@@ -429,17 +429,17 @@ describe('Momentum Strategy Tests', () => {
   
     describe('BUY Signals - Oversold Conditions', () => {
       it('should generate BUY signal when price below BB lower band', async () => {
-        // EXTREME oversold: stable base then accelerating crash
+        // EXTREME oversold: stable base then steep linear crash (stays positive)
         const mockData = {
           bars: Array.from({ length: 30 }, (_, i) => {
             let price, volume;
             if (i < 20) {
-              price = 120; // Stable for BB calculation
+              price = 150; // Higher stable base
               volume = 1000000;
             } else {
               const crashDays = i - 19;
-              price = 120 - (crashDays * crashDays * 2); // Quadratic crash
-              volume = 1000000 * (1 + crashDays * 0.5); // Volume spike
+              price = 150 - (crashDays * 10); // Linear crash: 150, 140, 130...50
+              volume = 1000000 * (1 + crashDays * 0.8); // Bigger volume spike
             }
             
             return {
