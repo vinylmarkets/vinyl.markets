@@ -272,7 +272,7 @@ Deno.serve(async (req) => {
     const { data: activeTraders, error: tradersError } = await supabase
       .from('user_amps')
       .select('user_id')
-      .eq('is_active', true);
+      .eq('status', 'active');
     
     if (tradersError) {
       throw new Error(`Failed to fetch active traders: ${tradersError.message}`);
