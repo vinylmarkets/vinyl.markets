@@ -929,28 +929,30 @@ describe('Momentum Strategy Tests', () => {
   
     describe('BUY Signals - Upside Breakout', () => {
       it('should generate BUY signal when price breaks above Donchian upper', async () => {
-        // Stable range then sudden breakout
+        // Stable range then explosive breakout with 50 bars for ATR
         const mockData = {
-          bars: Array.from({ length: 30 }, (_, i) => {
-            let price, volume;
-            if (i < 25) {
-              // Stable 20-day range: 90-110
-              price = 100 + (Math.sin(i) * 10);
+          bars: Array.from({ length: 50 }, (_, i) => {
+            let price, volume, range;
+            if (i < 40) {
+              // Stable 20-day range: 95-105
+              price = 100 + (Math.sin(i / 5) * 5);
               volume = 1000000;
+              range = 2;
             } else {
-              // Explosive breakout in last 5 days
-              const breakoutDays = i - 24;
-              price = 110 + (breakoutDays * breakoutDays * 5); // 110, 115, 130, 155, 190
-              volume = 1000000 * (1 + breakoutDays); // Volume surge
+              // Explosive breakout in last 10 days
+              const breakoutDays = i - 39;
+              price = 105 + (breakoutDays * breakoutDays * 3); // Quadratic breakout
+              volume = 1000000 * (1 + breakoutDays * 0.5); // Volume surge
+              range = 2 + (breakoutDays * 1.5); // Expanding volatility
             }
             
             return {
-              o: price - 2,
-              h: price + 3,
-              l: price - 3,
+              o: price - range * 0.3,
+              h: price + range,
+              l: price - range,
               c: price,
               v: volume,
-              t: new Date(Date.now() - (30-i) * 86400000).toISOString()
+              t: new Date(Date.now() - (50-i) * 86400000).toISOString()
             };
           })
         };
@@ -1037,28 +1039,28 @@ describe('Momentum Strategy Tests', () => {
       });
 
       it('should trigger BUY only when ALL conditions met', async () => {
-        // Perfect breakout: price + volume + ATR
+        // Perfect breakout: price + massive volume + huge ATR expansion
         const mockData = {
-          bars: Array.from({ length: 30 }, (_, i) => {
+          bars: Array.from({ length: 50 }, (_, i) => {
             let price, volume, range;
-            if (i < 25) {
-              price = 100;
+            if (i < 40) {
+              price = 100 + (Math.sin(i / 5) * 5);
               volume = 1000000;
-              range = 2; // Normal range
+              range = 2; // Low volatility
             } else {
-              const breakoutDays = i - 24;
-              price = 110 + (breakoutDays * 10); // Strong breakout
-              volume = 1000000 * (1 + breakoutDays * 0.5); // Volume surge
-              range = 2 + (breakoutDays * 2); // Expanding volatility
+              const breakoutDays = i - 39;
+              price = 105 + (breakoutDays * 12); // Strong linear breakout
+              volume = 1000000 * (1 + breakoutDays * 0.6); // Big volume surge
+              range = 2 + (breakoutDays * 2.5); // Massive volatility expansion
             }
             
             return {
-              o: price - range,
+              o: price - range * 0.3,
               h: price + range,
               l: price - range,
               c: price,
               v: volume,
-              t: new Date(Date.now() - (30-i) * 86400000).toISOString()
+              t: new Date(Date.now() - (50-i) * 86400000).toISOString()
             };
           })
         };
@@ -1081,26 +1083,30 @@ describe('Momentum Strategy Tests', () => {
 
     describe('SELL Signals - Downside Breakout', () => {
       it('should generate SELL signal when price breaks below Donchian lower', async () => {
-        // Stable range then downside breakdown
+        // Stable range then catastrophic breakdown with 50 bars
         const mockData = {
-          bars: Array.from({ length: 30 }, (_, i) => {
-            let price, volume;
-            if (i < 25) {
-              price = 100 + (Math.sin(i) * 10); // Range 90-110
+          bars: Array.from({ length: 50 }, (_, i) => {
+            let price, volume, range;
+            if (i < 40) {
+              // Stable range: 95-105
+              price = 100 + (Math.sin(i / 5) * 5);
               volume = 1000000;
+              range = 2;
             } else {
-              const breakdownDays = i - 24;
-              price = 90 - (breakdownDays * breakdownDays * 5); // Breakdown
-              volume = 1000000 * (1 + breakdownDays); // Volume surge
+              // Catastrophic breakdown
+              const breakdownDays = i - 39;
+              price = 95 - (breakdownDays * breakdownDays * 3); // Quadratic drop
+              volume = 1000000 * (1 + breakdownDays * 0.5); // Volume surge
+              range = 2 + (breakdownDays * 1.5); // Expanding volatility
             }
             
             return {
-              o: price + 2,
-              h: price + 3,
-              l: price - 3,
+              o: price + range * 0.3,
+              h: price + range,
+              l: price - range,
               c: price,
               v: volume,
-              t: new Date(Date.now() - (30-i) * 86400000).toISOString()
+              t: new Date(Date.now() - (50-i) * 86400000).toISOString()
             };
           })
         };
