@@ -373,11 +373,11 @@ serve(async (req) => {
 
     // Get active traders (users with active AMPs)
     console.log('Fetching active traders...');
-    const { data: activeTraders, error: tradersError } = await supabase
-      .from('user_amps')
-      .select('user_id, allocated_capital')
-      .eq('is_active', true)
-      .gt('allocated_capital', 0);
+  const { data: activeTraders, error: tradersError } = await supabase
+    .from('user_amps')
+    .select('user_id, allocated_capital')
+    .eq('status', 'active')
+    .gt('allocated_capital', 0);
 
     if (tradersError) {
       console.error('Error fetching active traders:', tradersError);
