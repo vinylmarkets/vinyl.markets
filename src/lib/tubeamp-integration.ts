@@ -55,8 +55,8 @@ export class TubeAmpIntegrator {
   private breakoutModule: BreakoutModule;
   
   private baseWeights: ModuleWeights = {
-    momentum: 0.40,
-    meanReversion: 0.30,
+    momentum: 0.45,
+    meanReversion: 0.35,
     breakout: 0.20,
   };
 
