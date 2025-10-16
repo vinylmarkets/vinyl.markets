@@ -442,10 +442,11 @@ Deno.serve(async (req) => {
       totalTradesExecuted,
       usersProcessed: uniqueUserIds.length,
       timestamp: new Date().toISOString(),
+      version: FUNCTION_VERSION,
       userResults
     };
 
-    console.log(`\n=== Trade execution completed ===`);
+    console.log(`\n=== Trade execution completed [v${FUNCTION_VERSION}] ===`);
     console.log(`Total users processed: ${uniqueUserIds.length}`);
     console.log(`Total trades executed: ${totalTradesExecuted}`);
 
