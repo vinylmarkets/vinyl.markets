@@ -3252,6 +3252,92 @@ export type Database = {
           },
         ]
       }
+      order_items: {
+        Row: {
+          amp_id: string
+          created_at: string | null
+          id: string
+          order_id: string
+          price: number
+          pricing_model: string
+        }
+        Insert: {
+          amp_id: string
+          created_at?: string | null
+          id?: string
+          order_id: string
+          price: number
+          pricing_model: string
+        }
+        Update: {
+          amp_id?: string
+          created_at?: string | null
+          id?: string
+          order_id?: string
+          price?: number
+          pricing_model?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_amp_id_fkey"
+            columns: ["amp_id"]
+            isOneToOne: false
+            referencedRelation: "amp_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          discount_amount: number | null
+          final_amount: number
+          id: string
+          promo_code: string | null
+          status: string
+          total_amount: number
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          discount_amount?: number | null
+          final_amount: number
+          id?: string
+          promo_code?: string | null
+          status?: string
+          total_amount: number
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          discount_amount?: number | null
+          final_amount?: number
+          id?: string
+          promo_code?: string | null
+          status?: string
+          total_amount?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_promo_code_fkey"
+            columns: ["promo_code"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
       paper_accounts: {
         Row: {
           account_name: string | null
@@ -4615,6 +4701,42 @@ export type Database = {
           id?: string
           updated_at?: string
           username?: string | null
+        }
+        Relationships: []
+      }
+      promo_codes: {
+        Row: {
+          code: string
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          discount_percent: number
+          expires_at: string
+          is_active: boolean | null
+          max_uses: number
+          uses_count: number | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          discount_percent: number
+          expires_at: string
+          is_active?: boolean | null
+          max_uses: number
+          uses_count?: number | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          discount_percent?: number
+          expires_at?: string
+          is_active?: boolean | null
+          max_uses?: number
+          uses_count?: number | null
         }
         Relationships: []
       }
@@ -6166,6 +6288,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_promo_code_usage: {
+        Args: { p_code: string }
+        Returns: undefined
+      }
       increment_review_helpful_count: {
         Args: { review_id: string }
         Returns: undefined
@@ -6228,6 +6354,14 @@ export type Database = {
       update_user_engagement: {
         Args: { p_event_type: string; p_user_id: string }
         Returns: undefined
+      }
+      validate_promo_code: {
+        Args: { p_code: string }
+        Returns: {
+          discount_percent: number
+          error_message: string
+          valid: boolean
+        }[]
       }
     }
     Enums: {

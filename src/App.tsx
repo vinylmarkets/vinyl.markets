@@ -49,6 +49,8 @@ import TraderAmpDetail from "./pages/trader/AmpDetail";
 import AdminAmpDetail from "./pages/admin/AmpDetail";
 import BacktestPage from "./pages/trader/BacktestPage";
 import { AmpCatalog } from "./pages/marketplace/AmpCatalog";
+import CheckoutPage from "./pages/marketplace/CheckoutPage";
+import OrderConfirmationPage from "./pages/marketplace/OrderConfirmationPage";
 import CreatorLayout from "./pages/creator/CreatorLayout";
 import CreatorDashboard from "./pages/creator/CreatorDashboard";
 import { LayerBuilder } from "./components/layers/LayerBuilder";
@@ -116,6 +118,8 @@ const App = () => {
                 <Route path="stock/:symbol" element={<StockAnalysis />} />
                 <Route path="backtest" element={<BacktestPage />} />
                 <Route path="marketplace" element={<AmpCatalog />} />
+                <Route path="checkout" element={<CheckoutPage />} />
+                <Route path="checkout/confirmation/:orderId" element={<OrderConfirmationPage />} />
                 <Route path="layers" element={<LayerDashboard />} />
                 <Route path="layers/new" element={<LayerBuilder />} />
                 <Route path="layers/:layerId/edit" element={<LayerBuilder />} />

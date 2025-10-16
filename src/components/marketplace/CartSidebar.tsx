@@ -1,4 +1,5 @@
 import { X, ShoppingCart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -13,6 +14,7 @@ interface CartSidebarProps {
 }
 
 export function CartSidebar({ open, onClose }: CartSidebarProps) {
+  const navigate = useNavigate();
   const { cart, loading, removeFromCart, clearCart, getCartSummary } = useCart();
   const summary = getCartSummary();
 
@@ -27,7 +29,8 @@ export function CartSidebar({ open, onClose }: CartSidebarProps) {
   };
 
   const handleCheckout = () => {
-    alert('Checkout flow coming in Issue #10!');
+    onClose();
+    navigate('/checkout');
   };
 
   return (
