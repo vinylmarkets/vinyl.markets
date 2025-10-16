@@ -73,6 +73,11 @@ export default function BentoDashboard() {
 
   return (
     <div className="min-h-screen bg-[#1F1F1F] p-4 md:p-6">
+      {/* DEPLOYMENT TEST MARKER */}
+      <div className="bg-red-500 text-white p-4 text-center font-bold mb-4 rounded-lg">
+        DEPLOYMENT TEST v3 - If you see this, deployment is working ✓
+      </div>
+      
       {/* Bento Grid Layout */}
       <div className="grid grid-cols-12 gap-3 md:gap-4">
         
