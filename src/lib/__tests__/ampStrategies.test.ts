@@ -929,26 +929,26 @@ describe('Momentum Strategy Tests', () => {
   
     describe('BUY Signals - Upside Breakout', () => {
       it('should generate BUY signal when price breaks above Donchian upper', async () => {
-        // Stable range then explosive breakout with 50 bars for ATR
+        // Long stable range, THEN explosive breakout ABOVE that range
         const mockData = {
           bars: Array.from({ length: 50 }, (_, i) => {
             let price, volume, range;
-            if (i < 40) {
-              // Stable 20-day range: 95-105
+            if (i < 45) {
+              // Long stable period for Donchian calculation: 95-105
               price = 100 + (Math.sin(i / 5) * 5);
               volume = 1000000;
               range = 2;
             } else {
-              // Explosive breakout in last 10 days
-              const breakoutDays = i - 39;
-              price = 105 + (breakoutDays * breakoutDays * 3); // Quadratic breakout
-              volume = 1000000 * (1 + breakoutDays * 0.5); // Volume surge
-              range = 2 + (breakoutDays * 1.5); // Expanding volatility
+              // Last 5 days: explosive breakout ABOVE 105
+              const breakoutDays = i - 44;
+              price = 105 + (breakoutDays * 20); // 125, 145, 165, 185, 205
+              volume = 1000000 * (1 + breakoutDays * 1.0); // 2x, 3x, 4x, 5x, 6x
+              range = 2 + (breakoutDays * 3); // Expanding volatility
             }
             
             return {
               o: price - range * 0.3,
-              h: price + range,
+              h: price + range * 0.5,
               l: price - range,
               c: price,
               v: volume,
@@ -1039,24 +1039,24 @@ describe('Momentum Strategy Tests', () => {
       });
 
       it('should trigger BUY only when ALL conditions met', async () => {
-        // Perfect breakout: price + massive volume + huge ATR expansion
+        // Perfect breakout: stable base then clear breakout above
         const mockData = {
           bars: Array.from({ length: 50 }, (_, i) => {
             let price, volume, range;
-            if (i < 40) {
+            if (i < 45) {
               price = 100 + (Math.sin(i / 5) * 5);
               volume = 1000000;
-              range = 2; // Low volatility
+              range = 2;
             } else {
-              const breakoutDays = i - 39;
-              price = 105 + (breakoutDays * 12); // Strong linear breakout
-              volume = 1000000 * (1 + breakoutDays * 0.6); // Big volume surge
-              range = 2 + (breakoutDays * 2.5); // Massive volatility expansion
+              const breakoutDays = i - 44;
+              price = 105 + (breakoutDays * 25); // Strong breakout: 130, 155, 180, 205, 230
+              volume = 1000000 * (1 + breakoutDays * 1.2); // Massive volume
+              range = 2 + (breakoutDays * 4); // Huge volatility expansion
             }
             
             return {
               o: price - range * 0.3,
-              h: price + range,
+              h: price + range * 0.5,
               l: price - range,
               c: price,
               v: volume,
@@ -1083,27 +1083,28 @@ describe('Momentum Strategy Tests', () => {
 
     describe('SELL Signals - Downside Breakout', () => {
       it('should generate SELL signal when price breaks below Donchian lower', async () => {
-        // Stable range then catastrophic breakdown with 50 bars
+        // Stable range then breakdown BELOW that range
         const mockData = {
           bars: Array.from({ length: 50 }, (_, i) => {
             let price, volume, range;
-            if (i < 40) {
+            if (i < 45) {
               // Stable range: 95-105
               price = 100 + (Math.sin(i / 5) * 5);
               volume = 1000000;
               range = 2;
             } else {
-              // Catastrophic breakdown
-              const breakdownDays = i - 39;
-              price = 95 - (breakdownDays * breakdownDays * 3); // Quadratic drop
-              volume = 1000000 * (1 + breakdownDays * 0.5); // Volume surge
-              range = 2 + (breakdownDays * 1.5); // Expanding volatility
+              // Last 5 days: breakdown BELOW 95
+              const breakdownDays = i - 44;
+              price = 95 - (breakdownDays * 20); // 75, 55, 35, 15, -5 → clamped
+              price = Math.max(price, 10); // Keep positive
+              volume = 1000000 * (1 + breakdownDays * 1.0);
+              range = 2 + (breakdownDays * 3);
             }
             
             return {
               o: price + range * 0.3,
               h: price + range,
-              l: price - range,
+              l: price - range * 0.5,
               c: price,
               v: volume,
               t: new Date(Date.now() - (50-i) * 86400000).toISOString()
