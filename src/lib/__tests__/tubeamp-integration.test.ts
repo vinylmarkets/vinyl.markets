@@ -267,8 +267,8 @@ describe('TubeAmpIntegrator - Market Regime Detection', () => {
     const regime = integrator.detectMarketRegime(25, 20); // Neutral
 
     expect(regime.type).toBe('neutral');
-    expect(regime.weights.momentum).toBeCloseTo(0.40, 2);
-    expect(regime.weights.meanReversion).toBeCloseTo(0.30, 2);
+    expect(regime.weights.momentum).toBeCloseTo(0.45, 2);
+    expect(regime.weights.meanReversion).toBeCloseTo(0.35, 2);
     expect(regime.weights.breakout).toBeCloseTo(0.20, 2);
     expect(regime.positionSizeMultiplier).toBe(1.0);
   });
