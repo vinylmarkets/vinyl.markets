@@ -305,7 +305,7 @@ describe('TubeAmpIntegrator - Signal Aggregation', () => {
     // Range-bound: 0.28*0.2 + 0.28*0.5 + 0.05*0.3 = 0.056 + 0.14 + 0.015 = 0.211 > 0.2 ✓
     expect(signal.shouldExecute).toBe(true);
     expect(signal.action).toBe('buy');
-    expect(signal.totalConfidence).toBeGreaterThan(0.2);
+    expect(signal.totalConfidence).toBeGreaterThan(0.15);
   });
 
   it('should not execute when confidence < threshold', () => {
@@ -325,7 +325,7 @@ describe('TubeAmpIntegrator - Signal Aggregation', () => {
 
     expect(signal.shouldExecute).toBe(false);
     expect(signal.action).toBe('hold');
-    expect(signal.totalConfidence).toBeLessThan(0.2);
+    expect(signal.totalConfidence).toBeLessThan(0.15);
   });
 
   it('should use majority vote for final action', () => {
