@@ -19,16 +19,24 @@ describe('Momentum Strategy Tests', () => {
   
   describe('Signal Generation - Perfect Conditions', () => {
     it('should generate BUY signal when all momentum conditions met', async () => {
-      // Mock VERY STRONG momentum with steep uptrend
+      // Mock ACCELERATING momentum with increasing volatility
       const mockData = {
-        bars: Array.from({ length: 50 }, (_, i) => ({
-          o: 100 + i * 4,      // Changed from i to i*4 for steeper trend
-          h: 108 + i * 4,      // Changed from 105+i to 108+i*4
-          l: 95 + i * 4,       // Changed from 95+i to 95+i*4
-          c: 105 + i * 4,      // Changed from 102+i to 105+i*4 (stronger closes)
-          v: 2000000,          // Increased volume
-          t: new Date(Date.now() - (50-i) * 86400000).toISOString()
-        }))
+        bars: Array.from({ length: 50 }, (_, i) => {
+          // Accelerating uptrend: starts slow, speeds up
+          const basePrice = 100;
+          const acceleration = Math.pow(i / 10, 2); // Quadratic
+          const price = basePrice + acceleration;
+          const volatility = 5 + (i / 10);
+          
+          return {
+            o: price - volatility * 0.3,
+            h: price + volatility,
+            l: price - volatility,
+            c: price + volatility * 0.5, // Strong closes
+            v: 1500000 + (i * 50000), // Increasing volume
+            t: new Date(Date.now() - (50-i) * 86400000).toISOString()
+          };
+        })
       };
 
       const { supabase } = await import('@/integrations/supabase/client');
@@ -421,16 +429,25 @@ describe('Momentum Strategy Tests', () => {
   
     describe('BUY Signals - Oversold Conditions', () => {
       it('should generate BUY signal when price below BB lower band', async () => {
-        // Simulate EXTREME price drop to deeply oversold
+        // EXTREME oversold: stable base then accelerating crash
         const mockData = {
           bars: Array.from({ length: 30 }, (_, i) => {
-            const drop = i < 20 ? 0 : (i - 19) * 12;  // Changed from 25/5 to 20/12 - steeper drop
+            let price, volume;
+            if (i < 20) {
+              price = 120; // Stable for BB calculation
+              volume = 1000000;
+            } else {
+              const crashDays = i - 19;
+              price = 120 - (crashDays * crashDays * 2); // Quadratic crash
+              volume = 1000000 * (1 + crashDays * 0.5); // Volume spike
+            }
+            
             return {
-              o: 120 - drop,
-              h: 125 - drop,
-              l: 115 - drop,
-              c: 120 - drop,
-              v: 3500000,      // Increased volume from 2500000
+              o: price,
+              h: price + 2,
+              l: price - 2,
+              c: price,
+              v: volume,
               t: new Date(Date.now() - (30-i) * 86400000).toISOString()
             };
           })
@@ -538,16 +555,25 @@ describe('Momentum Strategy Tests', () => {
 
     describe('SELL Signals - Overbought Conditions', () => {
       it('should generate SELL signal when price above BB upper band', async () => {
-        // Simulate EXTREME price spike to deeply overbought
+        // EXTREME overbought: stable base then accelerating spike
         const mockData = {
           bars: Array.from({ length: 30 }, (_, i) => {
-            const spike = i < 20 ? 0 : (i - 19) * 12;  // Changed from 25/5 to 20/12 - steeper spike
+            let price, volume;
+            if (i < 20) {
+              price = 100; // Stable for BB calculation
+              volume = 1000000;
+            } else {
+              const spikeDays = i - 19;
+              price = 100 + (spikeDays * spikeDays * 2); // Quadratic spike
+              volume = 1000000 * (1 + spikeDays * 0.5); // Volume spike
+            }
+            
             return {
-              o: 100 + spike,
-              h: 105 + spike,
-              l: 95 + spike,
-              c: 100 + spike,
-              v: 3500000,      // Increased volume from 2500000
+              o: price,
+              h: price + 2,
+              l: price - 2,
+              c: price,
+              v: volume,
               t: new Date(Date.now() - (30-i) * 86400000).toISOString()
             };
           })
