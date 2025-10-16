@@ -60,7 +60,7 @@ export class TubeAmpIntegrator {
     breakout: 0.20,
   };
 
-  private confidenceThreshold = 0.5;
+  private confidenceThreshold = 0.35;
 
   constructor() {
     this.momentumModule = new MomentumModule();
