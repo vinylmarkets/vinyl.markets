@@ -65,60 +65,61 @@ export function validatePositionSize(
   reason: string;
 } {
   
-  const positionValue = proposedQuantity * price;
-  const positionPct = positionValue / totalCapital;
-  
-  // Check single position limit
-  if (positionPct > limits.maxSinglePosition) {
-    const maxValue = totalCapital * limits.maxSinglePosition;
-    const adjustedQty = Math.floor(maxValue / price);
-    
-    return {
-      approved: true,
-      adjustedQuantity: adjustedQty,
-      reason: `Reduced from ${proposedQuantity} to ${adjustedQty} to respect ${(limits.maxSinglePosition * 100).toFixed(0)}% position limit`
-    };
-  }
-  
-  // Check total exposure limit
-  const currentExposure = currentPositions.reduce((sum, pos) => 
-    sum + (pos.quantity * pos.currentPrice), 0
-  );
-  const totalExposure = currentExposure + positionValue;
-  const totalExposurePct = totalExposure / totalCapital;
-  
-  if (totalExposurePct > limits.maxTotalExposure) {
-    const availableCapital = (totalCapital * limits.maxTotalExposure) - currentExposure;
-    
-    if (availableCapital <= 0) {
-      return {
-        approved: false,
-        adjustedQuantity: 0,
-        reason: `Total exposure at ${(totalExposurePct * 100).toFixed(1)}%, max ${(limits.maxTotalExposure * 100).toFixed(0)}%. No capital available.`
-      };
-    }
-    
-    const adjustedQty = Math.floor(availableCapital / price);
-    return {
-      approved: true,
-      adjustedQuantity: adjustedQty,
-      reason: `Reduced to ${adjustedQty} shares to stay within ${(limits.maxTotalExposure * 100).toFixed(0)}% exposure limit`
-    };
-  }
-  
-  // Check max positions limit
+  // VALIDATION CHECK 1: Maximum Position Count (5 positions)
   if (currentPositions.length >= limits.maxPositions) {
     return {
       approved: false,
       adjustedQuantity: 0,
-      reason: `Already at maximum ${limits.maxPositions} positions`
+      reason: `Already at maximum number of positions (${limits.maxPositions}). Cannot open new position.`
+    };
+  }
+  
+  // VALIDATION CHECK 2: Maximum Position Size (20% per position)
+  const positionValue = proposedQuantity * price;
+  const positionPercent = positionValue / totalCapital;
+  const maxPerPosition = limits.maxSinglePosition; // 0.20 (20%)
+  
+  if (positionPercent > maxPerPosition) {
+    const maxValue = totalCapital * maxPerPosition;
+    const adjustedQuantity = Math.floor(maxValue / price);
+    return {
+      approved: false,
+      reason: `Position size ${(positionPercent * 100).toFixed(1)}% exceeds maximum ${(maxPerPosition * 100)}% per position`,
+      adjustedQuantity
+    };
+  }
+  
+  // VALIDATION CHECK 3: Maximum Total Exposure (60% of capital)
+  const currentExposure = currentPositions.reduce((sum, pos) =>
+    sum + (pos.quantity * pos.currentPrice), 0
+  );
+  const totalExposure = currentExposure + positionValue;
+  const exposurePercent = totalExposure / totalCapital;
+  const maxExposure = limits.maxTotalExposure; // 0.60 (60%)
+  
+  if (exposurePercent > maxExposure) {
+    const availableCapital = (totalCapital * maxExposure) - currentExposure;
+    const adjustedQuantity = Math.max(0, Math.floor(availableCapital / price));
+    
+    if (adjustedQuantity === 0) {
+      return {
+        approved: false,
+        reason: `Total exposure at ${(exposurePercent * 100).toFixed(1)}%, max ${(maxExposure * 100)}%. No capital available.`,
+        adjustedQuantity: 0
+      };
+    }
+    
+    return {
+      approved: false,
+      reason: `Would exceed ${(maxExposure * 100)}% total exposure limit. Current: ${((currentExposure / totalCapital) * 100).toFixed(1)}%`,
+      adjustedQuantity
     };
   }
   
   return {
     approved: true,
     adjustedQuantity: proposedQuantity,
-    reason: 'Position approved'
+    reason: 'Position size approved'
   };
 }
 
@@ -134,8 +135,14 @@ export function calculateStops(
   takeProfit: number;
 } {
   
-  const stopLoss = entryPrice - (atr * limits.stopLossMultiplier);
-  const takeProfit = entryPrice + (atr * limits.takeProfitMultiplier);
+  // Handle negative ATR by using absolute value
+  const absATR = Math.abs(atr);
+  
+  // Stop loss: 2 ATR below entry price (default)
+  const stopLoss = entryPrice - (absATR * limits.stopLossMultiplier);
+  
+  // Take profit: 3 ATR above entry price (default)
+  const takeProfit = entryPrice + (absATR * limits.takeProfitMultiplier);
   
   return {
     stopLoss: Number(stopLoss.toFixed(2)),
@@ -176,27 +183,27 @@ export function checkKillSwitches(
   action: 'pause' | 'liquidate' | 'continue';
 } {
   
-  // Daily loss limit
+  // Check daily loss limit (3%)
   if (Math.abs(status.dailyPnLPercent) >= limits.maxDailyLoss) {
     return {
       triggered: true,
-      reason: `Daily loss ${(status.dailyPnLPercent * 100).toFixed(2)}% exceeds ${(limits.maxDailyLoss * 100).toFixed(0)}% limit`,
+      reason: `Daily loss limit exceeded: ${(status.dailyPnLPercent * 100).toFixed(2)}% daily loss`,
       action: 'pause'
     };
   }
   
-  // Maximum drawdown
+  // Check maximum drawdown (15%)
   if (status.currentDrawdown >= limits.maxDrawdown) {
     return {
       triggered: true,
-      reason: `Drawdown ${(status.currentDrawdown * 100).toFixed(2)}% exceeds ${(limits.maxDrawdown * 100).toFixed(0)}% limit`,
+      reason: `Maximum drawdown exceeded: ${(status.currentDrawdown * 100).toFixed(2)}% drawdown`,
       action: 'liquidate'
     };
   }
   
   return {
     triggered: false,
-    reason: 'All systems normal',
+    reason: '',
     action: 'continue'
   };
 }
@@ -339,25 +346,21 @@ function calculateConfidenceSize(params: {
   const confidence = params.signal?.confidence || 0.5;
   const atr = params.atr || params.currentPrice * 0.02;
   
-  // Base position: 2% of capital (Issue #7 spec)
-  let positionPercent = 0.02;
+  // Base allocation: 2% of capital
+  const baseAllocation = params.totalCapital * 0.02;
   
-  // Adjust by confidence (0.5x to 1.5x multiplier based on confidence)
+  // Confidence multiplier: ranges from 0.5 (confidence=0) to 1.5 (confidence=1)
   const confidenceMultiplier = 0.5 + confidence;
-  positionPercent *= confidenceMultiplier;
   
-  // Adjust by volatility (reduce size in high volatility)
-  const normalizedATR = atr / params.currentPrice;
-  const volatilityMultiplier = Math.max(0.5, 1 - normalizedATR * 2);
-  positionPercent *= volatilityMultiplier;
+  // Apply confidence multiplier to base allocation
+  const allocation = baseAllocation * confidenceMultiplier;
   
-  // Cap at maximum single position (20% per Issue #7)
-  positionPercent = Math.min(positionPercent, 0.20);
+  // Adjust for volatility (reduce position in high volatility)
+  const atrPercent = atr / params.currentPrice;
+  const volatilityAdjustment = Math.max(0.5, 1 - atrPercent);
   
-  const dollarAmount = params.totalCapital * positionPercent;
-  const shares = Math.floor(dollarAmount / params.currentPrice);
-  
-  return shares;
+  const adjustedAllocation = allocation * volatilityAdjustment;
+  return Math.floor(adjustedAllocation / params.currentPrice);
 }
 
 /**
