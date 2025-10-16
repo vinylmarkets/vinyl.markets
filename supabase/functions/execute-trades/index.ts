@@ -268,7 +268,7 @@ Deno.serve(async (req) => {
   try {
     console.log('Execute trades function starting...');
     
-    // Fetch all active users who have auto-trading enabled
+    // Fetch all users with active amps (status = 'active')
     const { data: activeTraders, error: tradersError } = await supabase
       .from('user_amps')
       .select('user_id')
