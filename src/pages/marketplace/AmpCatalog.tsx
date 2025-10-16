@@ -10,6 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { Search, Filter, Grid, List, Star, TrendingUp, Users, X } from 'lucide-react';
 import { useDebounce } from '@/hooks/use-debounce';
+import { CartButton } from '@/components/marketplace/CartButton';
+import { CartSidebar } from '@/components/marketplace/CartSidebar';
+import { useCart } from '@/hooks/use-cart';
 
 interface AmpCatalogItem {
   id: string;
@@ -45,6 +48,8 @@ const RISK_LEVELS = ['Conservative', 'Moderate', 'Aggressive'];
 
 export function AmpCatalog() {
   const navigate = useNavigate();
+  const { getCartSummary } = useCart();
+  const cartSummary = getCartSummary();
   
   // State
   const [amps, setAmps] = useState<AmpCatalogItem[]>([]);
@@ -60,6 +65,7 @@ export function AmpCatalog() {
   const [selectedRiskLevels, setSelectedRiskLevels] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState('popular');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [cartOpen, setCartOpen] = useState(false);
   
   const debouncedSearch = useDebounce(searchQuery, 300);
   
@@ -197,7 +203,13 @@ export function AmpCatalog() {
       {/* Header */}
       <div className="border-b bg-card">
         <div className="container mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold mb-4">Marketplace</h1>
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-3xl font-bold">Marketplace</h1>
+            <CartButton
+              itemCount={cartSummary.itemCount}
+              onClick={() => setCartOpen(true)}
+            />
+          </div>
           
           {/* Search Bar */}
           <div className="relative max-w-2xl">
@@ -395,6 +407,8 @@ export function AmpCatalog() {
           </main>
         </div>
       </div>
+      
+      <CartSidebar open={cartOpen} onClose={() => setCartOpen(false)} />
     </div>
   );
 }
@@ -420,6 +434,20 @@ function AmpGrid({ amps, viewMode, navigate }: { amps: AmpCatalogItem[]; viewMod
 }
 
 function AmpCardGrid({ amp, navigate }: { amp: AmpCatalogItem; navigate: any }) {
+  const { addToCart } = useCart();
+  const [isAdding, setIsAdding] = useState(false);
+
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsAdding(true);
+    await addToCart({
+      amp_id: amp.id,
+      pricing_model: amp.pricing_model === 'onetime' ? 'onetime' : 'monthly',
+      price: amp.price || 29
+    });
+    setIsAdding(false);
+  };
+
   return (
     <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/marketplace/${amp.id}`)}>
       <CardContent className="p-0">
@@ -459,15 +487,21 @@ function AmpCardGrid({ amp, navigate }: { amp: AmpCatalogItem; navigate: any }) 
             </div>
           </div>
           
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-3">
             <div>
               <span className="text-2xl font-bold">${amp.price || 29}</span>
               <span className="text-sm text-muted-foreground">/mo</span>
             </div>
-            <Button onClick={(e) => { e.stopPropagation(); navigate(`/marketplace/${amp.id}`); }}>
-              View Details
-            </Button>
           </div>
+
+          <Button 
+            className="w-full" 
+            variant="outline" 
+            onClick={handleAddToCart}
+            disabled={isAdding}
+          >
+            {isAdding ? 'Adding...' : 'Add to Cart'}
+          </Button>
         </div>
       </CardContent>
     </Card>
@@ -475,6 +509,20 @@ function AmpCardGrid({ amp, navigate }: { amp: AmpCatalogItem; navigate: any }) 
 }
 
 function AmpCardList({ amp, navigate }: { amp: AmpCatalogItem; navigate: any }) {
+  const { addToCart } = useCart();
+  const [isAdding, setIsAdding] = useState(false);
+
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsAdding(true);
+    await addToCart({
+      amp_id: amp.id,
+      pricing_model: amp.pricing_model === 'onetime' ? 'onetime' : 'monthly',
+      price: amp.price || 29
+    });
+    setIsAdding(false);
+  };
+
   return (
     <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/marketplace/${amp.id}`)}>
       <CardContent className="p-4">
@@ -519,13 +567,17 @@ function AmpCardList({ amp, navigate }: { amp: AmpCatalogItem; navigate: any }) 
           </div>
           
           {/* Right side - Price & CTA */}
-          <div className="flex flex-col items-end justify-between">
+          <div className="flex flex-col items-end justify-between gap-2">
             <div className="text-right">
               <div className="text-2xl font-bold">${amp.price || 29}</div>
               <div className="text-sm text-muted-foreground">/month</div>
             </div>
-            <Button onClick={(e) => { e.stopPropagation(); navigate(`/marketplace/${amp.id}`); }}>
-              View Details
+            <Button 
+              variant="outline" 
+              onClick={handleAddToCart}
+              disabled={isAdding}
+            >
+              {isAdding ? 'Adding...' : 'Add to Cart'}
             </Button>
           </div>
         </div>

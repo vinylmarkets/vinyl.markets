@@ -997,6 +997,44 @@ export type Database = {
         }
         Relationships: []
       }
+      cart_items: {
+        Row: {
+          added_at: string | null
+          amp_id: string
+          id: string
+          price: number
+          pricing_model: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          added_at?: string | null
+          amp_id: string
+          id?: string
+          price: number
+          pricing_model: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          added_at?: string | null
+          amp_id?: string
+          id?: string
+          price?: number
+          pricing_model?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_items_amp_id_fkey"
+            columns: ["amp_id"]
+            isOneToOne: false
+            referencedRelation: "amp_catalog"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cognee_insights: {
         Row: {
           acknowledged: boolean | null
