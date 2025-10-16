@@ -304,7 +304,7 @@ describe('TubeAmpIntegrator - Signal Aggregation', () => {
 
     expect(signal.shouldExecute).toBe(true);
     expect(signal.action).toBe('buy');
-    expect(signal.totalConfidence).toBeGreaterThan(0.35);
+    expect(signal.totalConfidence).toBeGreaterThan(0.3);
     expect(signal.breakdown.momentum.action).toBe('buy');
     expect(signal.breakdown.breakout.action).toBe('buy');
   });
@@ -326,7 +326,7 @@ describe('TubeAmpIntegrator - Signal Aggregation', () => {
 
     expect(signal.shouldExecute).toBe(false);
     expect(signal.action).toBe('hold');
-    expect(signal.totalConfidence).toBeLessThan(0.35);
+    expect(signal.totalConfidence).toBeLessThan(0.3);
   });
 
   it('should use majority vote for final action', () => {
