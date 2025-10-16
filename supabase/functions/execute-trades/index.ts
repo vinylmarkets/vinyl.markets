@@ -1,6 +1,8 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
 
+const FUNCTION_VERSION = '1.1.0'; // Fixed user_amps.status query
+
 // Initialize Supabase client
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
@@ -266,7 +268,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    console.log('Execute trades function starting...');
+    console.log(`Execute trades function starting... [v${FUNCTION_VERSION}]`);
     
     // Fetch all users with active amps (status = 'active')
     const { data: activeTraders, error: tradersError } = await supabase
