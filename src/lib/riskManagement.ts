@@ -84,7 +84,7 @@ export function validatePositionSize(
     const adjustedQuantity = Math.floor(maxValue / price);
     return {
       approved: false,
-      reason: `Position size ${(positionPercent * 100).toFixed(1)}% exceeds maximum ${(maxPerPosition * 100)}% per position`,
+      reason: `Position size ${(positionPercent * 100).toFixed(1)}% exceeds maximum. Adjusted to maximum ${(maxPerPosition * 100)}% per position`,
       adjustedQuantity
     };
   }
@@ -355,9 +355,17 @@ function calculateConfidenceSize(params: {
   // Apply confidence multiplier to base allocation
   const allocation = baseAllocation * confidenceMultiplier;
   
-  // Adjust for volatility (reduce position in high volatility)
+  // Adjust for volatility (reduce position in HIGH volatility only)
+  // Only apply adjustment when ATR > 5% of price
   const atrPercent = atr / params.currentPrice;
-  const volatilityAdjustment = Math.max(0.5, 1 - atrPercent);
+  let volatilityAdjustment = 1.0;
+  
+  if (atrPercent > 0.05) {
+    // High volatility: reduce position
+    // Formula: for every 1% ATR over 5%, reduce position by 5%
+    const excessVolatility = atrPercent - 0.05;
+    volatilityAdjustment = Math.max(0.5, 1 - (excessVolatility * 5));
+  }
   
   const adjustedAllocation = allocation * volatilityAdjustment;
   return Math.floor(adjustedAllocation / params.currentPrice);
