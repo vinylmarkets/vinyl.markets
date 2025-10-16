@@ -283,20 +283,20 @@ describe('TubeAmpIntegrator - Signal Aggregation', () => {
 
   it('should aggregate signals and execute BUY when confidence > threshold', () => {
     const indicators = createMockIndicators({
-      rsi: 68, // Momentum: BUY (high confidence)
+      rsi: 75, // Momentum: BUY (high)
       macd: { macd: 3.5, signal: 2.0, histogram: 1.5 },
-      adx: 35, // Trending market
+      adx: 25, // NEUTRAL regime (45/35/20 weights)
       sma50: 150,
-      bollingerBands: { upper: 180, middle: 165, lower: 150, bandwidth: 0.13 },
-      zScore: -0.5, // Neutral mean reversion
+      bollingerBands: { upper: 165, middle: 157, lower: 150, bandwidth: 0.13 },
+      zScore: -2.2, // Mean Reversion: BUY (moderate)
       atr: 4.5,
-      donchianChannels: { upper: 165, lower: 135 },
+      donchianChannels: { upper: 165, lower: 145 },
       volumeProfile: { avgVolume: 1000000, volumeRatio: 2.5 },
     });
 
     const signal = integrator.generateAggregatedSignal(
       'AAPL',
-      170, // Above SMA50, above Donchian upper = momentum + breakout BUY
+      148, // Below BB lower (mean rev BUY), above Donchian upper for breakout potential
       2500000,
       indicators,
       20
@@ -331,12 +331,12 @@ describe('TubeAmpIntegrator - Signal Aggregation', () => {
 
   it('should use majority vote for final action', () => {
     const indicators = createMockIndicators({
-      rsi: 68, // Momentum: BUY
+      rsi: 72, // Momentum: BUY
       macd: { macd: 3.0, signal: 2.0, histogram: 1.0 },
-      adx: 35, // Trending
+      adx: 25, // NEUTRAL regime
       sma50: 150,
       bollingerBands: { upper: 160, middle: 155, lower: 150, bandwidth: 0.13 },
-      zScore: 2.8, // Mean Reversion: SELL (overbought)
+      zScore: 2.6, // Mean Reversion: SELL
       volumeProfile: { avgVolume: 1000000, volumeRatio: 1.5 },
       donchianChannels: { upper: 165, lower: 145 },
       atr: 4.5,
@@ -344,7 +344,7 @@ describe('TubeAmpIntegrator - Signal Aggregation', () => {
 
     const signal = integrator.generateAggregatedSignal(
       'AAPL',
-      170, // Above BB upper (SELL from mean rev), above Donchian upper + above SMA (BUY from momentum + breakout)
+      168, // Above BB upper + Donchian upper + SMA = 2 BUY, 1 SELL
       2500000, // High volume for breakout
       indicators
     );
