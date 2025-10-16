@@ -283,12 +283,12 @@ describe('TubeAmpIntegrator - Signal Aggregation', () => {
 
   it('should aggregate signals and execute BUY when confidence > threshold', () => {
     const indicators = createMockIndicators({
-      rsi: 65, // Momentum: BUY
-      macd: { macd: 3.0, signal: 2.0, histogram: 1.0 },
-      adx: 32,
+      rsi: 68, // Momentum: BUY (high confidence)
+      macd: { macd: 3.5, signal: 2.0, histogram: 1.5 },
+      adx: 35, // Trending market
       sma50: 150,
-      bollingerBands: { upper: 160, middle: 150, lower: 140, bandwidth: 0.13 },
-      zScore: -2.5, // Mean Reversion: BUY
+      bollingerBands: { upper: 180, middle: 165, lower: 150, bandwidth: 0.13 },
+      zScore: -0.5, // Neutral mean reversion
       atr: 4.5,
       donchianChannels: { upper: 165, lower: 135 },
       volumeProfile: { avgVolume: 1000000, volumeRatio: 2.5 },
@@ -296,7 +296,7 @@ describe('TubeAmpIntegrator - Signal Aggregation', () => {
 
     const signal = integrator.generateAggregatedSignal(
       'AAPL',
-      136, // Price below lower band (140) for mean reversion BUY, above lower Donchian for breakout BUY
+      170, // Above SMA50, above Donchian upper = momentum + breakout BUY
       2500000,
       indicators,
       20
@@ -331,21 +331,21 @@ describe('TubeAmpIntegrator - Signal Aggregation', () => {
 
   it('should use majority vote for final action', () => {
     const indicators = createMockIndicators({
-      rsi: 65, // Momentum: BUY
+      rsi: 68, // Momentum: BUY
       macd: { macd: 3.0, signal: 2.0, histogram: 1.0 },
-      adx: 32,
+      adx: 35, // Trending
       sma50: 150,
-      bollingerBands: { upper: 160, middle: 150, lower: 140, bandwidth: 0.13 },
-      zScore: 2.5, // Mean Reversion: SELL (opposite)
-      volumeProfile: { avgVolume: 1000000, volumeRatio: 1.3 },
-      donchianChannels: { upper: 165, lower: 135 },
+      bollingerBands: { upper: 160, middle: 155, lower: 150, bandwidth: 0.13 },
+      zScore: 2.8, // Mean Reversion: SELL (overbought)
+      volumeProfile: { avgVolume: 1000000, volumeRatio: 1.5 },
+      donchianChannels: { upper: 165, lower: 145 },
       atr: 4.5,
     });
 
     const signal = integrator.generateAggregatedSignal(
       'AAPL',
-      162, // Price above upper band (160) for mean reversion SELL, above upper Donchian for breakout BUY
-      2500000,
+      170, // Above BB upper (SELL from mean rev), above Donchian upper + above SMA (BUY from momentum + breakout)
+      2500000, // High volume for breakout
       indicators
     );
 
