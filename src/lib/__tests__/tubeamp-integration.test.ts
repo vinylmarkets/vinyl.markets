@@ -286,7 +286,7 @@ describe('TubeAmpIntegrator - Signal Aggregation', () => {
       rsi: 85, // Strong momentum: (85-50)/50*0.4 = 0.28
       macd: { macd: 3.5, signal: 2.0, histogram: 1.5 },
       adx: 26, // Neutral regime (45/35/20), allows momentum to signal (ADX > 25)
-      sma50: 150,
+      sma50: 140,
       bollingerBands: { upper: 170, middle: 160, lower: 150, bandwidth: 0.13 },
       zScore: -2.8, // Strong mean reversion: 2.8/3*0.3 = 0.28
       atr: 4.5,
@@ -333,7 +333,7 @@ describe('TubeAmpIntegrator - Signal Aggregation', () => {
       rsi: 80, // Momentum: BUY
       macd: { macd: 3.0, signal: 2.0, histogram: 1.0 },
       adx: 26, // Neutral regime, allows momentum
-      sma50: 150,
+      sma50: 140,
       bollingerBands: { upper: 160, middle: 155, lower: 150, bandwidth: 0.13 },
       zScore: -2.5, // Mean Reversion: BUY
       volumeProfile: { avgVolume: 1000000, volumeRatio: 2.5 },
