@@ -7,6 +7,7 @@ import {
   Briefcase,
   ClipboardList,
   Search,
+  Star,
   Bell,
   BarChart3,
   Rewind,
@@ -58,6 +59,7 @@ const menuGroups: MenuGroup[] = [
   {
     label: "TOOLS",
     items: [
+      { label: "Watchlists", icon: Star, path: "/trader/watchlists" },
       { label: "Research", icon: Search, path: "/trader/research", comingSoon: true },
       { label: "Alerts", icon: Bell, path: "/trader/alerts" },
       { label: "Reports", icon: BarChart3, path: "/trader/reporting" },
