@@ -51,6 +51,7 @@ const menuGroups: MenuGroup[] = [
       { label: "Dashboard", icon: Home, path: "/trader" },
       { label: "Amps", icon: Music, path: "/trader/amps" },
       { label: "Layers", icon: Layers, path: "/trader/layers" },
+      { label: "Watchlists", icon: Star, path: "/trader/watchlists" },
       { label: "Performance", icon: TrendingUp, path: "/trader/performance" },
       { label: "Positions", icon: Briefcase, path: "/trader/positions", comingSoon: true },
       { label: "Orders", icon: ClipboardList, path: "/trader/orders", comingSoon: true },
@@ -59,7 +60,6 @@ const menuGroups: MenuGroup[] = [
   {
     label: "TOOLS",
     items: [
-      { label: "Watchlists", icon: Star, path: "/trader/watchlists" },
       { label: "Research", icon: Search, path: "/trader/research", comingSoon: true },
       { label: "Alerts", icon: Bell, path: "/trader/alerts" },
       { label: "Reports", icon: BarChart3, path: "/trader/reporting" },
