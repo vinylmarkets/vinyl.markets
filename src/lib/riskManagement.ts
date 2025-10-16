@@ -324,25 +324,38 @@ function calculateVolatilitySize(params: {
 }
 
 /**
- * Confidence-based sizing
+ * Confidence-based sizing (Issue #7 specification)
+ * Base: 2% of capital
+ * Adjusted by: signal confidence
+ * Adjusted by: volatility (ATR)
  */
 function calculateConfidenceSize(params: {
   totalCapital: number;
   currentPrice: number;
   signal?: AggregatedSignal;
+  atr?: number;
 }): number {
   
   const confidence = params.signal?.confidence || 0.5;
+  const atr = params.atr || params.currentPrice * 0.02;
   
-  // Scale position size with confidence
-  // 0.5 confidence = 1% of capital
-  // 1.0 confidence = 3% of capital
-  const basePercent = 0.01;
-  const maxPercent = 0.03;
-  const scaledPercent = basePercent + (confidence * (maxPercent - basePercent));
+  // Base position: 2% of capital (Issue #7 spec)
+  let positionPercent = 0.02;
   
-  const dollarRisk = params.totalCapital * scaledPercent;
-  const shares = Math.floor(dollarRisk / params.currentPrice);
+  // Adjust by confidence (0.5x to 1.5x multiplier based on confidence)
+  const confidenceMultiplier = 0.5 + confidence;
+  positionPercent *= confidenceMultiplier;
+  
+  // Adjust by volatility (reduce size in high volatility)
+  const normalizedATR = atr / params.currentPrice;
+  const volatilityMultiplier = Math.max(0.5, 1 - normalizedATR * 2);
+  positionPercent *= volatilityMultiplier;
+  
+  // Cap at maximum single position (20% per Issue #7)
+  positionPercent = Math.min(positionPercent, 0.20);
+  
+  const dollarAmount = params.totalCapital * positionPercent;
+  const shares = Math.floor(dollarAmount / params.currentPrice);
   
   return shares;
 }

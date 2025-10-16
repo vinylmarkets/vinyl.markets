@@ -317,7 +317,7 @@ export async function runBreakoutStrategy(
       // Calculate ATR moving average
       const atrValues: number[] = [];
       for (let i = atrPeriod; i < marketData.length; i++) {
-        const slice = marketData.slice(i - atrPeriod, i);
+        const slice = marketData.slice(i - atrPeriod, i + 1); // Fixed: need period + 1 bars for ATR
         atrValues.push(calculateATR(slice, atrPeriod));
       }
       const atrMA = calculateSMA(atrValues, Math.min(14, atrValues.length));
@@ -391,12 +391,15 @@ export async function runBreakoutStrategy(
 
 /**
  * Helper: Calculate Donchian Channels
+ * Fixed: Exclude current bar to avoid look-ahead bias
  */
 function calculateDonchianChannels(
   bars: PriceBar[], 
   period: number = 20
 ): { upper: number; lower: number; middle: number } {
-  const recentBars = bars.slice(-period);
+  // Use bars EXCLUDING the current bar to avoid look-ahead bias
+  // For breakout detection, we want to know if current price breaks ABOVE/BELOW the previous period's range
+  const recentBars = bars.slice(-(period + 1), -1);
   const highs = recentBars.map(b => b.high);
   const lows = recentBars.map(b => b.low);
   

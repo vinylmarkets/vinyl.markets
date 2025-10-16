@@ -943,7 +943,7 @@ describe('Momentum Strategy Tests', () => {
               const breakoutDays = i - 44;
               price = 105 + (breakoutDays * 20); // 125, 145, 165, 185, 205
               volume = 1000000 * (1 + breakoutDays * 1.0); // 2x, 3x, 4x, 5x, 6x
-              range = 2 + (breakoutDays * 3); // Expanding volatility
+              range = 2; // Keep range small so high doesn't exceed close on final bar
             }
             
             return {
@@ -1051,7 +1051,7 @@ describe('Momentum Strategy Tests', () => {
               const breakoutDays = i - 44;
               price = 105 + (breakoutDays * 25); // Strong breakout: 130, 155, 180, 205, 230
               volume = 1000000 * (1 + breakoutDays * 1.2); // Massive volume
-              range = 2 + (breakoutDays * 4); // Huge volatility expansion
+              range = 2; // Keep range small for clear breakout
             }
             
             return {
@@ -1098,7 +1098,7 @@ describe('Momentum Strategy Tests', () => {
               price = 95 - (breakdownDays * 20); // 75, 55, 35, 15, -5 → clamped
               price = Math.max(price, 10); // Keep positive
               volume = 1000000 * (1 + breakdownDays * 1.0);
-              range = 2 + (breakdownDays * 3);
+              range = 2; // Keep range small for clear breakdown
             }
             
             return {
