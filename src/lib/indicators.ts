@@ -86,14 +86,23 @@ export function calculateMACD(
     throw new Error(`Insufficient data for MACD. Need at least ${slowPeriod + signalPeriod} prices.`);
   }
 
-  const fastEMA = calculateEMA(prices, fastPeriod);
-  const slowEMA = calculateEMA(prices, slowPeriod);
-  const macdLine = fastEMA - slowEMA;
+  // Calculate MACD line for all periods
+  const macdValues: number[] = [];
+  for (let i = slowPeriod; i <= prices.length; i++) {
+    const slice = prices.slice(0, i);
+    const fastEMA = calculateEMA(slice, fastPeriod);
+    const slowEMA = calculateEMA(slice, slowPeriod);
+    macdValues.push(fastEMA - slowEMA);
+  }
+
+  // Get the most recent MACD value
+  const macdLine = macdValues[macdValues.length - 1];
 
   // Calculate signal line (EMA of MACD values)
-  // For simplicity, we'll use a simple approximation
-  const macdValues = [macdLine]; // In production, calculate for all periods
-  const signalLine = calculateEMA(macdValues.concat([macdLine]), signalPeriod);
+  const signalLine = macdValues.length >= signalPeriod 
+    ? calculateEMA(macdValues, signalPeriod)
+    : macdLine;
+
   const histogram = macdLine - signalLine;
 
   return {
