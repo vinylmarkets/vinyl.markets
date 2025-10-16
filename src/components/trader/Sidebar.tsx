@@ -1,3 +1,4 @@
+// Sidebar v2.0 - Updated with Watchlists in TRADING section
 import React, { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
