@@ -285,7 +285,7 @@ describe('TubeAmpIntegrator - Signal Aggregation', () => {
     const indicators = createMockIndicators({
       rsi: 85, // Strong momentum: (85-50)/50*0.4 = 0.28
       macd: { macd: 3.5, signal: 2.0, histogram: 1.5 },
-      adx: 18, // Range-bound regime (20/50/30)
+      adx: 26, // Neutral regime (45/35/20), allows momentum to signal (ADX > 25)
       sma50: 150,
       bollingerBands: { upper: 170, middle: 160, lower: 150, bandwidth: 0.13 },
       zScore: -2.8, // Strong mean reversion: 2.8/3*0.3 = 0.28
@@ -302,7 +302,7 @@ describe('TubeAmpIntegrator - Signal Aggregation', () => {
       20
     );
 
-    // Range-bound: 0.28*0.2 + 0.28*0.5 + 0.05*0.3 = 0.056 + 0.14 + 0.015 = 0.211 > 0.2 ✓
+    // Neutral (45/35/20): momentum 0.28*0.45 + meanRev 0.28*0.35 + breakout 0.05*0.2 = 0.126 + 0.098 + 0.01 = 0.234 > 0.15 ✓
     expect(signal.shouldExecute).toBe(true);
     expect(signal.action).toBe('buy');
     expect(signal.totalConfidence).toBeGreaterThan(0.15);
@@ -332,7 +332,7 @@ describe('TubeAmpIntegrator - Signal Aggregation', () => {
     const indicators = createMockIndicators({
       rsi: 80, // Momentum: BUY
       macd: { macd: 3.0, signal: 2.0, histogram: 1.0 },
-      adx: 18, // Range-bound
+      adx: 26, // Neutral regime, allows momentum
       sma50: 150,
       bollingerBands: { upper: 160, middle: 155, lower: 150, bandwidth: 0.13 },
       zScore: -2.5, // Mean Reversion: BUY
