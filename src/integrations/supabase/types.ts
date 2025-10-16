@@ -453,6 +453,89 @@ export type Database = {
         }
         Relationships: []
       }
+      amp_performance: {
+        Row: {
+          avg_loss: number
+          avg_win: number
+          created_at: string | null
+          cumulative_losses: number
+          cumulative_pnl: number
+          cumulative_trades: number
+          cumulative_wins: number
+          current_drawdown: number
+          date: string
+          id: string
+          largest_loss: number
+          largest_win: number
+          losing_trades: number
+          max_drawdown: number
+          realized_pnl: number
+          total_pnl: number
+          trades_executed: number
+          unrealized_pnl: number
+          updated_at: string | null
+          user_amp_id: string
+          win_rate: number
+          winning_trades: number
+        }
+        Insert: {
+          avg_loss?: number
+          avg_win?: number
+          created_at?: string | null
+          cumulative_losses?: number
+          cumulative_pnl?: number
+          cumulative_trades?: number
+          cumulative_wins?: number
+          current_drawdown?: number
+          date: string
+          id?: string
+          largest_loss?: number
+          largest_win?: number
+          losing_trades?: number
+          max_drawdown?: number
+          realized_pnl?: number
+          total_pnl?: number
+          trades_executed?: number
+          unrealized_pnl?: number
+          updated_at?: string | null
+          user_amp_id: string
+          win_rate?: number
+          winning_trades?: number
+        }
+        Update: {
+          avg_loss?: number
+          avg_win?: number
+          created_at?: string | null
+          cumulative_losses?: number
+          cumulative_pnl?: number
+          cumulative_trades?: number
+          cumulative_wins?: number
+          current_drawdown?: number
+          date?: string
+          id?: string
+          largest_loss?: number
+          largest_win?: number
+          losing_trades?: number
+          max_drawdown?: number
+          realized_pnl?: number
+          total_pnl?: number
+          trades_executed?: number
+          unrealized_pnl?: number
+          updated_at?: string | null
+          user_amp_id?: string
+          win_rate?: number
+          winning_trades?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "amp_performance_user_amp_id_fkey"
+            columns: ["user_amp_id"]
+            isOneToOne: false
+            referencedRelation: "user_amps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       amp_reviews: {
         Row: {
           amp_id: string
